@@ -68,7 +68,7 @@ function render() {
     const picture = p.photo || `assets/players/${entry.playerId}.png`;
     return `<a class="player-card glass" href="index.html?player=${encodeURIComponent(entry.playerId)}">
       <span class="player-avatar"><img src="${esc(picture)}" alt="" loading="lazy"></span>
-      <span class="player-card-copy"><b>${esc(p.tag || entry.tag)}</b>${p.sponsor ? `<span class="mono muted player-sponsor">${esc(p.sponsor)}</span>` : ''}<span class="muted">${esc(location || games.map(g => g.name).join(' · ') || 'Player')}</span></span>
+      <span class="player-card-copy">${p.sponsor ? `<span class="mono muted player-sponsor">${esc(p.sponsor)}</span>` : ''}<b>${esc(p.tag || entry.tag)}</b><span class="muted">${esc(location || games.map(g => g.name).join(' · ') || 'Player')}</span></span>
       <span class="player-card-meta"><b>${events}</b><span class="mono muted">${eventLabel}</span></span>
     </a>`;
   }).join('') : '<div class="panel glass empty-state"><h2>No matches</h2><p class="muted">Try another player name, tag, sponsor or game.</p></div>';

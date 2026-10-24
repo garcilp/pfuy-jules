@@ -12,9 +12,46 @@ const fmt = d => d ? new Date(`${d}T00:00:00`).toLocaleDateString('en-US', { mon
 const fmtMonthYear = d => d ? new Date(d.includes('T') ? d : `${d}T00:00:00`).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : '';
 const profileId = new URLSearchParams(location.search).get('player');
 let data;
+let playerDirectory = [];
+let playerTagToIdMap = new Map();
 let resultPage = 1;
 let selectedOpponent = null;
 let selectedBestPlacement = null;
+
+async function loadPlayerDirectory() {
+  try {
+    const res = await fetch('data/profiles/index.json', { cache: 'no-store' });
+    if (res.ok) {
+      playerDirectory = await res.json();
+      playerDirectory.forEach(item => {
+        if (item.tag) {
+          const normTag = String(item.tag).trim().replace(/\s+/g, ' ').toLowerCase();
+          if (!playerTagToIdMap.has(normTag)) {
+            playerTagToIdMap.set(normTag, item.playerId);
+          }
+        }
+      });
+    }
+  } catch (e) {
+    console.error('Failed to load player directory index for opponent linking', e);
+  }
+}
+
+function linkifyOpponent(nameStr) {
+  if (!nameStr || nameStr === '—' || nameStr === 'Unknown') return esc(nameStr || '—');
+  const parts = String(nameStr).split(/\s*([,/])\s*/);
+  return parts.map((part, i) => {
+    if (i % 2 === 1) return esc(part); // separator
+    const trimmed = part.trim();
+    if (!trimmed) return '';
+    const norm = trimmed.replace(/\s+/g, ' ').toLowerCase();
+    const pid = playerTagToIdMap.get(norm);
+    if (pid) {
+      return `<a class="opponent-link" href="index.html?player=${encodeURIComponent(pid)}">${esc(trimmed)}</a>`;
+    }
+    return esc(trimmed);
+  }).join(' ');
+}
 
 async function loadProfile() {
   let profileUrl = 'data/mint.json';
@@ -47,7 +84,7 @@ async function loadProfile() {
   return response.json();
 }
 
-loadProfile().then(d => {
+Promise.all([loadProfile(), loadPlayerDirectory()]).then(([d]) => {
   data = d;
   render();
   addEventListener('hashchange', () => { resultPage = 1; render(); });
@@ -99,7 +136,7 @@ function render() {
   const bestEvent = bestResults.length > 1 ? `${bestResults.length} times` : bestResults[0]?.event?.split(' · ')[0] || 'No placement recorded';
   const scoreGames = score => {
     const match = String(score || '').match(/^\s*(\d+)\s*[-–—:]\s*(\d+)\s*$/);
-    return match ? Number(match[1]) + Number(match[2]) : null;
+    return match ? { own: Number(match[1]), opp: Number(match[2]), total: Number(match[1]) + Number(match[2]) } : null;
   };
   const stats = [
     ...(!sel ? [['EVENTS ENTERED', ev, ev === 1 ? '' : `Across ${G.length} game${G.length === 1 ? '' : 's'}`]] : []),
@@ -110,16 +147,18 @@ function render() {
     const upsetCount = Number(sel.upsets) || 0;
     const seededLosses = (sel.results || []).flatMap(result => result.sets || [])
       .filter(set => set.outcome === 'loss' && Number(set.opponentSeed) > 0)
-      .map(set => ({ ...set, gameScore: scoreGames(set.score) }))
+      .map(set => ({ ...set, parsedScore: scoreGames(set.score) }))
+      .filter(set => set.parsedScore && set.parsedScore.own > 0)
       .sort((a, b) => Number(a.opponentSeed) - Number(b.opponentSeed)
-        || (b.gameScore?.total || 0) - (a.gameScore?.total || 0));
+        || (b.parsedScore?.own || 0) - (a.parsedScore?.own || 0)
+        || (b.parsedScore?.total || 0) - (a.parsedScore?.total || 0));
     const closestLoss = seededLosses[0];
     const closestLossDetail = closestLoss
-      ? `Seed ${closestLoss.opponentSeed}${closestLoss.gameScore ? ` (Game ${closestLoss.gameScore})` : ''}`
+      ? `Seed ${closestLoss.opponentSeed}${closestLoss.score ? ` (${closestLoss.score})` : ''}`
       : 'No seeded losses recorded';
     const upsetStat = upsetCount > 0
       ? ['UPSET WINS', upsetCount, 'Higher seeds beaten']
-      : ['CLOSEST UPSET', closestLoss?.opponent || '—', closestLossDetail];
+      : ['CLOSEST UPSET', linkifyOpponent(closestLoss?.opponent), closestLossDetail];
     stats.push(['BEST PLACING', ord(bestPlace), bestEvent], upsetStat);
   } else {
     const tournamentDates = games.flatMap(game => (game.results || []).map(result => result.date))
@@ -161,7 +200,7 @@ function render() {
     const [oppName, opp] = Object.entries(tot).sort((x, y) => y[1].sets - x[1].sets)[0] || ['—', null];
     mostPlayedOpponent = opp ? oppName : null;
     stats.push(['ACTIVE FOR', singleEventResult ? '1 Event' : activeDuration, activityPeriod],
-      ['MOST-PLAYED OPPONENT', oppName, opp ? `${opp.sets} sets · ${opp.wins}–${opp.sets - opp.wins} · ${opp.games} game${opp.games === 1 ? '' : 's'}` : 'No set data']);
+      ['MOST-PLAYED OPPONENT', linkifyOpponent(oppName), opp ? `${opp.sets} sets · ${opp.wins}–${opp.sets - opp.wins} · ${opp.games} game${opp.games === 1 ? '' : 's'}` : 'No set data']);
   }
   const notableWinsList = [];
   const seenOpponents = new Map();
@@ -185,8 +224,10 @@ function render() {
   }
   const notableWins = notableWinsList.slice(0, 4);
   const mainCharacter = sel?.characters?.find(c => String(c.name || '').toLowerCase() !== 'other');
+  const mainCharSlug = mainCharacter ? slug(mainCharacter.name) : 'other';
+  const mainCharName = mainCharacter ? mainCharacter.name : 'other';
   const characterFeatureTile = sel
-    ? `<div class="tile glass character-feature-tile">${mainCharacter ? `<img src="assets/renders/${esc(sel.slug)}/full/${slug(mainCharacter.name)}.png" alt="${esc(mainCharacter.name)}" onerror="this.remove()">` : ''}</div>`
+    ? `<div class="tile glass character-feature-tile"><img src="assets/renders/${esc(sel.slug)}/full/${mainCharSlug}.png" alt="${esc(mainCharName)}" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='assets/renders/${esc(sel.slug)}/full/other.png'}else{this.remove()}"></div>`
     : '';
   const tiles = stats.map(([a, b, c]) => {
     const tileClass = `tile glass${a === 'MOST-PLAYED OPPONENT' ? ' tile-opponent' : a === 'BEST PLACING' ? ' tile-best-placement' : a === 'ACTIVE FOR' ? ' tile-active-for' : a === 'CLOSEST UPSET' ? ' tile-upset-fallback' : ''}`;
@@ -202,12 +243,12 @@ function render() {
   if (!sel) {
     middle = `<h2 class="sec" style="margin:4px 4px 0">Games played</h2><div class="cards">` +
       gamesBySetsPlayed.map(g => {
-        const character = g.characters?.[0]?.name;
+          const character = g.characters?.[0]?.name || 'other';
         const eventWins = (g.results || []).filter(result => Number(result.place) === 1).length;
         const bestLabel = eventWins
           ? `Won ${eventWins} event${eventWins === 1 ? '' : 's'}`
           : `Best: ${ord(g.bestPlace)}`;
-        return `<a class="card glass" href="#${encodeURIComponent(g.id)}">${character ? `<span class="ini">${esc(character[0])}</span><img class="bg" src="assets/renders/${esc(g.slug)}/portraits/${slug(character)}.png" alt="" onload="this.previousElementSibling.remove()" onerror="this.remove()">` : ''}
+          return `<a class="card glass" href="#${encodeURIComponent(g.id)}"><span class="ini">${esc(character[0])}</span><img class="bg" src="assets/renders/${esc(g.slug)}/portraits/${slug(character)}.png" alt="" onload="this.previousElementSibling.remove()" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='assets/renders/${esc(g.slug)}/portraits/other.png'}else{this.remove()}">
         <b>${esc(g.name)}</b><span class="muted">${g.events} event${g.events === 1 ? '' : 's'}</span>
         <span class="rec">${g.wins}–${g.losses}</span><span class="muted">${bestLabel}</span></a>`;
       }).join('') + `</div>`;
@@ -228,10 +269,20 @@ function render() {
         const metaHtml = count > 1
           ? `${count} times <span aria-hidden="true">·</span> Latest: ${tourneyAndDate}`
           : tourneyAndDate;
-        return `<div class="win"><span class="win-main"><b class="win-opponent">${esc(x.opponent)}</b><small class="win-meta">${metaHtml}</small></span><span class="mono muted win-detail">${esc(x.score || x.detail?.split(' · ')[0] || '—')}</span></div>`;
+        return `<div class="win"><span class="win-main"><b class="win-opponent">${linkifyOpponent(x.opponent)}</b><small class="win-meta">${metaHtml}</small></span><span class="mono muted win-detail">${esc(x.score || x.detail?.split(' · ')[0] || '—')}</span></div>`;
       }).join('') || '<p class="muted">No notable wins recorded.</p>'}</div>
     </div>
-    <div class="panel glass"><h2>Placement history</h2>${chart(sel)}</div>`;
+    <div class="panel glass">
+      <div class="chart-header">
+        <h2 style="margin:0">Placement history</h2>
+        <div class="chart-controls">
+          <button class="quiet-button chart-zoom-in" type="button" title="Zoom In">+</button>
+          <button class="quiet-button chart-zoom-out" type="button" title="Zoom Out">−</button>
+          <button class="quiet-button chart-zoom-reset" type="button" title="Reset Zoom">Reset</button>
+        </div>
+      </div>
+      ${chart(sel)}
+    </div>`;
   }
 
   const opponentHistory = !sel && selectedOpponent && selectedOpponent === mostPlayedOpponent
@@ -243,7 +294,7 @@ function render() {
           .map(set => ({ ...set, game: game.name, event: result.event, date: result.date }))))
         .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
       const rows = sets.map(set => `<div class="opponent-set-row"><span class="opponent-set-context"><b>${esc((set.event || '').split(' · ')[0])}</b><small>${esc(set.game)}${set.round ? ` · ${esc(set.round)}` : ''}</small></span><span class="opponent-set-score">${esc(set.score || '—')}</span><span class="set-result ${['win', 'loss'].includes(set.outcome) ? set.outcome : 'unknown'}">${set.outcome === 'win' ? 'WIN' : set.outcome === 'loss' ? 'LOSS' : 'UNKNOWN'}</span></div>`).join('');
-      return `<div class="panel glass opponent-history" id="opponent-history"><div class="opponent-history-heading"><h2>Sets vs ${esc(selectedOpponent)}</h2><button class="quiet-button close-opponent-history" type="button">Close</button></div>${rows || '<p class="muted">No set details were recorded against this opponent.</p>'}</div>`;
+      return `<div class="panel glass opponent-history" id="opponent-history"><div class="opponent-history-heading"><h2>Sets vs ${linkifyOpponent(selectedOpponent)}</h2><button class="quiet-button close-opponent-history" type="button">Close</button></div>${rows || '<p class="muted">No set details were recorded against this opponent.</p>'}</div>`;
     })()
     : '';
   const bestPlacementHistory = sel && selectedBestPlacement === sel.id
@@ -277,7 +328,7 @@ function render() {
         const roundHtml = (!isPools && set.round) ? `<small>${esc(set.round)}</small>` : '';
         return `<div class="set-row">
           <span class="set-phase"><b>${esc(set.phase || 'Phase not recorded')}</b>${roundHtml}</span>
-          <span class="set-opponent">${esc(set.opponent || 'Unknown')}</span>
+          <span class="set-opponent">${linkifyOpponent(set.opponent || 'Unknown')}</span>
           <span class="set-score">${esc(set.score || '—')}</span>
           <span class="set-result ${outcome}">${outcome === 'unknown' ? 'RESULT UNKNOWN' : outcome.toUpperCase()}</span>
         </div>`;
@@ -325,6 +376,120 @@ function render() {
       details.hidden = expanded;
     });
   });
+
+  setupInteractiveChart();
+}
+
+let chartZoom = 1;
+let chartPanX = 0;
+
+function setupInteractiveChart() {
+  const container = $('#main .chart-container');
+  if (!container) return;
+  const svg = container.querySelector('svg');
+  const tooltip = $('#chart-tooltip');
+  if (!svg || !tooltip) return;
+
+  const baseWidth = 640;
+  const baseHeight = 150;
+
+  function updateTransform() {
+    chartZoom = Math.max(1, Math.min(5, chartZoom));
+    const visibleWidth = baseWidth / chartZoom;
+    const maxPanX = baseWidth - visibleWidth;
+    chartPanX = Math.max(0, Math.min(maxPanX, chartPanX));
+    svg.setAttribute('viewBox', `${chartPanX} 0 ${visibleWidth} ${baseHeight}`);
+  }
+
+  $('#main .chart-zoom-in')?.addEventListener('click', () => {
+    chartZoom *= 1.4;
+    updateTransform();
+  });
+
+  $('#main .chart-zoom-out')?.addEventListener('click', () => {
+    chartZoom /= 1.4;
+    if (chartZoom <= 1) { chartZoom = 1; chartPanX = 0; }
+    updateTransform();
+  });
+
+  $('#main .chart-zoom-reset')?.addEventListener('click', () => {
+    chartZoom = 1;
+    chartPanX = 0;
+    updateTransform();
+  });
+
+  // Wheel zoom
+  const wrap = container.querySelector('.chart-svg-wrap');
+  wrap?.addEventListener('wheel', e => {
+    e.preventDefault();
+    const zoomFactor = e.deltaY < 0 ? 1.2 : 1 / 1.2;
+    const mouseX = e.offsetX / wrap.clientWidth;
+    const oldVisibleWidth = baseWidth / chartZoom;
+    chartZoom = Math.max(1, Math.min(5, chartZoom * zoomFactor));
+    const newVisibleWidth = baseWidth / chartZoom;
+    chartPanX += (oldVisibleWidth - newVisibleWidth) * mouseX;
+    updateTransform();
+  }, { passive: false });
+
+  // Pan dragging
+  let isDragging = false;
+  let startX = 0;
+
+  wrap?.addEventListener('pointerdown', e => {
+    if (e.target.closest('.chart-point')) return;
+    isDragging = true;
+    startX = e.clientX;
+    wrap.setPointerCapture(e.pointerId);
+  });
+
+  wrap?.addEventListener('pointermove', e => {
+    if (!isDragging) return;
+    const dx = e.clientX - startX;
+    startX = e.clientX;
+    const visibleWidth = baseWidth / chartZoom;
+    const svgDx = (dx / wrap.clientWidth) * visibleWidth;
+    chartPanX -= svgDx;
+    updateTransform();
+  });
+
+  const stopDrag = e => {
+    if (isDragging) {
+      isDragging = false;
+      try { wrap?.releasePointerCapture(e.pointerId); } catch (_) {}
+    }
+  };
+  wrap?.addEventListener('pointerup', stopDrag);
+  wrap?.addEventListener('pointercancel', stopDrag);
+
+  // Hover Tooltip for points
+  container.querySelectorAll('.chart-point').forEach(point => {
+    const showTooltip = () => {
+      const tourney = point.dataset.tourney;
+      const date = point.dataset.date;
+      const place = point.dataset.place;
+      tooltip.innerHTML = `<b>${esc(tourney)}</b><small>${fmt(date)}</small><div class="chart-place">${ord(place)} Place</div>`;
+      tooltip.hidden = false;
+
+      const rect = point.getBoundingClientRect();
+      const wrapRect = wrap.getBoundingClientRect();
+      const x = rect.left + rect.width / 2 - wrapRect.left;
+      const y = rect.top - wrapRect.top;
+
+      tooltip.style.left = `${x}px`;
+      tooltip.style.top = `${y}px`;
+    };
+
+    const hideTooltip = () => {
+      tooltip.hidden = true;
+    };
+
+    point.addEventListener('mouseenter', showTooltip);
+    point.addEventListener('focus', showTooltip);
+    point.addEventListener('mouseleave', hideTooltip);
+    point.addEventListener('blur', hideTooltip);
+  });
+
+  updateTransform();
 }
 
 function fitPlayerName() {
@@ -355,12 +520,33 @@ function chart(g) {
   const rs = [...(g.results || [])].filter(r => r.place != null && Number.isFinite(Number(r.place)) && Number(r.place) > 0 && r.date).sort((a, b) => a.date.localeCompare(b.date));
   if (!rs.length) return '<p class="muted">No placement history recorded.</p>';
   const maxP = Math.max(4, ...rs.map(r => Number(r.place)));
-  const pts = rs.map((r, i) => [40 + i * 560 / Math.max(1, rs.length - 1), 15 + (r.place - 1) / (maxP - 1) * 90]);
-  const last = pts[pts.length - 1];
-  return `<svg viewBox="0 0 640 130" role="img" aria-label="Placement over recent events">
-    <line x1="40" y1="15" x2="620" y2="15" stroke="rgba(255,255,255,.2)"/><line x1="40" y1="105" x2="620" y2="105" stroke="rgba(255,255,255,.2)"/>
-    <text x="0" y="19">1st</text><text x="0" y="109">${ord(maxP)}</text>
-    <polyline points="${pts.map(p => p.map(Math.round).join(',')).join(' ')}" fill="none" stroke="#9FD6FF" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
-    <circle cx="${Math.round(last[0])}" cy="${Math.round(last[1])}" r="6" fill="#9FD6FF"/>
-    <text x="40" y="127">Oldest</text><text x="560" y="127">Latest</text></svg>`;
+  const pts = rs.map((r, i) => {
+    const x = rs.length === 1 ? 330 : 40 + i * 560 / (rs.length - 1);
+    const y = maxP === 1 ? 60 : 15 + (r.place - 1) / (maxP - 1) * 90;
+    return { x: Math.round(x), y: Math.round(y), result: r };
+  });
+
+  const polylinePoints = pts.map(p => `${p.x},${p.y}`).join(' ');
+  const pointsHtml = pts.map(p => {
+    const tourneyName = (p.result.event || '').split(' · ')[0];
+    return `<g class="chart-point" tabindex="0" data-tourney="${esc(tourneyName)}" data-date="${esc(p.result.date)}" data-place="${esc(p.result.place)}">
+      <circle cx="${p.x}" cy="${p.y}" r="5" />
+    </g>`;
+  }).join('');
+
+  return `<div class="chart-container">
+    <div class="chart-svg-wrap">
+      <svg viewBox="0 0 640 150" role="img" aria-label="Placement over recent events">
+        <line x1="40" y1="15" x2="620" y2="15" stroke="rgba(255,255,255,.2)"/>
+        <line x1="40" y1="105" x2="620" y2="105" stroke="rgba(255,255,255,.2)"/>
+        <text x="0" y="19">1st</text>
+        <text x="0" y="109">${ord(maxP)}</text>
+        <polyline points="${polylinePoints}" fill="none" stroke="#9FD6FF" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+        ${pointsHtml}
+        <text x="40" y="140">Oldest</text>
+        <text x="560" y="140">Latest</text>
+      </svg>
+    </div>
+    <div class="chart-tooltip" id="chart-tooltip" hidden></div>
+  </div>`;
 }
