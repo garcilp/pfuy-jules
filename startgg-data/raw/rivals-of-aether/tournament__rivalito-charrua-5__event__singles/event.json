@@ -1,0 +1,44 @@
+{
+  "fetchedAt": "2026-10-23T14:42:24.809380+00:00",
+  "sourceUrl": "http://start.gg/tournament/rivalito-charrua-5/event/singles",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/rivalito-charrua-5/event/singles"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1085040,
+        "name": "Singles",
+        "numEntrants": 13,
+        "tournament": {
+          "id": 641831,
+          "name": "Rivalito Charrua #5",
+          "slug": "tournament/rivalito-charrua-5",
+          "images": [
+            {
+              "url": "https://images.start.gg/images/tournament/641831/image-6c6dd66a8677ddcda3114e540be3952d.png?ehk=eYYiow27ao6S7oJxjmqQS1%2B%2FXk73bU3qELeS0zRu21s%3D&ehkOptimized=LIUFpq24JgIDdsbHxID45k7voJiG2PtRnLi2b6eQFLI%3D",
+              "type": "profile"
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

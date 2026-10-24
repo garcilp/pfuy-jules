@@ -1,0 +1,326 @@
+{
+  "fetchedAt": "2026-10-22T21:49:24.293266+00:00",
+  "sourceUrl": "http://start.gg/tournament/montevideo-melee-monthly-1/event/melee-singles",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 1184007,
+    "page": 4,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1184007,
+        "name": "Melee Singles",
+        "sets": {
+          "pageInfo": {
+            "total": 33
+          },
+          "nodes": [
+            {
+              "id": 77675358,
+              "state": 3,
+              "winnerId": 17305368,
+              "round": 2,
+              "fullRoundText": "Winners Round 2",
+              "displayScore": "DIO 3 - Sol!d 0",
+              "lPlacement": 17,
+              "wPlacement": 9,
+              "identifier": "I",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1722118382,
+              "createdAt": 1722118256,
+              "updatedAt": 1722118382,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2558174,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-1/events/melee-singles/brackets/1721275/2558174",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1721275,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "77675358-0",
+                  "entrant": {
+                    "id": 17305368,
+                    "name": "DIO",
+                    "participants": [
+                      {
+                        "id": 16060020,
+                        "gamerTag": "DIO",
+                        "player": {
+                          "id": 4211496
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30626958_sets_77675358",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "77675358-1",
+                  "entrant": {
+                    "id": 17305357,
+                    "name": "Sol!d",
+                    "participants": [
+                      {
+                        "id": 16060025,
+                        "gamerTag": "Sol!d",
+                        "player": {
+                          "id": 4211499
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30626948_sets_77675358",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            },
+            {
+              "id": 77675408,
+              "state": 3,
+              "winnerId": 17305357,
+              "round": -4,
+              "fullRoundText": "Losers Round 1",
+              "displayScore": "Sol!d 3 - Rod 2",
+              "lPlacement": 17,
+              "wPlacement": 13,
+              "identifier": "S",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1722118506,
+              "createdAt": 1722118256,
+              "updatedAt": 1722118506,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2558174,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-1/events/melee-singles/brackets/1721275/2558174",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1721275,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "77675408-0",
+                  "entrant": {
+                    "id": 17305357,
+                    "name": "Sol!d",
+                    "participants": [
+                      {
+                        "id": 16060025,
+                        "gamerTag": "Sol!d",
+                        "player": {
+                          "id": 4211499
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30626948_sets_77675408",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "77675408-1",
+                  "entrant": {
+                    "id": 17305407,
+                    "name": "Rod",
+                    "participants": [
+                      {
+                        "id": 16059983,
+                        "gamerTag": "Rod",
+                        "player": {
+                          "id": 4211474
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30627015_sets_77675408",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            },
+            {
+              "id": 77675336,
+              "state": 3,
+              "winnerId": 17305409,
+              "round": 1,
+              "fullRoundText": "Winners Round 1",
+              "displayScore": "Alfa 3 - Rod 0",
+              "lPlacement": 17,
+              "wPlacement": 13,
+              "identifier": "A",
+              "startAt": null,
+              "startedAt": 1722118285,
+              "completedAt": 1722118307,
+              "createdAt": 1722118256,
+              "updatedAt": 1722118308,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2558174,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-1/events/melee-singles/brackets/1721275/2558174",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1721275,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "77675336-0",
+                  "entrant": {
+                    "id": 17305409,
+                    "name": "Alfa",
+                    "participants": [
+                      {
+                        "id": 16059980,
+                        "gamerTag": "Alfa",
+                        "player": {
+                          "id": 4211471
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30627017_sets_77675336",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "77675336-1",
+                  "entrant": {
+                    "id": 17305407,
+                    "name": "Rod",
+                    "participants": [
+                      {
+                        "id": 16059983,
+                        "gamerTag": "Rod",
+                        "player": {
+                          "id": 4211474
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30627015_sets_77675336",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 97
+    },
+    "actionRecords": []
+  }
+}

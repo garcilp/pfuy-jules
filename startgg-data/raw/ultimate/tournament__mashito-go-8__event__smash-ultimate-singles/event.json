@@ -1,0 +1,44 @@
+{
+  "fetchedAt": "2026-10-23T14:44:16.311867+00:00",
+  "sourceUrl": "http://start.gg/tournament/mashito-go-8/event/smash-ultimate-singles",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/mashito-go-8/event/smash-ultimate-singles"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1727455,
+        "name": "Smash Ultimate singles",
+        "numEntrants": 31,
+        "tournament": {
+          "id": 961562,
+          "name": "Mashito? GO! #8",
+          "slug": "tournament/mashito-go-8",
+          "images": [
+            {
+              "url": "https://images.start.gg/images/tournament/961562/image-8fe10f96a6ac3c064c650fc0e3ad32d5.png",
+              "type": "profile"
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

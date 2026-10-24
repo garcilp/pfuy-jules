@@ -1,0 +1,44 @@
+{
+  "fetchedAt": "2026-10-23T14:44:08.528039+00:00",
+  "sourceUrl": "http://start.gg/tournament/mashito-go-3/event/singles-b",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/mashito-go-3/event/singles-b"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1603413,
+        "name": "Singles B",
+        "numEntrants": 19,
+        "tournament": {
+          "id": 896079,
+          "name": "Mashito GO! #3",
+          "slug": "tournament/mashito-go-3",
+          "images": [
+            {
+              "url": "https://images.start.gg/images/tournament/896079/image-4a74c502552e406d2723d1b69976359b.png",
+              "type": "profile"
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

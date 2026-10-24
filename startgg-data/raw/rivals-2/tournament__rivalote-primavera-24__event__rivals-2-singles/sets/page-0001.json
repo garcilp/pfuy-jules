@@ -1,0 +1,1859 @@
+{
+  "fetchedAt": "2026-10-22T20:53:06.848052+00:00",
+  "sourceUrl": "http://start.gg/tournament/rivalote-primavera-24/event/rivals-2-singles",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 1249124,
+    "page": 1,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1249124,
+        "name": "Rivals 2 - Singles",
+        "sets": {
+          "pageInfo": {
+            "total": 45
+          },
+          "nodes": [
+            {
+              "id": 82657733,
+              "state": 3,
+              "winnerId": 18413777,
+              "round": 6,
+              "fullRoundText": "Grand Final",
+              "displayScore": "BCP | Mitsu 0 - W&L | Marroll 2",
+              "lPlacement": 2,
+              "wPlacement": 1,
+              "identifier": "W",
+              "startAt": null,
+              "startedAt": 1732393304,
+              "completedAt": 1732393321,
+              "createdAt": 1732324201,
+              "updatedAt": 1732393321,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2669212,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/rivalote-primavera-24/events/rivals-2-singles/brackets/1805416/2669212",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1805416,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "82657733-0",
+                  "entrant": {
+                    "id": 18322339,
+                    "name": "BCP | Mitsu",
+                    "participants": [
+                      {
+                        "id": 16931077,
+                        "gamerTag": "Mitsu",
+                        "player": {
+                          "id": 557903
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_32112161_sets_82657733",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "82657733-1",
+                  "entrant": {
+                    "id": 18413777,
+                    "name": "W&L | Marroll",
+                    "participants": [
+                      {
+                        "id": 17009330,
+                        "gamerTag": "Marroll",
+                        "player": {
+                          "id": 795083
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_32243583_sets_82657733",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 26401707,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 18413777,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 38457362,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2503,
+                      "entrant": {
+                        "id": 18322339
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2503,
+                        "name": "Clairen"
+                      }
+                    },
+                    {
+                      "id": 38457363,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2504,
+                      "entrant": {
+                        "id": 18413777
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2504,
+                        "name": "Kragg"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 26401708,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 18413777,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 38457364,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2503,
+                      "entrant": {
+                        "id": 18322339
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2503,
+                        "name": "Clairen"
+                      }
+                    },
+                    {
+                      "id": 38457365,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2504,
+                      "entrant": {
+                        "id": 18413777
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2504,
+                        "name": "Kragg"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 82657734,
+              "state": 3,
+              "winnerId": 18413777,
+              "round": 6,
+              "fullRoundText": "Grand Final Reset",
+              "displayScore": "W&L | Marroll 2 - BCP | Mitsu 0",
+              "lPlacement": 2,
+              "wPlacement": 1,
+              "identifier": "X",
+              "startAt": null,
+              "startedAt": 1732393461,
+              "completedAt": 1732393701,
+              "createdAt": 1732324201,
+              "updatedAt": 1732393701,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2669212,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/rivalote-primavera-24/events/rivals-2-singles/brackets/1805416/2669212",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1805416,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "82657734-0",
+                  "entrant": {
+                    "id": 18413777,
+                    "name": "W&L | Marroll",
+                    "participants": [
+                      {
+                        "id": 17009330,
+                        "gamerTag": "Marroll",
+                        "player": {
+                          "id": 795083
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_32243583_sets_82657734",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "82657734-1",
+                  "entrant": {
+                    "id": 18322339,
+                    "name": "BCP | Mitsu",
+                    "participants": [
+                      {
+                        "id": 16931077,
+                        "gamerTag": "Mitsu",
+                        "player": {
+                          "id": 557903
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_32112161_sets_82657734",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 26402032,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 18413777,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 38457738,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2503,
+                      "entrant": {
+                        "id": 18322339
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2503,
+                        "name": "Clairen"
+                      }
+                    },
+                    {
+                      "id": 38457739,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2504,
+                      "entrant": {
+                        "id": 18413777
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2504,
+                        "name": "Kragg"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 26402033,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 18413777,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 38457740,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2503,
+                      "entrant": {
+                        "id": 18322339
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2503,
+                        "name": "Clairen"
+                      }
+                    },
+                    {
+                      "id": 38457741,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2504,
+                      "entrant": {
+                        "id": 18413777
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2504,
+                        "name": "Kragg"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 82657732,
+              "state": 3,
+              "winnerId": 18322339,
+              "round": 5,
+              "fullRoundText": "Winners Final",
+              "displayScore": "BCP | Mitsu 2 - BCP | Mint 0",
+              "lPlacement": 3,
+              "wPlacement": 2,
+              "identifier": "V",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1732391127,
+              "createdAt": 1732324201,
+              "updatedAt": 1732391128,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2669212,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/rivalote-primavera-24/events/rivals-2-singles/brackets/1805416/2669212",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1805416,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "82657732-0",
+                  "entrant": {
+                    "id": 18322339,
+                    "name": "BCP | Mitsu",
+                    "participants": [
+                      {
+                        "id": 16931077,
+                        "gamerTag": "Mitsu",
+                        "player": {
+                          "id": 557903
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_32112161_sets_82657732",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "82657732-1",
+                  "entrant": {
+                    "id": 18319881,
+                    "name": "BCP | Mint",
+                    "participants": [
+                      {
+                        "id": 16928915,
+                        "gamerTag": "Mint",
+                        "player": {
+                          "id": 2441157
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_32109067_sets_82657732",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 26400127,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 18322339,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 38455031,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2597,
+                      "entrant": {
+                        "id": 18319881
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2597,
+                        "name": "Orcane"
+                      }
+                    },
+                    {
+                      "id": 38455032,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2503,
+                      "entrant": {
+                        "id": 18322339
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2503,
+                        "name": "Clairen"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 26400128,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 18322339,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 38455033,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2597,
+                      "entrant": {
+                        "id": 18319881
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2597,
+                        "name": "Orcane"
+                      }
+                    },
+                    {
+                      "id": 38455034,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2503,
+                      "entrant": {
+                        "id": 18322339
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2503,
+                        "name": "Clairen"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 82657796,
+              "state": 3,
+              "winnerId": 18413777,
+              "round": -10,
+              "fullRoundText": "Losers Final",
+              "displayScore": "BCP | Mint 0 - W&L | Marroll 2",
+              "lPlacement": 3,
+              "wPlacement": 2,
+              "identifier": "AS",
+              "startAt": null,
+              "startedAt": 1732392734,
+              "completedAt": 1732392751,
+              "createdAt": 1732324201,
+              "updatedAt": 1732392752,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2669212,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/rivalote-primavera-24/events/rivals-2-singles/brackets/1805416/2669212",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1805416,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "82657796-0",
+                  "entrant": {
+                    "id": 18319881,
+                    "name": "BCP | Mint",
+                    "participants": [
+                      {
+                        "id": 16928915,
+                        "gamerTag": "Mint",
+                        "player": {
+                          "id": 2441157
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_32109067_sets_82657796",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "82657796-1",
+                  "entrant": {
+                    "id": 18413777,
+                    "name": "W&L | Marroll",
+                    "participants": [
+                      {
+                        "id": 17009330,
+                        "gamerTag": "Marroll",
+                        "player": {
+                          "id": 795083
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_32243583_sets_82657796",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 26401225,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 18413777,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 38456739,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2597,
+                      "entrant": {
+                        "id": 18319881
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2597,
+                        "name": "Orcane"
+                      }
+                    },
+                    {
+                      "id": 38456740,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2504,
+                      "entrant": {
+                        "id": 18413777
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2504,
+                        "name": "Kragg"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 26401226,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 18413777,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 38456741,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2597,
+                      "entrant": {
+                        "id": 18319881
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2597,
+                        "name": "Orcane"
+                      }
+                    },
+                    {
+                      "id": 38456742,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2504,
+                      "entrant": {
+                        "id": 18413777
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2504,
+                        "name": "Kragg"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 82657795,
+              "state": 3,
+              "winnerId": 18413777,
+              "round": -9,
+              "fullRoundText": "Losers Semi-Final",
+              "displayScore": "ojo de oro 1 - W&L | Marroll 2",
+              "lPlacement": 4,
+              "wPlacement": 3,
+              "identifier": "AR",
+              "startAt": null,
+              "startedAt": 1732391920,
+              "completedAt": 1732392066,
+              "createdAt": 1732324201,
+              "updatedAt": 1732392066,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2669212,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/rivalote-primavera-24/events/rivals-2-singles/brackets/1805416/2669212",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1805416,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "82657795-0",
+                  "entrant": {
+                    "id": 18359716,
+                    "name": "ojo de oro",
+                    "participants": [
+                      {
+                        "id": 16963304,
+                        "gamerTag": "ojo de oro",
+                        "player": {
+                          "id": 1670731
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_32169299_sets_82657795",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "82657795-1",
+                  "entrant": {
+                    "id": 18413777,
+                    "name": "W&L | Marroll",
+                    "participants": [
+                      {
+                        "id": 17009330,
+                        "gamerTag": "Marroll",
+                        "player": {
+                          "id": 795083
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_32243583_sets_82657795",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 26400754,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 18359716,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 38456063,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2504,
+                      "entrant": {
+                        "id": 18359716
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2504,
+                        "name": "Kragg"
+                      }
+                    },
+                    {
+                      "id": 38456064,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2504,
+                      "entrant": {
+                        "id": 18413777
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2504,
+                        "name": "Kragg"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 26400755,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 18413777,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 38456065,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2504,
+                      "entrant": {
+                        "id": 18359716
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2504,
+                        "name": "Kragg"
+                      }
+                    },
+                    {
+                      "id": 38456066,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2504,
+                      "entrant": {
+                        "id": 18413777
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2504,
+                        "name": "Kragg"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 26400756,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 18413777,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 38456067,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2504,
+                      "entrant": {
+                        "id": 18359716
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2504,
+                        "name": "Kragg"
+                      }
+                    },
+                    {
+                      "id": 38456068,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2504,
+                      "entrant": {
+                        "id": 18413777
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2504,
+                        "name": "Kragg"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 82657730,
+              "state": 3,
+              "winnerId": 18322339,
+              "round": 4,
+              "fullRoundText": "Winners Semi-Final",
+              "displayScore": "W&L | Marroll 1 - BCP | Mitsu 2",
+              "lPlacement": 5,
+              "wPlacement": 3,
+              "identifier": "T",
+              "startAt": null,
+              "startedAt": 1732389757,
+              "completedAt": 1732389949,
+              "createdAt": 1732324201,
+              "updatedAt": 1732389950,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2669212,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/rivalote-primavera-24/events/rivals-2-singles/brackets/1805416/2669212",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1805416,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "82657730-0",
+                  "entrant": {
+                    "id": 18413777,
+                    "name": "W&L | Marroll",
+                    "participants": [
+                      {
+                        "id": 17009330,
+                        "gamerTag": "Marroll",
+                        "player": {
+                          "id": 795083
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_32243583_sets_82657730",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "82657730-1",
+                  "entrant": {
+                    "id": 18322339,
+                    "name": "BCP | Mitsu",
+                    "participants": [
+                      {
+                        "id": 16931077,
+                        "gamerTag": "Mitsu",
+                        "player": {
+                          "id": 557903
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_32112161_sets_82657730",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 26399240,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 18413777,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 38453654,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2503,
+                      "entrant": {
+                        "id": 18322339
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2503,
+                        "name": "Clairen"
+                      }
+                    },
+                    {
+                      "id": 38453655,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2504,
+                      "entrant": {
+                        "id": 18413777
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2504,
+                        "name": "Kragg"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 26399241,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 18322339,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 38453656,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2503,
+                      "entrant": {
+                        "id": 18322339
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2503,
+                        "name": "Clairen"
+                      }
+                    },
+                    {
+                      "id": 38453657,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2504,
+                      "entrant": {
+                        "id": 18413777
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2504,
+                        "name": "Kragg"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 26399242,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 18322339,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 38453658,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2503,
+                      "entrant": {
+                        "id": 18322339
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2503,
+                        "name": "Clairen"
+                      }
+                    },
+                    {
+                      "id": 38453659,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2504,
+                      "entrant": {
+                        "id": 18413777
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2504,
+                        "name": "Kragg"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 82657731,
+              "state": 3,
+              "winnerId": 18319881,
+              "round": 4,
+              "fullRoundText": "Winners Semi-Final",
+              "displayScore": "BCP | Mint 2 - francokiwi 0",
+              "lPlacement": 5,
+              "wPlacement": 3,
+              "identifier": "U",
+              "startAt": null,
+              "startedAt": 1732390011,
+              "completedAt": 1732390503,
+              "createdAt": 1732324201,
+              "updatedAt": 1732390503,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2669212,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/rivalote-primavera-24/events/rivals-2-singles/brackets/1805416/2669212",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1805416,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "82657731-0",
+                  "entrant": {
+                    "id": 18319881,
+                    "name": "BCP | Mint",
+                    "participants": [
+                      {
+                        "id": 16928915,
+                        "gamerTag": "Mint",
+                        "player": {
+                          "id": 2441157
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_32109067_sets_82657731",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "82657731-1",
+                  "entrant": {
+                    "id": 18325757,
+                    "name": "francokiwi",
+                    "participants": [
+                      {
+                        "id": 16934068,
+                        "gamerTag": "francokiwi",
+                        "player": {
+                          "id": 1154899
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_32120147_sets_82657731",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 26399650,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 18319881,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 38454374,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2597,
+                      "entrant": {
+                        "id": 18319881
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2597,
+                        "name": "Orcane"
+                      }
+                    },
+                    {
+                      "id": 38454375,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2499,
+                      "entrant": {
+                        "id": 18325757
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2499,
+                        "name": "Zetterburn"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 26399651,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 18319881,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 38454376,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2597,
+                      "entrant": {
+                        "id": 18319881
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2597,
+                        "name": "Orcane"
+                      }
+                    },
+                    {
+                      "id": 38454377,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2499,
+                      "entrant": {
+                        "id": 18325757
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2499,
+                        "name": "Zetterburn"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 82657793,
+              "state": 3,
+              "winnerId": 18359716,
+              "round": -8,
+              "fullRoundText": "Losers Quarter-Final",
+              "displayScore": "francokiwi 0 - ojo de oro 2",
+              "lPlacement": 5,
+              "wPlacement": 4,
+              "identifier": "AP",
+              "startAt": null,
+              "startedAt": 1732391136,
+              "completedAt": 1732391623,
+              "createdAt": 1732324201,
+              "updatedAt": 1732391624,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2669212,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/rivalote-primavera-24/events/rivals-2-singles/brackets/1805416/2669212",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1805416,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "82657793-0",
+                  "entrant": {
+                    "id": 18325757,
+                    "name": "francokiwi",
+                    "participants": [
+                      {
+                        "id": 16934068,
+                        "gamerTag": "francokiwi",
+                        "player": {
+                          "id": 1154899
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_32120147_sets_82657793",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "82657793-1",
+                  "entrant": {
+                    "id": 18359716,
+                    "name": "ojo de oro",
+                    "participants": [
+                      {
+                        "id": 16963304,
+                        "gamerTag": "ojo de oro",
+                        "player": {
+                          "id": 1670731
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_32169299_sets_82657793",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 26400473,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 18359716,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 38455585,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2499,
+                      "entrant": {
+                        "id": 18325757
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2499,
+                        "name": "Zetterburn"
+                      }
+                    },
+                    {
+                      "id": 38455586,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2504,
+                      "entrant": {
+                        "id": 18359716
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2504,
+                        "name": "Kragg"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 26400474,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 18359716,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 38455587,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2499,
+                      "entrant": {
+                        "id": 18325757
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2499,
+                        "name": "Zetterburn"
+                      }
+                    },
+                    {
+                      "id": 38455588,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2504,
+                      "entrant": {
+                        "id": 18359716
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2504,
+                        "name": "Kragg"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 82657794,
+              "state": 3,
+              "winnerId": 18413777,
+              "round": -8,
+              "fullRoundText": "Losers Quarter-Final",
+              "displayScore": "W&L | Marroll 2 - EL TROMPAS 0",
+              "lPlacement": 5,
+              "wPlacement": 4,
+              "identifier": "AQ",
+              "startAt": null,
+              "startedAt": 1732391140,
+              "completedAt": 1732391245,
+              "createdAt": 1732324201,
+              "updatedAt": 1732391245,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2669212,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/rivalote-primavera-24/events/rivals-2-singles/brackets/1805416/2669212",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1805416,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "82657794-0",
+                  "entrant": {
+                    "id": 18413777,
+                    "name": "W&L | Marroll",
+                    "participants": [
+                      {
+                        "id": 17009330,
+                        "gamerTag": "Marroll",
+                        "player": {
+                          "id": 795083
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_32243583_sets_82657794",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "82657794-1",
+                  "entrant": {
+                    "id": 18333193,
+                    "name": "EL TROMPAS",
+                    "participants": [
+                      {
+                        "id": 16940566,
+                        "gamerTag": "EL TROMPAS",
+                        "player": {
+                          "id": 1219130
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_32132524_sets_82657794",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 26400209,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 18413777,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 38455162,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2505,
+                      "entrant": {
+                        "id": 18333193
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2505,
+                        "name": "Loxodont"
+                      }
+                    },
+                    {
+                      "id": 38455163,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2504,
+                      "entrant": {
+                        "id": 18413777
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2504,
+                        "name": "Kragg"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 26400210,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 18413777,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 38455164,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2505,
+                      "entrant": {
+                        "id": 18333193
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2505,
+                        "name": "Loxodont"
+                      }
+                    },
+                    {
+                      "id": 38455165,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2504,
+                      "entrant": {
+                        "id": 18413777
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2504,
+                        "name": "Kragg"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 82657791,
+              "state": 3,
+              "winnerId": 18359716,
+              "round": -7,
+              "fullRoundText": "Losers Round 4",
+              "displayScore": "ojo de oro 2 - Roxy | SMB | Bati 0",
+              "lPlacement": 7,
+              "wPlacement": 5,
+              "identifier": "AN",
+              "startAt": null,
+              "startedAt": 1732390318,
+              "completedAt": 1732391008,
+              "createdAt": 1732324201,
+              "updatedAt": 1732391008,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2669212,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/rivalote-primavera-24/events/rivals-2-singles/brackets/1805416/2669212",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1805416,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "82657791-0",
+                  "entrant": {
+                    "id": 18359716,
+                    "name": "ojo de oro",
+                    "participants": [
+                      {
+                        "id": 16963304,
+                        "gamerTag": "ojo de oro",
+                        "player": {
+                          "id": 1670731
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_32169299_sets_82657791",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "82657791-1",
+                  "entrant": {
+                    "id": 18413758,
+                    "name": "Roxy | SMB | Bati",
+                    "participants": [
+                      {
+                        "id": 17009315,
+                        "gamerTag": "Bati",
+                        "player": {
+                          "id": 1244662
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_32243564_sets_82657791",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 26400010,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 18359716,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 38454873,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2504,
+                      "entrant": {
+                        "id": 18359716
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2504,
+                        "name": "Kragg"
+                      }
+                    },
+                    {
+                      "id": 38454874,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2501,
+                      "entrant": {
+                        "id": 18413758
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2501,
+                        "name": "Ranno"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 26400011,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 18359716,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 38454875,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2504,
+                      "entrant": {
+                        "id": 18359716
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2504,
+                        "name": "Kragg"
+                      }
+                    },
+                    {
+                      "id": 38454876,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2501,
+                      "entrant": {
+                        "id": 18413758
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2501,
+                        "name": "Ranno"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 487
+    },
+    "actionRecords": []
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "fetchedAt": "2026-10-23T14:42:23.509227+00:00",
+  "sourceUrl": "http://start.gg/tournament/azradimba-rivalimba/event/singles",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/azradimba-rivalimba/event/singles"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1034263,
+        "name": "Singles",
+        "numEntrants": 11,
+        "tournament": {
+          "id": 616158,
+          "name": "Azradimba Rivalimba",
+          "slug": "tournament/azradimba-rivalimba",
+          "images": []
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

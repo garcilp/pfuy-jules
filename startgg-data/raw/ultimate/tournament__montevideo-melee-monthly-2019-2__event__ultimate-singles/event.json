@@ -1,0 +1,44 @@
+{
+  "fetchedAt": "2026-10-23T14:42:48.793436+00:00",
+  "sourceUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2019-2/event/ultimate-singles",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/montevideo-melee-monthly-2019-2/event/ultimate-singles"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 321282,
+        "name": "Ultimate Singles",
+        "numEntrants": 16,
+        "tournament": {
+          "id": 139440,
+          "name": "Montevideo Melee Monthly 2019 #2",
+          "slug": "tournament/montevideo-melee-monthly-2019-2",
+          "images": [
+            {
+              "url": "https://images.start.gg/images/tournament/139440/image-da6c75c151010671afb7861739896df0.png",
+              "type": "profile"
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

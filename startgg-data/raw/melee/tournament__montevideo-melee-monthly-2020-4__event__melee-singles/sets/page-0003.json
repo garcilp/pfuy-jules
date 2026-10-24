@@ -1,0 +1,991 @@
+{
+  "fetchedAt": "2026-10-22T21:57:02.296756+00:00",
+  "sourceUrl": "http://start.gg/tournament/montevideo-melee-monthly-2020-4/event/melee-singles",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 477415,
+    "page": 3,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 477415,
+        "name": "Melee Singles",
+        "sets": {
+          "pageInfo": {
+            "total": 61
+          },
+          "nodes": [
+            {
+              "id": 28433019,
+              "state": 3,
+              "winnerId": 5115231,
+              "round": 4,
+              "fullRoundText": "Round 4",
+              "displayScore": "freshflower 2 - Aigua 0",
+              "lPlacement": null,
+              "wPlacement": null,
+              "identifier": "L",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1587938366,
+              "createdAt": 1587830301,
+              "updatedAt": 1587938370,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 1283901,
+                "displayIdentifier": "2",
+                "bracketType": "ROUND_ROBIN",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2020-4/events/melee-singles/brackets/800188/1283901",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 800188,
+                  "name": "Pools",
+                  "phaseOrder": 1,
+                  "bracketType": "ROUND_ROBIN",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "28433019-0",
+                  "entrant": {
+                    "id": 5115231,
+                    "name": "freshflower",
+                    "participants": [
+                      {
+                        "id": 4858053,
+                        "gamerTag": "freshflower",
+                        "player": {
+                          "id": 553613
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_13168016_sets_28433019",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "28433019-1",
+                  "entrant": {
+                    "id": 5115986,
+                    "name": "Aigua",
+                    "participants": [
+                      {
+                        "id": 4858886,
+                        "gamerTag": "Aigua",
+                        "player": {
+                          "id": 1798741
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_13172181_sets_28433019",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            },
+            {
+              "id": 28512384,
+              "state": 3,
+              "winnerId": 5114961,
+              "round": -8,
+              "fullRoundText": "Losers Final",
+              "displayScore": "Guasausky W - Black6667 L",
+              "lPlacement": 3,
+              "wPlacement": 2,
+              "identifier": "Y",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1588375980,
+              "createdAt": 1587938369,
+              "updatedAt": 1588624392,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 1283906,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2020-4/events/melee-singles/brackets/800189/1283906",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 800189,
+                  "name": "Singles Bracket",
+                  "phaseOrder": 2,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "28512384-0",
+                  "entrant": {
+                    "id": 5114961,
+                    "name": "Guasausky",
+                    "participants": [
+                      {
+                        "id": 4857753,
+                        "gamerTag": "Guasausky",
+                        "player": {
+                          "id": 1724829
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_13178942_sets_28512384",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": null,
+                        "displayValue": null
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "28512384-1",
+                  "entrant": {
+                    "id": 5118822,
+                    "name": "Black6667",
+                    "participants": [
+                      {
+                        "id": 4862140,
+                        "gamerTag": "Black6667",
+                        "player": {
+                          "id": 1799738
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_13178944_sets_28512384",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": null,
+                        "displayValue": null
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            },
+            {
+              "id": 28512383,
+              "state": 3,
+              "winnerId": 5118822,
+              "round": -7,
+              "fullRoundText": "Losers Semi-Final",
+              "displayScore": "Papyrus 0 - Black6667 3",
+              "lPlacement": 4,
+              "wPlacement": 3,
+              "identifier": "X",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1588301924,
+              "createdAt": 1587938369,
+              "updatedAt": 1588624392,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 1283906,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2020-4/events/melee-singles/brackets/800189/1283906",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 800189,
+                  "name": "Singles Bracket",
+                  "phaseOrder": 2,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "28512383-0",
+                  "entrant": {
+                    "id": 5119189,
+                    "name": "Papyrus",
+                    "participants": [
+                      {
+                        "id": 4862546,
+                        "gamerTag": "Papyrus",
+                        "player": {
+                          "id": 127772
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_13178946_sets_28512383",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "28512383-1",
+                  "entrant": {
+                    "id": 5118822,
+                    "name": "Black6667",
+                    "participants": [
+                      {
+                        "id": 4862140,
+                        "gamerTag": "Black6667",
+                        "player": {
+                          "id": 1799738
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_13178944_sets_28512383",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            },
+            {
+              "id": 28512350,
+              "state": 3,
+              "winnerId": 5114961,
+              "round": 3,
+              "fullRoundText": "Winners Semi-Final",
+              "displayScore": "Guasausky 3 - Papyrus 1",
+              "lPlacement": 5,
+              "wPlacement": 3,
+              "identifier": "J",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1588037531,
+              "createdAt": 1587938369,
+              "updatedAt": 1588624392,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 1283906,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2020-4/events/melee-singles/brackets/800189/1283906",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 800189,
+                  "name": "Singles Bracket",
+                  "phaseOrder": 2,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "28512350-0",
+                  "entrant": {
+                    "id": 5114961,
+                    "name": "Guasausky",
+                    "participants": [
+                      {
+                        "id": 4857753,
+                        "gamerTag": "Guasausky",
+                        "player": {
+                          "id": 1724829
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_13178942_sets_28512350",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "28512350-1",
+                  "entrant": {
+                    "id": 5119189,
+                    "name": "Papyrus",
+                    "participants": [
+                      {
+                        "id": 4862546,
+                        "gamerTag": "Papyrus",
+                        "player": {
+                          "id": 127772
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_13178946_sets_28512350",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            },
+            {
+              "id": 28512351,
+              "state": 3,
+              "winnerId": 5113862,
+              "round": 3,
+              "fullRoundText": "Winners Semi-Final",
+              "displayScore": "Iguana 3 - Black6667 2",
+              "lPlacement": 5,
+              "wPlacement": 3,
+              "identifier": "K",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1588023013,
+              "createdAt": 1587938369,
+              "updatedAt": 1588624392,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 1283906,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2020-4/events/melee-singles/brackets/800189/1283906",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 800189,
+                  "name": "Singles Bracket",
+                  "phaseOrder": 2,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "28512351-0",
+                  "entrant": {
+                    "id": 5113862,
+                    "name": "Iguana",
+                    "participants": [
+                      {
+                        "id": 4856519,
+                        "gamerTag": "Iguana",
+                        "player": {
+                          "id": 264244
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_13178943_sets_28512351",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "28512351-1",
+                  "entrant": {
+                    "id": 5118822,
+                    "name": "Black6667",
+                    "participants": [
+                      {
+                        "id": 4862140,
+                        "gamerTag": "Black6667",
+                        "player": {
+                          "id": 1799738
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_13178944_sets_28512351",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            },
+            {
+              "id": 28428218,
+              "state": 3,
+              "winnerId": 5114961,
+              "round": 3,
+              "fullRoundText": "Round 3",
+              "displayScore": "Guasausky 2 - Black6667 0",
+              "lPlacement": null,
+              "wPlacement": null,
+              "identifier": "G",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1587856817,
+              "createdAt": 1587830301,
+              "updatedAt": 1587938370,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 1283900,
+                "displayIdentifier": "1",
+                "bracketType": "ROUND_ROBIN",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2020-4/events/melee-singles/brackets/800188/1283900",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 800188,
+                  "name": "Pools",
+                  "phaseOrder": 1,
+                  "bracketType": "ROUND_ROBIN",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "28428218-0",
+                  "entrant": {
+                    "id": 5114961,
+                    "name": "Guasausky",
+                    "participants": [
+                      {
+                        "id": 4857753,
+                        "gamerTag": "Guasausky",
+                        "player": {
+                          "id": 1724829
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_13164781_sets_28428218",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "28428218-1",
+                  "entrant": {
+                    "id": 5118822,
+                    "name": "Black6667",
+                    "participants": [
+                      {
+                        "id": 4862140,
+                        "gamerTag": "Black6667",
+                        "player": {
+                          "id": 1799738
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_13177135_sets_28428218",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            },
+            {
+              "id": 28433014,
+              "state": 3,
+              "winnerId": 5113862,
+              "round": 3,
+              "fullRoundText": "Round 3",
+              "displayScore": "Iguana 2 - Cariño 0",
+              "lPlacement": null,
+              "wPlacement": null,
+              "identifier": "G",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1587838372,
+              "createdAt": 1587830301,
+              "updatedAt": 1587938370,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 1283901,
+                "displayIdentifier": "2",
+                "bracketType": "ROUND_ROBIN",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2020-4/events/melee-singles/brackets/800188/1283901",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 800188,
+                  "name": "Pools",
+                  "phaseOrder": 1,
+                  "bracketType": "ROUND_ROBIN",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "28433014-0",
+                  "entrant": {
+                    "id": 5113862,
+                    "name": "Iguana",
+                    "participants": [
+                      {
+                        "id": 4856519,
+                        "gamerTag": "Iguana",
+                        "player": {
+                          "id": 264244
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_13162808_sets_28433014",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "28433014-1",
+                  "entrant": {
+                    "id": 5117885,
+                    "name": "Cariño",
+                    "participants": [
+                      {
+                        "id": 4861110,
+                        "gamerTag": "Cariño",
+                        "player": {
+                          "id": 1701226
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_13174927_sets_28433014",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            },
+            {
+              "id": 28428219,
+              "state": 3,
+              "winnerId": 5119189,
+              "round": 3,
+              "fullRoundText": "Round 3",
+              "displayScore": "Papyrus 2 - Berry 0",
+              "lPlacement": null,
+              "wPlacement": null,
+              "identifier": "H",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1587841593,
+              "createdAt": 1587830301,
+              "updatedAt": 1587938370,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 1283900,
+                "displayIdentifier": "1",
+                "bracketType": "ROUND_ROBIN",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2020-4/events/melee-singles/brackets/800188/1283900",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 800188,
+                  "name": "Pools",
+                  "phaseOrder": 1,
+                  "bracketType": "ROUND_ROBIN",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "28428219-0",
+                  "entrant": {
+                    "id": 5119189,
+                    "name": "Papyrus",
+                    "participants": [
+                      {
+                        "id": 4862546,
+                        "gamerTag": "Papyrus",
+                        "player": {
+                          "id": 127772
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_13177855_sets_28428219",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "28428219-1",
+                  "entrant": {
+                    "id": 5114661,
+                    "name": "Berry",
+                    "participants": [
+                      {
+                        "id": 4857411,
+                        "gamerTag": "Berry",
+                        "player": {
+                          "id": 1455673
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_13164451_sets_28428219",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            },
+            {
+              "id": 28433015,
+              "state": 3,
+              "winnerId": 5116442,
+              "round": 3,
+              "fullRoundText": "Round 3",
+              "displayScore": "freshflower 0 - Abu Dabi 2",
+              "lPlacement": null,
+              "wPlacement": null,
+              "identifier": "H",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1587936116,
+              "createdAt": 1587830301,
+              "updatedAt": 1587938370,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 1283901,
+                "displayIdentifier": "2",
+                "bracketType": "ROUND_ROBIN",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2020-4/events/melee-singles/brackets/800188/1283901",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 800188,
+                  "name": "Pools",
+                  "phaseOrder": 1,
+                  "bracketType": "ROUND_ROBIN",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "28433015-0",
+                  "entrant": {
+                    "id": 5115231,
+                    "name": "freshflower",
+                    "participants": [
+                      {
+                        "id": 4858053,
+                        "gamerTag": "freshflower",
+                        "player": {
+                          "id": 553613
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_13168016_sets_28433015",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "28433015-1",
+                  "entrant": {
+                    "id": 5116442,
+                    "name": "Abu Dabi",
+                    "participants": [
+                      {
+                        "id": 4859446,
+                        "gamerTag": "Abu Dabi",
+                        "player": {
+                          "id": 1160205
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_13172654_sets_28433015",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            },
+            {
+              "id": 28428220,
+              "state": 3,
+              "winnerId": 5114328,
+              "round": 3,
+              "fullRoundText": "Round 3",
+              "displayScore": "CL | Transformación 0 - FrancoKiwi 2",
+              "lPlacement": null,
+              "wPlacement": null,
+              "identifier": "I",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1587836007,
+              "createdAt": 1587830301,
+              "updatedAt": 1587938370,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 1283900,
+                "displayIdentifier": "1",
+                "bracketType": "ROUND_ROBIN",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2020-4/events/melee-singles/brackets/800188/1283900",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 800188,
+                  "name": "Pools",
+                  "phaseOrder": 1,
+                  "bracketType": "ROUND_ROBIN",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "28428220-0",
+                  "entrant": {
+                    "id": 5118865,
+                    "name": "CL | Transformación",
+                    "participants": [
+                      {
+                        "id": 4862194,
+                        "gamerTag": "Transformación",
+                        "player": {
+                          "id": 312992
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_13177182_sets_28428220",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "28428220-1",
+                  "entrant": {
+                    "id": 5114328,
+                    "name": "FrancoKiwi",
+                    "participants": [
+                      {
+                        "id": 4857041,
+                        "gamerTag": "FrancoKiwi",
+                        "player": {
+                          "id": 1154899
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_13163418_sets_28428220",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 321
+    },
+    "actionRecords": []
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "fetchedAt": "2026-10-22T21:45:24.330651+00:00",
+  "sourceUrl": "http://start.gg/tournament/mashito-go-8/event/falsa-b",
+  "operationName": "EventStandings",
+  "variables": {
+    "eventId": 1736392,
+    "page": 1,
+    "perPage": 100
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1736392,
+        "name": "Falsa B",
+        "standings": {
+          "nodes": [
+            {
+              "placement": 1,
+              "entrant": {
+                "id": 25025514,
+                "name": "Robótico25"
+              }
+            },
+            {
+              "placement": 2,
+              "entrant": {
+                "id": 25025513,
+                "name": "xXN4ch0Xx"
+              }
+            },
+            {
+              "placement": 3,
+              "entrant": {
+                "id": 25025517,
+                "name": "Pepas"
+              }
+            },
+            {
+              "placement": 4,
+              "entrant": {
+                "id": 25025515,
+                "name": "RenzoUTE"
+              }
+            },
+            {
+              "placement": 5,
+              "entrant": {
+                "id": 25025518,
+                "name": "Zertun"
+              }
+            },
+            {
+              "placement": 5,
+              "entrant": {
+                "id": 25025516,
+                "name": "Misheon"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 13
+    },
+    "actionRecords": []
+  }
+}

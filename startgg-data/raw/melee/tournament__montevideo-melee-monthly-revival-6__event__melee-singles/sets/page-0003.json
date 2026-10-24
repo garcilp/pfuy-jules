@@ -1,0 +1,719 @@
+{
+  "fetchedAt": "2026-10-22T21:59:34.275060+00:00",
+  "sourceUrl": "http://start.gg/tournament/montevideo-melee-monthly-revival-6/event/melee-singles",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 935326,
+    "page": 3,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 935326,
+        "name": "Melee Singles",
+        "sets": {
+          "pageInfo": {
+            "total": 23
+          },
+          "nodes": [
+            {
+              "id": 62190393,
+              "state": 3,
+              "winnerId": 13570506,
+              "round": 1,
+              "fullRoundText": "Winners Round 1",
+              "displayScore": "Mingudai 3 - Cody 1",
+              "lPlacement": 9,
+              "wPlacement": 9,
+              "identifier": "B",
+              "startAt": null,
+              "startedAt": 1688239705,
+              "completedAt": 1688239748,
+              "createdAt": 1688238439,
+              "updatedAt": 1688239749,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2124690,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-revival-6/events/melee-singles/brackets/1400510/2124690",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1400510,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "62190393-0",
+                  "entrant": {
+                    "id": 13570506,
+                    "name": "Mingudai",
+                    "participants": [
+                      {
+                        "id": 12747260,
+                        "gamerTag": "Mingudai",
+                        "player": {
+                          "id": 2503277
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_25158521_sets_62190393",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "62190393-1",
+                  "entrant": {
+                    "id": 13571198,
+                    "name": "Cody",
+                    "participants": [
+                      {
+                        "id": 12747867,
+                        "gamerTag": "Cody",
+                        "player": {
+                          "id": 3503257
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_25159355_sets_62190393",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 17447382,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 13570506,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 24983163,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 6,
+                      "entrant": {
+                        "id": 13570506
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 6,
+                        "name": "Fox"
+                      }
+                    },
+                    {
+                      "id": 24983164,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 18,
+                      "entrant": {
+                        "id": 13571198
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 18,
+                        "name": "Peach"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 17447383,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 13570506,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 24983165,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2,
+                      "entrant": {
+                        "id": 13570506
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2,
+                        "name": "Captain Falcon"
+                      }
+                    },
+                    {
+                      "id": 24983166,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 18,
+                      "entrant": {
+                        "id": 13571198
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 18,
+                        "name": "Peach"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 17447384,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 13571198,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 24983167,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2,
+                      "entrant": {
+                        "id": 13570506
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2,
+                        "name": "Captain Falcon"
+                      }
+                    },
+                    {
+                      "id": 24983168,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 18,
+                      "entrant": {
+                        "id": 13571198
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 18,
+                        "name": "Peach"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 17447385,
+                  "orderNum": 4,
+                  "state": 3,
+                  "winnerId": 13570506,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 24983169,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2,
+                      "entrant": {
+                        "id": 13570506
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2,
+                        "name": "Captain Falcon"
+                      }
+                    },
+                    {
+                      "id": 24983170,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 18,
+                      "entrant": {
+                        "id": 13571198
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 18,
+                        "name": "Peach"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 62190395,
+              "state": 3,
+              "winnerId": 13551887,
+              "round": 1,
+              "fullRoundText": "Winners Round 1",
+              "displayScore": "Transformación 3 - Zeeka 0",
+              "lPlacement": 9,
+              "wPlacement": 9,
+              "identifier": "C",
+              "startAt": null,
+              "startedAt": 1688239763,
+              "completedAt": 1688239781,
+              "createdAt": 1688238439,
+              "updatedAt": 1688239782,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2124690,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-revival-6/events/melee-singles/brackets/1400510/2124690",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1400510,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "62190395-0",
+                  "entrant": {
+                    "id": 13551887,
+                    "name": "Transformación",
+                    "participants": [
+                      {
+                        "id": 12731491,
+                        "gamerTag": "Transformación",
+                        "player": {
+                          "id": 312992
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_25132243_sets_62190395",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "62190395-1",
+                  "entrant": {
+                    "id": 13552347,
+                    "name": "Zeeka",
+                    "participants": [
+                      {
+                        "id": 12731917,
+                        "gamerTag": "Zeeka",
+                        "player": {
+                          "id": 3260814
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_25132799_sets_62190395",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 17447396,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 13551887,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 24983189,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 14,
+                      "entrant": {
+                        "id": 13551887
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 14,
+                        "name": "Marth"
+                      }
+                    },
+                    {
+                      "id": 24983190,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 23,
+                      "entrant": {
+                        "id": 13552347
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 23,
+                        "name": "Sheik"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 17447397,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 13551887,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 24983191,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 14,
+                      "entrant": {
+                        "id": 13551887
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 14,
+                        "name": "Marth"
+                      }
+                    },
+                    {
+                      "id": 24983192,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 23,
+                      "entrant": {
+                        "id": 13552347
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 23,
+                        "name": "Sheik"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 17447398,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 13551887,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 24983193,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 14,
+                      "entrant": {
+                        "id": 13551887
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 14,
+                        "name": "Marth"
+                      }
+                    },
+                    {
+                      "id": 24983194,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 23,
+                      "entrant": {
+                        "id": 13552347
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 23,
+                        "name": "Sheik"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 62190397,
+              "state": 3,
+              "winnerId": 13569028,
+              "round": 1,
+              "fullRoundText": "Winners Round 1",
+              "displayScore": "SrPaz 3 - Pladson 0",
+              "lPlacement": 9,
+              "wPlacement": 9,
+              "identifier": "D",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1688241632,
+              "createdAt": 1688238439,
+              "updatedAt": 1688241633,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2124690,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-revival-6/events/melee-singles/brackets/1400510/2124690",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1400510,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "62190397-0",
+                  "entrant": {
+                    "id": 13569028,
+                    "name": "SrPaz",
+                    "participants": [
+                      {
+                        "id": 12746036,
+                        "gamerTag": "SrPaz",
+                        "player": {
+                          "id": 895125
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_25156589_sets_62190397",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "62190397-1",
+                  "entrant": {
+                    "id": 13570730,
+                    "name": "Pladson",
+                    "participants": [
+                      {
+                        "id": 12747464,
+                        "gamerTag": "Pladson",
+                        "player": {
+                          "id": 330339
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_25158769_sets_62190397",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 17448128,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 13569028,
+                  "entrant1Score": 0,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 24984337,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 5,
+                      "entrant": {
+                        "id": 13569028
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 5,
+                        "name": "Falco"
+                      }
+                    },
+                    {
+                      "id": 24984338,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 11,
+                      "entrant": {
+                        "id": 13570730
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 11,
+                        "name": "Link"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 17448129,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 13569028,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 24984339,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 5,
+                      "entrant": {
+                        "id": 13569028
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 5,
+                        "name": "Falco"
+                      }
+                    },
+                    {
+                      "id": 24984340,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 11,
+                      "entrant": {
+                        "id": 13570730
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 11,
+                        "name": "Link"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 17448130,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 13569028,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 24984341,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 5,
+                      "entrant": {
+                        "id": 13569028
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 5,
+                        "name": "Falco"
+                      }
+                    },
+                    {
+                      "id": 24984342,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 11,
+                      "entrant": {
+                        "id": 13570730
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 11,
+                        "name": "Link"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 174
+    },
+    "actionRecords": []
+  }
+}

@@ -1,0 +1,1550 @@
+{
+  "fetchedAt": "2026-10-22T20:47:32.739295+00:00",
+  "sourceUrl": "http://start.gg/tournament/azradimba-rivalimba/event/singles",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 1034263,
+    "page": 2,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1034263,
+        "name": "Singles",
+        "sets": {
+          "pageInfo": {
+            "total": 18
+          },
+          "nodes": [
+            {
+              "id": 69752611,
+              "state": 3,
+              "winnerId": 15021124,
+              "round": 2,
+              "fullRoundText": "Winners Quarter-Final",
+              "displayScore": "W&L | BCP | Mint 2 - Azrad 1",
+              "lPlacement": 7,
+              "wPlacement": 5,
+              "identifier": "C",
+              "startAt": null,
+              "startedAt": 1705775987,
+              "completedAt": 1705776798,
+              "createdAt": 1705770519,
+              "updatedAt": 1705776798,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2298534,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/azradimba-rivalimba/events/singles/brackets/1527543/2298534",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1527543,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "69752611-0",
+                  "entrant": {
+                    "id": 15021124,
+                    "name": "W&L | BCP | Mint",
+                    "participants": [
+                      {
+                        "id": 14005490,
+                        "gamerTag": "Mint",
+                        "player": {
+                          "id": 2441157
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_27281593_sets_69752611",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "69752611-1",
+                  "entrant": {
+                    "id": 15337224,
+                    "name": "Azrad",
+                    "participants": [
+                      {
+                        "id": 14279477,
+                        "gamerTag": "Azrad",
+                        "player": {
+                          "id": 2915041
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_27733213_sets_69752611",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 20381507,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 15021124,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 29377063,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 186,
+                      "entrant": {
+                        "id": 15021124
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 186,
+                        "name": "Wrastor"
+                      }
+                    },
+                    {
+                      "id": 29377064,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1923,
+                      "entrant": {
+                        "id": 15337224
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1923,
+                        "name": "Olympia"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 20381508,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 15337224,
+                  "entrant1Score": 0,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 29377065,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 186,
+                      "entrant": {
+                        "id": 15021124
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 186,
+                        "name": "Wrastor"
+                      }
+                    },
+                    {
+                      "id": 29377066,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1923,
+                      "entrant": {
+                        "id": 15337224
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1923,
+                        "name": "Olympia"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 20381509,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 15021124,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 29377067,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 186,
+                      "entrant": {
+                        "id": 15021124
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 186,
+                        "name": "Wrastor"
+                      }
+                    },
+                    {
+                      "id": 29377068,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1923,
+                      "entrant": {
+                        "id": 15337224
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1923,
+                        "name": "Olympia"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 69752612,
+              "state": 3,
+              "winnerId": 15341203,
+              "round": 2,
+              "fullRoundText": "Winners Quarter-Final",
+              "displayScore": "ojo de oro 2 - W&L|GAMER | Vodokex 0",
+              "lPlacement": 9,
+              "wPlacement": 5,
+              "identifier": "D",
+              "startAt": null,
+              "startedAt": 1705775158,
+              "completedAt": 1705775193,
+              "createdAt": 1705770519,
+              "updatedAt": 1705775193,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2298534,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/azradimba-rivalimba/events/singles/brackets/1527543/2298534",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1527543,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "69752612-0",
+                  "entrant": {
+                    "id": 15341203,
+                    "name": "ojo de oro",
+                    "participants": [
+                      {
+                        "id": 14282679,
+                        "gamerTag": "ojo de oro",
+                        "player": {
+                          "id": 1670731
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_27740038_sets_69752612",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "69752612-1",
+                  "entrant": {
+                    "id": 15386542,
+                    "name": "W&L|GAMER | Vodokex",
+                    "participants": [
+                      {
+                        "id": 14328260,
+                        "gamerTag": "Vodokex",
+                        "player": {
+                          "id": 2684562
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_27808759_sets_69752612",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 20380333,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 15341203,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 29375737,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 187,
+                      "entrant": {
+                        "id": 15341203
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 187,
+                        "name": "Kragg"
+                      }
+                    },
+                    {
+                      "id": 29375738,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 188,
+                      "entrant": {
+                        "id": 15386542
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 188,
+                        "name": "Forsburn"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 20380334,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 15341203,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 29375739,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 187,
+                      "entrant": {
+                        "id": 15341203
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 187,
+                        "name": "Kragg"
+                      }
+                    },
+                    {
+                      "id": 29375740,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 188,
+                      "entrant": {
+                        "id": 15386542
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 188,
+                        "name": "Forsburn"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 69752613,
+              "state": 3,
+              "winnerId": 15340117,
+              "round": 2,
+              "fullRoundText": "Winners Quarter-Final",
+              "displayScore": "FrancoKiwi 2 - NSG | Catwo 1",
+              "lPlacement": 7,
+              "wPlacement": 5,
+              "identifier": "E",
+              "startAt": null,
+              "startedAt": 1705776810,
+              "completedAt": 1705777409,
+              "createdAt": 1705770519,
+              "updatedAt": 1705777410,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2298534,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/azradimba-rivalimba/events/singles/brackets/1527543/2298534",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1527543,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "69752613-0",
+                  "entrant": {
+                    "id": 15340117,
+                    "name": "FrancoKiwi",
+                    "participants": [
+                      {
+                        "id": 14281757,
+                        "gamerTag": "FrancoKiwi",
+                        "player": {
+                          "id": 1154899
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_27737810_sets_69752613",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "69752613-1",
+                  "entrant": {
+                    "id": 15331441,
+                    "name": "NSG | Catwo",
+                    "participants": [
+                      {
+                        "id": 14274888,
+                        "gamerTag": "Catwo",
+                        "player": {
+                          "id": 3326405
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_27727135_sets_69752613",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 20381868,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 15331441,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 29377443,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 191,
+                      "entrant": {
+                        "id": 15331441
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 191,
+                        "name": "Etalus"
+                      }
+                    },
+                    {
+                      "id": 29377444,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1119,
+                      "entrant": {
+                        "id": 15340117
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1119,
+                        "name": "Clairen"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 20381869,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 15340117,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 29377445,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 191,
+                      "entrant": {
+                        "id": 15331441
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 191,
+                        "name": "Etalus"
+                      }
+                    },
+                    {
+                      "id": 29377446,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1119,
+                      "entrant": {
+                        "id": 15340117
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1119,
+                        "name": "Clairen"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 20381870,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 15340117,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 29377447,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 191,
+                      "entrant": {
+                        "id": 15331441
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 191,
+                        "name": "Etalus"
+                      }
+                    },
+                    {
+                      "id": 29377448,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1119,
+                      "entrant": {
+                        "id": 15340117
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1119,
+                        "name": "Clairen"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 69752614,
+              "state": 3,
+              "winnerId": 15240974,
+              "round": 2,
+              "fullRoundText": "Winners Quarter-Final",
+              "displayScore": "Rey Rata 2 - CG | Freakazoiid 1",
+              "lPlacement": 9,
+              "wPlacement": 5,
+              "identifier": "F",
+              "startAt": null,
+              "startedAt": 1705775869,
+              "completedAt": 1705775983,
+              "createdAt": 1705770519,
+              "updatedAt": 1705775983,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2298534,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/azradimba-rivalimba/events/singles/brackets/1527543/2298534",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1527543,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "69752614-0",
+                  "entrant": {
+                    "id": 15240974,
+                    "name": "Rey Rata",
+                    "participants": [
+                      {
+                        "id": 14196110,
+                        "gamerTag": "Rey Rata",
+                        "player": {
+                          "id": 3654948
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_27598252_sets_69752614",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "69752614-1",
+                  "entrant": {
+                    "id": 15331401,
+                    "name": "CG | Freakazoiid",
+                    "participants": [
+                      {
+                        "id": 14274844,
+                        "gamerTag": "Freakazoiid",
+                        "player": {
+                          "id": 3008029
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_27727095_sets_69752614",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 20380914,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 15331401,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 29376390,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1920,
+                      "entrant": {
+                        "id": 15240974
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1920,
+                        "name": "Mollo"
+                      }
+                    },
+                    {
+                      "id": 29376391,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 190,
+                      "entrant": {
+                        "id": 15331401
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 190,
+                        "name": "Absa"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 20380915,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 15240974,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 29376392,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 189,
+                      "entrant": {
+                        "id": 15240974
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 189,
+                        "name": "Maypul"
+                      }
+                    },
+                    {
+                      "id": 29376393,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 187,
+                      "entrant": {
+                        "id": 15331401
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 187,
+                        "name": "Kragg"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 20380916,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 15240974,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 29376394,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 189,
+                      "entrant": {
+                        "id": 15240974
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 189,
+                        "name": "Maypul"
+                      }
+                    },
+                    {
+                      "id": 29376395,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 190,
+                      "entrant": {
+                        "id": 15331401
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 190,
+                        "name": "Absa"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 69752640,
+              "state": 3,
+              "winnerId": 15331401,
+              "round": -4,
+              "fullRoundText": "Losers Round 1",
+              "displayScore": "CG | Freakazoiid 2 - CG | Misheon 0",
+              "lPlacement": 9,
+              "wPlacement": 7,
+              "identifier": "L",
+              "startAt": null,
+              "startedAt": 1705778496,
+              "completedAt": 1705778519,
+              "createdAt": 1705770519,
+              "updatedAt": 1705778519,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2298534,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/azradimba-rivalimba/events/singles/brackets/1527543/2298534",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1527543,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "69752640-0",
+                  "entrant": {
+                    "id": 15331401,
+                    "name": "CG | Freakazoiid",
+                    "participants": [
+                      {
+                        "id": 14274844,
+                        "gamerTag": "Freakazoiid",
+                        "player": {
+                          "id": 3008029
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_27727095_sets_69752640",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "69752640-1",
+                  "entrant": {
+                    "id": 15338994,
+                    "name": "CG | Misheon",
+                    "participants": [
+                      {
+                        "id": 14280821,
+                        "gamerTag": "Misheon",
+                        "player": {
+                          "id": 3118601
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_27735747_sets_69752640",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 20382570,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 15331401,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 29378367,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 190,
+                      "entrant": {
+                        "id": 15331401
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 190,
+                        "name": "Absa"
+                      }
+                    },
+                    {
+                      "id": 29378368,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1119,
+                      "entrant": {
+                        "id": 15338994
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1119,
+                        "name": "Clairen"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 20382571,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 15331401,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 29378369,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 190,
+                      "entrant": {
+                        "id": 15331401
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 190,
+                        "name": "Absa"
+                      }
+                    },
+                    {
+                      "id": 29378370,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1119,
+                      "entrant": {
+                        "id": 15338994
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1119,
+                        "name": "Clairen"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 69752642,
+              "state": 3,
+              "winnerId": 15390235,
+              "round": -4,
+              "fullRoundText": "Losers Round 1",
+              "displayScore": "W&L|GAMER | Vodokex 0 - SMB/ZMS | Kapito22 2",
+              "lPlacement": 9,
+              "wPlacement": 7,
+              "identifier": "M",
+              "startAt": null,
+              "startedAt": 1705779290,
+              "completedAt": 1705779323,
+              "createdAt": 1705770519,
+              "updatedAt": 1705779323,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2298534,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/azradimba-rivalimba/events/singles/brackets/1527543/2298534",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1527543,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "69752642-0",
+                  "entrant": {
+                    "id": 15386542,
+                    "name": "W&L|GAMER | Vodokex",
+                    "participants": [
+                      {
+                        "id": 14328260,
+                        "gamerTag": "Vodokex",
+                        "player": {
+                          "id": 2684562
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_27808759_sets_69752642",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "69752642-1",
+                  "entrant": {
+                    "id": 15390235,
+                    "name": "SMB/ZMS | Kapito22",
+                    "participants": [
+                      {
+                        "id": 14331732,
+                        "gamerTag": "Kapito22",
+                        "player": {
+                          "id": 958669
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_27813324_sets_69752642",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 20383051,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 15390235,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 29379100,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 188,
+                      "entrant": {
+                        "id": 15386542
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 188,
+                        "name": "Forsburn"
+                      }
+                    },
+                    {
+                      "id": 29379101,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 184,
+                      "entrant": {
+                        "id": 15390235
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 184,
+                        "name": "Zetterburn"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 20383052,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 15390235,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 29379102,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 188,
+                      "entrant": {
+                        "id": 15386542
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 188,
+                        "name": "Forsburn"
+                      }
+                    },
+                    {
+                      "id": 29379103,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 184,
+                      "entrant": {
+                        "id": 15390235
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 184,
+                        "name": "Zetterburn"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 69752604,
+              "state": 3,
+              "winnerId": 15337224,
+              "round": 1,
+              "fullRoundText": "Winners Round 1",
+              "displayScore": "Azrad 2 - CG | Misheon 0",
+              "lPlacement": 9,
+              "wPlacement": 7,
+              "identifier": "A",
+              "startAt": null,
+              "startedAt": 1705774474,
+              "completedAt": 1705774572,
+              "createdAt": 1705770519,
+              "updatedAt": 1705774573,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2298534,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/azradimba-rivalimba/events/singles/brackets/1527543/2298534",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1527543,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "69752604-0",
+                  "entrant": {
+                    "id": 15337224,
+                    "name": "Azrad",
+                    "participants": [
+                      {
+                        "id": 14279477,
+                        "gamerTag": "Azrad",
+                        "player": {
+                          "id": 2915041
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_27733213_sets_69752604",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "69752604-1",
+                  "entrant": {
+                    "id": 15338994,
+                    "name": "CG | Misheon",
+                    "participants": [
+                      {
+                        "id": 14280821,
+                        "gamerTag": "Misheon",
+                        "player": {
+                          "id": 3118601
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_27735747_sets_69752604",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 20379935,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 15337224,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 29375356,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1923,
+                      "entrant": {
+                        "id": 15337224
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1923,
+                        "name": "Olympia"
+                      }
+                    },
+                    {
+                      "id": 29375357,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1119,
+                      "entrant": {
+                        "id": 15338994
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1119,
+                        "name": "Clairen"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 20379936,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 15337224,
+                  "entrant1Score": 0,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 29375358,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1923,
+                      "entrant": {
+                        "id": 15337224
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1923,
+                        "name": "Olympia"
+                      }
+                    },
+                    {
+                      "id": 29375359,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1119,
+                      "entrant": {
+                        "id": 15338994
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1119,
+                        "name": "Clairen"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 69752608,
+              "state": 3,
+              "winnerId": 15331441,
+              "round": 1,
+              "fullRoundText": "Winners Round 1",
+              "displayScore": "NSG | Catwo 2 - SMB/ZMS | Kapito22 0",
+              "lPlacement": 9,
+              "wPlacement": 7,
+              "identifier": "B",
+              "startAt": null,
+              "startedAt": 1705773895,
+              "completedAt": 1705773994,
+              "createdAt": 1705770519,
+              "updatedAt": 1705773994,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2298534,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/azradimba-rivalimba/events/singles/brackets/1527543/2298534",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1527543,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "69752608-0",
+                  "entrant": {
+                    "id": 15331441,
+                    "name": "NSG | Catwo",
+                    "participants": [
+                      {
+                        "id": 14274888,
+                        "gamerTag": "Catwo",
+                        "player": {
+                          "id": 3326405
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_27727135_sets_69752608",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "69752608-1",
+                  "entrant": {
+                    "id": 15390235,
+                    "name": "SMB/ZMS | Kapito22",
+                    "participants": [
+                      {
+                        "id": 14331732,
+                        "gamerTag": "Kapito22",
+                        "player": {
+                          "id": 958669
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_27813324_sets_69752608",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 20379527,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 15331441,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 29374889,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 191,
+                      "entrant": {
+                        "id": 15331441
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 191,
+                        "name": "Etalus"
+                      }
+                    },
+                    {
+                      "id": 29374899,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 184,
+                      "entrant": {
+                        "id": 15390235
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 184,
+                        "name": "Zetterburn"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 20379528,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 15331441,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 29374891,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 191,
+                      "entrant": {
+                        "id": 15331441
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 191,
+                        "name": "Etalus"
+                      }
+                    },
+                    {
+                      "id": 29374900,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 184,
+                      "entrant": {
+                        "id": 15390235
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 184,
+                        "name": "Zetterburn"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 401
+    },
+    "actionRecords": []
+  }
+}

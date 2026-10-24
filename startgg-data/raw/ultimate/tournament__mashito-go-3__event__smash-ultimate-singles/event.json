@@ -1,0 +1,38 @@
+{
+  "fetchedAt": "2026-10-22T21:41:44.586252+00:00",
+  "sourceUrl": "http://start.gg/tournament/mashito-go-3/event/smash-ultimate-singles",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/mashito-go-3/event/smash-ultimate-singles"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1592120,
+        "name": "Smash Ultimate singles",
+        "numEntrants": 54,
+        "tournament": {
+          "id": 896079,
+          "name": "Mashito GO! #3",
+          "slug": "tournament/mashito-go-3"
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

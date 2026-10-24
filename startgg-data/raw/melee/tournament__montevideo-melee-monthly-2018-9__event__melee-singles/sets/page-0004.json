@@ -1,0 +1,136 @@
+{
+  "fetchedAt": "2026-10-22T21:52:21.171741+00:00",
+  "sourceUrl": "http://start.gg/tournament/montevideo-melee-monthly-2018-9/event/melee-singles",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 250634,
+    "page": 4,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 250634,
+        "name": "Melee Singles",
+        "sets": {
+          "pageInfo": {
+            "total": 31
+          },
+          "nodes": [
+            {
+              "id": 17116602,
+              "state": 3,
+              "winnerId": 2248785,
+              "round": 1,
+              "fullRoundText": "Round 1",
+              "displayScore": "kalarse 0 - SrPaz 2",
+              "lPlacement": null,
+              "wPlacement": null,
+              "identifier": "B",
+              "startAt": null,
+              "startedAt": 1540750322,
+              "completedAt": 1540750824,
+              "createdAt": 1540749109,
+              "updatedAt": 1540750825,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 798533,
+                "displayIdentifier": "3",
+                "bracketType": "ROUND_ROBIN",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2018-9/events/melee-singles/brackets/445559/798533",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 445559,
+                  "name": "RR",
+                  "phaseOrder": 2,
+                  "bracketType": "ROUND_ROBIN",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "17116602-0",
+                  "entrant": {
+                    "id": 2239308,
+                    "name": "kalarse",
+                    "participants": [
+                      {
+                        "id": 2204212,
+                        "gamerTag": "kalarse",
+                        "player": {
+                          "id": 152484
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_8101119_sets_17116602",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "17116602-1",
+                  "entrant": {
+                    "id": 2248785,
+                    "name": "SrPaz",
+                    "participants": [
+                      {
+                        "id": 2209873,
+                        "gamerTag": "SrPaz",
+                        "player": {
+                          "id": 895125
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_8101124_sets_17116602",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 33
+    },
+    "actionRecords": []
+  }
+}

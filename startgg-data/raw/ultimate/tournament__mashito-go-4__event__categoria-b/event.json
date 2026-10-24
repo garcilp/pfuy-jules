@@ -1,0 +1,44 @@
+{
+  "fetchedAt": "2026-10-23T14:44:09.988217+00:00",
+  "sourceUrl": "http://start.gg/tournament/mashito-go-4/event/categoria-b",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/mashito-go-4/event/categoria-b"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1628022,
+        "name": "Categoria B",
+        "numEntrants": 17,
+        "tournament": {
+          "id": 907703,
+          "name": "Mashito GO! #4",
+          "slug": "tournament/mashito-go-4",
+          "images": [
+            {
+              "url": "https://images.start.gg/images/tournament/907703/image-853d517cd06a3bc91351f39401d14391.png",
+              "type": "profile"
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

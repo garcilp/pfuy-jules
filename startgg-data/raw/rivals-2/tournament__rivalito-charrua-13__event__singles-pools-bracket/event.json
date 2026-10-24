@@ -1,0 +1,44 @@
+{
+  "fetchedAt": "2026-10-23T14:42:42.628726+00:00",
+  "sourceUrl": "http://start.gg/tournament/rivalito-charrua-13/event/singles-pools-bracket",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/rivalito-charrua-13/event/singles-pools-bracket"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1413621,
+        "name": "Singles (Pools + Bracket)",
+        "numEntrants": 12,
+        "tournament": {
+          "id": 806456,
+          "name": "Rivalito Charrua #13",
+          "slug": "tournament/rivalito-charrua-13",
+          "images": [
+            {
+              "url": "https://images.start.gg/images/tournament/806456/image-48b1c91d371c783950c4ff4a3d244605.png",
+              "type": "profile"
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

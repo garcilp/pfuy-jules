@@ -1,0 +1,1820 @@
+{
+  "fetchedAt": "2026-10-22T21:44:56.624327+00:00",
+  "sourceUrl": "http://start.gg/tournament/mashito-go-7/event/falsa-b",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 1714218,
+    "page": 1,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1714218,
+        "name": "Falsa B",
+        "sets": {
+          "pageInfo": {
+            "total": 12
+          },
+          "nodes": [
+            {
+              "id": 107926681,
+              "state": 3,
+              "winnerId": 24744863,
+              "round": 4,
+              "fullRoundText": "Grand Final",
+              "displayScore": "elcusquerman 2 - JoaquinYn 0",
+              "lPlacement": 2,
+              "wPlacement": 1,
+              "identifier": "G",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1789848559,
+              "createdAt": 1789840477,
+              "updatedAt": 1789848560,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 3464433,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/mashito-go-7/events/falsa-b/brackets/2403644/3464433",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 2403644,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "107926681-0",
+                  "entrant": {
+                    "id": 24744863,
+                    "name": "elcusquerman",
+                    "participants": [
+                      {
+                        "id": 22623295,
+                        "gamerTag": "elcusquerman",
+                        "player": {
+                          "id": 3124833
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_41884931_sets_107926681",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "107926681-1",
+                  "entrant": {
+                    "id": 24744866,
+                    "name": "JoaquinYn",
+                    "participants": [
+                      {
+                        "id": 22629222,
+                        "gamerTag": "JoaquinYn",
+                        "player": {
+                          "id": 5241086
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_41884934_sets_107926681",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 40974068,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 24744863,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 61387240,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1340,
+                      "entrant": {
+                        "id": 24744863
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1340,
+                        "name": "Zelda"
+                      }
+                    },
+                    {
+                      "id": 61387241,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1532,
+                      "entrant": {
+                        "id": 24744866
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1532,
+                        "name": "Terry"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 40974069,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 24744863,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 61387242,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1340,
+                      "entrant": {
+                        "id": 24744863
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1340,
+                        "name": "Zelda"
+                      }
+                    },
+                    {
+                      "id": 61387243,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1532,
+                      "entrant": {
+                        "id": 24744866
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1532,
+                        "name": "Terry"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 107926680,
+              "state": 3,
+              "winnerId": 24744863,
+              "round": 3,
+              "fullRoundText": "Winners Final",
+              "displayScore": "elcusquerman 2 - JoaquinYn 0",
+              "lPlacement": 3,
+              "wPlacement": 2,
+              "identifier": "F",
+              "startAt": null,
+              "startedAt": 1789842819,
+              "completedAt": 1789842847,
+              "createdAt": 1789840477,
+              "updatedAt": 1789842847,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 3464433,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/mashito-go-7/events/falsa-b/brackets/2403644/3464433",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 2403644,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "107926680-0",
+                  "entrant": {
+                    "id": 24744863,
+                    "name": "elcusquerman",
+                    "participants": [
+                      {
+                        "id": 22623295,
+                        "gamerTag": "elcusquerman",
+                        "player": {
+                          "id": 3124833
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_41884931_sets_107926680",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "107926680-1",
+                  "entrant": {
+                    "id": 24744866,
+                    "name": "JoaquinYn",
+                    "participants": [
+                      {
+                        "id": 22629222,
+                        "gamerTag": "JoaquinYn",
+                        "player": {
+                          "id": 5241086
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_41884934_sets_107926680",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 40969754,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 24744863,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 61380032,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1340,
+                      "entrant": {
+                        "id": 24744863
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1340,
+                        "name": "Zelda"
+                      }
+                    },
+                    {
+                      "id": 61380034,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1532,
+                      "entrant": {
+                        "id": 24744866
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1532,
+                        "name": "Terry"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 40969756,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 24744863,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 61380036,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1340,
+                      "entrant": {
+                        "id": 24744863
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1340,
+                        "name": "Zelda"
+                      }
+                    },
+                    {
+                      "id": 61380038,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1532,
+                      "entrant": {
+                        "id": 24744866
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1532,
+                        "name": "Terry"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 107926696,
+              "state": 3,
+              "winnerId": 24744866,
+              "round": -6,
+              "fullRoundText": "Losers Final",
+              "displayScore": "JoaquinYn 2 - Robotico25 0",
+              "lPlacement": 3,
+              "wPlacement": 2,
+              "identifier": "M",
+              "startAt": null,
+              "startedAt": 1789844763,
+              "completedAt": 1789844798,
+              "createdAt": 1789840477,
+              "updatedAt": 1789844799,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 3464433,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/mashito-go-7/events/falsa-b/brackets/2403644/3464433",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 2403644,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "107926696-0",
+                  "entrant": {
+                    "id": 24744866,
+                    "name": "JoaquinYn",
+                    "participants": [
+                      {
+                        "id": 22629222,
+                        "gamerTag": "JoaquinYn",
+                        "player": {
+                          "id": 5241086
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_41884934_sets_107926696",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "107926696-1",
+                  "entrant": {
+                    "id": 24744868,
+                    "name": "Robotico25",
+                    "participants": [
+                      {
+                        "id": 22638582,
+                        "gamerTag": "Robotico25",
+                        "player": {
+                          "id": 5586213
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_41884935_sets_107926696",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 40970841,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 24744866,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 61382012,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1532,
+                      "entrant": {
+                        "id": 24744866
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1532,
+                        "name": "Terry"
+                      }
+                    },
+                    {
+                      "id": 61382013,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1407,
+                      "entrant": {
+                        "id": 24744868
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1407,
+                        "name": "King K. Rool"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 40970842,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 24744866,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 61382014,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1532,
+                      "entrant": {
+                        "id": 24744866
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1532,
+                        "name": "Terry"
+                      }
+                    },
+                    {
+                      "id": 61382015,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1795,
+                      "entrant": {
+                        "id": 24744868
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1795,
+                        "name": "Pyra & Mythra"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 107926695,
+              "state": 3,
+              "winnerId": 24744868,
+              "round": -5,
+              "fullRoundText": "Losers Semi-Final",
+              "displayScore": "Dieguix 0 - Robotico25 2",
+              "lPlacement": 4,
+              "wPlacement": 3,
+              "identifier": "L",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1789844134,
+              "createdAt": 1789840477,
+              "updatedAt": 1789844135,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 3464433,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/mashito-go-7/events/falsa-b/brackets/2403644/3464433",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 2403644,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "107926695-0",
+                  "entrant": {
+                    "id": 24744862,
+                    "name": "Dieguix",
+                    "participants": [
+                      {
+                        "id": 22638580,
+                        "gamerTag": "Dieguix",
+                        "player": {
+                          "id": 4297313
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_41884930_sets_107926695",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "107926695-1",
+                  "entrant": {
+                    "id": 24744868,
+                    "name": "Robotico25",
+                    "participants": [
+                      {
+                        "id": 22638582,
+                        "gamerTag": "Robotico25",
+                        "player": {
+                          "id": 5586213
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_41884935_sets_107926695",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 40970467,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 24744868,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 61381357,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1795,
+                      "entrant": {
+                        "id": 24744862
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1795,
+                        "name": "Pyra & Mythra"
+                      }
+                    },
+                    {
+                      "id": 61381358,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1407,
+                      "entrant": {
+                        "id": 24744868
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1407,
+                        "name": "King K. Rool"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 40970468,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 24744868,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 61381359,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1795,
+                      "entrant": {
+                        "id": 24744862
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1795,
+                        "name": "Pyra & Mythra"
+                      }
+                    },
+                    {
+                      "id": 61381360,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1407,
+                      "entrant": {
+                        "id": 24744868
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1407,
+                        "name": "King K. Rool"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 107926678,
+              "state": 3,
+              "winnerId": 24744863,
+              "round": 2,
+              "fullRoundText": "Winners Semi-Final",
+              "displayScore": "elcusquerman 2 - Robotico25 1",
+              "lPlacement": 5,
+              "wPlacement": 3,
+              "identifier": "D",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1789841916,
+              "createdAt": 1789840477,
+              "updatedAt": 1789841917,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 3464433,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/mashito-go-7/events/falsa-b/brackets/2403644/3464433",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 2403644,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "107926678-0",
+                  "entrant": {
+                    "id": 24744863,
+                    "name": "elcusquerman",
+                    "participants": [
+                      {
+                        "id": 22623295,
+                        "gamerTag": "elcusquerman",
+                        "player": {
+                          "id": 3124833
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_41884931_sets_107926678",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "107926678-1",
+                  "entrant": {
+                    "id": 24744868,
+                    "name": "Robotico25",
+                    "participants": [
+                      {
+                        "id": 22638582,
+                        "gamerTag": "Robotico25",
+                        "player": {
+                          "id": 5586213
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_41884935_sets_107926678",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 40969241,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 24744863,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 61379024,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1340,
+                      "entrant": {
+                        "id": 24744863
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1340,
+                        "name": "Zelda"
+                      }
+                    },
+                    {
+                      "id": 61379025,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1407,
+                      "entrant": {
+                        "id": 24744868
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1407,
+                        "name": "King K. Rool"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 40969242,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 24744868,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 61379026,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1340,
+                      "entrant": {
+                        "id": 24744863
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1340,
+                        "name": "Zelda"
+                      }
+                    },
+                    {
+                      "id": 61379027,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1407,
+                      "entrant": {
+                        "id": 24744868
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1407,
+                        "name": "King K. Rool"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 40969243,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 24744863,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 61379028,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1340,
+                      "entrant": {
+                        "id": 24744863
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1340,
+                        "name": "Zelda"
+                      }
+                    },
+                    {
+                      "id": 61379029,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1407,
+                      "entrant": {
+                        "id": 24744868
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1407,
+                        "name": "King K. Rool"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 107926679,
+              "state": 3,
+              "winnerId": 24744866,
+              "round": 2,
+              "fullRoundText": "Winners Semi-Final",
+              "displayScore": "JoaquinYn 2 - Dieguix 0",
+              "lPlacement": 5,
+              "wPlacement": 3,
+              "identifier": "E",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1789842163,
+              "createdAt": 1789840477,
+              "updatedAt": 1789842163,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 3464433,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/mashito-go-7/events/falsa-b/brackets/2403644/3464433",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 2403644,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "107926679-0",
+                  "entrant": {
+                    "id": 24744866,
+                    "name": "JoaquinYn",
+                    "participants": [
+                      {
+                        "id": 22629222,
+                        "gamerTag": "JoaquinYn",
+                        "player": {
+                          "id": 5241086
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_41884934_sets_107926679",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "107926679-1",
+                  "entrant": {
+                    "id": 24744862,
+                    "name": "Dieguix",
+                    "participants": [
+                      {
+                        "id": 22638580,
+                        "gamerTag": "Dieguix",
+                        "player": {
+                          "id": 4297313
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_41884930_sets_107926679",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 40969353,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 24744866,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 61379246,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1795,
+                      "entrant": {
+                        "id": 24744862
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1795,
+                        "name": "Pyra & Mythra"
+                      }
+                    },
+                    {
+                      "id": 61379247,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1532,
+                      "entrant": {
+                        "id": 24744866
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1532,
+                        "name": "Terry"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 40969354,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 24744866,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 61379248,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1795,
+                      "entrant": {
+                        "id": 24744862
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1795,
+                        "name": "Pyra & Mythra"
+                      }
+                    },
+                    {
+                      "id": 61379249,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1532,
+                      "entrant": {
+                        "id": 24744866
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1532,
+                        "name": "Terry"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 107926693,
+              "state": 3,
+              "winnerId": 24744862,
+              "round": -4,
+              "fullRoundText": "Losers Quarter-Final",
+              "displayScore": "Dieguix 2 - Choyer 0",
+              "lPlacement": 5,
+              "wPlacement": 4,
+              "identifier": "J",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1789842669,
+              "createdAt": 1789840477,
+              "updatedAt": 1789842712,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 3464433,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/mashito-go-7/events/falsa-b/brackets/2403644/3464433",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 2403644,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "107926693-0",
+                  "entrant": {
+                    "id": 24744862,
+                    "name": "Dieguix",
+                    "participants": [
+                      {
+                        "id": 22638580,
+                        "gamerTag": "Dieguix",
+                        "player": {
+                          "id": 4297313
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_41884930_sets_107926693",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "107926693-1",
+                  "entrant": {
+                    "id": 24744865,
+                    "name": "Choyer",
+                    "participants": [
+                      {
+                        "id": 22583608,
+                        "gamerTag": "Choyer",
+                        "player": {
+                          "id": 5533511
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_41884933_sets_107926693",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 40969686,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 24744862,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 61379891,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1795,
+                      "entrant": {
+                        "id": 24744862
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1795,
+                        "name": "Pyra & Mythra"
+                      }
+                    },
+                    {
+                      "id": 61379892,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1275,
+                      "entrant": {
+                        "id": 24744865
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1275,
+                        "name": "Cloud"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 40969687,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 24744862,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 61379893,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1795,
+                      "entrant": {
+                        "id": 24744862
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1795,
+                        "name": "Pyra & Mythra"
+                      }
+                    },
+                    {
+                      "id": 61379894,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1275,
+                      "entrant": {
+                        "id": 24744865
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1275,
+                        "name": "Cloud"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 107926694,
+              "state": 3,
+              "winnerId": 24744868,
+              "round": -4,
+              "fullRoundText": "Losers Quarter-Final",
+              "displayScore": "Robotico25 2 - YATTA 0",
+              "lPlacement": 5,
+              "wPlacement": 4,
+              "identifier": "K",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1789843692,
+              "createdAt": 1789840477,
+              "updatedAt": 1789843693,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 3464433,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/mashito-go-7/events/falsa-b/brackets/2403644/3464433",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 2403644,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "107926694-0",
+                  "entrant": {
+                    "id": 24744868,
+                    "name": "Robotico25",
+                    "participants": [
+                      {
+                        "id": 22638582,
+                        "gamerTag": "Robotico25",
+                        "player": {
+                          "id": 5586213
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_41884935_sets_107926694",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "107926694-1",
+                  "entrant": {
+                    "id": 24744860,
+                    "name": "YATTA",
+                    "participants": [
+                      {
+                        "id": 22585690,
+                        "gamerTag": "YATTA",
+                        "player": {
+                          "id": 3927015
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_41884929_sets_107926694",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 40970228,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 24744868,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 61380891,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1305,
+                      "entrant": {
+                        "id": 24744860
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1305,
+                        "name": "Mega Man"
+                      }
+                    },
+                    {
+                      "id": 61380892,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1407,
+                      "entrant": {
+                        "id": 24744868
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1407,
+                        "name": "King K. Rool"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 40970229,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 24744868,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 61380893,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1305,
+                      "entrant": {
+                        "id": 24744860
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1305,
+                        "name": "Mega Man"
+                      }
+                    },
+                    {
+                      "id": 61380894,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1407,
+                      "entrant": {
+                        "id": 24744868
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1407,
+                        "name": "King K. Rool"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 107926692,
+              "state": 3,
+              "winnerId": 24744860,
+              "round": -3,
+              "fullRoundText": "Losers Round 1",
+              "displayScore": "youshouldbettercallsoul 0 - YATTA 2",
+              "lPlacement": 7,
+              "wPlacement": 5,
+              "identifier": "I",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1789843151,
+              "createdAt": 1789840477,
+              "updatedAt": 1789843151,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 3464433,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/mashito-go-7/events/falsa-b/brackets/2403644/3464433",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 2403644,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "107926692-0",
+                  "entrant": {
+                    "id": 24744864,
+                    "name": "youshouldbettercallsoul",
+                    "participants": [
+                      {
+                        "id": 22638581,
+                        "gamerTag": "youshouldbettercallsoul",
+                        "player": {
+                          "id": 5586212
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_41884932_sets_107926692",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "107926692-1",
+                  "entrant": {
+                    "id": 24744860,
+                    "name": "YATTA",
+                    "participants": [
+                      {
+                        "id": 22585690,
+                        "gamerTag": "YATTA",
+                        "player": {
+                          "id": 3927015
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_41884929_sets_107926692",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 40969908,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 24744860,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 61380320,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1305,
+                      "entrant": {
+                        "id": 24744860
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1305,
+                        "name": "Mega Man"
+                      }
+                    },
+                    {
+                      "id": 61380321,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1292,
+                      "entrant": {
+                        "id": 24744864
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1292,
+                        "name": "Inkling"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 40969909,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 24744860,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 61380322,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1305,
+                      "entrant": {
+                        "id": 24744860
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1305,
+                        "name": "Mega Man"
+                      }
+                    },
+                    {
+                      "id": 61380323,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1332,
+                      "entrant": {
+                        "id": 24744864
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1332,
+                        "name": "Sonic"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 107926675,
+              "state": 3,
+              "winnerId": 24744868,
+              "round": 1,
+              "fullRoundText": "Winners Quarter-Final",
+              "displayScore": "Robotico25 2 - Choyer 0",
+              "lPlacement": 5,
+              "wPlacement": 5,
+              "identifier": "A",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1789841173,
+              "createdAt": 1789840477,
+              "updatedAt": 1789841280,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 3464433,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/mashito-go-7/events/falsa-b/brackets/2403644/3464433",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 2403644,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "107926675-0",
+                  "entrant": {
+                    "id": 24744868,
+                    "name": "Robotico25",
+                    "participants": [
+                      {
+                        "id": 22638582,
+                        "gamerTag": "Robotico25",
+                        "player": {
+                          "id": 5586213
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_41884935_sets_107926675",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "107926675-1",
+                  "entrant": {
+                    "id": 24744865,
+                    "name": "Choyer",
+                    "participants": [
+                      {
+                        "id": 22583608,
+                        "gamerTag": "Choyer",
+                        "player": {
+                          "id": 5533511
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_41884933_sets_107926675",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 40968850,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 24744868,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 61378273,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1275,
+                      "entrant": {
+                        "id": 24744865
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1275,
+                        "name": "Cloud"
+                      }
+                    },
+                    {
+                      "id": 61378274,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1407,
+                      "entrant": {
+                        "id": 24744868
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1407,
+                        "name": "King K. Rool"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 40968851,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 24744868,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 61378275,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1275,
+                      "entrant": {
+                        "id": 24744865
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1275,
+                        "name": "Cloud"
+                      }
+                    },
+                    {
+                      "id": 61378276,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1407,
+                      "entrant": {
+                        "id": 24744868
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1407,
+                        "name": "King K. Rool"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 479
+    },
+    "actionRecords": []
+  }
+}

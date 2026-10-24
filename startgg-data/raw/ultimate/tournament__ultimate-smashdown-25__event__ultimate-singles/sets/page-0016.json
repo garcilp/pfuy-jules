@@ -1,0 +1,836 @@
+{
+  "fetchedAt": "2026-10-22T21:29:06.792780+00:00",
+  "sourceUrl": "https://www.start.gg/tournament/ultimate-smashdown-25/event/ultimate-singles",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 1212303,
+    "page": 16,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1212303,
+        "name": "Ultimate Singles",
+        "sets": {
+          "pageInfo": {
+            "total": 153
+          },
+          "nodes": [
+            {
+              "id": 80036154,
+              "state": 3,
+              "winnerId": 17760824,
+              "round": -4,
+              "fullRoundText": "Losers Quarter-Final",
+              "displayScore": "UWA | Belipe 3 - UWA | DarkFlame 2",
+              "lPlacement": 5,
+              "wPlacement": 4,
+              "identifier": "I",
+              "startAt": null,
+              "startedAt": 1726955448,
+              "completedAt": 1726955829,
+              "createdAt": 1726951467,
+              "updatedAt": 1726955830,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2607601,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/ultimate-smashdown-25/events/ultimate-singles/brackets/1758309/2607601",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1758309,
+                  "name": "Top 8",
+                  "phaseOrder": 5,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "80036154-0",
+                  "entrant": {
+                    "id": 17760824,
+                    "name": "UWA | Belipe",
+                    "participants": [
+                      {
+                        "id": 16457454,
+                        "gamerTag": "Belipe",
+                        "player": {
+                          "id": 1398327
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_31280895_sets_80036154",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "80036154-1",
+                  "entrant": {
+                    "id": 17757940,
+                    "name": "UWA | DarkFlame",
+                    "participants": [
+                      {
+                        "id": 16455346,
+                        "gamerTag": "DarkFlame",
+                        "player": {
+                          "id": 1446472
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_31280899_sets_80036154",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 25060592,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 17760824,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 36389649,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1795,
+                      "entrant": {
+                        "id": 17757940
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1795,
+                        "name": "Pyra & Mythra"
+                      }
+                    },
+                    {
+                      "id": 36389650,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1333,
+                      "entrant": {
+                        "id": 17760824
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1333,
+                        "name": "Toon Link"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 25060593,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 17757940,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 36389651,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1795,
+                      "entrant": {
+                        "id": 17757940
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1795,
+                        "name": "Pyra & Mythra"
+                      }
+                    },
+                    {
+                      "id": 36389652,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1333,
+                      "entrant": {
+                        "id": 17760824
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1333,
+                        "name": "Toon Link"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 25060594,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 17760824,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 36389653,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1795,
+                      "entrant": {
+                        "id": 17757940
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1795,
+                        "name": "Pyra & Mythra"
+                      }
+                    },
+                    {
+                      "id": 36389654,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1333,
+                      "entrant": {
+                        "id": 17760824
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1333,
+                        "name": "Toon Link"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 25060595,
+                  "orderNum": 4,
+                  "state": 3,
+                  "winnerId": 17757940,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 36389655,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1532,
+                      "entrant": {
+                        "id": 17757940
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1532,
+                        "name": "Terry"
+                      }
+                    },
+                    {
+                      "id": 36389656,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1333,
+                      "entrant": {
+                        "id": 17760824
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1333,
+                        "name": "Toon Link"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 25060596,
+                  "orderNum": 5,
+                  "state": 3,
+                  "winnerId": 17760824,
+                  "entrant1Score": 0,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 36389657,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1532,
+                      "entrant": {
+                        "id": 17757940
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1532,
+                        "name": "Terry"
+                      }
+                    },
+                    {
+                      "id": 36389658,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1333,
+                      "entrant": {
+                        "id": 17760824
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1333,
+                        "name": "Toon Link"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 80036151,
+              "state": 3,
+              "winnerId": 17791016,
+              "round": -3,
+              "fullRoundText": "Losers Round 1",
+              "displayScore": "Pulga 3 - DBD | RIGONARDO 1",
+              "lPlacement": 7,
+              "wPlacement": 5,
+              "identifier": "F",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1726953829,
+              "createdAt": 1726951467,
+              "updatedAt": 1726953830,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2607601,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/ultimate-smashdown-25/events/ultimate-singles/brackets/1758309/2607601",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1758309,
+                  "name": "Top 8",
+                  "phaseOrder": 5,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "80036151-0",
+                  "entrant": {
+                    "id": 17791016,
+                    "name": "Pulga",
+                    "participants": [
+                      {
+                        "id": 16482491,
+                        "gamerTag": "Pulga",
+                        "player": {
+                          "id": 1365932
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_31280898_sets_80036151",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "80036151-1",
+                  "entrant": {
+                    "id": 17746594,
+                    "name": "DBD | RIGONARDO",
+                    "participants": [
+                      {
+                        "id": 16445345,
+                        "gamerTag": "RIGONARDO",
+                        "player": {
+                          "id": 1244573
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_31280897_sets_80036151",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 25059646,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 17791016,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 36388171,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1321,
+                      "entrant": {
+                        "id": 17746594
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1321,
+                        "name": "Pokemon Trainer"
+                      }
+                    },
+                    {
+                      "id": 36388172,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1294,
+                      "entrant": {
+                        "id": 17791016
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1294,
+                        "name": "King Dedede"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 25059647,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 17746594,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 36388173,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1321,
+                      "entrant": {
+                        "id": 17746594
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1321,
+                        "name": "Pokemon Trainer"
+                      }
+                    },
+                    {
+                      "id": 36388174,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1294,
+                      "entrant": {
+                        "id": 17791016
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1294,
+                        "name": "King Dedede"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 25059648,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 17791016,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 36388175,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1321,
+                      "entrant": {
+                        "id": 17746594
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1321,
+                        "name": "Pokemon Trainer"
+                      }
+                    },
+                    {
+                      "id": 36388176,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1294,
+                      "entrant": {
+                        "id": 17791016
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1294,
+                        "name": "King Dedede"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 25059649,
+                  "orderNum": 4,
+                  "state": 3,
+                  "winnerId": 17791016,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 36388177,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1321,
+                      "entrant": {
+                        "id": 17746594
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1321,
+                        "name": "Pokemon Trainer"
+                      }
+                    },
+                    {
+                      "id": 36388178,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1294,
+                      "entrant": {
+                        "id": 17791016
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1294,
+                        "name": "King Dedede"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 80036152,
+              "state": 3,
+              "winnerId": 17757940,
+              "round": -3,
+              "fullRoundText": "Losers Round 1",
+              "displayScore": "UWA | DarkFlame 3 - SMB | Pos3idóN 1",
+              "lPlacement": 7,
+              "wPlacement": 5,
+              "identifier": "G",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1726953209,
+              "createdAt": 1726951467,
+              "updatedAt": 1726953210,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2607601,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/ultimate-smashdown-25/events/ultimate-singles/brackets/1758309/2607601",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1758309,
+                  "name": "Top 8",
+                  "phaseOrder": 5,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "80036152-0",
+                  "entrant": {
+                    "id": 17757940,
+                    "name": "UWA | DarkFlame",
+                    "participants": [
+                      {
+                        "id": 16455346,
+                        "gamerTag": "DarkFlame",
+                        "player": {
+                          "id": 1446472
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_31280899_sets_80036152",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "80036152-1",
+                  "entrant": {
+                    "id": 17877444,
+                    "name": "SMB | Pos3idóN",
+                    "participants": [
+                      {
+                        "id": 16554767,
+                        "gamerTag": "Pos3idóN",
+                        "player": {
+                          "id": 1360085
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_31280896_sets_80036152",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 25059347,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 17877444,
+                  "entrant1Score": 0,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 36387740,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1846,
+                      "entrant": {
+                        "id": 17757940
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1846,
+                        "name": "Kazuya"
+                      }
+                    },
+                    {
+                      "id": 36387741,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1327,
+                      "entrant": {
+                        "id": 17877444
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1327,
+                        "name": "Ryu"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 25059348,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 17757940,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 36387742,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1846,
+                      "entrant": {
+                        "id": 17757940
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1846,
+                        "name": "Kazuya"
+                      }
+                    },
+                    {
+                      "id": 36387743,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1327,
+                      "entrant": {
+                        "id": 17877444
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1327,
+                        "name": "Ryu"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 25059349,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 17757940,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 36387744,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1846,
+                      "entrant": {
+                        "id": 17757940
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1846,
+                        "name": "Kazuya"
+                      }
+                    },
+                    {
+                      "id": 36387745,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1327,
+                      "entrant": {
+                        "id": 17877444
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1327,
+                        "name": "Ryu"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 25059350,
+                  "orderNum": 4,
+                  "state": 3,
+                  "winnerId": 17757940,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 36387746,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1846,
+                      "entrant": {
+                        "id": 17757940
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1846,
+                        "name": "Kazuya"
+                      }
+                    },
+                    {
+                      "id": 36387747,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1327,
+                      "entrant": {
+                        "id": 17877444
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1327,
+                        "name": "Ryu"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 198
+    },
+    "actionRecords": []
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "fetchedAt": "2026-10-23T14:44:11.242030+00:00",
+  "sourceUrl": "http://start.gg/tournament/ultimo-smashdown/event/smash-ultimate-singles",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/ultimo-smashdown/event/smash-ultimate-singles"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1638646,
+        "name": "Smash Ultimate singles",
+        "numEntrants": 45,
+        "tournament": {
+          "id": 918501,
+          "name": "Ultimo Smashdown",
+          "slug": "tournament/ultimo-smashdown",
+          "images": [
+            {
+              "url": "https://images.start.gg/images/tournament/918501/image-80b733c524407d11624300f4b5b05321.png",
+              "type": "profile"
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

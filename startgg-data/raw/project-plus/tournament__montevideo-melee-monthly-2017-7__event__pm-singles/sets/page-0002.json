@@ -1,0 +1,136 @@
+{
+  "fetchedAt": "2026-10-22T21:48:25.477121+00:00",
+  "sourceUrl": "http://start.gg/tournament/montevideo-melee-monthly-2017-7/event/pm-singles",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 41908,
+    "page": 2,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 41908,
+        "name": "PM Singles",
+        "sets": {
+          "pageInfo": {
+            "total": 11
+          },
+          "nodes": [
+            {
+              "id": 9148391,
+              "state": 3,
+              "winnerId": 934261,
+              "round": 1,
+              "fullRoundText": "Round 1",
+              "displayScore": "SOL!D 2 - Deleted user 0",
+              "lPlacement": 9,
+              "wPlacement": 5,
+              "identifier": "D",
+              "startAt": null,
+              "startedAt": 1501363658,
+              "completedAt": 1501364032,
+              "createdAt": 1501362736,
+              "updatedAt": 1501364033,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 402197,
+                "displayIdentifier": "1",
+                "bracketType": "SINGLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2017-7/events/pm-singles/brackets/143498/402197",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 143498,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "SINGLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "9148391-0",
+                  "entrant": {
+                    "id": 934261,
+                    "name": "SOL!D",
+                    "participants": [
+                      {
+                        "id": 975503,
+                        "gamerTag": "SOL!D",
+                        "player": {
+                          "id": 330371
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_5681851_sets_9148391",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "9148391-1",
+                  "entrant": {
+                    "id": 935435,
+                    "name": "Deleted user",
+                    "participants": [
+                      {
+                        "id": 976893,
+                        "gamerTag": "Deleted user",
+                        "player": {
+                          "id": 442840
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_5683429_sets_9148391",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 33
+    },
+    "actionRecords": []
+  }
+}

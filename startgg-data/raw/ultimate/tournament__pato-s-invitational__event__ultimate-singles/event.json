@@ -1,0 +1,44 @@
+{
+  "fetchedAt": "2026-10-23T14:42:57.393444+00:00",
+  "sourceUrl": "https://www.start.gg/tournament/pato-s-invitational/event/ultimate-singles",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/pato-s-invitational/event/ultimate-singles"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 380958,
+        "name": "Ultimate Singles",
+        "numEntrants": 35,
+        "tournament": {
+          "id": 165520,
+          "name": "Pato's Invitational",
+          "slug": "tournament/pato-s-invitational",
+          "images": [
+            {
+              "url": "https://images.start.gg/images/tournament/165520/image-88de15c4d66d9d7529c317abe40d6600.jpg",
+              "type": "profile"
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

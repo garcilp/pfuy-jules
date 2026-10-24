@@ -1,0 +1,991 @@
+{
+  "fetchedAt": "2026-10-22T21:51:06.414123+00:00",
+  "sourceUrl": "http://start.gg/tournament/montevideo-melee-monthly-2018-2/event/melee-singles",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 92119,
+    "page": 1,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 92119,
+        "name": "Melee Singles",
+        "sets": {
+          "pageInfo": {
+            "total": 40
+          },
+          "nodes": [
+            {
+              "id": 12518775,
+              "state": 3,
+              "winnerId": 1551238,
+              "round": 5,
+              "fullRoundText": "Grand Final",
+              "displayScore": "Iguana 1 - cubax 3",
+              "lPlacement": 2,
+              "wPlacement": 1,
+              "identifier": "M",
+              "startAt": null,
+              "startedAt": 1522530185,
+              "completedAt": 1522531452,
+              "createdAt": 1522520985,
+              "updatedAt": 1522519609,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 544080,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2018-2/events/melee-singles/brackets/235472/544080",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 235472,
+                  "name": "Bracket",
+                  "phaseOrder": 2,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "12518775-0",
+                  "entrant": {
+                    "id": 1481633,
+                    "name": "Iguana",
+                    "participants": [
+                      {
+                        "id": 1503586,
+                        "gamerTag": "Iguana",
+                        "player": {
+                          "id": 264244
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_6906297_sets_12518775",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "12518775-1",
+                  "entrant": {
+                    "id": 1551238,
+                    "name": "cubax",
+                    "participants": [
+                      {
+                        "id": 1566681,
+                        "gamerTag": "cubax",
+                        "player": {
+                          "id": 264064
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_6906300_sets_12518775",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            },
+            {
+              "id": 12518776,
+              "state": 3,
+              "winnerId": 1481633,
+              "round": 5,
+              "fullRoundText": "Grand Final Reset",
+              "displayScore": "cubax 0 - Iguana 3",
+              "lPlacement": 2,
+              "wPlacement": 1,
+              "identifier": "N",
+              "startAt": null,
+              "startedAt": 1522531457,
+              "completedAt": 1522532063,
+              "createdAt": 1522520985,
+              "updatedAt": 1522519609,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 544080,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2018-2/events/melee-singles/brackets/235472/544080",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 235472,
+                  "name": "Bracket",
+                  "phaseOrder": 2,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "12518776-0",
+                  "entrant": {
+                    "id": 1551238,
+                    "name": "cubax",
+                    "participants": [
+                      {
+                        "id": 1566681,
+                        "gamerTag": "cubax",
+                        "player": {
+                          "id": 264064
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_6906300_sets_12518776",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "12518776-1",
+                  "entrant": {
+                    "id": 1481633,
+                    "name": "Iguana",
+                    "participants": [
+                      {
+                        "id": 1503586,
+                        "gamerTag": "Iguana",
+                        "player": {
+                          "id": 264244
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_6906297_sets_12518776",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            },
+            {
+              "id": 12518774,
+              "state": 3,
+              "winnerId": 1481633,
+              "round": 4,
+              "fullRoundText": "Winners Final",
+              "displayScore": "Iguana 3 - CL | Transformación 0",
+              "lPlacement": 3,
+              "wPlacement": 2,
+              "identifier": "L",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1522529660,
+              "createdAt": 1522520985,
+              "updatedAt": 1522518850,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 544080,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2018-2/events/melee-singles/brackets/235472/544080",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 235472,
+                  "name": "Bracket",
+                  "phaseOrder": 2,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "12518774-0",
+                  "entrant": {
+                    "id": 1481633,
+                    "name": "Iguana",
+                    "participants": [
+                      {
+                        "id": 1503586,
+                        "gamerTag": "Iguana",
+                        "player": {
+                          "id": 264244
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_6906297_sets_12518774",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "12518774-1",
+                  "entrant": {
+                    "id": 1481976,
+                    "name": "CL | Transformación",
+                    "participants": [
+                      {
+                        "id": 1503836,
+                        "gamerTag": "Transformación",
+                        "player": {
+                          "id": 312992
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_6906299_sets_12518774",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            },
+            {
+              "id": 12518806,
+              "state": 3,
+              "winnerId": 1551238,
+              "round": -8,
+              "fullRoundText": "Losers Final",
+              "displayScore": "CL | Transformación 0 - cubax 3",
+              "lPlacement": 3,
+              "wPlacement": 2,
+              "identifier": "Y",
+              "startAt": null,
+              "startedAt": 1522529668,
+              "completedAt": 1522530152,
+              "createdAt": 1522520985,
+              "updatedAt": 1522519154,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 544080,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2018-2/events/melee-singles/brackets/235472/544080",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 235472,
+                  "name": "Bracket",
+                  "phaseOrder": 2,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "12518806-0",
+                  "entrant": {
+                    "id": 1481976,
+                    "name": "CL | Transformación",
+                    "participants": [
+                      {
+                        "id": 1503836,
+                        "gamerTag": "Transformación",
+                        "player": {
+                          "id": 312992
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_6906299_sets_12518806",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "12518806-1",
+                  "entrant": {
+                    "id": 1551238,
+                    "name": "cubax",
+                    "participants": [
+                      {
+                        "id": 1566681,
+                        "gamerTag": "cubax",
+                        "player": {
+                          "id": 264064
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_6906300_sets_12518806",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            },
+            {
+              "id": 12518805,
+              "state": 3,
+              "winnerId": 1551238,
+              "round": -7,
+              "fullRoundText": "Losers Semi-Final",
+              "displayScore": "cubax 3 - Smeag 0",
+              "lPlacement": 4,
+              "wPlacement": 3,
+              "identifier": "X",
+              "startAt": null,
+              "startedAt": 1522529603,
+              "completedAt": 1522529609,
+              "createdAt": 1522520985,
+              "updatedAt": 1522518019,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 544080,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2018-2/events/melee-singles/brackets/235472/544080",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 235472,
+                  "name": "Bracket",
+                  "phaseOrder": 2,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "12518805-0",
+                  "entrant": {
+                    "id": 1551238,
+                    "name": "cubax",
+                    "participants": [
+                      {
+                        "id": 1566681,
+                        "gamerTag": "cubax",
+                        "player": {
+                          "id": 264064
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_6906300_sets_12518805",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "12518805-1",
+                  "entrant": {
+                    "id": 1481392,
+                    "name": "Smeag",
+                    "participants": [
+                      {
+                        "id": 1503392,
+                        "gamerTag": "Smeag",
+                        "player": {
+                          "id": 312977
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_6906298_sets_12518805",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            },
+            {
+              "id": 12518772,
+              "state": 3,
+              "winnerId": 1481633,
+              "round": 3,
+              "fullRoundText": "Winners Semi-Final",
+              "displayScore": "Iguana 3 - cubax 2",
+              "lPlacement": 5,
+              "wPlacement": 3,
+              "identifier": "J",
+              "startAt": null,
+              "startedAt": 1522524740,
+              "completedAt": 1522525979,
+              "createdAt": 1522520985,
+              "updatedAt": 1522517658,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 544080,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2018-2/events/melee-singles/brackets/235472/544080",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 235472,
+                  "name": "Bracket",
+                  "phaseOrder": 2,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "12518772-0",
+                  "entrant": {
+                    "id": 1481633,
+                    "name": "Iguana",
+                    "participants": [
+                      {
+                        "id": 1503586,
+                        "gamerTag": "Iguana",
+                        "player": {
+                          "id": 264244
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_6906297_sets_12518772",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "12518772-1",
+                  "entrant": {
+                    "id": 1551238,
+                    "name": "cubax",
+                    "participants": [
+                      {
+                        "id": 1566681,
+                        "gamerTag": "cubax",
+                        "player": {
+                          "id": 264064
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_6906300_sets_12518772",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            },
+            {
+              "id": 12518773,
+              "state": 3,
+              "winnerId": 1481976,
+              "round": 3,
+              "fullRoundText": "Winners Semi-Final",
+              "displayScore": "Smeag 2 - CL | Transformación 3",
+              "lPlacement": 5,
+              "wPlacement": 3,
+              "identifier": "K",
+              "startAt": null,
+              "startedAt": 1522525993,
+              "completedAt": 1522527322,
+              "createdAt": 1522520985,
+              "updatedAt": 1522517658,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 544080,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2018-2/events/melee-singles/brackets/235472/544080",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 235472,
+                  "name": "Bracket",
+                  "phaseOrder": 2,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "12518773-0",
+                  "entrant": {
+                    "id": 1481392,
+                    "name": "Smeag",
+                    "participants": [
+                      {
+                        "id": 1503392,
+                        "gamerTag": "Smeag",
+                        "player": {
+                          "id": 312977
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_6906298_sets_12518773",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "12518773-1",
+                  "entrant": {
+                    "id": 1481976,
+                    "name": "CL | Transformación",
+                    "participants": [
+                      {
+                        "id": 1503836,
+                        "gamerTag": "Transformación",
+                        "player": {
+                          "id": 312992
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_6906299_sets_12518773",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            },
+            {
+              "id": 12515696,
+              "state": 3,
+              "winnerId": 1481633,
+              "round": 3,
+              "fullRoundText": "Round 3",
+              "displayScore": "Iguana 2 - BugSmasher 0",
+              "lPlacement": null,
+              "wPlacement": null,
+              "identifier": "C",
+              "startAt": null,
+              "startedAt": 1522519057,
+              "completedAt": 1522519585,
+              "createdAt": 1522517941,
+              "updatedAt": 1522519585,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 544069,
+                "displayIdentifier": "1",
+                "bracketType": "ROUND_ROBIN",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2018-2/events/melee-singles/brackets/235465/544069",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 235465,
+                  "name": "Melee Round Robin",
+                  "phaseOrder": 1,
+                  "bracketType": "ROUND_ROBIN",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "12515696-0",
+                  "entrant": {
+                    "id": 1481633,
+                    "name": "Iguana",
+                    "participants": [
+                      {
+                        "id": 1503586,
+                        "gamerTag": "Iguana",
+                        "player": {
+                          "id": 264244
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_6905943_sets_12515696",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "12515696-1",
+                  "entrant": {
+                    "id": 1484570,
+                    "name": "BugSmasher",
+                    "participants": [
+                      {
+                        "id": 1506200,
+                        "gamerTag": "BugSmasher",
+                        "player": {
+                          "id": 328352
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_6905959_sets_12515696",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            },
+            {
+              "id": 12515705,
+              "state": 3,
+              "winnerId": 1481392,
+              "round": 3,
+              "fullRoundText": "Round 3",
+              "displayScore": "Smeag 2 - S1R 0",
+              "lPlacement": null,
+              "wPlacement": null,
+              "identifier": "C",
+              "startAt": null,
+              "startedAt": 1522520412,
+              "completedAt": 1522520921,
+              "createdAt": 1522517942,
+              "updatedAt": 1522520922,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 544076,
+                "displayIdentifier": "2",
+                "bracketType": "ROUND_ROBIN",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2018-2/events/melee-singles/brackets/235465/544076",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 235465,
+                  "name": "Melee Round Robin",
+                  "phaseOrder": 1,
+                  "bracketType": "ROUND_ROBIN",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "12515705-0",
+                  "entrant": {
+                    "id": 1481392,
+                    "name": "Smeag",
+                    "participants": [
+                      {
+                        "id": 1503392,
+                        "gamerTag": "Smeag",
+                        "player": {
+                          "id": 312977
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_6905952_sets_12515705",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "12515705-1",
+                  "entrant": {
+                    "id": 1484346,
+                    "name": "S1R",
+                    "participants": [
+                      {
+                        "id": 1505972,
+                        "gamerTag": "S1R",
+                        "player": {
+                          "id": 45954
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_6905958_sets_12515705",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            },
+            {
+              "id": 12515755,
+              "state": 3,
+              "winnerId": 1481976,
+              "round": 3,
+              "fullRoundText": "Round 3",
+              "displayScore": "CL | Transformación 2 - Walachia 0",
+              "lPlacement": null,
+              "wPlacement": null,
+              "identifier": "C",
+              "startAt": null,
+              "startedAt": 1522520528,
+              "completedAt": 1522520984,
+              "createdAt": 1522517943,
+              "updatedAt": 1522520985,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 544077,
+                "displayIdentifier": "3",
+                "bracketType": "ROUND_ROBIN",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2018-2/events/melee-singles/brackets/235465/544077",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 235465,
+                  "name": "Melee Round Robin",
+                  "phaseOrder": 1,
+                  "bracketType": "ROUND_ROBIN",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "12515755-0",
+                  "entrant": {
+                    "id": 1481976,
+                    "name": "CL | Transformación",
+                    "participants": [
+                      {
+                        "id": 1503836,
+                        "gamerTag": "Transformación",
+                        "player": {
+                          "id": 312992
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_6905955_sets_12515755",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "12515755-1",
+                  "entrant": {
+                    "id": 1485252,
+                    "name": "Walachia",
+                    "participants": [
+                      {
+                        "id": 1506897,
+                        "gamerTag": "Walachia",
+                        "player": {
+                          "id": 330721
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_6905944_sets_12515755",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 321
+    },
+    "actionRecords": []
+  }
+}

@@ -1,0 +1,136 @@
+{
+  "fetchedAt": "2026-10-22T21:47:38.086630+00:00",
+  "sourceUrl": "http://start.gg/tournament/montevideo-melee-monthly-2026-5/event/project",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 1630640,
+    "page": 4,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1630640,
+        "name": "Project +",
+        "sets": {
+          "pageInfo": {
+            "total": 31
+          },
+          "nodes": [
+            {
+              "id": 103816000,
+              "state": 3,
+              "winnerId": 23746093,
+              "round": 1,
+              "fullRoundText": "Winners Round 1",
+              "displayScore": "DQ",
+              "lPlacement": 13,
+              "wPlacement": 9,
+              "identifier": "H",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1780787078,
+              "createdAt": 1780774866,
+              "updatedAt": 1780787078,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 3322326,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2026-5/events/project/brackets/2294969/3322326",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 2294969,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "103816000-0",
+                  "entrant": {
+                    "id": 23690702,
+                    "name": "Zeeka",
+                    "participants": [
+                      {
+                        "id": 21738681,
+                        "gamerTag": "Zeeka",
+                        "player": {
+                          "id": 3260814
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_40294335_sets_103816000",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": -1,
+                        "displayValue": "-1"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "103816000-1",
+                  "entrant": {
+                    "id": 23746093,
+                    "name": "SilverVoluntary | Lucky78",
+                    "participants": [
+                      {
+                        "id": 21787210,
+                        "gamerTag": "Lucky78",
+                        "player": {
+                          "id": 1555267
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_40377671_sets_103816000",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": null,
+                        "displayValue": null
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 33
+    },
+    "actionRecords": []
+  }
+}

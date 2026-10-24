@@ -1,0 +1,44 @@
+{
+  "fetchedAt": "2026-10-23T14:44:26.400702+00:00",
+  "sourceUrl": "http://start.gg/tournament/lury-s-birthday-invitacional/event/project",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/lury-s-birthday-invitacional/event/project"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1573925,
+        "name": "Project +",
+        "numEntrants": 11,
+        "tournament": {
+          "id": 887438,
+          "name": "Lury´s Birthday Invitacional",
+          "slug": "tournament/lury-s-birthday-invitacional",
+          "images": [
+            {
+              "url": "https://images.start.gg/images/tournament/887438/image-7b40aae82e1f81fbd61f747f05238449.png",
+              "type": "profile"
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

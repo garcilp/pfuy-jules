@@ -1,0 +1,254 @@
+{
+  "fetchedAt": "2026-10-22T21:59:24.667033+00:00",
+  "sourceUrl": "http://start.gg/tournament/montevideo-melee-monthly-revival-5-1/event/melee-singles",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 911174,
+    "page": 4,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 911174,
+        "name": "Melee Singles",
+        "sets": {
+          "pageInfo": {
+            "total": 31
+          },
+          "nodes": [
+            {
+              "id": 61374579,
+              "state": 3,
+              "winnerId": 13381399,
+              "round": 1,
+              "fullRoundText": "Winners Round 1",
+              "displayScore": "Mingudai 3 - Pencil 0",
+              "lPlacement": 13,
+              "wPlacement": 9,
+              "identifier": "H",
+              "startAt": null,
+              "startedAt": 1686425473,
+              "completedAt": 1686426315,
+              "createdAt": 1686423561,
+              "updatedAt": 1686426316,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2082618,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-revival-5-1/events/melee-singles/brackets/1369004/2082618",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1369004,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "61374579-0",
+                  "entrant": {
+                    "id": 13381399,
+                    "name": "Mingudai",
+                    "participants": [
+                      {
+                        "id": 12579113,
+                        "gamerTag": "Mingudai",
+                        "player": {
+                          "id": 2503277
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_24883164_sets_61374579",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "61374579-1",
+                  "entrant": {
+                    "id": 13127718,
+                    "name": "Pencil",
+                    "participants": [
+                      {
+                        "id": 12357808,
+                        "gamerTag": "Pencil",
+                        "player": {
+                          "id": 228886
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_24500945_sets_61374579",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 17180503,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 13381399,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 24581235,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 20,
+                      "entrant": {
+                        "id": 13127718
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 20,
+                        "name": "Pikachu"
+                      }
+                    },
+                    {
+                      "id": 24581236,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 6,
+                      "entrant": {
+                        "id": 13381399
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 6,
+                        "name": "Fox"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 17180504,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 13381399,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 24581237,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 20,
+                      "entrant": {
+                        "id": 13127718
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 20,
+                        "name": "Pikachu"
+                      }
+                    },
+                    {
+                      "id": 24581238,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 6,
+                      "entrant": {
+                        "id": 13381399
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 6,
+                        "name": "Fox"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 17180505,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 13381399,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 24581239,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 20,
+                      "entrant": {
+                        "id": 13127718
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 20,
+                        "name": "Pikachu"
+                      }
+                    },
+                    {
+                      "id": 24581240,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 6,
+                      "entrant": {
+                        "id": 13381399
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 6,
+                        "name": "Fox"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 56
+    },
+    "actionRecords": []
+  }
+}

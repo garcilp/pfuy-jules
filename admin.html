@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Player data · Platfighters.uy</title>
+<link rel="icon" href="assets/logo.jpg">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<header class="topbar glass pill">
+  <a class="brand" href="index.html"><img src="assets/logo.jpg" alt="">Platfighters<span class="tld">.uy</span></a>
+  <span class="spacer"></span>
+  <nav><a href="players.html">Players</a><a href="events.html">Events</a><a href="#">Rankings</a></nav>
+  <span class="badge">ADMIN</span>
+</header>
+<main class="admin-page page-single">
+  <section class="admin-heading"><div class="eyebrow mono">PLAYER MANAGEMENT</div><h1>Player data</h1><p class="muted">Update the profile details shown on Platfighters.uy.</p></section>
+  <section id="admin-login" class="panel glass admin-panel">
+    <h2>Administrator sign in</h2><p class="muted admin-copy">Sign in to edit player profile information.</p>
+    <form id="login-form" class="admin-form">
+      <label>Admin password<input id="admin-password" type="password" autocomplete="current-password" required></label>
+      <button class="action-button" type="submit">Sign in</button>
+      <p id="login-message" class="form-message mono" role="status"></p>
+    </form>
+  </section>
+  <section id="admin-editor" class="panel glass admin-panel" hidden>
+    <div class="editor-heading"><div><h2>Edit player</h2><p class="muted admin-copy">Edit every profile field, game summary, character, matchup, and result in the full JSON document. The start.gg player ID stays fixed.</p></div><button id="signout" class="quiet-button" type="button">Sign out</button></div>
+    <form id="profile-form" class="admin-form">
+      <label>Player profile<select id="profile-select" required></select></label>
+      <fieldset id="player-game-exclusions" class="visibility-fieldset">
+        <legend>Game visibility</legend>
+        <p class="muted admin-copy">Check games to hide this player’s activity from those games across the site.</p>
+        <div id="player-game-options" class="visibility-options"></div>
+        <div class="form-actions"><button id="save-game-exclusions" class="quiet-button" type="button">Save game visibility</button><p id="game-exclusion-message" class="form-message mono" role="status"></p></div>
+      </fieldset>
+      <label>Complete profile data<textarea id="profile-json" class="profile-json" spellcheck="false" required></textarea></label>
+      <div class="photo-row"><label class="upload-control">Replace picture<input id="profile-photo-file" type="file" accept="image/png,image/jpeg,image/webp"></label><span id="photo-name" class="mono muted">PNG, JPEG or WebP · up to 5 MB</span><img id="photo-preview" class="photo-preview" alt="Selected player picture preview" hidden></div>
+      <div class="form-actions"><button class="action-button" type="submit">Save changes</button><p id="save-message" class="form-message mono" role="status"></p></div>
+    </form>
+    <section class="merge-panel" aria-labelledby="merge-heading">
+      <h3 id="merge-heading">Merge player identities</h3>
+      <p class="muted admin-copy">Combine a duplicate start.gg account into the profile you want to keep. Tournament history and statistics will be rebuilt together.</p>
+      <form id="merge-form" class="admin-form merge-form">
+        <label>Merge this player<select id="merge-source" required></select></label>
+        <label>Into the profile to keep<select id="merge-target" required></select></label>
+        <div class="form-actions"><button class="action-button" type="submit">Merge profiles</button><p id="merge-message" class="form-message mono" role="status"></p></div>
+      </form>
+    </section>
+    <section class="merge-panel" aria-labelledby="event-group-heading">
+      <h3 id="event-group-heading">Group an additional event</h3>
+      <p class="muted admin-copy">Attach an event such as an amateur bracket to its main event. Enter the start.gg event URLs; this can be configured before the event data is imported. Sets from the added event will appear under the main event with your phase label.</p>
+      <form id="event-group-form" class="admin-form merge-form">
+        <label>Main event URL<input id="event-parent-url" type="url" placeholder="https://start.gg/tournament/.../event/smash-ultimate-singles" required></label>
+        <label>Additional event URL<input id="event-child-url" type="url" placeholder="https://start.gg/tournament/.../event/categoria-b" required></label>
+        <label>Phase label<input id="event-phase-label" type="text" maxlength="80" placeholder="Categoria B" required></label>
+        <div class="form-actions"><button class="action-button" type="submit">Save event grouping</button><p id="event-group-message" class="form-message mono" role="status"></p></div>
+      </form>
+      <div id="event-group-list" class="event-group-list" aria-live="polite"></div>
+    </section>
+    <section class="merge-panel" aria-labelledby="event-exclusion-heading">
+      <h3 id="event-exclusion-heading">Exclude an event</h3>
+      <p class="muted admin-copy">Excluded events are omitted from every player profile, game statistic, result list, and player-directory filter.</p>
+      <form id="event-exclusion-form" class="admin-form merge-form">
+        <label>Event URL<input id="event-exclusion-url" type="url" placeholder="https://start.gg/tournament/.../event/..." required></label>
+        <label class="check-label"><input id="event-excluded" type="checkbox"> Exclude this event from all views</label>
+        <div class="form-actions"><button class="action-button" type="submit">Save event visibility</button><p id="event-exclusion-message" class="form-message mono" role="status"></p></div>
+      </form>
+      <div id="event-exclusion-list" class="event-exclusion-list" aria-live="polite"></div>
+    </section>
+  </section>
+</main>
+<footer class="foot mono muted">Platfighters.uy · Local administrator session</footer>
+<script src="js/admin.js"></script>
+</body>
+</html>

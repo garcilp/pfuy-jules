@@ -1,0 +1,584 @@
+{
+  "fetchedAt": "2026-10-22T21:42:09.328105+00:00",
+  "sourceUrl": "http://start.gg/tournament/mashito-go-3/event/smash-ultimate-singles",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 1592120,
+    "page": 13,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1592120,
+        "name": "Smash Ultimate singles",
+        "sets": {
+          "pageInfo": {
+            "total": 122
+          },
+          "nodes": [
+            {
+              "id": 101523983,
+              "state": 3,
+              "winnerId": 23069740,
+              "round": -3,
+              "fullRoundText": "Losers Round 1",
+              "displayScore": "DBD | RIGONARDO 3 - CG | Freakazoiid 1",
+              "lPlacement": 7,
+              "wPlacement": 5,
+              "identifier": "F",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1775948071,
+              "createdAt": 1775945166,
+              "updatedAt": 1775948072,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 3253819,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/mashito-go-3/events/smash-ultimate-singles/brackets/2244730/3253819",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 2244730,
+                  "name": "Top 8",
+                  "phaseOrder": 3,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "101523983-0",
+                  "entrant": {
+                    "id": 23069740,
+                    "name": "DBD | RIGONARDO",
+                    "participants": [
+                      {
+                        "id": 21199022,
+                        "gamerTag": "RIGONARDO",
+                        "player": {
+                          "id": 1244573
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_39279957_sets_101523983",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "101523983-1",
+                  "entrant": {
+                    "id": 23069636,
+                    "name": "CG | Freakazoiid",
+                    "participants": [
+                      {
+                        "id": 21198854,
+                        "gamerTag": "Freakazoiid",
+                        "player": {
+                          "id": 3008029
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_39279954_sets_101523983",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 37228067,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 23069636,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 55507805,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1319,
+                      "entrant": {
+                        "id": 23069636
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1319,
+                        "name": "Pikachu"
+                      }
+                    },
+                    {
+                      "id": 55507806,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1321,
+                      "entrant": {
+                        "id": 23069740
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1321,
+                        "name": "Pokemon Trainer"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 37228068,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 23069740,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 55507807,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1319,
+                      "entrant": {
+                        "id": 23069636
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1319,
+                        "name": "Pikachu"
+                      }
+                    },
+                    {
+                      "id": 55507808,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1321,
+                      "entrant": {
+                        "id": 23069740
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1321,
+                        "name": "Pokemon Trainer"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 37228069,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 23069740,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 55507809,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1319,
+                      "entrant": {
+                        "id": 23069636
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1319,
+                        "name": "Pikachu"
+                      }
+                    },
+                    {
+                      "id": 55507810,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1321,
+                      "entrant": {
+                        "id": 23069740
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1321,
+                        "name": "Pokemon Trainer"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 37228070,
+                  "orderNum": 4,
+                  "state": 3,
+                  "winnerId": 23069740,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 55507811,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1319,
+                      "entrant": {
+                        "id": 23069636
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1319,
+                        "name": "Pikachu"
+                      }
+                    },
+                    {
+                      "id": 55507812,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1321,
+                      "entrant": {
+                        "id": 23069740
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1321,
+                        "name": "Pokemon Trainer"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 101523984,
+              "state": 3,
+              "winnerId": 23067966,
+              "round": -3,
+              "fullRoundText": "Losers Round 1",
+              "displayScore": "W&L | Trim 2 - UWA | Belipe 3",
+              "lPlacement": 7,
+              "wPlacement": 5,
+              "identifier": "G",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1775948202,
+              "createdAt": 1775945166,
+              "updatedAt": 1775948203,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 3253819,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/mashito-go-3/events/smash-ultimate-singles/brackets/2244730/3253819",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 2244730,
+                  "name": "Top 8",
+                  "phaseOrder": 3,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "101523984-0",
+                  "entrant": {
+                    "id": 23156981,
+                    "name": "W&L | Trim",
+                    "participants": [
+                      {
+                        "id": 21278984,
+                        "gamerTag": "Trim",
+                        "player": {
+                          "id": 599412
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_39279956_sets_101523984",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "101523984-1",
+                  "entrant": {
+                    "id": 23067966,
+                    "name": "UWA | Belipe",
+                    "participants": [
+                      {
+                        "id": 21196825,
+                        "gamerTag": "Belipe",
+                        "player": {
+                          "id": 1398327
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_39279955_sets_101523984",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 37228163,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 23156981,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 55507988,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1285,
+                      "entrant": {
+                        "id": 23067966
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1285,
+                        "name": "Falco"
+                      }
+                    },
+                    {
+                      "id": 55507989,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1340,
+                      "entrant": {
+                        "id": 23156981
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1340,
+                        "name": "Zelda"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 37228164,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 23067966,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 55507990,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1285,
+                      "entrant": {
+                        "id": 23067966
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1285,
+                        "name": "Falco"
+                      }
+                    },
+                    {
+                      "id": 55507991,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1340,
+                      "entrant": {
+                        "id": 23156981
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1340,
+                        "name": "Zelda"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 37228165,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 23156981,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 55507992,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1285,
+                      "entrant": {
+                        "id": 23067966
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1285,
+                        "name": "Falco"
+                      }
+                    },
+                    {
+                      "id": 55507993,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1340,
+                      "entrant": {
+                        "id": 23156981
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1340,
+                        "name": "Zelda"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 37228166,
+                  "orderNum": 4,
+                  "state": 3,
+                  "winnerId": 23067966,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 55507994,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1285,
+                      "entrant": {
+                        "id": 23067966
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1285,
+                        "name": "Falco"
+                      }
+                    },
+                    {
+                      "id": 55507995,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1340,
+                      "entrant": {
+                        "id": 23156981
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1340,
+                        "name": "Zelda"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 37228167,
+                  "orderNum": 5,
+                  "state": 3,
+                  "winnerId": 23067966,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 55507996,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1285,
+                      "entrant": {
+                        "id": 23067966
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1285,
+                        "name": "Falco"
+                      }
+                    },
+                    {
+                      "id": 55507997,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1340,
+                      "entrant": {
+                        "id": 23156981
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1340,
+                        "name": "Zelda"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 135
+    },
+    "actionRecords": []
+  }
+}

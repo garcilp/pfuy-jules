@@ -1,0 +1,44 @@
+{
+  "fetchedAt": "2026-10-23T14:45:11.599757+00:00",
+  "sourceUrl": "http://start.gg/tournament/montevideo-melee-monthly-2021-2/event/melee-singles",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/montevideo-melee-monthly-2021-2/event/melee-singles"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 556952,
+        "name": "Melee Singles",
+        "numEntrants": 6,
+        "tournament": {
+          "id": 274542,
+          "name": "Montevideo Melee Monthly 2021  #2",
+          "slug": "tournament/montevideo-melee-monthly-2021-2",
+          "images": [
+            {
+              "url": "https://images.start.gg/images/tournament/274542/image-ff72aa189bc9ffa00145793b1a6a46d2.png",
+              "type": "profile"
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

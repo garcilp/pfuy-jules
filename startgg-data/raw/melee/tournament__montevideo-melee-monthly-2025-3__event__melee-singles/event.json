@@ -1,0 +1,44 @@
+{
+  "fetchedAt": "2026-10-23T14:45:43.251153+00:00",
+  "sourceUrl": "http://start.gg/tournament/montevideo-melee-monthly-2025-3/event/melee-singles",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/montevideo-melee-monthly-2025-3/event/melee-singles"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1347112,
+        "name": "Melee Singles",
+        "numEntrants": 11,
+        "tournament": {
+          "id": 774000,
+          "name": "Montevideo Melee Monthly 2025 #3",
+          "slug": "tournament/montevideo-melee-monthly-2025-3",
+          "images": [
+            {
+              "url": "https://images.start.gg/images/tournament/774000/image-898ab0f9d24bf5a95de6289aa55a29b3.png",
+              "type": "profile"
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

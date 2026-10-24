@@ -1,0 +1,44 @@
+{
+  "fetchedAt": "2026-10-23T14:43:50.690220+00:00",
+  "sourceUrl": "https://www.start.gg/tournament/koopa-series-1/event/ultimate-singles",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/koopa-series-1/event/ultimate-singles"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1222105,
+        "name": "Ultimate Singles",
+        "numEntrants": 37,
+        "tournament": {
+          "id": 712554,
+          "name": "Koopa Series",
+          "slug": "tournament/koopa-series-1",
+          "images": [
+            {
+              "url": "https://images.start.gg/images/tournament/712554/image-4b041b94954daa9f8a468899a6f0ef07.png?ehk=yt5SzZW0J515UAjxYbKsNYKYOAqmez3bCM9dzUhwKVo%3D&ehkOptimized=KG1TJzULzkjMDESaTnO7nczgNKjtRJKEuABgyXSTwwk%3D",
+              "type": "profile"
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

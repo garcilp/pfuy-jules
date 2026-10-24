@@ -1,0 +1,38 @@
+{
+  "fetchedAt": "2026-10-22T21:43:19.341903+00:00",
+  "sourceUrl": "http://start.gg/tournament/ultimo-smashdown/event/categoria-b",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/ultimo-smashdown/event/categoria-b"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1651851,
+        "name": "Categoria B",
+        "numEntrants": 11,
+        "tournament": {
+          "id": 918501,
+          "name": "Ultimo Smashdown",
+          "slug": "tournament/ultimo-smashdown"
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

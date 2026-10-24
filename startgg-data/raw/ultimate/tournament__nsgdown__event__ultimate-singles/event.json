@@ -1,0 +1,44 @@
+{
+  "fetchedAt": "2026-10-23T14:43:46.766169+00:00",
+  "sourceUrl": "https://www.start.gg/tournament/nsgdown/event/ultimate-singles",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/nsgdown/event/ultimate-singles"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1161641,
+        "name": "Ultimate singles",
+        "numEntrants": 41,
+        "tournament": {
+          "id": 681568,
+          "name": "NSGdown",
+          "slug": "tournament/nsgdown",
+          "images": [
+            {
+              "url": "https://images.start.gg/images/tournament/681568/image-ebf08808111d6fbe684be0fa9f03b5a0.jpg?ehk=JqYJRsdf%2FaLXhGKgO2mOYPLm4zRH4inEpAzlCAcyJjQ%3D&ehkOptimized=aklu3vtwcbHx6EPYRcwWTbFXnurxEJWAfMgORP%2FrDRg%3D",
+              "type": "profile"
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

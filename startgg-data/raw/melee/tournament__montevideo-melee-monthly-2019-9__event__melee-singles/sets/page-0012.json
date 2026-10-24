@@ -1,0 +1,215 @@
+{
+  "fetchedAt": "2026-10-22T21:55:03.862958+00:00",
+  "sourceUrl": "http://start.gg/tournament/montevideo-melee-monthly-2019-9/event/melee-singles",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 394950,
+    "page": 12,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 394950,
+        "name": "Melee Singles",
+        "sets": {
+          "pageInfo": {
+            "total": 111
+          },
+          "nodes": [
+            {
+              "id": 23493835,
+              "state": 3,
+              "winnerId": 3795040,
+              "round": 1,
+              "fullRoundText": "Round 1",
+              "displayScore": "Weedcats F.C. | BugSmasher 2 - Link 0",
+              "lPlacement": null,
+              "wPlacement": null,
+              "identifier": "B",
+              "startAt": null,
+              "startedAt": 1569696436,
+              "completedAt": 1740001408,
+              "createdAt": 1569693042,
+              "updatedAt": 1740001408,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 1094101,
+                "displayIdentifier": "8",
+                "bracketType": "ROUND_ROBIN",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2019-9/events/melee-singles/brackets/658917/1094101",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 658917,
+                  "name": "Melee Round Robin",
+                  "phaseOrder": 1,
+                  "bracketType": "ROUND_ROBIN",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "23493835-0",
+                  "entrant": {
+                    "id": 3795040,
+                    "name": "Weedcats F.C. | BugSmasher",
+                    "participants": [
+                      {
+                        "id": 3643585,
+                        "gamerTag": "BugSmasher",
+                        "player": {
+                          "id": 328352
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_10991354_sets_23493835",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "23493835-1",
+                  "entrant": {
+                    "id": 3795023,
+                    "name": "Link",
+                    "participants": [
+                      {
+                        "id": 3643570,
+                        "gamerTag": "Link",
+                        "player": {
+                          "id": 894493
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_10991337_sets_23493835",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 28043049,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 3795040,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 41014147,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 25,
+                      "entrant": {
+                        "id": 3795023
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 25,
+                        "name": "Young Link"
+                      }
+                    },
+                    {
+                      "id": 41014148,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 14,
+                      "entrant": {
+                        "id": 3795040
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 14,
+                        "name": "Marth"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 28043050,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 3795040,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 41014149,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 25,
+                      "entrant": {
+                        "id": 3795023
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 25,
+                        "name": "Young Link"
+                      }
+                    },
+                    {
+                      "id": 41014150,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 14,
+                      "entrant": {
+                        "id": 3795040
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 14,
+                        "name": "Marth"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 48
+    },
+    "actionRecords": []
+  }
+}

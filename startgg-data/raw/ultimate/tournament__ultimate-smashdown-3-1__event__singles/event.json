@@ -1,0 +1,44 @@
+{
+  "fetchedAt": "2026-10-23T14:43:07.503227+00:00",
+  "sourceUrl": "https://www.start.gg/tournament/ultimate-smashdown-3-1/event/singles",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/ultimate-smashdown-3-1/event/singles"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 532600,
+        "name": "Singles",
+        "numEntrants": 43,
+        "tournament": {
+          "id": 255581,
+          "name": "Ultimate Smashdown #3",
+          "slug": "tournament/ultimate-smashdown-3-1",
+          "images": [
+            {
+              "url": "https://images.start.gg/images/tournament/255581/image-14a93a4b72570f86aa4c30483e24926a.jpg",
+              "type": "profile"
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

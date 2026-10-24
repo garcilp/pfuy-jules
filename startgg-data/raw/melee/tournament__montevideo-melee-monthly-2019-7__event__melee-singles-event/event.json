@@ -1,0 +1,44 @@
+{
+  "fetchedAt": "2026-10-23T14:44:59.686776+00:00",
+  "sourceUrl": "http://start.gg/tournament/montevideo-melee-monthly-2019-7/event/melee-singles-event",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/montevideo-melee-monthly-2019-7/event/melee-singles-event"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 378839,
+        "name": "Melee Singles Event",
+        "numEntrants": 12,
+        "tournament": {
+          "id": 164275,
+          "name": "Montevideo Melee Monthly 2019 #7",
+          "slug": "tournament/montevideo-melee-monthly-2019-7",
+          "images": [
+            {
+              "url": "https://images.start.gg/images/tournament/164275/image-c05726c503687b55f684a765c07274db.png",
+              "type": "profile"
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

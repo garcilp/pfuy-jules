@@ -1,0 +1,1829 @@
+{
+  "fetchedAt": "2026-10-22T21:24:21.941307+00:00",
+  "sourceUrl": "https://www.start.gg/tournament/ultimate-smashdown-20/event/ultimate-singles",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 1088602,
+    "page": 1,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1088602,
+        "name": "Ultimate Singles",
+        "sets": {
+          "pageInfo": {
+            "total": 132
+          },
+          "nodes": [
+            {
+              "id": 72129444,
+              "state": 3,
+              "winnerId": 15916723,
+              "round": 6,
+              "fullRoundText": "Grand Final",
+              "displayScore": "CG | elcusquerman 2 - NSG | merume 0",
+              "lPlacement": 2,
+              "wPlacement": 1,
+              "identifier": "R",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1710623511,
+              "createdAt": 1710611928,
+              "updatedAt": 1710623511,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2389848,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/ultimate-smashdown-20/events/ultimate-singles/brackets/1597029/2389848",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1597029,
+                  "name": "Bracket B",
+                  "phaseOrder": 4,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": true
+                }
+              },
+              "slots": [
+                {
+                  "id": "72129444-0",
+                  "entrant": {
+                    "id": 15916723,
+                    "name": "CG | elcusquerman",
+                    "participants": [
+                      {
+                        "id": 14819713,
+                        "gamerTag": "elcusquerman",
+                        "player": {
+                          "id": 3124833
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_28575188_sets_72129444",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "72129444-1",
+                  "entrant": {
+                    "id": 15879554,
+                    "name": "NSG | merume",
+                    "participants": [
+                      {
+                        "id": 14785841,
+                        "gamerTag": "merume",
+                        "player": {
+                          "id": 3644687
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_28533459_sets_72129444",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 21429225,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 15916723,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 30947409,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1328,
+                      "entrant": {
+                        "id": 15879554
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1328,
+                        "name": "Samus"
+                      }
+                    },
+                    {
+                      "id": 30947410,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1340,
+                      "entrant": {
+                        "id": 15916723
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1340,
+                        "name": "Zelda"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 21429226,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 15916723,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 30947411,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1328,
+                      "entrant": {
+                        "id": 15879554
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1328,
+                        "name": "Samus"
+                      }
+                    },
+                    {
+                      "id": 30947412,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1340,
+                      "entrant": {
+                        "id": 15916723
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1340,
+                        "name": "Zelda"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 72129443,
+              "state": 3,
+              "winnerId": 15916723,
+              "round": 5,
+              "fullRoundText": "Winners Final",
+              "displayScore": "CG | elcusquerman 2 - NSG | merume 0",
+              "lPlacement": 3,
+              "wPlacement": 2,
+              "identifier": "Q",
+              "startAt": null,
+              "startedAt": 1710620370,
+              "completedAt": 1710620383,
+              "createdAt": 1710611928,
+              "updatedAt": 1710620384,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2389848,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/ultimate-smashdown-20/events/ultimate-singles/brackets/1597029/2389848",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1597029,
+                  "name": "Bracket B",
+                  "phaseOrder": 4,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": true
+                }
+              },
+              "slots": [
+                {
+                  "id": "72129443-0",
+                  "entrant": {
+                    "id": 15916723,
+                    "name": "CG | elcusquerman",
+                    "participants": [
+                      {
+                        "id": 14819713,
+                        "gamerTag": "elcusquerman",
+                        "player": {
+                          "id": 3124833
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_28575188_sets_72129443",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "72129443-1",
+                  "entrant": {
+                    "id": 15879554,
+                    "name": "NSG | merume",
+                    "participants": [
+                      {
+                        "id": 14785841,
+                        "gamerTag": "merume",
+                        "player": {
+                          "id": 3644687
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_28533459_sets_72129443",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 21427625,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 15916723,
+                  "entrant1Score": 0,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 30944775,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1328,
+                      "entrant": {
+                        "id": 15879554
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1328,
+                        "name": "Samus"
+                      }
+                    },
+                    {
+                      "id": 30944776,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1340,
+                      "entrant": {
+                        "id": 15916723
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1340,
+                        "name": "Zelda"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 21427626,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 15916723,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 30944777,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1328,
+                      "entrant": {
+                        "id": 15879554
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1328,
+                        "name": "Samus"
+                      }
+                    },
+                    {
+                      "id": 30944778,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1340,
+                      "entrant": {
+                        "id": 15916723
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1340,
+                        "name": "Zelda"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 72129507,
+              "state": 3,
+              "winnerId": 15879554,
+              "round": -10,
+              "fullRoundText": "Losers Final",
+              "displayScore": "NSG | merume 2 - CG | Tintokill 0",
+              "lPlacement": 3,
+              "wPlacement": 2,
+              "identifier": "AI",
+              "startAt": null,
+              "startedAt": 1710622254,
+              "completedAt": 1710622483,
+              "createdAt": 1710611928,
+              "updatedAt": 1710622483,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2389848,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/ultimate-smashdown-20/events/ultimate-singles/brackets/1597029/2389848",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1597029,
+                  "name": "Bracket B",
+                  "phaseOrder": 4,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": true
+                }
+              },
+              "slots": [
+                {
+                  "id": "72129507-0",
+                  "entrant": {
+                    "id": 15879554,
+                    "name": "NSG | merume",
+                    "participants": [
+                      {
+                        "id": 14785841,
+                        "gamerTag": "merume",
+                        "player": {
+                          "id": 3644687
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_28533459_sets_72129507",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "72129507-1",
+                  "entrant": {
+                    "id": 15932417,
+                    "name": "CG | Tintokill",
+                    "participants": [
+                      {
+                        "id": 14832923,
+                        "gamerTag": "Tintokill",
+                        "player": {
+                          "id": 3321222
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_28575008_sets_72129507",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 21428671,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 15879554,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 30946476,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1328,
+                      "entrant": {
+                        "id": 15879554
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1328,
+                        "name": "Samus"
+                      }
+                    },
+                    {
+                      "id": 30946477,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1846,
+                      "entrant": {
+                        "id": 15932417
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1846,
+                        "name": "Kazuya"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 21428672,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 15879554,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 30946478,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1328,
+                      "entrant": {
+                        "id": 15879554
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1328,
+                        "name": "Samus"
+                      }
+                    },
+                    {
+                      "id": 30946479,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1846,
+                      "entrant": {
+                        "id": 15932417
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1846,
+                        "name": "Kazuya"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 72129506,
+              "state": 3,
+              "winnerId": 15932417,
+              "round": -9,
+              "fullRoundText": "Losers Semi-Final",
+              "displayScore": "Boudin 0 - CG | Tintokill 2",
+              "lPlacement": 4,
+              "wPlacement": 3,
+              "identifier": "AH",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1710621636,
+              "createdAt": 1710611928,
+              "updatedAt": 1710621636,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2389848,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/ultimate-smashdown-20/events/ultimate-singles/brackets/1597029/2389848",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1597029,
+                  "name": "Bracket B",
+                  "phaseOrder": 4,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": true
+                }
+              },
+              "slots": [
+                {
+                  "id": "72129506-0",
+                  "entrant": {
+                    "id": 15879351,
+                    "name": "Boudin",
+                    "participants": [
+                      {
+                        "id": 14785668,
+                        "gamerTag": "Boudin",
+                        "player": {
+                          "id": 3146586
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_28575825_sets_72129506",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "72129506-1",
+                  "entrant": {
+                    "id": 15932417,
+                    "name": "CG | Tintokill",
+                    "participants": [
+                      {
+                        "id": 14832923,
+                        "gamerTag": "Tintokill",
+                        "player": {
+                          "id": 3321222
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_28575008_sets_72129506",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 21428230,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 15932417,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 30945765,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1338,
+                      "entrant": {
+                        "id": 15879351
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1338,
+                        "name": "Yoshi"
+                      }
+                    },
+                    {
+                      "id": 30945766,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1846,
+                      "entrant": {
+                        "id": 15932417
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1846,
+                        "name": "Kazuya"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 21428231,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 15932417,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 30945768,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1846,
+                      "entrant": {
+                        "id": 15932417
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1846,
+                        "name": "Kazuya"
+                      }
+                    },
+                    {
+                      "id": 30945825,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1338,
+                      "entrant": {
+                        "id": 15879351
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1338,
+                        "name": "Yoshi"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 72129441,
+              "state": 3,
+              "winnerId": 15916723,
+              "round": 4,
+              "fullRoundText": "Winners Semi-Final",
+              "displayScore": "CG | elcusquerman 2 - NSG | El Hombre Playa 0",
+              "lPlacement": 5,
+              "wPlacement": 3,
+              "identifier": "O",
+              "startAt": null,
+              "startedAt": 1710619391,
+              "completedAt": 1710619633,
+              "createdAt": 1710611928,
+              "updatedAt": 1710619633,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2389848,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/ultimate-smashdown-20/events/ultimate-singles/brackets/1597029/2389848",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1597029,
+                  "name": "Bracket B",
+                  "phaseOrder": 4,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": true
+                }
+              },
+              "slots": [
+                {
+                  "id": "72129441-0",
+                  "entrant": {
+                    "id": 15916723,
+                    "name": "CG | elcusquerman",
+                    "participants": [
+                      {
+                        "id": 14819713,
+                        "gamerTag": "elcusquerman",
+                        "player": {
+                          "id": 3124833
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_28575188_sets_72129441",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "72129441-1",
+                  "entrant": {
+                    "id": 15904813,
+                    "name": "NSG | El Hombre Playa",
+                    "participants": [
+                      {
+                        "id": 14809090,
+                        "gamerTag": "El Hombre Playa",
+                        "player": {
+                          "id": 3333889
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_28540196_sets_72129441",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 21427182,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 15916723,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 30944103,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1296,
+                      "entrant": {
+                        "id": 15904813
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1296,
+                        "name": "Link"
+                      }
+                    },
+                    {
+                      "id": 30944104,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1340,
+                      "entrant": {
+                        "id": 15916723
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1340,
+                        "name": "Zelda"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 21427183,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 15916723,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": {
+                    "id": 387,
+                    "name": "Smashville"
+                  },
+                  "selections": [
+                    {
+                      "id": 30944105,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1341,
+                      "entrant": {
+                        "id": 15904813
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1341,
+                        "name": "Zero Suit Samus"
+                      }
+                    },
+                    {
+                      "id": 30944106,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1340,
+                      "entrant": {
+                        "id": 15916723
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1340,
+                        "name": "Zelda"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 72129442,
+              "state": 3,
+              "winnerId": 15879554,
+              "round": 4,
+              "fullRoundText": "Winners Semi-Final",
+              "displayScore": "Boudin 0 - NSG | merume 2",
+              "lPlacement": 5,
+              "wPlacement": 3,
+              "identifier": "P",
+              "startAt": null,
+              "startedAt": 1710618857,
+              "completedAt": 1710618868,
+              "createdAt": 1710611928,
+              "updatedAt": 1710618869,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2389848,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/ultimate-smashdown-20/events/ultimate-singles/brackets/1597029/2389848",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1597029,
+                  "name": "Bracket B",
+                  "phaseOrder": 4,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": true
+                }
+              },
+              "slots": [
+                {
+                  "id": "72129442-0",
+                  "entrant": {
+                    "id": 15879351,
+                    "name": "Boudin",
+                    "participants": [
+                      {
+                        "id": 14785668,
+                        "gamerTag": "Boudin",
+                        "player": {
+                          "id": 3146586
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_28575825_sets_72129442",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "72129442-1",
+                  "entrant": {
+                    "id": 15879554,
+                    "name": "NSG | merume",
+                    "participants": [
+                      {
+                        "id": 14785841,
+                        "gamerTag": "merume",
+                        "player": {
+                          "id": 3644687
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_28533459_sets_72129442",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 21426732,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 15879554,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 30943462,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1338,
+                      "entrant": {
+                        "id": 15879351
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1338,
+                        "name": "Yoshi"
+                      }
+                    },
+                    {
+                      "id": 30943463,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1328,
+                      "entrant": {
+                        "id": 15879554
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1328,
+                        "name": "Samus"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 21426733,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 15879554,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 30943464,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1338,
+                      "entrant": {
+                        "id": 15879351
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1338,
+                        "name": "Yoshi"
+                      }
+                    },
+                    {
+                      "id": 30943465,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1328,
+                      "entrant": {
+                        "id": 15879554
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1328,
+                        "name": "Samus"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 72129504,
+              "state": 3,
+              "winnerId": 15879351,
+              "round": -8,
+              "fullRoundText": "Losers Quarter-Final",
+              "displayScore": "Boudin 2 - CG | Misheon 0",
+              "lPlacement": 5,
+              "wPlacement": 4,
+              "identifier": "AF",
+              "startAt": null,
+              "startedAt": 1710620421,
+              "completedAt": 1710620564,
+              "createdAt": 1710611928,
+              "updatedAt": 1710620565,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2389848,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/ultimate-smashdown-20/events/ultimate-singles/brackets/1597029/2389848",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1597029,
+                  "name": "Bracket B",
+                  "phaseOrder": 4,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": true
+                }
+              },
+              "slots": [
+                {
+                  "id": "72129504-0",
+                  "entrant": {
+                    "id": 15879351,
+                    "name": "Boudin",
+                    "participants": [
+                      {
+                        "id": 14785668,
+                        "gamerTag": "Boudin",
+                        "player": {
+                          "id": 3146586
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_28575825_sets_72129504",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "72129504-1",
+                  "entrant": {
+                    "id": 15931938,
+                    "name": "CG | Misheon",
+                    "participants": [
+                      {
+                        "id": 14832485,
+                        "gamerTag": "Misheon",
+                        "player": {
+                          "id": 3118601
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_28637613_sets_72129504",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 21427706,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 15879351,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 30944921,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1338,
+                      "entrant": {
+                        "id": 15879351
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1338,
+                        "name": "Yoshi"
+                      }
+                    },
+                    {
+                      "id": 30944922,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1338,
+                      "entrant": {
+                        "id": 15931938
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1338,
+                        "name": "Yoshi"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 21427707,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 15879351,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 30944923,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1338,
+                      "entrant": {
+                        "id": 15879351
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1338,
+                        "name": "Yoshi"
+                      }
+                    },
+                    {
+                      "id": 30944924,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1338,
+                      "entrant": {
+                        "id": 15931938
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1338,
+                        "name": "Yoshi"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 72129505,
+              "state": 3,
+              "winnerId": 15932417,
+              "round": -8,
+              "fullRoundText": "Losers Quarter-Final",
+              "displayScore": "NSG | El Hombre Playa 0 - CG | Tintokill 2",
+              "lPlacement": 5,
+              "wPlacement": 4,
+              "identifier": "AG",
+              "startAt": null,
+              "startedAt": 1710620444,
+              "completedAt": 1710620456,
+              "createdAt": 1710611928,
+              "updatedAt": 1710620457,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2389848,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/ultimate-smashdown-20/events/ultimate-singles/brackets/1597029/2389848",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1597029,
+                  "name": "Bracket B",
+                  "phaseOrder": 4,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": true
+                }
+              },
+              "slots": [
+                {
+                  "id": "72129505-0",
+                  "entrant": {
+                    "id": 15904813,
+                    "name": "NSG | El Hombre Playa",
+                    "participants": [
+                      {
+                        "id": 14809090,
+                        "gamerTag": "El Hombre Playa",
+                        "player": {
+                          "id": 3333889
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_28540196_sets_72129505",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "72129505-1",
+                  "entrant": {
+                    "id": 15932417,
+                    "name": "CG | Tintokill",
+                    "participants": [
+                      {
+                        "id": 14832923,
+                        "gamerTag": "Tintokill",
+                        "player": {
+                          "id": 3321222
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_28575008_sets_72129505",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 21427665,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 15932417,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 30944853,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1296,
+                      "entrant": {
+                        "id": 15904813
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1296,
+                        "name": "Link"
+                      }
+                    },
+                    {
+                      "id": 30944854,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1846,
+                      "entrant": {
+                        "id": 15932417
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1846,
+                        "name": "Kazuya"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 21427666,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 15932417,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 30944855,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1296,
+                      "entrant": {
+                        "id": 15904813
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1296,
+                        "name": "Link"
+                      }
+                    },
+                    {
+                      "id": 30944856,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1846,
+                      "entrant": {
+                        "id": 15932417
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1846,
+                        "name": "Kazuya"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 72129502,
+              "state": 3,
+              "winnerId": 15931938,
+              "round": -7,
+              "fullRoundText": "Losers Round 4",
+              "displayScore": "CG | Misheon 2 - NSG | Ituab 1",
+              "lPlacement": 7,
+              "wPlacement": 5,
+              "identifier": "AD",
+              "startAt": null,
+              "startedAt": 1710619737,
+              "completedAt": 1710620036,
+              "createdAt": 1710611928,
+              "updatedAt": 1710620037,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2389848,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/ultimate-smashdown-20/events/ultimate-singles/brackets/1597029/2389848",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1597029,
+                  "name": "Bracket B",
+                  "phaseOrder": 4,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": true
+                }
+              },
+              "slots": [
+                {
+                  "id": "72129502-0",
+                  "entrant": {
+                    "id": 15931938,
+                    "name": "CG | Misheon",
+                    "participants": [
+                      {
+                        "id": 14832485,
+                        "gamerTag": "Misheon",
+                        "player": {
+                          "id": 3118601
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_28637613_sets_72129502",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "72129502-1",
+                  "entrant": {
+                    "id": 15881079,
+                    "name": "NSG | Ituab",
+                    "participants": [
+                      {
+                        "id": 14787206,
+                        "gamerTag": "Ituab",
+                        "player": {
+                          "id": 3095167
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_28522305_sets_72129502",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 21427412,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 15931938,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 30944436,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1294,
+                      "entrant": {
+                        "id": 15881079
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1294,
+                        "name": "King Dedede"
+                      }
+                    },
+                    {
+                      "id": 30944437,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1338,
+                      "entrant": {
+                        "id": 15931938
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1338,
+                        "name": "Yoshi"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 21427413,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 15881079,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 30944438,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1294,
+                      "entrant": {
+                        "id": 15881079
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1294,
+                        "name": "King Dedede"
+                      }
+                    },
+                    {
+                      "id": 30944439,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1338,
+                      "entrant": {
+                        "id": 15931938
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1338,
+                        "name": "Yoshi"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 21427414,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 15931938,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 30944440,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1294,
+                      "entrant": {
+                        "id": 15881079
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1294,
+                        "name": "King Dedede"
+                      }
+                    },
+                    {
+                      "id": 30944441,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1338,
+                      "entrant": {
+                        "id": 15931938
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1338,
+                        "name": "Yoshi"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 72129503,
+              "state": 3,
+              "winnerId": 15932417,
+              "round": -7,
+              "fullRoundText": "Losers Round 4",
+              "displayScore": "CG | Tintokill 2 - SMB||Dieguix2004 0",
+              "lPlacement": 7,
+              "wPlacement": 5,
+              "identifier": "AE",
+              "startAt": null,
+              "startedAt": 1710619099,
+              "completedAt": 1710619325,
+              "createdAt": 1710611928,
+              "updatedAt": 1710619325,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2389848,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/ultimate-smashdown-20/events/ultimate-singles/brackets/1597029/2389848",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1597029,
+                  "name": "Bracket B",
+                  "phaseOrder": 4,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": true
+                }
+              },
+              "slots": [
+                {
+                  "id": "72129503-0",
+                  "entrant": {
+                    "id": 15932417,
+                    "name": "CG | Tintokill",
+                    "participants": [
+                      {
+                        "id": 14832923,
+                        "gamerTag": "Tintokill",
+                        "player": {
+                          "id": 3321222
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_28575008_sets_72129503",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "72129503-1",
+                  "entrant": {
+                    "id": 15878531,
+                    "name": "SMB||Dieguix2004",
+                    "participants": [
+                      {
+                        "id": 14785036,
+                        "gamerTag": "SMB||Dieguix2004",
+                        "player": {
+                          "id": 3863680
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_28588590_sets_72129503",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 21427020,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 15932417,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": {
+                    "id": 328,
+                    "name": "Final Destination"
+                  },
+                  "selections": [
+                    {
+                      "id": 30943860,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1453,
+                      "entrant": {
+                        "id": 15878531
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1453,
+                        "name": "Joker"
+                      }
+                    },
+                    {
+                      "id": 30943861,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1846,
+                      "entrant": {
+                        "id": 15932417
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1846,
+                        "name": "Kazuya"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 21427021,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 15932417,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": {
+                    "id": 348,
+                    "name": "Kalos Pokémon League"
+                  },
+                  "selections": [
+                    {
+                      "id": 30943862,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1795,
+                      "entrant": {
+                        "id": 15878531
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1795,
+                        "name": "Pyra & Mythra"
+                      }
+                    },
+                    {
+                      "id": 30943863,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1846,
+                      "entrant": {
+                        "id": 15932417
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1846,
+                        "name": "Kazuya"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 479
+    },
+    "actionRecords": []
+  }
+}

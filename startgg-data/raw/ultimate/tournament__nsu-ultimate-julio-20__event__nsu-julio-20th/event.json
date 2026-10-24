@@ -1,0 +1,44 @@
+{
+  "fetchedAt": "2026-10-23T14:42:56.138976+00:00",
+  "sourceUrl": "https://www.start.gg/tournament/nsu-ultimate-julio-20/event/nsu-julio-20th",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/nsu-ultimate-julio-20/event/nsu-julio-20th"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 377111,
+        "name": "NSU Ultimate Julio 2",
+        "numEntrants": 18,
+        "tournament": {
+          "id": 163556,
+          "name": "NSU Ultimate Julio 20",
+          "slug": "tournament/nsu-ultimate-julio-20",
+          "images": [
+            {
+              "url": "https://images.start.gg/images/tournament/163556/image-eacfac8ef904b4c8df711359fc712beb.jpg",
+              "type": "profile"
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

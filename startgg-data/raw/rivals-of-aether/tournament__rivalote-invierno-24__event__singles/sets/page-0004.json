@@ -1,0 +1,136 @@
+{
+  "fetchedAt": "2026-10-22T20:49:21.500917+00:00",
+  "sourceUrl": "https://www.start.gg/tournament/rivalote-invierno-24/event/singles",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 1186735,
+    "page": 4,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1186735,
+        "name": "Singles",
+        "sets": {
+          "pageInfo": {
+            "total": 31
+          },
+          "nodes": [
+            {
+              "id": 78487438,
+              "state": 3,
+              "winnerId": 17346447,
+              "round": 1,
+              "fullRoundText": "Winners Round 1",
+              "displayScore": "DQ",
+              "lPlacement": 13,
+              "wPlacement": 9,
+              "identifier": "H",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1723925154,
+              "createdAt": 1723828296,
+              "updatedAt": 1723925202,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2562760,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/rivalote-invierno-24/events/singles/brackets/1724776/2562760",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1724776,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "78487438-0",
+                  "entrant": {
+                    "id": 17346447,
+                    "name": "NSG | Catwo",
+                    "participants": [
+                      {
+                        "id": 16094138,
+                        "gamerTag": "Catwo",
+                        "player": {
+                          "id": 3326405
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30690608_sets_78487438",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": null,
+                        "displayValue": null
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "78487438-1",
+                  "entrant": {
+                    "id": 17453960,
+                    "name": "BCP | BRYANT MYERS",
+                    "participants": [
+                      {
+                        "id": 16187299,
+                        "gamerTag": "BRYANT MYERS",
+                        "player": {
+                          "id": 1013310
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30850248_sets_78487438",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": -1,
+                        "displayValue": "-1"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 33
+    },
+    "actionRecords": []
+  }
+}

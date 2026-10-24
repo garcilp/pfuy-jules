@@ -1,0 +1,136 @@
+{
+  "fetchedAt": "2026-10-22T21:50:05.711779+00:00",
+  "sourceUrl": "http://start.gg/tournament/montevideo-melee-monthly-6/event/melee-singles",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 1184121,
+    "page": 3,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1184121,
+        "name": "Melee Singles",
+        "sets": {
+          "pageInfo": {
+            "total": 21
+          },
+          "nodes": [
+            {
+              "id": 77698481,
+              "state": 3,
+              "winnerId": 17307960,
+              "round": 1,
+              "fullRoundText": "Winners Round 1",
+              "displayScore": "EmilioLoco28 0 - Smeag 3",
+              "lPlacement": 9,
+              "wPlacement": 9,
+              "identifier": "C",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1722140321,
+              "createdAt": 1722140262,
+              "updatedAt": 1722140321,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2558370,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-6/events/melee-singles/brackets/1721424/2558370",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1721424,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "77698481-0",
+                  "entrant": {
+                    "id": 17307976,
+                    "name": "EmilioLoco28",
+                    "participants": [
+                      {
+                        "id": 16062209,
+                        "gamerTag": "EmilioLoco28",
+                        "player": {
+                          "id": 4211949
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30629996_sets_77698481",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "77698481-1",
+                  "entrant": {
+                    "id": 17307960,
+                    "name": "Smeag",
+                    "participants": [
+                      {
+                        "id": 16062197,
+                        "gamerTag": "Smeag",
+                        "player": {
+                          "id": 4211944
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30629980_sets_77698481",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 33
+    },
+    "actionRecords": []
+  }
+}

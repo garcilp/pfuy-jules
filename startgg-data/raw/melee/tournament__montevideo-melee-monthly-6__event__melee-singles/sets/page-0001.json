@@ -1,0 +1,991 @@
+{
+  "fetchedAt": "2026-10-22T21:50:02.485128+00:00",
+  "sourceUrl": "http://start.gg/tournament/montevideo-melee-monthly-6/event/melee-singles",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 1184121,
+    "page": 1,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1184121,
+        "name": "Melee Singles",
+        "sets": {
+          "pageInfo": {
+            "total": 21
+          },
+          "nodes": [
+            {
+              "id": 77698489,
+              "state": 3,
+              "winnerId": 17307966,
+              "round": 5,
+              "fullRoundText": "Grand Final",
+              "displayScore": "Iguana 1 - Sagat 3",
+              "lPlacement": 2,
+              "wPlacement": 1,
+              "identifier": "K",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1722140592,
+              "createdAt": 1722140262,
+              "updatedAt": 1722140593,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2558370,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-6/events/melee-singles/brackets/1721424/2558370",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1721424,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "77698489-0",
+                  "entrant": {
+                    "id": 17307959,
+                    "name": "Iguana",
+                    "participants": [
+                      {
+                        "id": 16062196,
+                        "gamerTag": "Iguana",
+                        "player": {
+                          "id": 4211943
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30629979_sets_77698489",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "77698489-1",
+                  "entrant": {
+                    "id": 17307966,
+                    "name": "Sagat",
+                    "participants": [
+                      {
+                        "id": 16062201,
+                        "gamerTag": "Sagat",
+                        "player": {
+                          "id": 4211946
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30629986_sets_77698489",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            },
+            {
+              "id": 77698490,
+              "state": 3,
+              "winnerId": 17307966,
+              "round": 5,
+              "fullRoundText": "Grand Final Reset",
+              "displayScore": "Sagat 3 - Iguana 2",
+              "lPlacement": 2,
+              "wPlacement": 1,
+              "identifier": "L",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1722140624,
+              "createdAt": 1722140262,
+              "updatedAt": 1722140624,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2558370,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-6/events/melee-singles/brackets/1721424/2558370",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1721424,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "77698490-0",
+                  "entrant": {
+                    "id": 17307966,
+                    "name": "Sagat",
+                    "participants": [
+                      {
+                        "id": 16062201,
+                        "gamerTag": "Sagat",
+                        "player": {
+                          "id": 4211946
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30629986_sets_77698490",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "77698490-1",
+                  "entrant": {
+                    "id": 17307959,
+                    "name": "Iguana",
+                    "participants": [
+                      {
+                        "id": 16062196,
+                        "gamerTag": "Iguana",
+                        "player": {
+                          "id": 4211943
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30629979_sets_77698490",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            },
+            {
+              "id": 77698488,
+              "state": 3,
+              "winnerId": 17307959,
+              "round": 4,
+              "fullRoundText": "Winners Final",
+              "displayScore": "Iguana 3 - Smeag 0",
+              "lPlacement": 3,
+              "wPlacement": 2,
+              "identifier": "J",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1722140496,
+              "createdAt": 1722140262,
+              "updatedAt": 1722140497,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2558370,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-6/events/melee-singles/brackets/1721424/2558370",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1721424,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "77698488-0",
+                  "entrant": {
+                    "id": 17307959,
+                    "name": "Iguana",
+                    "participants": [
+                      {
+                        "id": 16062196,
+                        "gamerTag": "Iguana",
+                        "player": {
+                          "id": 4211943
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30629979_sets_77698488",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "77698488-1",
+                  "entrant": {
+                    "id": 17307960,
+                    "name": "Smeag",
+                    "participants": [
+                      {
+                        "id": 16062197,
+                        "gamerTag": "Smeag",
+                        "player": {
+                          "id": 4211944
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30629980_sets_77698488",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            },
+            {
+              "id": 77698520,
+              "state": 3,
+              "winnerId": 17307966,
+              "round": -8,
+              "fullRoundText": "Losers Final",
+              "displayScore": "Smeag 0 - Sagat 3",
+              "lPlacement": 3,
+              "wPlacement": 2,
+              "identifier": "U",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1722140558,
+              "createdAt": 1722140262,
+              "updatedAt": 1722140559,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2558370,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-6/events/melee-singles/brackets/1721424/2558370",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1721424,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "77698520-0",
+                  "entrant": {
+                    "id": 17307960,
+                    "name": "Smeag",
+                    "participants": [
+                      {
+                        "id": 16062197,
+                        "gamerTag": "Smeag",
+                        "player": {
+                          "id": 4211944
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30629980_sets_77698520",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "77698520-1",
+                  "entrant": {
+                    "id": 17307966,
+                    "name": "Sagat",
+                    "participants": [
+                      {
+                        "id": 16062201,
+                        "gamerTag": "Sagat",
+                        "player": {
+                          "id": 4211946
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30629986_sets_77698520",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            },
+            {
+              "id": 77698519,
+              "state": 3,
+              "winnerId": 17307966,
+              "round": -7,
+              "fullRoundText": "Losers Semi-Final",
+              "displayScore": "Sagat 3 - Son Rolo 0",
+              "lPlacement": 4,
+              "wPlacement": 3,
+              "identifier": "T",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1722140545,
+              "createdAt": 1722140262,
+              "updatedAt": 1722140546,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2558370,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-6/events/melee-singles/brackets/1721424/2558370",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1721424,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "77698519-0",
+                  "entrant": {
+                    "id": 17307966,
+                    "name": "Sagat",
+                    "participants": [
+                      {
+                        "id": 16062201,
+                        "gamerTag": "Sagat",
+                        "player": {
+                          "id": 4211946
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30629986_sets_77698519",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "77698519-1",
+                  "entrant": {
+                    "id": 17307962,
+                    "name": "Son Rolo",
+                    "participants": [
+                      {
+                        "id": 16062199,
+                        "gamerTag": "Son Rolo",
+                        "player": {
+                          "id": 4211945
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30629982_sets_77698519",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            },
+            {
+              "id": 77698486,
+              "state": 3,
+              "winnerId": 17307959,
+              "round": 3,
+              "fullRoundText": "Winners Semi-Final",
+              "displayScore": "Sagat 1 - Iguana 3",
+              "lPlacement": 5,
+              "wPlacement": 3,
+              "identifier": "H",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1722140374,
+              "createdAt": 1722140262,
+              "updatedAt": 1722140375,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2558370,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-6/events/melee-singles/brackets/1721424/2558370",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1721424,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "77698486-0",
+                  "entrant": {
+                    "id": 17307966,
+                    "name": "Sagat",
+                    "participants": [
+                      {
+                        "id": 16062201,
+                        "gamerTag": "Sagat",
+                        "player": {
+                          "id": 4211946
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30629986_sets_77698486",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "77698486-1",
+                  "entrant": {
+                    "id": 17307959,
+                    "name": "Iguana",
+                    "participants": [
+                      {
+                        "id": 16062196,
+                        "gamerTag": "Iguana",
+                        "player": {
+                          "id": 4211943
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30629979_sets_77698486",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            },
+            {
+              "id": 77698487,
+              "state": 3,
+              "winnerId": 17307960,
+              "round": 3,
+              "fullRoundText": "Winners Semi-Final",
+              "displayScore": "Son Rolo 1 - Smeag 3",
+              "lPlacement": 5,
+              "wPlacement": 3,
+              "identifier": "I",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1722140385,
+              "createdAt": 1722140262,
+              "updatedAt": 1722140385,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2558370,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-6/events/melee-singles/brackets/1721424/2558370",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1721424,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "77698487-0",
+                  "entrant": {
+                    "id": 17307962,
+                    "name": "Son Rolo",
+                    "participants": [
+                      {
+                        "id": 16062199,
+                        "gamerTag": "Son Rolo",
+                        "player": {
+                          "id": 4211945
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30629982_sets_77698487",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "77698487-1",
+                  "entrant": {
+                    "id": 17307960,
+                    "name": "Smeag",
+                    "participants": [
+                      {
+                        "id": 16062197,
+                        "gamerTag": "Smeag",
+                        "player": {
+                          "id": 4211944
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30629980_sets_77698487",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            },
+            {
+              "id": 77698517,
+              "state": 3,
+              "winnerId": 17307966,
+              "round": -6,
+              "fullRoundText": "Losers Quarter-Final",
+              "displayScore": "Sagat 3 - Transformacion 1",
+              "lPlacement": 5,
+              "wPlacement": 4,
+              "identifier": "R",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1722140471,
+              "createdAt": 1722140262,
+              "updatedAt": 1722140471,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2558370,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-6/events/melee-singles/brackets/1721424/2558370",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1721424,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "77698517-0",
+                  "entrant": {
+                    "id": 17307966,
+                    "name": "Sagat",
+                    "participants": [
+                      {
+                        "id": 16062201,
+                        "gamerTag": "Sagat",
+                        "player": {
+                          "id": 4211946
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30629986_sets_77698517",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "77698517-1",
+                  "entrant": {
+                    "id": 17308000,
+                    "name": "Transformacion",
+                    "participants": [
+                      {
+                        "id": 16062230,
+                        "gamerTag": "Transformacion",
+                        "player": {
+                          "id": 4211954
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30630020_sets_77698517",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            },
+            {
+              "id": 77698518,
+              "state": 3,
+              "winnerId": 17307962,
+              "round": -6,
+              "fullRoundText": "Losers Quarter-Final",
+              "displayScore": "Son Rolo 3 - Sol!d 2",
+              "lPlacement": 5,
+              "wPlacement": 4,
+              "identifier": "S",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1722140460,
+              "createdAt": 1722140262,
+              "updatedAt": 1722140460,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2558370,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-6/events/melee-singles/brackets/1721424/2558370",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1721424,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "77698518-0",
+                  "entrant": {
+                    "id": 17307962,
+                    "name": "Son Rolo",
+                    "participants": [
+                      {
+                        "id": 16062199,
+                        "gamerTag": "Son Rolo",
+                        "player": {
+                          "id": 4211945
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30629982_sets_77698518",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "77698518-1",
+                  "entrant": {
+                    "id": 17307970,
+                    "name": "Sol!d",
+                    "participants": [
+                      {
+                        "id": 16062203,
+                        "gamerTag": "Sol!d",
+                        "player": {
+                          "id": 4211947
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30629990_sets_77698518",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            },
+            {
+              "id": 77698515,
+              "state": 3,
+              "winnerId": 17308000,
+              "round": -5,
+              "fullRoundText": "Losers Round 2",
+              "displayScore": "Cody 2 - Transformacion 3",
+              "lPlacement": 7,
+              "wPlacement": 5,
+              "identifier": "P",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1722140434,
+              "createdAt": 1722140262,
+              "updatedAt": 1722140435,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2558370,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-6/events/melee-singles/brackets/1721424/2558370",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1721424,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "77698515-0",
+                  "entrant": {
+                    "id": 17308017,
+                    "name": "Cody",
+                    "participants": [
+                      {
+                        "id": 16062246,
+                        "gamerTag": "Cody",
+                        "player": {
+                          "id": 4211956
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30630037_sets_77698515",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "77698515-1",
+                  "entrant": {
+                    "id": 17308000,
+                    "name": "Transformacion",
+                    "participants": [
+                      {
+                        "id": 16062230,
+                        "gamerTag": "Transformacion",
+                        "player": {
+                          "id": 4211954
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30630020_sets_77698515",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 321
+    },
+    "actionRecords": []
+  }
+}

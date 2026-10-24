@@ -1,0 +1,38 @@
+{
+  "fetchedAt": "2026-10-22T21:41:07.309962+00:00",
+  "sourceUrl": "http://start.gg/tournament/mashito-go-2/event/smash-ultimate-singles",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/mashito-go-2/event/smash-ultimate-singles"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1581525,
+        "name": "Smash Ultimate singles",
+        "numEntrants": 41,
+        "tournament": {
+          "id": 891040,
+          "name": "Mashito GO! #2",
+          "slug": "tournament/mashito-go-2"
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

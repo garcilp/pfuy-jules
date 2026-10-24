@@ -1,0 +1,2093 @@
+{
+  "fetchedAt": "2026-10-22T20:53:30.861327+00:00",
+  "sourceUrl": "http://start.gg/tournament/rivalito-charrua-11/event/rivals-2-singles",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 1346772,
+    "page": 1,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1346772,
+        "name": "Rivals 2 - Singles",
+        "sets": {
+          "pageInfo": {
+            "total": 28
+          },
+          "nodes": [
+            {
+              "id": 87532393,
+              "state": 3,
+              "winnerId": 19654171,
+              "round": 5,
+              "fullRoundText": "Grand Final",
+              "displayScore": "BCP | Mitsu 3 - BCP | Mint 1",
+              "lPlacement": 2,
+              "wPlacement": 1,
+              "identifier": "O",
+              "startAt": null,
+              "startedAt": 1743993616,
+              "completedAt": 1743993636,
+              "createdAt": 1743959856,
+              "updatedAt": 1743993636,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2836460,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/rivalito-charrua-11/events/rivals-2-singles/brackets/1930409/2836460",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1930409,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "87532393-0",
+                  "entrant": {
+                    "id": 19654171,
+                    "name": "BCP | Mitsu",
+                    "participants": [
+                      {
+                        "id": 18133902,
+                        "gamerTag": "Mitsu",
+                        "player": {
+                          "id": 557903
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_34137536_sets_87532393",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "87532393-1",
+                  "entrant": {
+                    "id": 19650736,
+                    "name": "BCP | Mint",
+                    "participants": [
+                      {
+                        "id": 18130861,
+                        "gamerTag": "Mint",
+                        "player": {
+                          "id": 2441157
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_34132575_sets_87532393",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 29134035,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 19654171,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 42724103,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2502,
+                      "entrant": {
+                        "id": 19650736
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2502,
+                        "name": "Maypul"
+                      }
+                    },
+                    {
+                      "id": 42724104,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2503,
+                      "entrant": {
+                        "id": 19654171
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2503,
+                        "name": "Clairen"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 29134036,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 19654171,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 42724105,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2619,
+                      "entrant": {
+                        "id": 19650736
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2619,
+                        "name": "Olympia"
+                      }
+                    },
+                    {
+                      "id": 42724106,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2503,
+                      "entrant": {
+                        "id": 19654171
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2503,
+                        "name": "Clairen"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 29134037,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 19650736,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 42724107,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2502,
+                      "entrant": {
+                        "id": 19650736
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2502,
+                        "name": "Maypul"
+                      }
+                    },
+                    {
+                      "id": 42724108,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2503,
+                      "entrant": {
+                        "id": 19654171
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2503,
+                        "name": "Clairen"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 29134038,
+                  "orderNum": 4,
+                  "state": 3,
+                  "winnerId": 19654171,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 42724109,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2502,
+                      "entrant": {
+                        "id": 19650736
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2502,
+                        "name": "Maypul"
+                      }
+                    },
+                    {
+                      "id": 42724110,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2503,
+                      "entrant": {
+                        "id": 19654171
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2503,
+                        "name": "Clairen"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 87532392,
+              "state": 3,
+              "winnerId": 19654171,
+              "round": 4,
+              "fullRoundText": "Winners Final",
+              "displayScore": "BCP | Mitsu 3 - BCP | Mint 1",
+              "lPlacement": 3,
+              "wPlacement": 2,
+              "identifier": "N",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1743968551,
+              "createdAt": 1743959856,
+              "updatedAt": 1743968552,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2836460,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/rivalito-charrua-11/events/rivals-2-singles/brackets/1930409/2836460",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1930409,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "87532392-0",
+                  "entrant": {
+                    "id": 19654171,
+                    "name": "BCP | Mitsu",
+                    "participants": [
+                      {
+                        "id": 18133902,
+                        "gamerTag": "Mitsu",
+                        "player": {
+                          "id": 557903
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_34137536_sets_87532392",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "87532392-1",
+                  "entrant": {
+                    "id": 19650736,
+                    "name": "BCP | Mint",
+                    "participants": [
+                      {
+                        "id": 18130861,
+                        "gamerTag": "Mint",
+                        "player": {
+                          "id": 2441157
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_34132575_sets_87532392",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 29123426,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 19650736,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 42707645,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2502,
+                      "entrant": {
+                        "id": 19650736
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2502,
+                        "name": "Maypul"
+                      }
+                    },
+                    {
+                      "id": 42707646,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2503,
+                      "entrant": {
+                        "id": 19654171
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2503,
+                        "name": "Clairen"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 29123427,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 19654171,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 42707647,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2502,
+                      "entrant": {
+                        "id": 19650736
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2502,
+                        "name": "Maypul"
+                      }
+                    },
+                    {
+                      "id": 42707648,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2503,
+                      "entrant": {
+                        "id": 19654171
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2503,
+                        "name": "Clairen"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 29123428,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 19654171,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 42707649,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2502,
+                      "entrant": {
+                        "id": 19650736
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2502,
+                        "name": "Maypul"
+                      }
+                    },
+                    {
+                      "id": 42707650,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2503,
+                      "entrant": {
+                        "id": 19654171
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2503,
+                        "name": "Clairen"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 29123429,
+                  "orderNum": 4,
+                  "state": 3,
+                  "winnerId": 19654171,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 42707651,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2502,
+                      "entrant": {
+                        "id": 19650736
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2502,
+                        "name": "Maypul"
+                      }
+                    },
+                    {
+                      "id": 42707652,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2503,
+                      "entrant": {
+                        "id": 19654171
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2503,
+                        "name": "Clairen"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 87532424,
+              "state": 3,
+              "winnerId": 19650736,
+              "round": -8,
+              "fullRoundText": "Losers Final",
+              "displayScore": "BCP | Mint 3 - W&L | BCP | Lazerth 0",
+              "lPlacement": 3,
+              "wPlacement": 2,
+              "identifier": "AC",
+              "startAt": null,
+              "startedAt": 1743971767,
+              "completedAt": 1743993611,
+              "createdAt": 1743959856,
+              "updatedAt": 1743993611,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2836460,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/rivalito-charrua-11/events/rivals-2-singles/brackets/1930409/2836460",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1930409,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "87532424-0",
+                  "entrant": {
+                    "id": 19650736,
+                    "name": "BCP | Mint",
+                    "participants": [
+                      {
+                        "id": 18130861,
+                        "gamerTag": "Mint",
+                        "player": {
+                          "id": 2441157
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_34132575_sets_87532424",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "87532424-1",
+                  "entrant": {
+                    "id": 19711294,
+                    "name": "W&L | BCP | Lazerth",
+                    "participants": [
+                      {
+                        "id": 18184330,
+                        "gamerTag": "Lazerth",
+                        "player": {
+                          "id": 1010061
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_34223769_sets_87532424",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 29134031,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 19650736,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 42724095,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2502,
+                      "entrant": {
+                        "id": 19650736
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2502,
+                        "name": "Maypul"
+                      }
+                    },
+                    {
+                      "id": 42724096,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2498,
+                      "entrant": {
+                        "id": 19711294
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2498,
+                        "name": "Fleet"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 29134032,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 19650736,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 42724097,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2502,
+                      "entrant": {
+                        "id": 19650736
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2502,
+                        "name": "Maypul"
+                      }
+                    },
+                    {
+                      "id": 42724098,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2498,
+                      "entrant": {
+                        "id": 19711294
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2498,
+                        "name": "Fleet"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 29134033,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 19650736,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 42724099,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2502,
+                      "entrant": {
+                        "id": 19650736
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2502,
+                        "name": "Maypul"
+                      }
+                    },
+                    {
+                      "id": 42724100,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2498,
+                      "entrant": {
+                        "id": 19711294
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2498,
+                        "name": "Fleet"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 87532423,
+              "state": 3,
+              "winnerId": 19711294,
+              "round": -7,
+              "fullRoundText": "Losers Semi-Final",
+              "displayScore": "SYR | ojo de oro 1 - W&L | BCP | Lazerth 2",
+              "lPlacement": 4,
+              "wPlacement": 3,
+              "identifier": "AB",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1743971759,
+              "createdAt": 1743959856,
+              "updatedAt": 1743971759,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2836460,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/rivalito-charrua-11/events/rivals-2-singles/brackets/1930409/2836460",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1930409,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "87532423-0",
+                  "entrant": {
+                    "id": 19692244,
+                    "name": "SYR | ojo de oro",
+                    "participants": [
+                      {
+                        "id": 18147642,
+                        "gamerTag": "ojo de oro",
+                        "player": {
+                          "id": 1670731
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_34195857_sets_87532423",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "87532423-1",
+                  "entrant": {
+                    "id": 19711294,
+                    "name": "W&L | BCP | Lazerth",
+                    "participants": [
+                      {
+                        "id": 18184330,
+                        "gamerTag": "Lazerth",
+                        "player": {
+                          "id": 1010061
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_34223769_sets_87532423",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 29124677,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 19692244,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 42709518,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2619,
+                      "entrant": {
+                        "id": 19692244
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2619,
+                        "name": "Olympia"
+                      }
+                    },
+                    {
+                      "id": 42709519,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2498,
+                      "entrant": {
+                        "id": 19711294
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2498,
+                        "name": "Fleet"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 29124678,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 19711294,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 42709520,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2619,
+                      "entrant": {
+                        "id": 19692244
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2619,
+                        "name": "Olympia"
+                      }
+                    },
+                    {
+                      "id": 42709521,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2498,
+                      "entrant": {
+                        "id": 19711294
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2498,
+                        "name": "Fleet"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 29124679,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 19711294,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 42709522,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2619,
+                      "entrant": {
+                        "id": 19692244
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2619,
+                        "name": "Olympia"
+                      }
+                    },
+                    {
+                      "id": 42709523,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2498,
+                      "entrant": {
+                        "id": 19711294
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2498,
+                        "name": "Fleet"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 87532390,
+              "state": 3,
+              "winnerId": 19654171,
+              "round": 3,
+              "fullRoundText": "Winners Semi-Final",
+              "displayScore": "BCP | Mitsu 2 - Rey rata(no me mires) 0",
+              "lPlacement": 5,
+              "wPlacement": 3,
+              "identifier": "L",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1743967075,
+              "createdAt": 1743959856,
+              "updatedAt": 1743967076,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2836460,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/rivalito-charrua-11/events/rivals-2-singles/brackets/1930409/2836460",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1930409,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "87532390-0",
+                  "entrant": {
+                    "id": 19654171,
+                    "name": "BCP | Mitsu",
+                    "participants": [
+                      {
+                        "id": 18133902,
+                        "gamerTag": "Mitsu",
+                        "player": {
+                          "id": 557903
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_34137536_sets_87532390",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "87532390-1",
+                  "entrant": {
+                    "id": 19690835,
+                    "name": "Rey rata(no me mires)",
+                    "participants": [
+                      {
+                        "id": 18166218,
+                        "gamerTag": "Rey rata(no me mires)",
+                        "player": {
+                          "id": 3654948
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_34193769_sets_87532390",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 29122876,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 19654171,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 42706867,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2503,
+                      "entrant": {
+                        "id": 19654171
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2503,
+                        "name": "Clairen"
+                      }
+                    },
+                    {
+                      "id": 42706868,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2498,
+                      "entrant": {
+                        "id": 19690835
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2498,
+                        "name": "Fleet"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 29122877,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 19654171,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 42706869,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2503,
+                      "entrant": {
+                        "id": 19654171
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2503,
+                        "name": "Clairen"
+                      }
+                    },
+                    {
+                      "id": 42706870,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2502,
+                      "entrant": {
+                        "id": 19690835
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2502,
+                        "name": "Maypul"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 87532391,
+              "state": 3,
+              "winnerId": 19650736,
+              "round": 3,
+              "fullRoundText": "Winners Semi-Final",
+              "displayScore": "BCP | Mint 2 - NSG | Catwo 0",
+              "lPlacement": 5,
+              "wPlacement": 3,
+              "identifier": "M",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1743967505,
+              "createdAt": 1743959856,
+              "updatedAt": 1743967505,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2836460,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/rivalito-charrua-11/events/rivals-2-singles/brackets/1930409/2836460",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1930409,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "87532391-0",
+                  "entrant": {
+                    "id": 19650736,
+                    "name": "BCP | Mint",
+                    "participants": [
+                      {
+                        "id": 18130861,
+                        "gamerTag": "Mint",
+                        "player": {
+                          "id": 2441157
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_34132575_sets_87532391",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "87532391-1",
+                  "entrant": {
+                    "id": 19654170,
+                    "name": "NSG | Catwo",
+                    "participants": [
+                      {
+                        "id": 18133901,
+                        "gamerTag": "Catwo",
+                        "player": {
+                          "id": 3326405
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_34137545_sets_87532391",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 29123030,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 19650736,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 42707085,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2502,
+                      "entrant": {
+                        "id": 19650736
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2502,
+                        "name": "Maypul"
+                      }
+                    },
+                    {
+                      "id": 42707086,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2615,
+                      "entrant": {
+                        "id": 19654170
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2615,
+                        "name": "Etalus"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 29123031,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 19650736,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 42707087,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2619,
+                      "entrant": {
+                        "id": 19650736
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2619,
+                        "name": "Olympia"
+                      }
+                    },
+                    {
+                      "id": 42707088,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2615,
+                      "entrant": {
+                        "id": 19654170
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2615,
+                        "name": "Etalus"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 87532422,
+              "state": 3,
+              "winnerId": 19711294,
+              "round": -6,
+              "fullRoundText": "Losers Quarter-Final",
+              "displayScore": "NSG | Catwo 1 - W&L | BCP | Lazerth 2",
+              "lPlacement": 5,
+              "wPlacement": 4,
+              "identifier": "AA",
+              "startAt": null,
+              "startedAt": 1743969912,
+              "completedAt": 1743970806,
+              "createdAt": 1743959856,
+              "updatedAt": 1743970806,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2836460,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/rivalito-charrua-11/events/rivals-2-singles/brackets/1930409/2836460",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1930409,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "87532422-0",
+                  "entrant": {
+                    "id": 19654170,
+                    "name": "NSG | Catwo",
+                    "participants": [
+                      {
+                        "id": 18133901,
+                        "gamerTag": "Catwo",
+                        "player": {
+                          "id": 3326405
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_34137545_sets_87532422",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "87532422-1",
+                  "entrant": {
+                    "id": 19711294,
+                    "name": "W&L | BCP | Lazerth",
+                    "participants": [
+                      {
+                        "id": 18184330,
+                        "gamerTag": "Lazerth",
+                        "player": {
+                          "id": 1010061
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_34223769_sets_87532422",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 29124230,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 19711294,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 42708742,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2615,
+                      "entrant": {
+                        "id": 19654170
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2615,
+                        "name": "Etalus"
+                      }
+                    },
+                    {
+                      "id": 42708743,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2498,
+                      "entrant": {
+                        "id": 19711294
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2498,
+                        "name": "Fleet"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 29124231,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 19654170,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 42708744,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2615,
+                      "entrant": {
+                        "id": 19654170
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2615,
+                        "name": "Etalus"
+                      }
+                    },
+                    {
+                      "id": 42708745,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2498,
+                      "entrant": {
+                        "id": 19711294
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2498,
+                        "name": "Fleet"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 29124232,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 19711294,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 42708746,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2615,
+                      "entrant": {
+                        "id": 19654170
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2615,
+                        "name": "Etalus"
+                      }
+                    },
+                    {
+                      "id": 42708747,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2498,
+                      "entrant": {
+                        "id": 19711294
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2498,
+                        "name": "Fleet"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 87532421,
+              "state": 3,
+              "winnerId": 19692244,
+              "round": -6,
+              "fullRoundText": "Losers Quarter-Final",
+              "displayScore": "Rey rata(no me mires) 1 - SYR | ojo de oro 2",
+              "lPlacement": 5,
+              "wPlacement": 4,
+              "identifier": "Z",
+              "startAt": null,
+              "startedAt": 1743970816,
+              "completedAt": 1743970938,
+              "createdAt": 1743959856,
+              "updatedAt": 1743970938,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2836460,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/rivalito-charrua-11/events/rivals-2-singles/brackets/1930409/2836460",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1930409,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "87532421-0",
+                  "entrant": {
+                    "id": 19690835,
+                    "name": "Rey rata(no me mires)",
+                    "participants": [
+                      {
+                        "id": 18166218,
+                        "gamerTag": "Rey rata(no me mires)",
+                        "player": {
+                          "id": 3654948
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_34193769_sets_87532421",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "87532421-1",
+                  "entrant": {
+                    "id": 19692244,
+                    "name": "SYR | ojo de oro",
+                    "participants": [
+                      {
+                        "id": 18147642,
+                        "gamerTag": "ojo de oro",
+                        "player": {
+                          "id": 1670731
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_34195857_sets_87532421",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 29124280,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 19690835,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 42708827,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2498,
+                      "entrant": {
+                        "id": 19690835
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2498,
+                        "name": "Fleet"
+                      }
+                    },
+                    {
+                      "id": 42708828,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2619,
+                      "entrant": {
+                        "id": 19692244
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2619,
+                        "name": "Olympia"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 29124281,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 19692244,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 42708829,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2498,
+                      "entrant": {
+                        "id": 19690835
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2498,
+                        "name": "Fleet"
+                      }
+                    },
+                    {
+                      "id": 42708830,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2619,
+                      "entrant": {
+                        "id": 19692244
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2619,
+                        "name": "Olympia"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 29124282,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 19692244,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 42708831,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2498,
+                      "entrant": {
+                        "id": 19690835
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2498,
+                        "name": "Fleet"
+                      }
+                    },
+                    {
+                      "id": 42708832,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2619,
+                      "entrant": {
+                        "id": 19692244
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2619,
+                        "name": "Olympia"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 87532419,
+              "state": 3,
+              "winnerId": 19692244,
+              "round": -5,
+              "fullRoundText": "Losers Round 3",
+              "displayScore": "W&L | Pritah 0 - SYR | ojo de oro 2",
+              "lPlacement": 7,
+              "wPlacement": 5,
+              "identifier": "X",
+              "startAt": null,
+              "startedAt": 1743969918,
+              "completedAt": 1743970117,
+              "createdAt": 1743959856,
+              "updatedAt": 1743970117,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2836460,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/rivalito-charrua-11/events/rivals-2-singles/brackets/1930409/2836460",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1930409,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "87532419-0",
+                  "entrant": {
+                    "id": 19654249,
+                    "name": "W&L | Pritah",
+                    "participants": [
+                      {
+                        "id": 18133976,
+                        "gamerTag": "Pritah",
+                        "player": {
+                          "id": 330721
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_34137633_sets_87532419",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "87532419-1",
+                  "entrant": {
+                    "id": 19692244,
+                    "name": "SYR | ojo de oro",
+                    "participants": [
+                      {
+                        "id": 18147642,
+                        "gamerTag": "ojo de oro",
+                        "player": {
+                          "id": 1670731
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_34195857_sets_87532419",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 29123999,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 19692244,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 42708385,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2599,
+                      "entrant": {
+                        "id": 19654249
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2599,
+                        "name": "Forsburn"
+                      }
+                    },
+                    {
+                      "id": 42708386,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2619,
+                      "entrant": {
+                        "id": 19692244
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2619,
+                        "name": "Olympia"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 29124000,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 19692244,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 42708387,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2599,
+                      "entrant": {
+                        "id": 19654249
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2599,
+                        "name": "Forsburn"
+                      }
+                    },
+                    {
+                      "id": 42708388,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2619,
+                      "entrant": {
+                        "id": 19692244
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2619,
+                        "name": "Olympia"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 87532420,
+              "state": 3,
+              "winnerId": 19711294,
+              "round": -5,
+              "fullRoundText": "Losers Round 3",
+              "displayScore": "W&L | BCP | Lazerth 2 - GAMER|CG|W&L | Vodokex 0",
+              "lPlacement": 7,
+              "wPlacement": 5,
+              "identifier": "Y",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1743969904,
+              "createdAt": 1743959856,
+              "updatedAt": 1743969905,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2836460,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/rivalito-charrua-11/events/rivals-2-singles/brackets/1930409/2836460",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1930409,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "87532420-0",
+                  "entrant": {
+                    "id": 19711294,
+                    "name": "W&L | BCP | Lazerth",
+                    "participants": [
+                      {
+                        "id": 18184330,
+                        "gamerTag": "Lazerth",
+                        "player": {
+                          "id": 1010061
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_34223769_sets_87532420",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "87532420-1",
+                  "entrant": {
+                    "id": 19692717,
+                    "name": "GAMER|CG|W&L | Vodokex",
+                    "participants": [
+                      {
+                        "id": 18167989,
+                        "gamerTag": "Vodokex",
+                        "player": {
+                          "id": 2684562
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_34196494_sets_87532420",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 29123934,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 19711294,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 42708313,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2599,
+                      "entrant": {
+                        "id": 19692717
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2599,
+                        "name": "Forsburn"
+                      }
+                    },
+                    {
+                      "id": 42708314,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2498,
+                      "entrant": {
+                        "id": 19711294
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2498,
+                        "name": "Fleet"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 29123935,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 19711294,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 42708315,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2599,
+                      "entrant": {
+                        "id": 19692717
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2599,
+                        "name": "Forsburn"
+                      }
+                    },
+                    {
+                      "id": 42708316,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 2498,
+                      "entrant": {
+                        "id": 19711294
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 2498,
+                        "name": "Fleet"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 535
+    },
+    "actionRecords": []
+  }
+}

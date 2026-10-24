@@ -1,0 +1,1779 @@
+{
+  "fetchedAt": "2026-10-22T21:37:15.552950+00:00",
+  "sourceUrl": "https://www.start.gg/tournament/ultimate-smashdown-31/event/ultimate-singles",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 1407584,
+    "page": 3,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1407584,
+        "name": "Ultimate Singles",
+        "sets": {
+          "pageInfo": {
+            "total": 112
+          },
+          "nodes": [
+            {
+              "id": 91592228,
+              "state": 3,
+              "winnerId": 20559711,
+              "round": -6,
+              "fullRoundText": "Losers Round 3",
+              "displayScore": "UWA | Kalcetin 2 - NSG | Catwo 1",
+              "lPlacement": 9,
+              "wPlacement": 7,
+              "identifier": "AM",
+              "startAt": null,
+              "startedAt": 1752956188,
+              "completedAt": 1752956708,
+              "createdAt": 1752950028,
+              "updatedAt": 1752956709,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2943505,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/ultimate-smashdown-31/events/ultimate-singles/brackets/2009144/2943505",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 2009144,
+                  "name": "Bracket A",
+                  "phaseOrder": 2,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "91592228-0",
+                  "entrant": {
+                    "id": 20559711,
+                    "name": "UWA | Kalcetin",
+                    "participants": [
+                      {
+                        "id": 18929816,
+                        "gamerTag": "Kalcetin",
+                        "player": {
+                          "id": 1398327
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_35457357_sets_91592228",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "91592228-1",
+                  "entrant": {
+                    "id": 20568729,
+                    "name": "NSG | Catwo",
+                    "participants": [
+                      {
+                        "id": 18937722,
+                        "gamerTag": "Catwo",
+                        "player": {
+                          "id": 3326405
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_35457367_sets_91592228",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 31375920,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 20559711,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 46180961,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1285,
+                      "entrant": {
+                        "id": 20559711
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1285,
+                        "name": "Falco"
+                      }
+                    },
+                    {
+                      "id": 46180962,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1280,
+                      "entrant": {
+                        "id": 20568729
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1280,
+                        "name": "Donkey Kong"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 31375921,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 20568729,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 46180963,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1322,
+                      "entrant": {
+                        "id": 20559711
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1322,
+                        "name": "Ridley"
+                      }
+                    },
+                    {
+                      "id": 46180964,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1280,
+                      "entrant": {
+                        "id": 20568729
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1280,
+                        "name": "Donkey Kong"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 31375922,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 20559711,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 46180965,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1285,
+                      "entrant": {
+                        "id": 20559711
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1285,
+                        "name": "Falco"
+                      }
+                    },
+                    {
+                      "id": 46180966,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1280,
+                      "entrant": {
+                        "id": 20568729
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1280,
+                        "name": "Donkey Kong"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 91592229,
+              "state": 3,
+              "winnerId": 20726524,
+              "round": -6,
+              "fullRoundText": "Losers Round 3",
+              "displayScore": "W&L | Trim 0 - NSG | Ketcha 2",
+              "lPlacement": 9,
+              "wPlacement": 7,
+              "identifier": "AN",
+              "startAt": null,
+              "startedAt": 1752956199,
+              "completedAt": 1752956974,
+              "createdAt": 1752950028,
+              "updatedAt": 1752956974,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2943505,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/ultimate-smashdown-31/events/ultimate-singles/brackets/2009144/2943505",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 2009144,
+                  "name": "Bracket A",
+                  "phaseOrder": 2,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "91592229-0",
+                  "entrant": {
+                    "id": 20687223,
+                    "name": "W&L | Trim",
+                    "participants": [
+                      {
+                        "id": 19040316,
+                        "gamerTag": "Trim",
+                        "player": {
+                          "id": 599412
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_35457361_sets_91592229",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "91592229-1",
+                  "entrant": {
+                    "id": 20726524,
+                    "name": "NSG | Ketcha",
+                    "participants": [
+                      {
+                        "id": 19074748,
+                        "gamerTag": "Ketcha",
+                        "player": {
+                          "id": 3383474
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_35457360_sets_91592229",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 31376058,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 20726524,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 46181217,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1340,
+                      "entrant": {
+                        "id": 20687223
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1340,
+                        "name": "Zelda"
+                      }
+                    },
+                    {
+                      "id": 46181218,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1747,
+                      "entrant": {
+                        "id": 20726524
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1747,
+                        "name": "Min Min"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 31376059,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 20726524,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 46181219,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1340,
+                      "entrant": {
+                        "id": 20687223
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1340,
+                        "name": "Zelda"
+                      }
+                    },
+                    {
+                      "id": 46181220,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1747,
+                      "entrant": {
+                        "id": 20726524
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1747,
+                        "name": "Min Min"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 91592230,
+              "state": 3,
+              "winnerId": 20561814,
+              "round": -6,
+              "fullRoundText": "Losers Round 3",
+              "displayScore": "DBD | ENEMA 2 - CG | Azrad 95% 1",
+              "lPlacement": 9,
+              "wPlacement": 7,
+              "identifier": "AO",
+              "startAt": null,
+              "startedAt": 1752957393,
+              "completedAt": 1752957422,
+              "createdAt": 1752950028,
+              "updatedAt": 1752957423,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2943505,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/ultimate-smashdown-31/events/ultimate-singles/brackets/2009144/2943505",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 2009144,
+                  "name": "Bracket A",
+                  "phaseOrder": 2,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "91592230-0",
+                  "entrant": {
+                    "id": 20561814,
+                    "name": "DBD | ENEMA",
+                    "participants": [
+                      {
+                        "id": 18931769,
+                        "gamerTag": "ENEMA",
+                        "player": {
+                          "id": 1244528
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_35457356_sets_91592230",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "91592230-1",
+                  "entrant": {
+                    "id": 20558477,
+                    "name": "CG | Azrad 95%",
+                    "participants": [
+                      {
+                        "id": 18928635,
+                        "gamerTag": "Azrad 95%",
+                        "player": {
+                          "id": 2915041
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_35457366_sets_91592230",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 31376300,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 20561814,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 46181603,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1311,
+                      "entrant": {
+                        "id": 20558477
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1311,
+                        "name": "Mii Brawler"
+                      }
+                    },
+                    {
+                      "id": 46181604,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1279,
+                      "entrant": {
+                        "id": 20561814
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1279,
+                        "name": "Diddy Kong"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 31376301,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 20558477,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 46181605,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1311,
+                      "entrant": {
+                        "id": 20558477
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1311,
+                        "name": "Mii Brawler"
+                      }
+                    },
+                    {
+                      "id": 46181606,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1279,
+                      "entrant": {
+                        "id": 20561814
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1279,
+                        "name": "Diddy Kong"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 31376302,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 20561814,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 46181607,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1311,
+                      "entrant": {
+                        "id": 20558477
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1311,
+                        "name": "Mii Brawler"
+                      }
+                    },
+                    {
+                      "id": 46181608,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1279,
+                      "entrant": {
+                        "id": 20561814
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1279,
+                        "name": "Diddy Kong"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 91591721,
+              "state": 3,
+              "winnerId": 20522692,
+              "round": -6,
+              "fullRoundText": "Losers Quarter-Final",
+              "displayScore": "tatu8052 1 - PIMBA|SMB | Gerix 2",
+              "lPlacement": 5,
+              "wPlacement": 4,
+              "identifier": "V",
+              "startAt": null,
+              "startedAt": 1752953616,
+              "completedAt": 1752953969,
+              "createdAt": 1752950278,
+              "updatedAt": 1752953970,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2943506,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/ultimate-smashdown-31/events/ultimate-singles/brackets/2009145/2943506",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 2009145,
+                  "name": "Bracket B",
+                  "phaseOrder": 4,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": true
+                }
+              },
+              "slots": [
+                {
+                  "id": "91591721-0",
+                  "entrant": {
+                    "id": 20690280,
+                    "name": "tatu8052",
+                    "participants": [
+                      {
+                        "id": 19035431,
+                        "gamerTag": "tatu8052",
+                        "player": {
+                          "id": 3335356
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_35733722_sets_91591721",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "91591721-1",
+                  "entrant": {
+                    "id": 20522692,
+                    "name": "PIMBA|SMB | Gerix",
+                    "participants": [
+                      {
+                        "id": 18897813,
+                        "gamerTag": "Gerix",
+                        "player": {
+                          "id": 1033952
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_35703925_sets_91591721",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 31374639,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 20522692,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 46178802,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1406,
+                      "entrant": {
+                        "id": 20522692
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1406,
+                        "name": "Incineroar"
+                      }
+                    },
+                    {
+                      "id": 46178803,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1295,
+                      "entrant": {
+                        "id": 20690280
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1295,
+                        "name": "Kirby"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 31374640,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 20690280,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 46178804,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1406,
+                      "entrant": {
+                        "id": 20522692
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1406,
+                        "name": "Incineroar"
+                      }
+                    },
+                    {
+                      "id": 46178805,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1295,
+                      "entrant": {
+                        "id": 20690280
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1295,
+                        "name": "Kirby"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 31374641,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 20522692,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 46178806,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1406,
+                      "entrant": {
+                        "id": 20522692
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1406,
+                        "name": "Incineroar"
+                      }
+                    },
+                    {
+                      "id": 46178807,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1295,
+                      "entrant": {
+                        "id": 20690280
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1295,
+                        "name": "Kirby"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 91591722,
+              "state": 3,
+              "winnerId": 20558028,
+              "round": -6,
+              "fullRoundText": "Losers Quarter-Final",
+              "displayScore": "DQ",
+              "lPlacement": 5,
+              "wPlacement": 4,
+              "identifier": "W",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1752952625,
+              "createdAt": 1752950278,
+              "updatedAt": 1752952626,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2943506,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/ultimate-smashdown-31/events/ultimate-singles/brackets/2009145/2943506",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 2009145,
+                  "name": "Bracket B",
+                  "phaseOrder": 4,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": true
+                }
+              },
+              "slots": [
+                {
+                  "id": "91591722-0",
+                  "entrant": {
+                    "id": 20558028,
+                    "name": "NSG | TowasPato",
+                    "participants": [
+                      {
+                        "id": 18928220,
+                        "gamerTag": "TowasPato",
+                        "player": {
+                          "id": 3332659
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_35711592_sets_91591722",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": null,
+                        "displayValue": null
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "91591722-1",
+                  "entrant": {
+                    "id": 20723108,
+                    "name": "swillwin | Salvawillwin",
+                    "participants": [
+                      {
+                        "id": 19071953,
+                        "gamerTag": "Salvawillwin",
+                        "player": {
+                          "id": 4746267
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_35723098_sets_91591722",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": -1,
+                        "displayValue": "-1"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            },
+            {
+              "id": 91592223,
+              "state": 3,
+              "winnerId": 20557267,
+              "round": -5,
+              "fullRoundText": "Losers Round 2",
+              "displayScore": "GAMER|CG|W&L | Vodokex 2 - CG | elcusquerman 0",
+              "lPlacement": 13,
+              "wPlacement": 9,
+              "identifier": "AH",
+              "startAt": null,
+              "startedAt": 1752954866,
+              "completedAt": 1752955464,
+              "createdAt": 1752950028,
+              "updatedAt": 1752955465,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2943505,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/ultimate-smashdown-31/events/ultimate-singles/brackets/2009144/2943505",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 2009144,
+                  "name": "Bracket A",
+                  "phaseOrder": 2,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "91592223-0",
+                  "entrant": {
+                    "id": 20557267,
+                    "name": "GAMER|CG|W&L | Vodokex",
+                    "participants": [
+                      {
+                        "id": 18927506,
+                        "gamerTag": "Vodokex",
+                        "player": {
+                          "id": 2684562
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_35457359_sets_91592223",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "91592223-1",
+                  "entrant": {
+                    "id": 20556744,
+                    "name": "CG | elcusquerman",
+                    "participants": [
+                      {
+                        "id": 18927004,
+                        "gamerTag": "elcusquerman",
+                        "player": {
+                          "id": 3124833
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_35457372_sets_91592223",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 31375310,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 20557267,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 46179927,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1340,
+                      "entrant": {
+                        "id": 20556744
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1340,
+                        "name": "Zelda"
+                      }
+                    },
+                    {
+                      "id": 46179928,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1307,
+                      "entrant": {
+                        "id": 20557267
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1307,
+                        "name": "Meta Knight"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 31375311,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 20557267,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 46179929,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1340,
+                      "entrant": {
+                        "id": 20556744
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1340,
+                        "name": "Zelda"
+                      }
+                    },
+                    {
+                      "id": 46179930,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1441,
+                      "entrant": {
+                        "id": 20557267
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1441,
+                        "name": "Piranha Plant"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 91592224,
+              "state": 3,
+              "winnerId": 20568729,
+              "round": -5,
+              "fullRoundText": "Losers Round 2",
+              "displayScore": "Aminas 0 - NSG | Catwo 2",
+              "lPlacement": 13,
+              "wPlacement": 9,
+              "identifier": "AI",
+              "startAt": null,
+              "startedAt": 1752953848,
+              "completedAt": 1752954787,
+              "createdAt": 1752950028,
+              "updatedAt": 1752954787,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2943505,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/ultimate-smashdown-31/events/ultimate-singles/brackets/2009144/2943505",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 2009144,
+                  "name": "Bracket A",
+                  "phaseOrder": 2,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "91592224-0",
+                  "entrant": {
+                    "id": 20688802,
+                    "name": "Aminas",
+                    "participants": [
+                      {
+                        "id": 19041828,
+                        "gamerTag": "Aminas",
+                        "player": {
+                          "id": 1000031
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_35457362_sets_91592224",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "91592224-1",
+                  "entrant": {
+                    "id": 20568729,
+                    "name": "NSG | Catwo",
+                    "participants": [
+                      {
+                        "id": 18937722,
+                        "gamerTag": "Catwo",
+                        "player": {
+                          "id": 3326405
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_35457367_sets_91592224",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 31375007,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 20568729,
+                  "entrant1Score": 0,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 46179427,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1280,
+                      "entrant": {
+                        "id": 20568729
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1280,
+                        "name": "Donkey Kong"
+                      }
+                    },
+                    {
+                      "id": 46179428,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1296,
+                      "entrant": {
+                        "id": 20688802
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1296,
+                        "name": "Link"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 31375008,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 20568729,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 46179429,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1280,
+                      "entrant": {
+                        "id": 20568729
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1280,
+                        "name": "Donkey Kong"
+                      }
+                    },
+                    {
+                      "id": 46179430,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1296,
+                      "entrant": {
+                        "id": 20688802
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1296,
+                        "name": "Link"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 91592225,
+              "state": 3,
+              "winnerId": 20726524,
+              "round": -5,
+              "fullRoundText": "Losers Round 2",
+              "displayScore": "NSG | Ketcha 2 - SMB | CG | Lucho 0",
+              "lPlacement": 13,
+              "wPlacement": 9,
+              "identifier": "AJ",
+              "startAt": null,
+              "startedAt": 1752953934,
+              "completedAt": 1752954280,
+              "createdAt": 1752950028,
+              "updatedAt": 1752954281,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2943505,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/ultimate-smashdown-31/events/ultimate-singles/brackets/2009144/2943505",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 2009144,
+                  "name": "Bracket A",
+                  "phaseOrder": 2,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "91592225-0",
+                  "entrant": {
+                    "id": 20726524,
+                    "name": "NSG | Ketcha",
+                    "participants": [
+                      {
+                        "id": 19074748,
+                        "gamerTag": "Ketcha",
+                        "player": {
+                          "id": 3383474
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_35457360_sets_91592225",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "91592225-1",
+                  "entrant": {
+                    "id": 20596707,
+                    "name": "SMB | CG | Lucho",
+                    "participants": [
+                      {
+                        "id": 18962537,
+                        "gamerTag": "Lucho",
+                        "player": {
+                          "id": 2390380
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_35457365_sets_91592225",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 31374813,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 20726524,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 46179109,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1409,
+                      "entrant": {
+                        "id": 20596707
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1409,
+                        "name": "Chrom"
+                      }
+                    },
+                    {
+                      "id": 46179110,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1747,
+                      "entrant": {
+                        "id": 20726524
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1747,
+                        "name": "Min Min"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 31374814,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 20726524,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 46179111,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1293,
+                      "entrant": {
+                        "id": 20596707
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1293,
+                        "name": "Jigglypuff"
+                      }
+                    },
+                    {
+                      "id": 46179112,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1747,
+                      "entrant": {
+                        "id": 20726524
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1747,
+                        "name": "Min Min"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 91592226,
+              "state": 3,
+              "winnerId": 20558477,
+              "round": -5,
+              "fullRoundText": "Losers Round 2",
+              "displayScore": "CG | Freakazoiid 1 - CG | Azrad 95% 2",
+              "lPlacement": 13,
+              "wPlacement": 9,
+              "identifier": "AK",
+              "startAt": null,
+              "startedAt": 1752954943,
+              "completedAt": 1752956374,
+              "createdAt": 1752950028,
+              "updatedAt": 1752956375,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2943505,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/ultimate-smashdown-31/events/ultimate-singles/brackets/2009144/2943505",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 2009144,
+                  "name": "Bracket A",
+                  "phaseOrder": 2,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "91592226-0",
+                  "entrant": {
+                    "id": 20556691,
+                    "name": "CG | Freakazoiid",
+                    "participants": [
+                      {
+                        "id": 18926961,
+                        "gamerTag": "Freakazoiid",
+                        "player": {
+                          "id": 3008029
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_35457363_sets_91592226",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "91592226-1",
+                  "entrant": {
+                    "id": 20558477,
+                    "name": "CG | Azrad 95%",
+                    "participants": [
+                      {
+                        "id": 18928635,
+                        "gamerTag": "Azrad 95%",
+                        "player": {
+                          "id": 2915041
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_35457366_sets_91592226",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 31375722,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 20558477,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 46180626,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1319,
+                      "entrant": {
+                        "id": 20556691
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1319,
+                        "name": "Pikachu"
+                      }
+                    },
+                    {
+                      "id": 46180627,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1311,
+                      "entrant": {
+                        "id": 20558477
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1311,
+                        "name": "Mii Brawler"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 31375723,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 20556691,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 46180628,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1319,
+                      "entrant": {
+                        "id": 20556691
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1319,
+                        "name": "Pikachu"
+                      }
+                    },
+                    {
+                      "id": 46180629,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1311,
+                      "entrant": {
+                        "id": 20558477
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1311,
+                        "name": "Mii Brawler"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 31375724,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 20558477,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 46180630,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1319,
+                      "entrant": {
+                        "id": 20556691
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1319,
+                        "name": "Pikachu"
+                      }
+                    },
+                    {
+                      "id": 46180631,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1311,
+                      "entrant": {
+                        "id": 20558477
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1311,
+                        "name": "Mii Brawler"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 91584974,
+              "state": 3,
+              "winnerId": 20556744,
+              "round": -5,
+              "fullRoundText": "Losers Round 2",
+              "displayScore": "DQ",
+              "lPlacement": 7,
+              "wPlacement": 5,
+              "identifier": "L",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1752949229,
+              "createdAt": 1752859939,
+              "updatedAt": 1752949229,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2943501,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/ultimate-smashdown-31/events/ultimate-singles/brackets/2009143/2943501",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 2009143,
+                  "name": "Pools",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "91584974-0",
+                  "entrant": {
+                    "id": 20556744,
+                    "name": "CG | elcusquerman",
+                    "participants": [
+                      {
+                        "id": 18927004,
+                        "gamerTag": "elcusquerman",
+                        "player": {
+                          "id": 3124833
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_35503603_sets_91584974",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": null,
+                        "displayValue": null
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "91584974-1",
+                  "entrant": {
+                    "id": 20689745,
+                    "name": "El Hombre Playa",
+                    "participants": [
+                      {
+                        "id": 19042728,
+                        "gamerTag": "El Hombre Playa",
+                        "player": {
+                          "id": 3333889
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_35715026_sets_91584974",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": -1,
+                        "displayValue": "-1"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 473
+    },
+    "actionRecords": []
+  }
+}

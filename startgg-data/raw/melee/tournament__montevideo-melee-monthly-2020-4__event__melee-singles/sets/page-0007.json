@@ -1,0 +1,136 @@
+{
+  "fetchedAt": "2026-10-22T21:57:08.810632+00:00",
+  "sourceUrl": "http://start.gg/tournament/montevideo-melee-monthly-2020-4/event/melee-singles",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 477415,
+    "page": 7,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 477415,
+        "name": "Melee Singles",
+        "sets": {
+          "pageInfo": {
+            "total": 61
+          },
+          "nodes": [
+            {
+              "id": 28433010,
+              "state": 3,
+              "winnerId": 5116442,
+              "round": 1,
+              "fullRoundText": "Round 1",
+              "displayScore": "Abu Dabi 2 - Cariño 0",
+              "lPlacement": null,
+              "wPlacement": null,
+              "identifier": "C",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1587852050,
+              "createdAt": 1587830301,
+              "updatedAt": 1587938370,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 1283901,
+                "displayIdentifier": "2",
+                "bracketType": "ROUND_ROBIN",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2020-4/events/melee-singles/brackets/800188/1283901",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 800188,
+                  "name": "Pools",
+                  "phaseOrder": 1,
+                  "bracketType": "ROUND_ROBIN",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "28433010-0",
+                  "entrant": {
+                    "id": 5116442,
+                    "name": "Abu Dabi",
+                    "participants": [
+                      {
+                        "id": 4859446,
+                        "gamerTag": "Abu Dabi",
+                        "player": {
+                          "id": 1160205
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_13172654_sets_28433010",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "28433010-1",
+                  "entrant": {
+                    "id": 5117885,
+                    "name": "Cariño",
+                    "participants": [
+                      {
+                        "id": 4861110,
+                        "gamerTag": "Cariño",
+                        "player": {
+                          "id": 1701226
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_13174927_sets_28433010",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 33
+    },
+    "actionRecords": []
+  }
+}

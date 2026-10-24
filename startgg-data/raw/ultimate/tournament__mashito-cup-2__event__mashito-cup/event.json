@@ -1,0 +1,44 @@
+{
+  "fetchedAt": "2026-10-23T14:43:15.270501+00:00",
+  "sourceUrl": "https://www.start.gg/tournament/mashito-cup-2/event/mashito-cup",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/mashito-cup-2/event/mashito-cup"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 682867,
+        "name": "Mashito Cup",
+        "numEntrants": 39,
+        "tournament": {
+          "id": 422036,
+          "name": "Mashito Cup 2",
+          "slug": "tournament/mashito-cup-2",
+          "images": [
+            {
+              "url": "https://images.start.gg/images/tournament/422036/image-f3d2b2fb81a4cf3ede545cbf21730e14.png?ehk=nYPrhfX5RKr3dfD84LvNv3N75w1a6wXfxuUEkkEqiT8%3D&ehkOptimized=hV8moQaaZ2SP1gjJ7eCHlNnaMd138ybhrAodcSQBQwc%3D",
+              "type": "profile"
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

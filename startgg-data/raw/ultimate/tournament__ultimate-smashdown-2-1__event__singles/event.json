@@ -1,0 +1,44 @@
+{
+  "fetchedAt": "2026-10-23T14:43:06.190818+00:00",
+  "sourceUrl": "https://www.start.gg/tournament/ultimate-smashdown-2-1/event/singles",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/ultimate-smashdown-2-1/event/singles"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 522138,
+        "name": "Singles",
+        "numEntrants": 42,
+        "tournament": {
+          "id": 247441,
+          "name": "Ultimate Smashdown #2",
+          "slug": "tournament/ultimate-smashdown-2-1",
+          "images": [
+            {
+              "url": "https://images.start.gg/images/tournament/247441/image-da1472e6ab6597b80d307e1d79787998.png",
+              "type": "profile"
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

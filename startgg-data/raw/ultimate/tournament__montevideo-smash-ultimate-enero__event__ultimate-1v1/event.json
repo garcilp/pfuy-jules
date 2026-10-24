@@ -1,0 +1,44 @@
+{
+  "fetchedAt": "2026-10-23T14:42:45.979201+00:00",
+  "sourceUrl": "https://www.start.gg/tournament/montevideo-smash-ultimate-enero/event/ultimate-1v1",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/montevideo-smash-ultimate-enero/event/ultimate-1v1"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 288655,
+        "name": "Ultimate 1v1",
+        "numEntrants": 36,
+        "tournament": {
+          "id": 125795,
+          "name": "Montevideo Smash Ultimate - Enero",
+          "slug": "tournament/montevideo-smash-ultimate-enero",
+          "images": [
+            {
+              "url": "https://images.start.gg/images/tournament/125795/image-d01d7dc8be432c0b0b8ea6c8010f2838.jpg",
+              "type": "profile"
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

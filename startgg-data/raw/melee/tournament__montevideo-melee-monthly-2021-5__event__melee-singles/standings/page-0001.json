@@ -1,0 +1,80 @@
+{
+  "fetchedAt": "2026-10-22T21:58:28.296639+00:00",
+  "sourceUrl": "http://start.gg/tournament/montevideo-melee-monthly-2021-5/event/melee-singles",
+  "operationName": "EventStandings",
+  "variables": {
+    "eventId": 580832,
+    "page": 1,
+    "perPage": 100
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 580832,
+        "name": "Melee Singles",
+        "standings": {
+          "nodes": [
+            {
+              "placement": 1,
+              "entrant": {
+                "id": 7430343,
+                "name": "SrPaz"
+              }
+            },
+            {
+              "placement": 2,
+              "entrant": {
+                "id": 7438428,
+                "name": "FrancoKiwi"
+              }
+            },
+            {
+              "placement": 3,
+              "entrant": {
+                "id": 7431512,
+                "name": "kalarse"
+              }
+            },
+            {
+              "placement": 4,
+              "entrant": {
+                "id": 7443745,
+                "name": "Sol!d"
+              }
+            },
+            {
+              "placement": 5,
+              "entrant": {
+                "id": 7445819,
+                "name": "Iguana"
+              }
+            },
+            {
+              "placement": 6,
+              "entrant": {
+                "id": 7447564,
+                "name": "Red_Some"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 13
+    },
+    "actionRecords": []
+  }
+}

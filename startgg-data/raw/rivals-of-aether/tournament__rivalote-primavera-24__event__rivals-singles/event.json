@@ -1,0 +1,44 @@
+{
+  "fetchedAt": "2026-10-23T14:42:33.804401+00:00",
+  "sourceUrl": "http://start.gg/tournament/rivalote-primavera-24/event/rivals-singles",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/rivalote-primavera-24/event/rivals-singles"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1236239,
+        "name": "Rivals - Singles",
+        "numEntrants": 20,
+        "tournament": {
+          "id": 719635,
+          "name": "Rivalote Primavera '24",
+          "slug": "tournament/rivalote-primavera-24",
+          "images": [
+            {
+              "url": "https://images.start.gg/images/tournament/719635/image-bd4132ef55596f42653462a2e064b6ec.png?ehk=A5GZ13eztIGkMYYw0643qWsgOK3Mcg6nbUUSulneYxQ%3D&ehkOptimized=9Kwbp177xN6EB7mT1YG2aUGiBSk74eYVeaxW3hCYr0E%3D",
+              "type": "profile"
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

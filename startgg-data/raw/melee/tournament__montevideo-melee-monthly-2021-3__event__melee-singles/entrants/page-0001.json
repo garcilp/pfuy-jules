@@ -1,0 +1,120 @@
+{
+  "fetchedAt": "2026-10-22T21:58:12.330446+00:00",
+  "sourceUrl": "http://start.gg/tournament/montevideo-melee-monthly-2021-3/event/melee-singles",
+  "operationName": "EventEntrants",
+  "variables": {
+    "eventId": 562917,
+    "page": 1,
+    "perPage": 100
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 562917,
+        "name": "Melee Singles",
+        "entrants": {
+          "pageInfo": {
+            "total": 6,
+            "totalPages": 1
+          },
+          "nodes": [
+            {
+              "id": 7099316,
+              "name": "Transformación",
+              "participants": [
+                {
+                  "id": 6830105,
+                  "gamerTag": "Transformación",
+                  "player": {
+                    "id": 312992
+                  }
+                }
+              ]
+            },
+            {
+              "id": 7087547,
+              "name": "Shluigi",
+              "participants": [
+                {
+                  "id": 6818207,
+                  "gamerTag": "Shluigi",
+                  "player": {
+                    "id": 549976
+                  }
+                }
+              ]
+            },
+            {
+              "id": 7083871,
+              "name": "Sol!d",
+              "participants": [
+                {
+                  "id": 6814633,
+                  "gamerTag": "Sol!d",
+                  "player": {
+                    "id": 330371
+                  }
+                }
+              ]
+            },
+            {
+              "id": 7081823,
+              "name": "Iguana",
+              "participants": [
+                {
+                  "id": 6812651,
+                  "gamerTag": "Iguana",
+                  "player": {
+                    "id": 264244
+                  }
+                }
+              ]
+            },
+            {
+              "id": 7070489,
+              "name": "FrancoKiwi",
+              "participants": [
+                {
+                  "id": 6801770,
+                  "gamerTag": "FrancoKiwi",
+                  "player": {
+                    "id": 1154899
+                  }
+                }
+              ]
+            },
+            {
+              "id": 7070210,
+              "name": "Trinity",
+              "participants": [
+                {
+                  "id": 6801483,
+                  "gamerTag": "Trinity",
+                  "player": {
+                    "id": 895125
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 13
+    },
+    "actionRecords": []
+  }
+}

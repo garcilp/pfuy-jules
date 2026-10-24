@@ -1,0 +1,87 @@
+{
+  "fetchedAt": "2026-10-22T21:48:30.155951+00:00",
+  "sourceUrl": "http://start.gg/tournament/montevideo-melee-monthly-2017-11/event/pm-singles",
+  "operationName": "EventStandings",
+  "variables": {
+    "eventId": 66137,
+    "page": 1,
+    "perPage": 100
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 66137,
+        "name": "PM Singles",
+        "standings": {
+          "nodes": [
+            {
+              "placement": 1,
+              "entrant": {
+                "id": 1220133,
+                "name": "Iguana"
+              }
+            },
+            {
+              "placement": 2,
+              "entrant": {
+                "id": 1228005,
+                "name": "SOL!D"
+              }
+            },
+            {
+              "placement": 3,
+              "entrant": {
+                "id": 1219872,
+                "name": "Smeag"
+              }
+            },
+            {
+              "placement": 4,
+              "entrant": {
+                "id": 1219901,
+                "name": "Walachia"
+              }
+            },
+            {
+              "placement": 5,
+              "entrant": {
+                "id": 1220076,
+                "name": "Pencil"
+              }
+            },
+            {
+              "placement": 6,
+              "entrant": {
+                "id": 1227541,
+                "name": "Son Rolo"
+              }
+            },
+            {
+              "placement": 7,
+              "entrant": {
+                "id": 1227642,
+                "name": "EmilioLoco28"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 15
+    },
+    "actionRecords": []
+  }
+}

@@ -1,0 +1,136 @@
+{
+  "fetchedAt": "2026-10-22T21:48:34.981771+00:00",
+  "sourceUrl": "http://start.gg/tournament/montevideo-melee-monthly-2017-11/event/pm-singles",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 66137,
+    "page": 3,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 66137,
+        "name": "PM Singles",
+        "sets": {
+          "pageInfo": {
+            "total": 21
+          },
+          "nodes": [
+            {
+              "id": 11296163,
+              "state": 3,
+              "winnerId": 1220133,
+              "round": 1,
+              "fullRoundText": "Round 1",
+              "displayScore": "Iguana 3 - Son Rolo 0",
+              "lPlacement": null,
+              "wPlacement": null,
+              "identifier": "C",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1511656093,
+              "createdAt": 1511654731,
+              "updatedAt": 1511656094,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 461190,
+                "displayIdentifier": "1",
+                "bracketType": "ROUND_ROBIN",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2017-11/events/pm-singles/brackets/178269/461190",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 178269,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "ROUND_ROBIN",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "11296163-0",
+                  "entrant": {
+                    "id": 1220133,
+                    "name": "Iguana",
+                    "participants": [
+                      {
+                        "id": 1253638,
+                        "gamerTag": "Iguana",
+                        "player": {
+                          "id": 264244
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_6325840_sets_11296163",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "11296163-1",
+                  "entrant": {
+                    "id": 1227541,
+                    "name": "Son Rolo",
+                    "participants": [
+                      {
+                        "id": 1260595,
+                        "gamerTag": "Son Rolo",
+                        "player": {
+                          "id": 330339
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_6338939_sets_11296163",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 33
+    },
+    "actionRecords": []
+  }
+}

@@ -1,0 +1,136 @@
+{
+  "fetchedAt": "2026-10-22T21:52:35.671749+00:00",
+  "sourceUrl": "http://start.gg/tournament/montevideo-melee-monthly-2018-10/event/melee-singles",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 264924,
+    "page": 5,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 264924,
+        "name": "Melee Singles",
+        "sets": {
+          "pageInfo": {
+            "total": 41
+          },
+          "nodes": [
+            {
+              "id": 17350820,
+              "state": 3,
+              "winnerId": 2312174,
+              "round": 1,
+              "fullRoundText": "Round 1",
+              "displayScore": "5HT | Wobble Gun 0 - kalarse 2",
+              "lPlacement": null,
+              "wPlacement": null,
+              "identifier": "B",
+              "startAt": null,
+              "startedAt": 1543088186,
+              "completedAt": 1543088296,
+              "createdAt": 1543082500,
+              "updatedAt": 1543088297,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 818509,
+                "displayIdentifier": "1",
+                "bracketType": "ROUND_ROBIN",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2018-10/events/melee-singles/brackets/461552/818509",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 461552,
+                  "name": "Melee Round Robin",
+                  "phaseOrder": 1,
+                  "bracketType": "ROUND_ROBIN",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "17350820-0",
+                  "entrant": {
+                    "id": 2311212,
+                    "name": "5HT | Wobble Gun",
+                    "participants": [
+                      {
+                        "id": 2271218,
+                        "gamerTag": "Wobble Gun",
+                        "player": {
+                          "id": 958669
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_8219866_sets_17350820",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "17350820-1",
+                  "entrant": {
+                    "id": 2312174,
+                    "name": "kalarse",
+                    "participants": [
+                      {
+                        "id": 2272160,
+                        "gamerTag": "kalarse",
+                        "player": {
+                          "id": 152484
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_8221281_sets_17350820",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 33
+    },
+    "actionRecords": []
+  }
+}

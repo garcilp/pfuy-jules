@@ -1,0 +1,1906 @@
+{
+  "fetchedAt": "2026-10-22T21:30:55.749804+00:00",
+  "sourceUrl": "https://www.start.gg/tournament/copa-del-rey-2/event/ultimate-singles",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 1153859,
+    "page": 9,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1153859,
+        "name": "Ultimate Singles",
+        "sets": {
+          "pageInfo": {
+            "total": 221
+          },
+          "nodes": [
+            {
+              "id": 81179753,
+              "state": 3,
+              "winnerId": 17241256,
+              "round": -5,
+              "fullRoundText": "Losers Round 2",
+              "displayScore": "CG | Freakazoiid 2 - SMB | Lucho 1",
+              "lPlacement": 7,
+              "wPlacement": 5,
+              "identifier": "L",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1729363724,
+              "createdAt": 1729287562,
+              "updatedAt": 1729363724,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2503450,
+                "displayIdentifier": "7",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/copa-del-rey-2/events/ultimate-singles/brackets/1681785/2503450",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1681785,
+                  "name": "Pools",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "81179753-0",
+                  "entrant": {
+                    "id": 17241256,
+                    "name": "CG | Freakazoiid",
+                    "participants": [
+                      {
+                        "id": 16005863,
+                        "gamerTag": "Freakazoiid",
+                        "player": {
+                          "id": 3008029
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30523775_sets_81179753",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "81179753-1",
+                  "entrant": {
+                    "id": 17456894,
+                    "name": "SMB | Lucho",
+                    "participants": [
+                      {
+                        "id": 16189944,
+                        "gamerTag": "Lucho",
+                        "player": {
+                          "id": 2390380
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30854329_sets_81179753",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 25653481,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 17456894,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 37323310,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1319,
+                      "entrant": {
+                        "id": 17241256
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1319,
+                        "name": "Pikachu"
+                      }
+                    },
+                    {
+                      "id": 37323311,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1409,
+                      "entrant": {
+                        "id": 17456894
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1409,
+                        "name": "Chrom"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 25653482,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 17241256,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 37323312,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1319,
+                      "entrant": {
+                        "id": 17241256
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1319,
+                        "name": "Pikachu"
+                      }
+                    },
+                    {
+                      "id": 37323313,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1409,
+                      "entrant": {
+                        "id": 17456894
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1409,
+                        "name": "Chrom"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 25653483,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 17241256,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": {
+                    "id": 318,
+                    "name": "Castle Siege"
+                  },
+                  "selections": [
+                    {
+                      "id": 37323314,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1319,
+                      "entrant": {
+                        "id": 17241256
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1319,
+                        "name": "Pikachu"
+                      }
+                    },
+                    {
+                      "id": 37323315,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1409,
+                      "entrant": {
+                        "id": 17456894
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1409,
+                        "name": "Chrom"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 81179800,
+              "state": 3,
+              "winnerId": 17294602,
+              "round": -5,
+              "fullRoundText": "Losers Round 2",
+              "displayScore": "Aminas 1 - W&L | CG | BugSmasher 2",
+              "lPlacement": 7,
+              "wPlacement": 5,
+              "identifier": "L",
+              "startAt": null,
+              "startedAt": 1729362524,
+              "completedAt": 1729362970,
+              "createdAt": 1729298837,
+              "updatedAt": 1729362971,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2503446,
+                "displayIdentifier": "3",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/copa-del-rey-2/events/ultimate-singles/brackets/1681785/2503446",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1681785,
+                  "name": "Pools",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "81179800-0",
+                  "entrant": {
+                    "id": 17239329,
+                    "name": "Aminas",
+                    "participants": [
+                      {
+                        "id": 16004359,
+                        "gamerTag": "Aminas",
+                        "player": {
+                          "id": 1000031
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30520341_sets_81179800",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "81179800-1",
+                  "entrant": {
+                    "id": 17294602,
+                    "name": "W&L | CG | BugSmasher",
+                    "participants": [
+                      {
+                        "id": 16051757,
+                        "gamerTag": "BugSmasher",
+                        "player": {
+                          "id": 328352
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30609347_sets_81179800",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 25653054,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 17239329,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": {
+                    "id": 311,
+                    "name": "Battlefield"
+                  },
+                  "selections": [
+                    {
+                      "id": 37322498,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1296,
+                      "entrant": {
+                        "id": 17239329
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1296,
+                        "name": "Link"
+                      }
+                    },
+                    {
+                      "id": 37322499,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1280,
+                      "entrant": {
+                        "id": 17294602
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1280,
+                        "name": "Donkey Kong"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 25653055,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 17294602,
+                  "entrant1Score": 0,
+                  "entrant2Score": 0,
+                  "stage": {
+                    "id": 513,
+                    "name": "Hollow Bastion"
+                  },
+                  "selections": [
+                    {
+                      "id": 37322500,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1296,
+                      "entrant": {
+                        "id": 17239329
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1296,
+                        "name": "Link"
+                      }
+                    },
+                    {
+                      "id": 37322501,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1407,
+                      "entrant": {
+                        "id": 17294602
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1407,
+                        "name": "King K. Rool"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 25653056,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 17294602,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 37322502,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1296,
+                      "entrant": {
+                        "id": 17239329
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1296,
+                        "name": "Link"
+                      }
+                    },
+                    {
+                      "id": 37322503,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1407,
+                      "entrant": {
+                        "id": 17294602
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1407,
+                        "name": "King K. Rool"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 81179953,
+              "state": 3,
+              "winnerId": 17539783,
+              "round": -5,
+              "fullRoundText": "Losers Round 2",
+              "displayScore": "BenjiGG 2 - Krav 1",
+              "lPlacement": 7,
+              "wPlacement": 5,
+              "identifier": "L",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1729363142,
+              "createdAt": 1729288116,
+              "updatedAt": 1729363142,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2503448,
+                "displayIdentifier": "5",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/copa-del-rey-2/events/ultimate-singles/brackets/1681785/2503448",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1681785,
+                  "name": "Pools",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "81179953-0",
+                  "entrant": {
+                    "id": 17539783,
+                    "name": "BenjiGG",
+                    "participants": [
+                      {
+                        "id": 16265698,
+                        "gamerTag": "BenjiGG",
+                        "player": {
+                          "id": 1857142
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30966886_sets_81179953",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "81179953-1",
+                  "entrant": {
+                    "id": 17966541,
+                    "name": "Krav",
+                    "participants": [
+                      {
+                        "id": 16632165,
+                        "gamerTag": "Krav",
+                        "player": {
+                          "id": 3101855
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_31592321_sets_81179953",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 25653168,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 17539783,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 37322902,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1273,
+                      "entrant": {
+                        "id": 17539783
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1273,
+                        "name": "Bowser"
+                      }
+                    },
+                    {
+                      "id": 37322903,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1410,
+                      "entrant": {
+                        "id": 17966541
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1410,
+                        "name": "Ken"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 25653169,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 17966541,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 37322904,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1273,
+                      "entrant": {
+                        "id": 17539783
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1273,
+                        "name": "Bowser"
+                      }
+                    },
+                    {
+                      "id": 37322905,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1410,
+                      "entrant": {
+                        "id": 17966541
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1410,
+                        "name": "Ken"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 25653170,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 17539783,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 37322906,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1273,
+                      "entrant": {
+                        "id": 17539783
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1273,
+                        "name": "Bowser"
+                      }
+                    },
+                    {
+                      "id": 37322907,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1410,
+                      "entrant": {
+                        "id": 17966541
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1410,
+                        "name": "Ken"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 81180051,
+              "state": 3,
+              "winnerId": 17278943,
+              "round": -5,
+              "fullRoundText": "Losers Round 2",
+              "displayScore": "Catwo 2 - SMB | Sigma 1",
+              "lPlacement": 7,
+              "wPlacement": 5,
+              "identifier": "L",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1729362791,
+              "createdAt": 1729291088,
+              "updatedAt": 1729362791,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2503449,
+                "displayIdentifier": "6",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/copa-del-rey-2/events/ultimate-singles/brackets/1681785/2503449",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1681785,
+                  "name": "Pools",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "81180051-0",
+                  "entrant": {
+                    "id": 17278943,
+                    "name": "Catwo",
+                    "participants": [
+                      {
+                        "id": 16038384,
+                        "gamerTag": "Catwo",
+                        "player": {
+                          "id": 3326405
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30580193_sets_81180051",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "81180051-1",
+                  "entrant": {
+                    "id": 18048740,
+                    "name": "SMB | Sigma",
+                    "participants": [
+                      {
+                        "id": 16702245,
+                        "gamerTag": "Sigma",
+                        "player": {
+                          "id": 311090
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_31714286_sets_81180051",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 25652911,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 17278943,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 37322614,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1280,
+                      "entrant": {
+                        "id": 17278943
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1280,
+                        "name": "Donkey Kong"
+                      }
+                    },
+                    {
+                      "id": 37322615,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1296,
+                      "entrant": {
+                        "id": 18048740
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1296,
+                        "name": "Link"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 25652912,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 18048740,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 37322616,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1280,
+                      "entrant": {
+                        "id": 17278943
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1280,
+                        "name": "Donkey Kong"
+                      }
+                    },
+                    {
+                      "id": 37322617,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1296,
+                      "entrant": {
+                        "id": 18048740
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1296,
+                        "name": "Link"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 25652913,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 17278943,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 37322618,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1287,
+                      "entrant": {
+                        "id": 17278943
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1287,
+                        "name": "Ganondorf"
+                      }
+                    },
+                    {
+                      "id": 37322619,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1296,
+                      "entrant": {
+                        "id": 18048740
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1296,
+                        "name": "Link"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 81179018,
+              "state": 3,
+              "winnerId": 17632769,
+              "round": -5,
+              "fullRoundText": "Losers Round 2",
+              "displayScore": "Fronk 1 - oscarcheDDar 2",
+              "lPlacement": 7,
+              "wPlacement": 5,
+              "identifier": "M",
+              "startAt": null,
+              "startedAt": 1729361548,
+              "completedAt": 1729362828,
+              "createdAt": 1729293085,
+              "updatedAt": 1729362829,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2503445,
+                "displayIdentifier": "2",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/copa-del-rey-2/events/ultimate-singles/brackets/1681785/2503445",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1681785,
+                  "name": "Pools",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "81179018-0",
+                  "entrant": {
+                    "id": 17632967,
+                    "name": "Fronk",
+                    "participants": [
+                      {
+                        "id": 16346385,
+                        "gamerTag": "Fronk",
+                        "player": {
+                          "id": 1033918
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_31109506_sets_81179018",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "81179018-1",
+                  "entrant": {
+                    "id": 17632769,
+                    "name": "oscarcheDDar",
+                    "participants": [
+                      {
+                        "id": 16346202,
+                        "gamerTag": "oscarcheDDar",
+                        "player": {
+                          "id": 2662712
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_31109269_sets_81179018",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 25652943,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 17632967,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 37322646,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1273,
+                      "entrant": {
+                        "id": 17632769
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1273,
+                        "name": "Bowser"
+                      }
+                    },
+                    {
+                      "id": 37322647,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1795,
+                      "entrant": {
+                        "id": 17632967
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1795,
+                        "name": "Pyra & Mythra"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 25652944,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 17632769,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 37322648,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1273,
+                      "entrant": {
+                        "id": 17632769
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1273,
+                        "name": "Bowser"
+                      }
+                    },
+                    {
+                      "id": 37322649,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1795,
+                      "entrant": {
+                        "id": 17632967
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1795,
+                        "name": "Pyra & Mythra"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 25652945,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 17632769,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 37322650,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1273,
+                      "entrant": {
+                        "id": 17632769
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1273,
+                        "name": "Bowser"
+                      }
+                    },
+                    {
+                      "id": 37322651,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1795,
+                      "entrant": {
+                        "id": 17632967
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1795,
+                        "name": "Pyra & Mythra"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 81179269,
+              "state": 3,
+              "winnerId": 17245258,
+              "round": -5,
+              "fullRoundText": "Losers Round 2",
+              "displayScore": "DQ",
+              "lPlacement": 7,
+              "wPlacement": 5,
+              "identifier": "M",
+              "startAt": null,
+              "startedAt": 1729361596,
+              "completedAt": 1729361603,
+              "createdAt": 1729291236,
+              "updatedAt": 1729361604,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2503451,
+                "displayIdentifier": "8",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/copa-del-rey-2/events/ultimate-singles/brackets/1681785/2503451",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1681785,
+                  "name": "Pools",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "81179269-0",
+                  "entrant": {
+                    "id": 17900009,
+                    "name": "TEW | Loba",
+                    "participants": [
+                      {
+                        "id": 16573960,
+                        "gamerTag": "Loba",
+                        "player": {
+                          "id": 409440
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_31494129_sets_81179269",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": -1,
+                        "displayValue": "-1"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "81179269-1",
+                  "entrant": {
+                    "id": 17245258,
+                    "name": "SMB | Dieguix2004",
+                    "participants": [
+                      {
+                        "id": 16009492,
+                        "gamerTag": "Dieguix2004",
+                        "player": {
+                          "id": 3863680
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30530248_sets_81179269",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": null,
+                        "displayValue": null
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            },
+            {
+              "id": 81179613,
+              "state": 3,
+              "winnerId": 17650725,
+              "round": -5,
+              "fullRoundText": "Losers Round 2",
+              "displayScore": "UDru 2 - TOX | Fulano 0",
+              "lPlacement": 7,
+              "wPlacement": 5,
+              "identifier": "M",
+              "startAt": null,
+              "startedAt": 1729361460,
+              "completedAt": 1729361505,
+              "createdAt": 1729294466,
+              "updatedAt": 1729361505,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2503447,
+                "displayIdentifier": "4",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/copa-del-rey-2/events/ultimate-singles/brackets/1681785/2503447",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1681785,
+                  "name": "Pools",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "81179613-0",
+                  "entrant": {
+                    "id": 17650725,
+                    "name": "UDru",
+                    "participants": [
+                      {
+                        "id": 16362032,
+                        "gamerTag": "UDru",
+                        "player": {
+                          "id": 2608261
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_31133678_sets_81179613",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "81179613-1",
+                  "entrant": {
+                    "id": 17293343,
+                    "name": "TOX | Fulano",
+                    "participants": [
+                      {
+                        "id": 16050719,
+                        "gamerTag": "Fulano",
+                        "player": {
+                          "id": 1861531
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30607797_sets_81179613",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 25652022,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 17650725,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 37321619,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1332,
+                      "entrant": {
+                        "id": 17293343
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1332,
+                        "name": "Sonic"
+                      }
+                    },
+                    {
+                      "id": 37321620,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1316,
+                      "entrant": {
+                        "id": 17650725
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1316,
+                        "name": "Palutena"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 25652023,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 17650725,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 37321621,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1334,
+                      "entrant": {
+                        "id": 17293343
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1334,
+                        "name": "Villager"
+                      }
+                    },
+                    {
+                      "id": 37321622,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1316,
+                      "entrant": {
+                        "id": 17650725
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1316,
+                        "name": "Palutena"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 81179707,
+              "state": 3,
+              "winnerId": 18112507,
+              "round": -5,
+              "fullRoundText": "Losers Round 2",
+              "displayScore": "Pos3idóN 0 - GAMER | Thithi 2",
+              "lPlacement": 7,
+              "wPlacement": 5,
+              "identifier": "M",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1729362427,
+              "createdAt": 1729289517,
+              "updatedAt": 1729362428,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2503444,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/copa-del-rey-2/events/ultimate-singles/brackets/1681785/2503444",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1681785,
+                  "name": "Pools",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "81179707-0",
+                  "entrant": {
+                    "id": 17467908,
+                    "name": "Pos3idóN",
+                    "participants": [
+                      {
+                        "id": 16200430,
+                        "gamerTag": "Pos3idóN",
+                        "player": {
+                          "id": 1360085
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30868105_sets_81179707",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "81179707-1",
+                  "entrant": {
+                    "id": 18112507,
+                    "name": "GAMER | Thithi",
+                    "participants": [
+                      {
+                        "id": 16703304,
+                        "gamerTag": "Thithi",
+                        "player": {
+                          "id": 894496
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_31807017_sets_81179707",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 25652660,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 18112507,
+                  "entrant1Score": 0,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 37322318,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1328,
+                      "entrant": {
+                        "id": 17467908
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1328,
+                        "name": "Samus"
+                      }
+                    },
+                    {
+                      "id": 37322319,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1407,
+                      "entrant": {
+                        "id": 18112507
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1407,
+                        "name": "King K. Rool"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 25652661,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 18112507,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 37322320,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1327,
+                      "entrant": {
+                        "id": 17467908
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1327,
+                        "name": "Ryu"
+                      }
+                    },
+                    {
+                      "id": 37322321,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1407,
+                      "entrant": {
+                        "id": 18112507
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1407,
+                        "name": "King K. Rool"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 81179754,
+              "state": 3,
+              "winnerId": 18042966,
+              "round": -5,
+              "fullRoundText": "Losers Round 2",
+              "displayScore": "Kamuri 2 - BCP | Sypha 0",
+              "lPlacement": 7,
+              "wPlacement": 5,
+              "identifier": "M",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1729363326,
+              "createdAt": 1729287562,
+              "updatedAt": 1729363327,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2503450,
+                "displayIdentifier": "7",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/copa-del-rey-2/events/ultimate-singles/brackets/1681785/2503450",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1681785,
+                  "name": "Pools",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "81179754-0",
+                  "entrant": {
+                    "id": 18042966,
+                    "name": "Kamuri",
+                    "participants": [
+                      {
+                        "id": 16697067,
+                        "gamerTag": "Kamuri",
+                        "player": {
+                          "id": 4193599
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_31706230_sets_81179754",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "81179754-1",
+                  "entrant": {
+                    "id": 18079539,
+                    "name": "BCP | Sypha",
+                    "participants": [
+                      {
+                        "id": 16728624,
+                        "gamerTag": "Sypha",
+                        "player": {
+                          "id": 894779
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_31761404_sets_81179754",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 25653272,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 18042966,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 37323044,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1277,
+                      "entrant": {
+                        "id": 18042966
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1277,
+                        "name": "Daisy"
+                      }
+                    },
+                    {
+                      "id": 37323045,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1301,
+                      "entrant": {
+                        "id": 18079539
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1301,
+                        "name": "Luigi"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 25653273,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 18042966,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 37323046,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1277,
+                      "entrant": {
+                        "id": 18042966
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1277,
+                        "name": "Daisy"
+                      }
+                    },
+                    {
+                      "id": 37323047,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1301,
+                      "entrant": {
+                        "id": 18079539
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1301,
+                        "name": "Luigi"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 81179801,
+              "state": 3,
+              "winnerId": 17376532,
+              "round": -5,
+              "fullRoundText": "Losers Round 2",
+              "displayScore": "SMB | Hora 2 - Maxeer 0",
+              "lPlacement": 7,
+              "wPlacement": 5,
+              "identifier": "M",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1729363676,
+              "createdAt": 1729298837,
+              "updatedAt": 1729363676,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2503446,
+                "displayIdentifier": "3",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/copa-del-rey-2/events/ultimate-singles/brackets/1681785/2503446",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1681785,
+                  "name": "Pools",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "81179801-0",
+                  "entrant": {
+                    "id": 17376532,
+                    "name": "SMB | Hora",
+                    "participants": [
+                      {
+                        "id": 16119992,
+                        "gamerTag": "Hora",
+                        "player": {
+                          "id": 1398498
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30734402_sets_81179801",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "81179801-1",
+                  "entrant": {
+                    "id": 17282228,
+                    "name": "Maxeer",
+                    "participants": [
+                      {
+                        "id": 16041281,
+                        "gamerTag": "Maxeer",
+                        "player": {
+                          "id": 3654531
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30592633_sets_81179801",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 25653462,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 17376532,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 37323285,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1530,
+                      "entrant": {
+                        "id": 17282228
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1530,
+                        "name": "Banjo-Kazooie"
+                      }
+                    },
+                    {
+                      "id": 37323286,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1337,
+                      "entrant": {
+                        "id": 17376532
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1337,
+                        "name": "Wolf"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 25653463,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 17376532,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 37323287,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1530,
+                      "entrant": {
+                        "id": 17282228
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1530,
+                        "name": "Banjo-Kazooie"
+                      }
+                    },
+                    {
+                      "id": 37323288,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1337,
+                      "entrant": {
+                        "id": 17376532
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1337,
+                        "name": "Wolf"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 496
+    },
+    "actionRecords": []
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "fetchedAt": "2026-10-23T14:44:41.475641+00:00",
+  "sourceUrl": "http://start.gg/tournament/montevideo-melee-monthly-2019-3-1/event/pm-singles",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/montevideo-melee-monthly-2019-3-1/event/pm-singles"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 339913,
+        "name": "PM Singles",
+        "numEntrants": 17,
+        "tournament": {
+          "id": 146502,
+          "name": "Montevideo Melee Monthly 2019 #3",
+          "slug": "tournament/montevideo-melee-monthly-2019-3-1",
+          "images": [
+            {
+              "url": "https://images.start.gg/images/tournament/146502/image-d173cb186ac6fdc3d32bc3863aba5731.png",
+              "type": "profile"
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

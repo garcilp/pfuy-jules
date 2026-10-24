@@ -1,0 +1,44 @@
+{
+  "fetchedAt": "2026-10-23T14:44:20.184535+00:00",
+  "sourceUrl": "http://start.gg/tournament/montevideo-melee-monthly-2025-6/event/project",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/montevideo-melee-monthly-2025-6/event/project"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1410609,
+        "name": "Project +",
+        "numEntrants": 10,
+        "tournament": {
+          "id": 804956,
+          "name": "Montevideo Melee Monthly 2025 #6",
+          "slug": "tournament/montevideo-melee-monthly-2025-6",
+          "images": [
+            {
+              "url": "https://images.start.gg/images/tournament/804956/image-a63bd47b81d92fea284d4f5a8f74f01c.png",
+              "type": "profile"
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

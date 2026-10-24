@@ -1,0 +1,52 @@
+{
+  "fetchedAt": "2026-10-23T14:44:38.953711+00:00",
+  "sourceUrl": "http://start.gg/tournament/montevideo-melee-monthly-2018-2/event/pm-singles",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/montevideo-melee-monthly-2018-2/event/pm-singles"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 92120,
+        "name": "PM Singles",
+        "numEntrants": 18,
+        "tournament": {
+          "id": 43154,
+          "name": "Montevideo Melee Monthly 2018 #2",
+          "slug": "tournament/montevideo-melee-monthly-2018-2",
+          "images": [
+            {
+              "url": "https://images.start.gg/images/tournament/43154/image-8818efc7a8ecaee985704991e23003cd.png",
+              "type": "profile"
+            },
+            {
+              "url": "https://images.start.gg/images/tournament/43154/image-63f23e8bee645d400cabea1e921b65d0.png",
+              "type": "profile"
+            },
+            {
+              "url": "https://images.start.gg/images/tournament/43154/image-82121516e095c078b235bbfa6d99ebcf.png",
+              "type": "profile"
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

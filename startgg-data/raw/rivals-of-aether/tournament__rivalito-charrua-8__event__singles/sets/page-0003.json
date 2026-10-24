@@ -1,0 +1,215 @@
+{
+  "fetchedAt": "2026-10-22T20:49:10.187892+00:00",
+  "sourceUrl": "http://start.gg/tournament/rivalito-charrua-8/event/singles",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 1173693,
+    "page": 3,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1173693,
+        "name": "Singles",
+        "sets": {
+          "pageInfo": {
+            "total": 21
+          },
+          "nodes": [
+            {
+              "id": 77666316,
+              "state": 3,
+              "winnerId": 17139935,
+              "round": 1,
+              "fullRoundText": "Winners Round 1",
+              "displayScore": "W&L | Pritah 2 - Deo 0",
+              "lPlacement": 9,
+              "wPlacement": 9,
+              "identifier": "C",
+              "startAt": null,
+              "startedAt": 1722112353,
+              "completedAt": 1722112372,
+              "createdAt": 1722101920,
+              "updatedAt": 1722112373,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2538783,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/rivalito-charrua-8/events/singles/brackets/1707736/2538783",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1707736,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "77666316-0",
+                  "entrant": {
+                    "id": 17139935,
+                    "name": "W&L | Pritah",
+                    "participants": [
+                      {
+                        "id": 15915523,
+                        "gamerTag": "Pritah",
+                        "player": {
+                          "id": 330721
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30361848_sets_77666316",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "77666316-1",
+                  "entrant": {
+                    "id": 17253901,
+                    "name": "Deo",
+                    "participants": [
+                      {
+                        "id": 16016395,
+                        "gamerTag": "Deo",
+                        "player": {
+                          "id": 4187564
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_30542589_sets_77666316",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 23925748,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 17139935,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 34724285,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1118,
+                      "entrant": {
+                        "id": 17139935
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1118,
+                        "name": "Ranno"
+                      }
+                    },
+                    {
+                      "id": 34724286,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 186,
+                      "entrant": {
+                        "id": 17253901
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 186,
+                        "name": "Wrastor"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 23925749,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 17139935,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 34724287,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1118,
+                      "entrant": {
+                        "id": 17139935
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1118,
+                        "name": "Ranno"
+                      }
+                    },
+                    {
+                      "id": 34724288,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 186,
+                      "entrant": {
+                        "id": 17253901
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 186,
+                        "name": "Wrastor"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 48
+    },
+    "actionRecords": []
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "fetchedAt": "2026-10-23T14:44:14.957831+00:00",
+  "sourceUrl": "http://start.gg/tournament/mashito-go-7/event/ultimate-singles",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/mashito-go-7/event/ultimate-singles"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1706260,
+        "name": "Ultimate Singles",
+        "numEntrants": 27,
+        "tournament": {
+          "id": 951577,
+          "name": "Mashito? GO! #7",
+          "slug": "tournament/mashito-go-7",
+          "images": [
+            {
+              "url": "https://images.start.gg/images/tournament/951577/image-da3ad09ef1966ff505da5f8563648e7c.png",
+              "type": "profile"
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

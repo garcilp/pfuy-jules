@@ -1,0 +1,428 @@
+{
+  "fetchedAt": "2026-10-22T20:55:56.358131+00:00",
+  "sourceUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2019-1/event/ultimate-singles",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 309554,
+    "page": 6,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 309554,
+        "name": "Ultimate Singles",
+        "sets": {
+          "pageInfo": {
+            "total": 52
+          },
+          "nodes": [
+            {
+              "id": 18207053,
+              "state": 3,
+              "winnerId": 2529199,
+              "round": 1,
+              "fullRoundText": "Winners Round 1",
+              "displayScore": "Fronk 2 - Sol!d 1",
+              "lPlacement": 25,
+              "wPlacement": 17,
+              "identifier": "J",
+              "startAt": null,
+              "startedAt": 1548527655,
+              "completedAt": 1548528589,
+              "createdAt": 1548525828,
+              "updatedAt": 1548032433,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 890136,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2019-1/events/ultimate-singles/brackets/521330/890136",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 521330,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "18207053-0",
+                  "entrant": {
+                    "id": 2529199,
+                    "name": "Fronk",
+                    "participants": [
+                      {
+                        "id": 2489429,
+                        "gamerTag": "Fronk",
+                        "player": {
+                          "id": 1033918
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_8583087_sets_18207053",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "18207053-1",
+                  "entrant": {
+                    "id": 2553798,
+                    "name": "Sol!d",
+                    "participants": [
+                      {
+                        "id": 2512635,
+                        "gamerTag": "Sol!d",
+                        "player": {
+                          "id": 330371
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_8621145_sets_18207053",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 1560198,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 2553798,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 1978975,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1330,
+                      "entrant": {
+                        "id": 2529199
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1330,
+                        "name": "Shulk"
+                      }
+                    },
+                    {
+                      "id": 1978976,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1331,
+                      "entrant": {
+                        "id": 2553798
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1331,
+                        "name": "Snake"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 1560199,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 2529199,
+                  "entrant1Score": 0,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 1978977,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1408,
+                      "entrant": {
+                        "id": 2529199
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1408,
+                        "name": "Dark Samus"
+                      }
+                    },
+                    {
+                      "id": 1978978,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1326,
+                      "entrant": {
+                        "id": 2553798
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1326,
+                        "name": "Roy"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 1560200,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 2529199,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 1978979,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1408,
+                      "entrant": {
+                        "id": 2529199
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1408,
+                        "name": "Dark Samus"
+                      }
+                    },
+                    {
+                      "id": 1978980,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1331,
+                      "entrant": {
+                        "id": 2553798
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1331,
+                        "name": "Snake"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 18207054,
+              "state": 3,
+              "winnerId": 2532833,
+              "round": 1,
+              "fullRoundText": "Winners Round 1",
+              "displayScore": "Sr.Mango 2 - EmilioLoco28 0",
+              "lPlacement": 25,
+              "wPlacement": 17,
+              "identifier": "K",
+              "startAt": null,
+              "startedAt": 1548527710,
+              "completedAt": 1548528632,
+              "createdAt": 1548525828,
+              "updatedAt": 1548032433,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 890136,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2019-1/events/ultimate-singles/brackets/521330/890136",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 521330,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "18207054-0",
+                  "entrant": {
+                    "id": 2532833,
+                    "name": "Sr.Mango",
+                    "participants": [
+                      {
+                        "id": 2493015,
+                        "gamerTag": "Sr.Mango",
+                        "player": {
+                          "id": 958669
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_8589156_sets_18207054",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "18207054-1",
+                  "entrant": {
+                    "id": 2553484,
+                    "name": "EmilioLoco28",
+                    "participants": [
+                      {
+                        "id": 2498940,
+                        "gamerTag": "EmilioLoco28",
+                        "player": {
+                          "id": 362971
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_8619056_sets_18207054",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 1560203,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 2532833,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 1978981,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1274,
+                      "entrant": {
+                        "id": 2532833
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1274,
+                        "name": "Captain Falcon"
+                      }
+                    },
+                    {
+                      "id": 1978982,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1280,
+                      "entrant": {
+                        "id": 2553484
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1280,
+                        "name": "Donkey Kong"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 1560204,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 2532833,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 1978983,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1274,
+                      "entrant": {
+                        "id": 2532833
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1274,
+                        "name": "Captain Falcon"
+                      }
+                    },
+                    {
+                      "id": 1978984,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1295,
+                      "entrant": {
+                        "id": 2553484
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1295,
+                        "name": "Kirby"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 103
+    },
+    "actionRecords": []
+  }
+}

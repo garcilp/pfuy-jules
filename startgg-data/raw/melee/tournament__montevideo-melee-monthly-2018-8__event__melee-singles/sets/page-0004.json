@@ -1,0 +1,136 @@
+{
+  "fetchedAt": "2026-10-22T21:52:07.992538+00:00",
+  "sourceUrl": "http://start.gg/tournament/montevideo-melee-monthly-2018-8/event/melee-singles",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 225809,
+    "page": 4,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 225809,
+        "name": "Melee Singles",
+        "sets": {
+          "pageInfo": {
+            "total": 31
+          },
+          "nodes": [
+            {
+              "id": 16786033,
+              "state": 3,
+              "winnerId": 2150517,
+              "round": 1,
+              "fullRoundText": "Round 1",
+              "displayScore": "Smeag 1 - Link 2",
+              "lPlacement": null,
+              "wPlacement": null,
+              "identifier": "B",
+              "startAt": null,
+              "startedAt": 1538249659,
+              "completedAt": 1538250512,
+              "createdAt": 1538248702,
+              "updatedAt": 1538250513,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 757312,
+                "displayIdentifier": "3",
+                "bracketType": "ROUND_ROBIN",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2018-8/events/melee-singles/brackets/409937/757312",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 409937,
+                  "name": "Melee Round Robin",
+                  "phaseOrder": 1,
+                  "bracketType": "ROUND_ROBIN",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "16786033-0",
+                  "entrant": {
+                    "id": 2150476,
+                    "name": "Smeag",
+                    "participants": [
+                      {
+                        "id": 2117597,
+                        "gamerTag": "Smeag",
+                        "player": {
+                          "id": 312977
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_7905537_sets_16786033",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "16786033-1",
+                  "entrant": {
+                    "id": 2150517,
+                    "name": "Link",
+                    "participants": [
+                      {
+                        "id": 2117632,
+                        "gamerTag": "Link",
+                        "player": {
+                          "id": 894493
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_7905738_sets_16786033",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 33
+    },
+    "actionRecords": []
+  }
+}

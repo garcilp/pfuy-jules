@@ -1,0 +1,545 @@
+{
+  "fetchedAt": "2026-10-22T21:09:51.988198+00:00",
+  "sourceUrl": "https://www.start.gg/tournament/ultimate-smashdown-6/event/singles",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 721037,
+    "page": 19,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 721037,
+        "name": "Singles",
+        "sets": {
+          "pageInfo": {
+            "total": 182
+          },
+          "nodes": [
+            {
+              "id": 47599746,
+              "state": 3,
+              "winnerId": 9991884,
+              "round": -3,
+              "fullRoundText": "Losers Round 1",
+              "displayScore": "Roxy | Batipeta 3 - Kapito22 1",
+              "lPlacement": 7,
+              "wPlacement": 5,
+              "identifier": "F",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1653175971,
+              "createdAt": 1653172260,
+              "updatedAt": 1653175971,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 1749478,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/ultimate-smashdown-6/events/singles/brackets/1125479/1749478",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1125479,
+                  "name": "Top 8 (Bo5)",
+                  "phaseOrder": 3,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "47599746-0",
+                  "entrant": {
+                    "id": 9991884,
+                    "name": "Roxy | Batipeta",
+                    "participants": [
+                      {
+                        "id": 9560412,
+                        "gamerTag": "Batipeta",
+                        "player": {
+                          "id": 1244662
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_19927181_sets_47599746",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "47599746-1",
+                  "entrant": {
+                    "id": 10045735,
+                    "name": "Kapito22",
+                    "participants": [
+                      {
+                        "id": 9610158,
+                        "gamerTag": "Kapito22",
+                        "player": {
+                          "id": 958669
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_19927178_sets_47599746",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 12728742,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 10045735,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 17666742,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1321,
+                      "entrant": {
+                        "id": 9991884
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1321,
+                        "name": "Pokemon Trainer"
+                      }
+                    },
+                    {
+                      "id": 17666743,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1275,
+                      "entrant": {
+                        "id": 10045735
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1275,
+                        "name": "Cloud"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 12728743,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 9991884,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 17666744,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1299,
+                      "entrant": {
+                        "id": 9991884
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1299,
+                        "name": "Lucas"
+                      }
+                    },
+                    {
+                      "id": 17666745,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1275,
+                      "entrant": {
+                        "id": 10045735
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1275,
+                        "name": "Cloud"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 12728744,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 9991884,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 17666746,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1299,
+                      "entrant": {
+                        "id": 9991884
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1299,
+                        "name": "Lucas"
+                      }
+                    },
+                    {
+                      "id": 17666747,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1275,
+                      "entrant": {
+                        "id": 10045735
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1275,
+                        "name": "Cloud"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 12728745,
+                  "orderNum": 4,
+                  "state": 3,
+                  "winnerId": 9991884,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 17666748,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1299,
+                      "entrant": {
+                        "id": 9991884
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1299,
+                        "name": "Lucas"
+                      }
+                    },
+                    {
+                      "id": 17666749,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1275,
+                      "entrant": {
+                        "id": 10045735
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1275,
+                        "name": "Cloud"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 47599747,
+              "state": 3,
+              "winnerId": 9991795,
+              "round": -3,
+              "fullRoundText": "Losers Round 1",
+              "displayScore": "W&L | BugSmasher 3 - UWA | Basija 1",
+              "lPlacement": 7,
+              "wPlacement": 5,
+              "identifier": "G",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1653176027,
+              "createdAt": 1653172260,
+              "updatedAt": 1653176028,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 1749478,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/ultimate-smashdown-6/events/singles/brackets/1125479/1749478",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1125479,
+                  "name": "Top 8 (Bo5)",
+                  "phaseOrder": 3,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "47599747-0",
+                  "entrant": {
+                    "id": 9991795,
+                    "name": "W&L | BugSmasher",
+                    "participants": [
+                      {
+                        "id": 9560331,
+                        "gamerTag": "BugSmasher",
+                        "player": {
+                          "id": 328352
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_19927180_sets_47599747",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "47599747-1",
+                  "entrant": {
+                    "id": 10055418,
+                    "name": "UWA | Basija",
+                    "participants": [
+                      {
+                        "id": 9619449,
+                        "gamerTag": "Basija",
+                        "player": {
+                          "id": 1499711
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_19927179_sets_47599747",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 12728762,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 9991795,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 17666767,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1280,
+                      "entrant": {
+                        "id": 9991795
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1280,
+                        "name": "Donkey Kong"
+                      }
+                    },
+                    {
+                      "id": 17666768,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1453,
+                      "entrant": {
+                        "id": 10055418
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1453,
+                        "name": "Joker"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 12728763,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 9991795,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 17666769,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1280,
+                      "entrant": {
+                        "id": 9991795
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1280,
+                        "name": "Donkey Kong"
+                      }
+                    },
+                    {
+                      "id": 17666770,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1453,
+                      "entrant": {
+                        "id": 10055418
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1453,
+                        "name": "Joker"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 12728764,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 10055418,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 17666771,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1280,
+                      "entrant": {
+                        "id": 9991795
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1280,
+                        "name": "Donkey Kong"
+                      }
+                    },
+                    {
+                      "id": 17666772,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1453,
+                      "entrant": {
+                        "id": 10055418
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1453,
+                        "name": "Joker"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 12728765,
+                  "orderNum": 4,
+                  "state": 3,
+                  "winnerId": 9991795,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 17666773,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1280,
+                      "entrant": {
+                        "id": 9991795
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1280,
+                        "name": "Donkey Kong"
+                      }
+                    },
+                    {
+                      "id": 17666774,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1453,
+                      "entrant": {
+                        "id": 10055418
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1453,
+                        "name": "Joker"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 127
+    },
+    "actionRecords": []
+  }
+}

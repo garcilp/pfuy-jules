@@ -1,0 +1,52 @@
+{
+  "fetchedAt": "2026-10-23T14:44:45.788927+00:00",
+  "sourceUrl": "http://start.gg/tournament/montevideo-melee-monthly-2017-3/event/melee-singles",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/montevideo-melee-monthly-2017-3/event/melee-singles"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 30434,
+        "name": "Melee Singles",
+        "numEntrants": 20,
+        "tournament": {
+          "id": 9819,
+          "name": "Montevideo Melee Monthly 2017 #3",
+          "slug": "tournament/montevideo-melee-monthly-2017-3",
+          "images": [
+            {
+              "url": "https://images.start.gg/images/tournament/9819/image-77ac7f160b25f4c87b299430d3db9e1c.png",
+              "type": "profile"
+            },
+            {
+              "url": "https://images.start.gg/images/tournament/9819/image-7e8278f37340b7fa9144fce91296c1c3.png",
+              "type": "profile"
+            },
+            {
+              "url": "https://images.start.gg/images/tournament/9819/image-82121516e095c078b235bbfa6d99ebcf.png",
+              "type": "profile"
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

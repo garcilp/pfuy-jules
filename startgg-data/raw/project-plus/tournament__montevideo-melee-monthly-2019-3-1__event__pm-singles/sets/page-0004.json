@@ -1,0 +1,523 @@
+{
+  "fetchedAt": "2026-10-22T21:49:05.663703+00:00",
+  "sourceUrl": "http://start.gg/tournament/montevideo-melee-monthly-2019-3-1/event/pm-singles",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 339913,
+    "page": 4,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 339913,
+        "name": "PM Singles",
+        "sets": {
+          "pageInfo": {
+            "total": 33
+          },
+          "nodes": [
+            {
+              "id": 19471448,
+              "state": 3,
+              "winnerId": 2862727,
+              "round": 2,
+              "fullRoundText": "Winners Round 2",
+              "displayScore": "Smeag 1 - S1R 2",
+              "lPlacement": 17,
+              "wPlacement": 9,
+              "identifier": "I",
+              "startAt": null,
+              "startedAt": 1553986494,
+              "completedAt": 1553987456,
+              "createdAt": 1553973240,
+              "updatedAt": 1553987456,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 948256,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2019-3-1/events/pm-singles/brackets/564772/948256",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 564772,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "19471448-0",
+                  "entrant": {
+                    "id": 2854365,
+                    "name": "Smeag",
+                    "participants": [
+                      {
+                        "id": 2798628,
+                        "gamerTag": "Smeag",
+                        "player": {
+                          "id": 312977
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_9212181_sets_19471448",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "19471448-1",
+                  "entrant": {
+                    "id": 2862727,
+                    "name": "S1R",
+                    "participants": [
+                      {
+                        "id": 2806041,
+                        "gamerTag": "S1R",
+                        "player": {
+                          "id": 45954
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_9241380_sets_19471448",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 1746266,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 2862727,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 2255742,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 131,
+                      "entrant": {
+                        "id": 2854365
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 131,
+                        "name": "Mr. Game & Watch"
+                      }
+                    },
+                    {
+                      "id": 2255743,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 106,
+                      "entrant": {
+                        "id": 2862727
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 106,
+                        "name": "Sheik"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 1746267,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 2854365,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 2255744,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 131,
+                      "entrant": {
+                        "id": 2854365
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 131,
+                        "name": "Mr. Game & Watch"
+                      }
+                    },
+                    {
+                      "id": 2255745,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 106,
+                      "entrant": {
+                        "id": 2862727
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 106,
+                        "name": "Sheik"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 1746268,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 2862727,
+                  "entrant1Score": 0,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 2255746,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 131,
+                      "entrant": {
+                        "id": 2854365
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 131,
+                        "name": "Mr. Game & Watch"
+                      }
+                    },
+                    {
+                      "id": 2255747,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 106,
+                      "entrant": {
+                        "id": 2862727
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 106,
+                        "name": "Sheik"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 19471498,
+              "state": 3,
+              "winnerId": 2854365,
+              "round": -4,
+              "fullRoundText": "Losers Round 1",
+              "displayScore": "DQ",
+              "lPlacement": 17,
+              "wPlacement": 13,
+              "identifier": "S",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1553988185,
+              "createdAt": 1553973240,
+              "updatedAt": 1553988185,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 948256,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2019-3-1/events/pm-singles/brackets/564772/948256",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 564772,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "19471498-0",
+                  "entrant": {
+                    "id": 2854365,
+                    "name": "Smeag",
+                    "participants": [
+                      {
+                        "id": 2798628,
+                        "gamerTag": "Smeag",
+                        "player": {
+                          "id": 312977
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_9212181_sets_19471498",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "19471498-1",
+                  "entrant": {
+                    "id": 2864132,
+                    "name": "Mitsu",
+                    "participants": [
+                      {
+                        "id": 2807097,
+                        "gamerTag": "Mitsu",
+                        "player": {
+                          "id": 1401382
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_9243635_sets_19471498",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": -1,
+                        "displayValue": "-1"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            },
+            {
+              "id": 19471426,
+              "state": 3,
+              "winnerId": 2863969,
+              "round": 1,
+              "fullRoundText": "Winners Round 1",
+              "displayScore": "EmilioLoco28 2 - Mitsu 0",
+              "lPlacement": 17,
+              "wPlacement": 13,
+              "identifier": "A",
+              "startAt": null,
+              "startedAt": 1553981280,
+              "completedAt": 1553981311,
+              "createdAt": 1553973240,
+              "updatedAt": 1553981311,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 948256,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2019-3-1/events/pm-singles/brackets/564772/948256",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 564772,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "19471426-0",
+                  "entrant": {
+                    "id": 2863969,
+                    "name": "EmilioLoco28",
+                    "participants": [
+                      {
+                        "id": 2806988,
+                        "gamerTag": "EmilioLoco28",
+                        "player": {
+                          "id": 362971
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_9243470_sets_19471426",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "19471426-1",
+                  "entrant": {
+                    "id": 2864132,
+                    "name": "Mitsu",
+                    "participants": [
+                      {
+                        "id": 2807097,
+                        "gamerTag": "Mitsu",
+                        "player": {
+                          "id": 1401382
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_9243635_sets_19471426",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 1745606,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 2863969,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 2254668,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 121,
+                      "entrant": {
+                        "id": 2863969
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 121,
+                        "name": "Ivysaur"
+                      }
+                    },
+                    {
+                      "id": 2254669,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 119,
+                      "entrant": {
+                        "id": 2864132
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 119,
+                        "name": "Mewtwo"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 1745607,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 2863969,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 2254670,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 123,
+                      "entrant": {
+                        "id": 2863969
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 123,
+                        "name": "Lucario"
+                      }
+                    },
+                    {
+                      "id": 2254671,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 128,
+                      "entrant": {
+                        "id": 2864132
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 128,
+                        "name": "Marth"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 135
+    },
+    "actionRecords": []
+  }
+}

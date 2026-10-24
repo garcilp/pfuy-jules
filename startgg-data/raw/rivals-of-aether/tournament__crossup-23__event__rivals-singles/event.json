@@ -1,0 +1,44 @@
+{
+  "fetchedAt": "2026-10-23T14:42:22.251247+00:00",
+  "sourceUrl": "http://start.gg/tournament/crossup-23/event/rivals-singles",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/crossup-23/event/rivals-singles"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 988836,
+        "name": "Rivals Singles",
+        "numEntrants": 22,
+        "tournament": {
+          "id": 592205,
+          "name": "CrossUp '23",
+          "slug": "tournament/crossup-23",
+          "images": [
+            {
+              "url": "https://images.start.gg/images/tournament/592205/image-fd5c89546310ef47adadd8c6873f924f.png?ehk=tk1wHwZ%2F8OBNqxpcBr9eOeENJLiwWT3mao3seBikdpg%3D&ehkOptimized=jmPqEvWAqIIGWjBT84XCq9teO7JYT2EUiHoNOJtOPHo%3D",
+              "type": "profile"
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

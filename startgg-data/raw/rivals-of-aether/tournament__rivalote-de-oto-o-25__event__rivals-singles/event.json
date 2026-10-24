@@ -1,0 +1,44 @@
+{
+  "fetchedAt": "2026-10-23T14:42:37.548225+00:00",
+  "sourceUrl": "http://start.gg/tournament/rivalote-de-oto-o-25/event/rivals-singles",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/rivalote-de-oto-o-25/event/rivals-singles"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1353594,
+        "name": "Rivals - Singles",
+        "numEntrants": 12,
+        "tournament": {
+          "id": 777192,
+          "name": "Rivalote de Otoño '25",
+          "slug": "tournament/rivalote-de-oto-o-25",
+          "images": [
+            {
+              "url": "https://images.start.gg/images/tournament/777192/image-fb1e3825d0a02e0bb62e72670b8f2118.png",
+              "type": "profile"
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

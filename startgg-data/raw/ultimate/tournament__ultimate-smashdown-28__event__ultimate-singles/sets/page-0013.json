@@ -1,0 +1,332 @@
+{
+  "fetchedAt": "2026-10-22T21:33:54.251563+00:00",
+  "sourceUrl": "https://www.start.gg/tournament/ultimate-smashdown-28/event/ultimate-singles",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 1347311,
+    "page": 13,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1347311,
+        "name": "Ultimate Singles",
+        "sets": {
+          "pageInfo": {
+            "total": 121
+          },
+          "nodes": [
+            {
+              "id": 87750406,
+              "state": 3,
+              "winnerId": 19751331,
+              "round": -3,
+              "fullRoundText": "Losers Round 1",
+              "displayScore": "GAMER|CG|W&L | Vodokex 2 - Pulga 3",
+              "lPlacement": 7,
+              "wPlacement": 5,
+              "identifier": "G",
+              "startAt": null,
+              "startedAt": 1744490206,
+              "completedAt": 1744490332,
+              "createdAt": 1744488963,
+              "updatedAt": 1744490333,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2837505,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/ultimate-smashdown-28/events/ultimate-singles/brackets/1931263/2837505",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1931263,
+                  "name": "Top 8",
+                  "phaseOrder": 5,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "87750406-0",
+                  "entrant": {
+                    "id": 19662756,
+                    "name": "GAMER|CG|W&L | Vodokex",
+                    "participants": [
+                      {
+                        "id": 18140871,
+                        "gamerTag": "Vodokex",
+                        "player": {
+                          "id": 2684562
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_34149321_sets_87750406",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "87750406-1",
+                  "entrant": {
+                    "id": 19751331,
+                    "name": "Pulga",
+                    "participants": [
+                      {
+                        "id": 18218787,
+                        "gamerTag": "Pulga",
+                        "player": {
+                          "id": 1365932
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_34149318_sets_87750406",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 29253334,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 19751331,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 42917508,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1307,
+                      "entrant": {
+                        "id": 19662756
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1307,
+                        "name": "Meta Knight"
+                      }
+                    },
+                    {
+                      "id": 42917509,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1283,
+                      "entrant": {
+                        "id": 19751331
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1283,
+                        "name": "Duck Hunt"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 29253335,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 19662756,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 42917510,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1307,
+                      "entrant": {
+                        "id": 19662756
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1307,
+                        "name": "Meta Knight"
+                      }
+                    },
+                    {
+                      "id": 42917511,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1283,
+                      "entrant": {
+                        "id": 19751331
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1283,
+                        "name": "Duck Hunt"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 29253336,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 19751331,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 42917512,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1307,
+                      "entrant": {
+                        "id": 19662756
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1307,
+                        "name": "Meta Knight"
+                      }
+                    },
+                    {
+                      "id": 42917513,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1283,
+                      "entrant": {
+                        "id": 19751331
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1283,
+                        "name": "Duck Hunt"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 29253337,
+                  "orderNum": 4,
+                  "state": 3,
+                  "winnerId": 19662756,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 42917514,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1307,
+                      "entrant": {
+                        "id": 19662756
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1307,
+                        "name": "Meta Knight"
+                      }
+                    },
+                    {
+                      "id": 42917515,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1283,
+                      "entrant": {
+                        "id": 19751331
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1283,
+                        "name": "Duck Hunt"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 29253338,
+                  "orderNum": 5,
+                  "state": 3,
+                  "winnerId": 19751331,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 42917516,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1307,
+                      "entrant": {
+                        "id": 19662756
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1307,
+                        "name": "Meta Knight"
+                      }
+                    },
+                    {
+                      "id": 42917517,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1283,
+                      "entrant": {
+                        "id": 19751331
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1283,
+                        "name": "Duck Hunt"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 72
+    },
+    "actionRecords": []
+  }
+}

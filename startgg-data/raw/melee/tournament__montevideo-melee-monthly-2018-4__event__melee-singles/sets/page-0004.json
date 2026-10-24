@@ -1,0 +1,136 @@
+{
+  "fetchedAt": "2026-10-22T21:51:40.452978+00:00",
+  "sourceUrl": "http://start.gg/tournament/montevideo-melee-monthly-2018-4/event/melee-singles",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 116716,
+    "page": 4,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 116716,
+        "name": "Melee Singles",
+        "sets": {
+          "pageInfo": {
+            "total": 31
+          },
+          "nodes": [
+            {
+              "id": 15256950,
+              "state": 3,
+              "winnerId": 1719599,
+              "round": 1,
+              "fullRoundText": "Round 1",
+              "displayScore": "Son Rolo 2 - Pencil 0",
+              "lPlacement": null,
+              "wPlacement": null,
+              "identifier": "B",
+              "startAt": null,
+              "startedAt": 1527364538,
+              "completedAt": 1527365132,
+              "createdAt": 1527363289,
+              "updatedAt": 1527365133,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 577053,
+                "displayIdentifier": "3",
+                "bracketType": "ROUND_ROBIN",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2018-4/events/melee-singles/brackets/260839/577053",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 260839,
+                  "name": "Melee Round Robin",
+                  "phaseOrder": 1,
+                  "bracketType": "ROUND_ROBIN",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "15256950-0",
+                  "entrant": {
+                    "id": 1719599,
+                    "name": "Son Rolo",
+                    "participants": [
+                      {
+                        "id": 1703951,
+                        "gamerTag": "Son Rolo",
+                        "player": {
+                          "id": 330339
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_7134578_sets_15256950",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "15256950-1",
+                  "entrant": {
+                    "id": 1751270,
+                    "name": "Pencil",
+                    "participants": [
+                      {
+                        "id": 1734026,
+                        "gamerTag": "Pencil",
+                        "player": {
+                          "id": 228886
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_7197165_sets_15256950",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 33
+    },
+    "actionRecords": []
+  }
+}

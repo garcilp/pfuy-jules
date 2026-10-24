@@ -1,0 +1,44 @@
+{
+  "fetchedAt": "2026-10-23T14:43:31.640915+00:00",
+  "sourceUrl": "https://www.start.gg/tournament/koopa-series-2/event/singles",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/koopa-series-2/event/singles"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 911457,
+        "name": "Singles",
+        "numEntrants": 43,
+        "tournament": {
+          "id": 549493,
+          "name": "Koopa Series #2",
+          "slug": "tournament/koopa-series-2",
+          "images": [
+            {
+              "url": "https://images.start.gg/images/tournament/549493/image-4d3e25a697a112e284d75fdf6747df58.png?ehk=2L1LYA6AS%2FHe7YAWEQU90CqLN3MOAD1vfa%2F5zB7wWn4%3D&ehkOptimized=YPr%2Bwfp8KGD77vUz6h%2FFEYixOky%2Bj7hso3DiwkE3sYc%3D",
+              "type": "profile"
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

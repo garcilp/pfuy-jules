@@ -1,0 +1,44 @@
+{
+  "fetchedAt": "2026-10-23T14:43:36.659113+00:00",
+  "sourceUrl": "https://www.start.gg/tournament/ultimate-smashdown-16/event/ultimate-singles",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/ultimate-smashdown-16/event/ultimate-singles"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 978627,
+        "name": "Ultimate Singles",
+        "numEntrants": 35,
+        "tournament": {
+          "id": 586729,
+          "name": "Ultimate Smashdown #16",
+          "slug": "tournament/ultimate-smashdown-16",
+          "images": [
+            {
+              "url": "https://images.start.gg/images/tournament/586729/image-be68a6837eb48be594d66f864c5bc37a.png?ehk=RIz2w6ayRqcnClzVW5mi%2FsuraR57fw0isRacFHaUYvM%3D&ehkOptimized=dg1sv%2ByqLxZwfZB48YmjLbjcCr9eG03MNHpW%2FWyif6E%3D",
+              "type": "profile"
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

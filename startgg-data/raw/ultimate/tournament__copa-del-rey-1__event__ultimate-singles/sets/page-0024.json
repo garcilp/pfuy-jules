@@ -1,0 +1,332 @@
+{
+  "fetchedAt": "2026-10-22T21:20:44.373412+00:00",
+  "sourceUrl": "https://www.start.gg/tournament/copa-del-rey-1/event/ultimate-singles",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 886094,
+    "page": 24,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 886094,
+        "name": "Ultimate Singles",
+        "sets": {
+          "pageInfo": {
+            "total": 231
+          },
+          "nodes": [
+            {
+              "id": 62996479,
+              "state": 3,
+              "winnerId": 13593173,
+              "round": -3,
+              "fullRoundText": "Losers Round 1",
+              "displayScore": "BCP | Mitsu 2 - SMB | Ray 3",
+              "lPlacement": 7,
+              "wPlacement": 5,
+              "identifier": "G",
+              "startAt": null,
+              "startedAt": 1690066585,
+              "completedAt": 1690066648,
+              "createdAt": 1690065200,
+              "updatedAt": 1690066649,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2076143,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/copa-del-rey-1/events/ultimate-singles/brackets/1364369/2076143",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1364369,
+                  "name": "Top 8",
+                  "phaseOrder": 4,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "62996479-0",
+                  "entrant": {
+                    "id": 13067573,
+                    "name": "BCP | Mitsu",
+                    "participants": [
+                      {
+                        "id": 12305633,
+                        "gamerTag": "Mitsu",
+                        "player": {
+                          "id": 557903
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_25340379_sets_62996479",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "62996479-1",
+                  "entrant": {
+                    "id": 13593173,
+                    "name": "SMB | Ray",
+                    "participants": [
+                      {
+                        "id": 12767126,
+                        "gamerTag": "Ray",
+                        "player": {
+                          "id": 560209
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_25340378_sets_62996479",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 17729767,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 13593173,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 25384278,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1777,
+                      "entrant": {
+                        "id": 13067573
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1777,
+                        "name": "Sephiroth"
+                      }
+                    },
+                    {
+                      "id": 25384279,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1311,
+                      "entrant": {
+                        "id": 13593173
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1311,
+                        "name": "Mii Brawler"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 17729768,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 13593173,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 25384280,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1777,
+                      "entrant": {
+                        "id": 13067573
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1777,
+                        "name": "Sephiroth"
+                      }
+                    },
+                    {
+                      "id": 25384281,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1311,
+                      "entrant": {
+                        "id": 13593173
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1311,
+                        "name": "Mii Brawler"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 17729769,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 13067573,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 25384282,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1410,
+                      "entrant": {
+                        "id": 13067573
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1410,
+                        "name": "Ken"
+                      }
+                    },
+                    {
+                      "id": 25384283,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1311,
+                      "entrant": {
+                        "id": 13593173
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1311,
+                        "name": "Mii Brawler"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 17729770,
+                  "orderNum": 4,
+                  "state": 3,
+                  "winnerId": 13067573,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 25384284,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1410,
+                      "entrant": {
+                        "id": 13067573
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1410,
+                        "name": "Ken"
+                      }
+                    },
+                    {
+                      "id": 25384285,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1453,
+                      "entrant": {
+                        "id": 13593173
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1453,
+                        "name": "Joker"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 17729771,
+                  "orderNum": 5,
+                  "state": 3,
+                  "winnerId": 13593173,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 25384286,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1410,
+                      "entrant": {
+                        "id": 13067573
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1410,
+                        "name": "Ken"
+                      }
+                    },
+                    {
+                      "id": 25384287,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1311,
+                      "entrant": {
+                        "id": 13593173
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1311,
+                        "name": "Mii Brawler"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 72
+    },
+    "actionRecords": []
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "fetchedAt": "2026-10-23T14:44:07.306911+00:00",
+  "sourceUrl": "http://start.gg/tournament/mashito-go-2/event/singles-b",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/mashito-go-2/event/singles-b"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1587138,
+        "name": "Singles B",
+        "numEntrants": 16,
+        "tournament": {
+          "id": 891040,
+          "name": "Mashito GO! #2",
+          "slug": "tournament/mashito-go-2",
+          "images": [
+            {
+              "url": "https://images.start.gg/images/tournament/891040/image-e527f10990383a840306fc7e986da797.png",
+              "type": "profile"
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

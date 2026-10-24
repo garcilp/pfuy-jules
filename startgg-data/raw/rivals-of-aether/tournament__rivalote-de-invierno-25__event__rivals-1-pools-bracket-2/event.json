@@ -1,0 +1,44 @@
+{
+  "fetchedAt": "2026-10-23T14:42:40.110735+00:00",
+  "sourceUrl": "http://start.gg/tournament/rivalote-de-invierno-25/event/rivals-1-pools-bracket-2",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/rivalote-de-invierno-25/event/rivals-1-pools-bracket-2"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1432089,
+        "name": "Rivals 1 (Pools + Bracket)",
+        "numEntrants": 8,
+        "tournament": {
+          "id": 815478,
+          "name": "Rivalote de Invierno '25",
+          "slug": "tournament/rivalote-de-invierno-25",
+          "images": [
+            {
+              "url": "https://images.start.gg/images/tournament/815478/image-623fc04dacfdb94601cdb0d1a44aaf85.png",
+              "type": "profile"
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

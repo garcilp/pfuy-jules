@@ -1,0 +1,107 @@
+{
+  "fetchedAt": "2026-10-22T21:58:20.660026+00:00",
+  "sourceUrl": "http://start.gg/tournament/montevideo-melee-monthly-2021-4/event/melee-singles",
+  "operationName": "EventEntrants",
+  "variables": {
+    "eventId": 571562,
+    "page": 1,
+    "perPage": 100
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 571562,
+        "name": "Melee Singles",
+        "entrants": {
+          "pageInfo": {
+            "total": 5,
+            "totalPages": 1
+          },
+          "nodes": [
+            {
+              "id": 7244490,
+              "name": "Iguana",
+              "participants": [
+                {
+                  "id": 6971989,
+                  "gamerTag": "Iguana",
+                  "player": {
+                    "id": 264244
+                  }
+                }
+              ]
+            },
+            {
+              "id": 7243069,
+              "name": "maay",
+              "participants": [
+                {
+                  "id": 6970620,
+                  "gamerTag": "maay",
+                  "player": {
+                    "id": 1495478
+                  }
+                }
+              ]
+            },
+            {
+              "id": 7238526,
+              "name": "MarioMario | Sol!d",
+              "participants": [
+                {
+                  "id": 6966118,
+                  "gamerTag": "Sol!d",
+                  "player": {
+                    "id": 330371
+                  }
+                }
+              ]
+            },
+            {
+              "id": 7235934,
+              "name": "FrancoKiwi",
+              "participants": [
+                {
+                  "id": 6963485,
+                  "gamerTag": "FrancoKiwi",
+                  "player": {
+                    "id": 1154899
+                  }
+                }
+              ]
+            },
+            {
+              "id": 7235904,
+              "name": "SrPaz",
+              "participants": [
+                {
+                  "id": 6963452,
+                  "gamerTag": "SrPaz",
+                  "player": {
+                    "id": 895125
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 11
+    },
+    "actionRecords": []
+  }
+}

@@ -1,0 +1,136 @@
+{
+  "fetchedAt": "2026-10-22T20:53:57.962392+00:00",
+  "sourceUrl": "http://start.gg/tournament/rivalito-charrua-13/event/singles-pools-bracket",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 1413621,
+    "page": 5,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1413621,
+        "name": "Singles (Pools + Bracket)",
+        "sets": {
+          "pageInfo": {
+            "total": 41
+          },
+          "nodes": [
+            {
+              "id": 91957147,
+              "state": 3,
+              "winnerId": 20660180,
+              "round": 1,
+              "fullRoundText": "Round 1",
+              "displayScore": "DQ",
+              "lPlacement": null,
+              "wPlacement": null,
+              "identifier": "B",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1753639770,
+              "createdAt": 1753629771,
+              "updatedAt": 1753639770,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 2977791,
+                "displayIdentifier": "2",
+                "bracketType": "ROUND_ROBIN",
+                "bracketUrl": "https://www.start.gg/tournament/rivalito-charrua-13/events/singles-pools-bracket/brackets/2017106/2977791",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 2017106,
+                  "name": "Pools (Bo3)",
+                  "phaseOrder": 1,
+                  "bracketType": "ROUND_ROBIN",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "91957147-0",
+                  "entrant": {
+                    "id": 20766667,
+                    "name": "SYR | Rey rata(no me mires)",
+                    "participants": [
+                      {
+                        "id": 19111937,
+                        "gamerTag": "Rey rata(no me mires)",
+                        "player": {
+                          "id": 3654948
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_35832156_sets_91957147",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": -1,
+                        "displayValue": "-1"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "91957147-1",
+                  "entrant": {
+                    "id": 20660180,
+                    "name": "W&L | Marroll",
+                    "participants": [
+                      {
+                        "id": 19017398,
+                        "gamerTag": "Marroll",
+                        "player": {
+                          "id": 795083
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_35672391_sets_91957147",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": null,
+                        "displayValue": null
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 33
+    },
+    "actionRecords": []
+  }
+}

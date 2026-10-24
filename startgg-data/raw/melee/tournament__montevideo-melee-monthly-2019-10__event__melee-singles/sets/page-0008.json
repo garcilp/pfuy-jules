@@ -1,0 +1,136 @@
+{
+  "fetchedAt": "2026-10-22T21:55:22.903606+00:00",
+  "sourceUrl": "http://start.gg/tournament/montevideo-melee-monthly-2019-10/event/melee-singles",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 402163,
+    "page": 8,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 402163,
+        "name": "Melee Singles",
+        "sets": {
+          "pageInfo": {
+            "total": 71
+          },
+          "nodes": [
+            {
+              "id": 24221395,
+              "state": 3,
+              "winnerId": 4014131,
+              "round": 1,
+              "fullRoundText": "Round 1",
+              "displayScore": "Double Bacon | ENEMA 2 - El Ongels | Belipe 0",
+              "lPlacement": null,
+              "wPlacement": null,
+              "identifier": "A",
+              "startAt": null,
+              "startedAt": 1572117256,
+              "completedAt": 1572117744,
+              "createdAt": 1572107178,
+              "updatedAt": 1572117745,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 1097577,
+                "displayIdentifier": "5",
+                "bracketType": "ROUND_ROBIN",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2019-10/events/melee-singles/brackets/671531/1097577",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 671531,
+                  "name": "Melee Round Robin",
+                  "phaseOrder": 1,
+                  "bracketType": "ROUND_ROBIN",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "24221395-0",
+                  "entrant": {
+                    "id": 4014131,
+                    "name": "Double Bacon | ENEMA",
+                    "participants": [
+                      {
+                        "id": 3837793,
+                        "gamerTag": "ENEMA",
+                        "player": {
+                          "id": 1244528
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_11403698_sets_24221395",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "24221395-1",
+                  "entrant": {
+                    "id": 4020370,
+                    "name": "El Ongels | Belipe",
+                    "participants": [
+                      {
+                        "id": 3843480,
+                        "gamerTag": "Belipe",
+                        "player": {
+                          "id": 1398327
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_11419037_sets_24221395",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 33
+    },
+    "actionRecords": []
+  }
+}

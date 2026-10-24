@@ -1,0 +1,467 @@
+{
+  "fetchedAt": "2026-10-22T22:03:38.556098+00:00",
+  "sourceUrl": "http://start.gg/tournament/montevideo-melee-monthly-2026-1/event/super-smash-bros-melee",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 1535598,
+    "page": 4,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1535598,
+        "name": "Super Smash Bros. Melee",
+        "sets": {
+          "pageInfo": {
+            "total": 32
+          },
+          "nodes": [
+            {
+              "id": 99080319,
+              "state": 3,
+              "winnerId": 22290543,
+              "round": -4,
+              "fullRoundText": "Losers Round 1",
+              "displayScore": "420 | PorritoCody 3 - SYR | robin 0",
+              "lPlacement": 17,
+              "wPlacement": 13,
+              "identifier": "S",
+              "startAt": null,
+              "startedAt": 1770496416,
+              "completedAt": 1770497419,
+              "createdAt": 1770424213,
+              "updatedAt": 1770497419,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 3161625,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2026-1/events/super-smash-bros-melee/brackets/2172711/3161625",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 2172711,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "99080319-0",
+                  "entrant": {
+                    "id": 22290543,
+                    "name": "420 | PorritoCody",
+                    "participants": [
+                      {
+                        "id": 20490737,
+                        "gamerTag": "PorritoCody",
+                        "player": {
+                          "id": 4732812
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_38156780_sets_99080319",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "99080319-1",
+                  "entrant": {
+                    "id": 22367120,
+                    "name": "SYR | robin",
+                    "participants": [
+                      {
+                        "id": 20560341,
+                        "gamerTag": "robin",
+                        "player": {
+                          "id": 3062204
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_38267250_sets_99080319",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 35685052,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 22290543,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 53005435,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 18,
+                      "entrant": {
+                        "id": 22290543
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 18,
+                        "name": "Peach"
+                      }
+                    },
+                    {
+                      "id": 53005436,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 10,
+                      "entrant": {
+                        "id": 22367120
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 10,
+                        "name": "Kirby"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 35685053,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 22290543,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 53005437,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 22,
+                      "entrant": {
+                        "id": 22290543
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 22,
+                        "name": "Samus"
+                      }
+                    },
+                    {
+                      "id": 53005438,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 10,
+                      "entrant": {
+                        "id": 22367120
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 10,
+                        "name": "Kirby"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 35685054,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 22290543,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 53005439,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 23,
+                      "entrant": {
+                        "id": 22290543
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 23,
+                        "name": "Sheik"
+                      }
+                    },
+                    {
+                      "id": 53005440,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 10,
+                      "entrant": {
+                        "id": 22367120
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 10,
+                        "name": "Kirby"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 99080247,
+              "state": 3,
+              "winnerId": 22500871,
+              "round": 1,
+              "fullRoundText": "Winners Round 1",
+              "displayScore": "SYR | robin 0 - Byfriend 3",
+              "lPlacement": 17,
+              "wPlacement": 13,
+              "identifier": "A",
+              "startAt": null,
+              "startedAt": 1770494382,
+              "completedAt": 1770496022,
+              "createdAt": 1770424213,
+              "updatedAt": 1770496023,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 3161625,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2026-1/events/super-smash-bros-melee/brackets/2172711/3161625",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 2172711,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "99080247-0",
+                  "entrant": {
+                    "id": 22367120,
+                    "name": "SYR | robin",
+                    "participants": [
+                      {
+                        "id": 20560341,
+                        "gamerTag": "robin",
+                        "player": {
+                          "id": 3062204
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_38267250_sets_99080247",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "99080247-1",
+                  "entrant": {
+                    "id": 22500871,
+                    "name": "Byfriend",
+                    "participants": [
+                      {
+                        "id": 20686134,
+                        "gamerTag": "Byfriend",
+                        "player": {
+                          "id": 4790544
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_38475343_sets_99080247",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 35683820,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 22500871,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 53003486,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 10,
+                      "entrant": {
+                        "id": 22367120
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 10,
+                        "name": "Kirby"
+                      }
+                    },
+                    {
+                      "id": 53003487,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 14,
+                      "entrant": {
+                        "id": 22500871
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 14,
+                        "name": "Marth"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 35683821,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 22500871,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 53003489,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 14,
+                      "entrant": {
+                        "id": 22500871
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 14,
+                        "name": "Marth"
+                      }
+                    },
+                    {
+                      "id": 53003542,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 10,
+                      "entrant": {
+                        "id": 22367120
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 10,
+                        "name": "Kirby"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 35683822,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 22500871,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 53003491,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 14,
+                      "entrant": {
+                        "id": 22500871
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 14,
+                        "name": "Marth"
+                      }
+                    },
+                    {
+                      "id": 53003543,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 10,
+                      "entrant": {
+                        "id": 22367120
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 10,
+                        "name": "Kirby"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 111
+    },
+    "actionRecords": []
+  }
+}

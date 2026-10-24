@@ -1,0 +1,136 @@
+{
+  "fetchedAt": "2026-10-22T21:10:06.351901+00:00",
+  "sourceUrl": "https://www.start.gg/tournament/ultimate-smashdown-6/event/ultimate-smashdown-6-categoria-b",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 721038,
+    "page": 4,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 721038,
+        "name": "Ultimate Smashdown #6 - Categoria B",
+        "sets": {
+          "pageInfo": {
+            "total": 31
+          },
+          "nodes": [
+            {
+              "id": 47578908,
+              "state": 3,
+              "winnerId": 10091336,
+              "round": 1,
+              "fullRoundText": "Winners Round 1",
+              "displayScore": "La UWA | MAXTER 1 - Bits 2",
+              "lPlacement": 13,
+              "wPlacement": 9,
+              "identifier": "H",
+              "startAt": null,
+              "startedAt": 1653162550,
+              "completedAt": 1653163071,
+              "createdAt": 1653161870,
+              "updatedAt": 1653163071,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 1749479,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/ultimate-smashdown-6/events/ultimate-smashdown-6-categoria-b/brackets/1125480/1749479",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 1125480,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "47578908-0",
+                  "entrant": {
+                    "id": 10091312,
+                    "name": "La UWA | MAXTER",
+                    "participants": [
+                      {
+                        "id": 9632922,
+                        "gamerTag": "MAXTER",
+                        "player": {
+                          "id": 1551385
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_20086798_sets_47578908",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 1,
+                        "displayValue": "1"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "47578908-1",
+                  "entrant": {
+                    "id": 10091336,
+                    "name": "Bits",
+                    "participants": [
+                      {
+                        "id": 9560161,
+                        "gamerTag": "Bits",
+                        "player": {
+                          "id": 2668633
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_20086835_sets_47578908",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": null
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 33
+    },
+    "actionRecords": []
+  }
+}

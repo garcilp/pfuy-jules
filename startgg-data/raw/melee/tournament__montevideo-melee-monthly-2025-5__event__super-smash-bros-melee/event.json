@@ -1,0 +1,38 @@
+{
+  "fetchedAt": "2026-10-22T22:02:32.896321+00:00",
+  "sourceUrl": "http://start.gg/tournament/montevideo-melee-monthly-2025-5/event/super-smash-bros-melee",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/montevideo-melee-monthly-2025-5/event/super-smash-bros-melee"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1379673,
+        "name": "Super Smash Bros. Melee",
+        "numEntrants": 14,
+        "tournament": {
+          "id": 789905,
+          "name": "Montevideo Melee Monthly 2025 #5",
+          "slug": "tournament/montevideo-melee-monthly-2025-5"
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 3
+    },
+    "actionRecords": []
+  }
+}

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Events · Platfighters.uy</title>
+<link rel="icon" href="assets/logo.jpg">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<header class="topbar glass pill">
+  <a class="brand" href="index.html"><img src="assets/logo.jpg" alt="">Platfighters<span class="tld">.uy</span></a>
+  <span class="spacer"></span>
+  <nav><a href="players.html">Players</a><a class="nav-active" href="events.html" aria-current="page">Events</a><a href="#">Rankings</a></nav>
+  <span class="badge">EVENT DIRECTORY</span>
+</header>
+<main class="directory page-single">
+  <section class="directory-head">
+    <div><div class="eyebrow mono">START.GG TOURNAMENT DATA</div><h1>Events</h1><p class="muted">Browse tournaments across the games we follow.</p></div>
+    <div class="directory-controls">
+      <label class="search glass"><span aria-hidden="true">⌕</span><input id="event-search" type="search" placeholder="Search tournaments or events" autocomplete="off" aria-label="Search events"></label>
+      <div class="directory-filter-row">
+        <label class="game-filter-wrap"><span class="sr-only">Filter by game</span><select id="game-filter" class="game-filter glass" aria-label="Filter events by game"><option value="">All games</option></select></label>
+        <label class="game-filter-wrap"><span class="sr-only">Event list display</span><select id="event-view" class="game-filter glass" aria-label="Event list display"><option value="condensed" selected>Condensed list</option><option value="cards">Cards</option></select></label>
+      </div>
+    </div>
+  </section>
+  <p id="directory-status" class="directory-status mono muted" aria-live="polite">Loading events…</p>
+  <section id="event-list" class="event-list" aria-label="Event list"></section>
+</main>
+<footer class="foot mono muted">Platfighters.uy · Event directory</footer>
+<script src="js/events.js"></script>
+</body>
+</html>
