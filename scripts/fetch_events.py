@@ -27,7 +27,9 @@ query GetEvent($slug: String) {
     id
     name
     numEntrants
-    tournament { id name slug images(type: "profile") { url type } }
+    startAt
+    state
+    tournament { id name slug startAt images(type: "profile") { url type } }
   }
 }
 """

@@ -34,7 +34,8 @@ CREATE TABLE IF NOT EXISTS events (
     videogame_slug TEXT NOT NULL REFERENCES videogames(slug),
     name TEXT NOT NULL,
     num_entrants INTEGER,
-    source_url TEXT
+    source_url TEXT,
+    is_temporary INTEGER DEFAULT 0
 );
 CREATE TABLE IF NOT EXISTS players (
     id TEXT PRIMARY KEY
@@ -239,6 +240,40 @@ def discover_events():
     return groups
 
 
+def normalize_event_key(value):
+    if not isinstance(value, str) or not value.strip():
+        return None
+    raw = value.strip()
+    parsed = urlparse(raw if "://" in raw else f"https://www.start.gg/{raw.lstrip('/')}")
+    if parsed.netloc and parsed.netloc.lower() not in {"start.gg", "www.start.gg"}:
+        return None
+    parts = parsed.path.strip("/").lower().split("/")
+    if len(parts) < 4 or parts[0] != "tournament" or parts[2] != "event":
+        return None
+    return "/".join(parts[:4])
+
+
+def load_event_configs():
+    if not MANIFEST.is_file():
+        return {}
+    with MANIFEST.open(encoding="utf-8-sig") as file:
+        config = json.load(file)
+    configs = {}
+    for game in config.get("games", []):
+        for event_ref in game.get("events", []):
+            if isinstance(event_ref, dict):
+                url = event_ref.get("url")
+                is_temp = bool(event_ref.get("temporary", False))
+            else:
+                url = str(event_ref)
+                is_temp = False
+            if url:
+                key = normalize_event_key(url)
+                if key:
+                    configs[key] = {"url": url, "temporary": is_temp, "game_slug": game.get("slug")}
+    return configs
+
+
 def tournament_slug_from_url(url, fallback_folder):
     if url:
         parts = [part for part in urlparse(url).path.split("/") if part]
@@ -298,7 +333,7 @@ def score_from_slot(slot):
     )
 
 
-def import_event(connection, candidate, event_id, game_names):
+def import_event(connection, candidate, event_id, game_names, event_configs):
     folder = candidate["folder"]
     event = candidate["event"]
     event_wrapper, _ = wrapped_response(folder / "event.json")
@@ -311,6 +346,10 @@ def import_event(connection, candidate, event_id, game_names):
     if api_tournament_slug:
         tournament_slug = api_tournament_slug.rsplit("/", 1)[-1]
 
+    event_key = normalize_event_key(source_url)
+    is_temporary = 1 if (event_key and event_configs.get(event_key, {}).get("temporary")) else 0
+    tournament_start = tournament.get("startAt") or event.get("startAt")
+
     counts = {"entrants": 0, "standings": 0, "sets": 0, "games": 0, "selections": 0}
     connection.execute(
         "INSERT INTO videogames(slug, name) VALUES (?, ?) "
@@ -320,18 +359,20 @@ def import_event(connection, candidate, event_id, game_names):
     # start.gg ID/name. Those columns are filled automatically if raw data later
     # includes tournament metadata.
     connection.execute(
-        "INSERT INTO tournaments(slug, startgg_id, name) VALUES (?, ?, ?) "
+        "INSERT INTO tournaments(slug, startgg_id, name, start_at) VALUES (?, ?, ?, ?) "
         "ON CONFLICT(slug) DO UPDATE SET startgg_id=COALESCE(excluded.startgg_id, tournaments.startgg_id), "
-        "name=COALESCE(excluded.name, tournaments.name)",
-        (tournament_slug, text_id(tournament.get("id")), tournament.get("name")),
+        "name=COALESCE(excluded.name, tournaments.name), "
+        "start_at=COALESCE(excluded.start_at, tournaments.start_at)",
+        (tournament_slug, text_id(tournament.get("id")), tournament.get("name"), tournament_start),
     )
     connection.execute(
-        "INSERT INTO events(id, tournament_slug, videogame_slug, name, num_entrants, source_url) "
-        "VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET "
+        "INSERT INTO events(id, tournament_slug, videogame_slug, name, num_entrants, source_url, is_temporary) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET "
         "tournament_slug=excluded.tournament_slug, videogame_slug=excluded.videogame_slug, "
-        "name=excluded.name, num_entrants=excluded.num_entrants, source_url=excluded.source_url",
+        "name=excluded.name, num_entrants=excluded.num_entrants, source_url=excluded.source_url, "
+        "is_temporary=excluded.is_temporary",
         (event_id, tournament_slug, game_slug, event.get("name") or "Unknown event",
-         event.get("numEntrants"), source_url),
+         event.get("numEntrants"), source_url, is_temporary),
     )
 
     for path in candidate["entrants"]:
@@ -510,10 +551,16 @@ def load_game_names():
 def main():
     DATABASE.parent.mkdir(parents=True, exist_ok=True)
     game_names = load_game_names()
+    event_configs = load_event_configs()
     connection = sqlite3.connect(DATABASE)
     connection.row_factory = sqlite3.Row
     connection.execute("PRAGMA foreign_keys = ON")
     connection.executescript(SCHEMA)
+
+    try:
+        connection.execute("ALTER TABLE events ADD COLUMN is_temporary INTEGER DEFAULT 0")
+    except sqlite3.OperationalError:
+        pass
 
     groups = discover_events()
     if not groups:
@@ -542,7 +589,7 @@ def main():
 
         try:
             with connection:
-                counts = import_event(connection, candidate, event_id, game_names)
+                counts = import_event(connection, candidate, event_id, game_names, event_configs)
                 connection.execute(
                     "INSERT INTO import_markers(event_id, source_path, content_sha256, imported_at, "
                     "entrants_imported, standings_imported, sets_imported, games_imported, selections_imported) "

@@ -256,7 +256,7 @@ def profile_for_player(connection, player_id, display_tag, profile_slug):
     rows = connection.execute(
         "SELECT DISTINCT e.id AS event_id, e.name AS event_name, e.num_entrants, e.source_url, "
         "e.videogame_slug, v.name AS videogame_name, t.slug AS tournament_slug, "
-        "t.name AS tournament_name, t.start_at AS tournament_start "
+        "t.name AS tournament_name, t.start_at AS tournament_start, e.is_temporary "
         "FROM participants p "
         "JOIN entrant_participants ep ON ep.participant_id=p.id "
         "JOIN entrants en ON en.id=ep.entrant_id "
@@ -266,7 +266,7 @@ def profile_for_player(connection, player_id, display_tag, profile_slug):
         f"WHERE p.player_id IN ({player_placeholders}) ORDER BY e.videogame_slug, e.id",
         player_ids,
     ).fetchall()
-    rows = [row for row in rows if normalize_event_key(row["source_url"]) not in exclusions["events"]]
+    rows = [row for row in rows if not row["is_temporary"] and normalize_event_key(row["source_url"]) not in exclusions["events"]]
     if not rows:
         raise ValueError(f"No event entries found for start.gg player ID {player_id}")
 
@@ -797,12 +797,14 @@ def write_event_index(connection):
                 continue
     rows = connection.execute(
         "SELECT e.id, e.videogame_slug, v.name AS game_name, e.name AS event_name, "
-        "e.num_entrants, e.source_url, t.slug AS tournament_slug, t.name AS tournament_name, "
+        "e.num_entrants, e.source_url, e.is_temporary, t.slug AS tournament_slug, t.name AS tournament_name, "
         "COALESCE(t.start_at, (SELECT MIN(COALESCE(s.started_at, s.start_at, s.completed_at)) "
         "FROM sets s WHERE s.event_id=e.id)) AS event_timestamp "
         "FROM events e JOIN videogames v ON v.slug=e.videogame_slug "
         "JOIN tournaments t ON t.slug=e.tournament_slug"
     ).fetchall()
+    now_timestamp = int(datetime.now(timezone.utc).timestamp())
+    today_iso = datetime.now(timezone.utc).date().isoformat()
     event_index = []
     for row in rows:
         if normalize_event_key(row["source_url"]) in excluded_events:
@@ -810,6 +812,23 @@ def write_event_index(connection):
         entrant_count = connection.execute(
             "SELECT COUNT(*) FROM entrants WHERE event_id=?", (row["id"],)
         ).fetchone()[0]
+        event_timestamp = row["event_timestamp"]
+        date_str = date_from_epoch(event_timestamp)
+        is_temp = bool(row["is_temporary"])
+
+        if date_str:
+            if date_str < today_iso:
+                has_taken_place = True
+            elif date_str > today_iso:
+                has_taken_place = False
+            else:
+                has_taken_place = (event_timestamp is not None and event_timestamp <= now_timestamp)
+        else:
+            has_taken_place = True
+
+        if is_temp and has_taken_place:
+            continue
+
         event_index.append({
             "id": str(row["id"]),
             "tournamentSlug": row["tournament_slug"],
@@ -818,9 +837,11 @@ def write_event_index(connection):
             "game": row["game_name"],
             "tournament": row["tournament_name"] or display_tournament(row["tournament_slug"]),
             "event": row["event_name"],
-            "date": date_from_epoch(row["event_timestamp"]),
+            "date": date_str,
             "entrants": row["num_entrants"] if row["num_entrants"] is not None else entrant_count,
             "url": row["source_url"],
+            "isTemporary": is_temp,
+            "hasTakenPlace": has_taken_place,
         })
     event_index.sort(key=lambda event: (event["tournament"].casefold(), event["event"].casefold()))
     event_index.sort(key=lambda event: event["date"] or "", reverse=True)
