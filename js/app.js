@@ -216,9 +216,15 @@ function render() {
     : '';
   const bestPlacementHistory = sel && selectedBestPlacement === sel.id
     ? (() => {
-      const tournaments = (sel.results || [])
-        .filter(result => Number(result.place) === Number(sel.bestPlace ?? bestPlace))
-        .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+      const validResults = (sel.results || [])
+        .filter(result => Number.isFinite(Number(result.place)) && Number(result.place) > 0);
+      const targetPlace = Number(sel.bestPlace ?? bestPlace);
+      const bestResults = validResults.filter(result => Number(result.place) === targetPlace);
+      const tournaments = bestResults.length >= 5
+        ? bestResults.sort((a, b) => (b.date || '').localeCompare(a.date || ''))
+        : validResults
+          .sort((a, b) => Number(a.place) - Number(b.place) || (b.date || '').localeCompare(a.date || ''))
+          .slice(0, 5);
       const rows = tournaments.map(result => `<div class="opponent-set-row"><span class="opponent-set-context"><b>${esc((result.event || '').split(' · ')[0])}</b><small>${fmt(result.date)}${result.entrants ? ` · ${result.entrants} entrants` : ''}</small></span><span class="opponent-set-score">${ord(result.place)}</span></div>`).join('');
       return `<div class="panel glass opponent-history" id="best-placement-history"><div class="opponent-history-heading"><h2>Best finishes</h2><button class="quiet-button close-best-placement-history" type="button">Close</button></div>${rows || '<p class="muted">No tournaments recorded for this placement.</p>'}</div>`;
     })()
