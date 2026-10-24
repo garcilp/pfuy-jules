@@ -565,7 +565,7 @@ def profile_for_player(connection, player_id, display_tag, profile_slug):
         else:
             visible_characters = ranked_characters
         characters = [
-            {"name": name, "usage": round(100 * count / total_character_uses)}
+            {"name": name, "usage": round(100 * count / total_character_uses, 1)}
             for name, count in visible_characters
         ] if total_character_uses else []
         profile["games"].append({
@@ -697,7 +697,7 @@ def profile_for_player(connection, player_id, display_tag, profile_slug):
             else:
                 visible_characters = ranked_characters
             game["characters"] = [
-                {"name": name, "usage": round(100 * count / total_uses)}
+                {"name": name, "usage": round(100 * count / total_uses, 1)}
                 for name, count in visible_characters
             ] if total_uses else []
         notable_wins = []

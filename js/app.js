@@ -214,7 +214,7 @@ function render() {
   } else {
     middle = `<div class="row2">
       <div class="panel glass"><h2>Character usage</h2>${(sel.characters || []).map(c =>
-        `<div class="usage"><div class="usage-row"><span class="stock-icon"><span>${esc(c.name[0])}</span><img src="assets/renders/${esc(sel.slug)}/stocks/${slug(c.name)}.webp" alt="" onload="this.previousElementSibling.remove()" onerror="if(!this.dataset.fallback){this.dataset.fallback='png';this.src=this.src.replace('.webp','.png')}else{this.parentElement.remove()}"></span><span>${esc(c.name)}</span><span class="mono usage-percent">${esc(c.usage)}%</span></div><div class="bar"><i style="width:${Number(c.usage) || 0}%"></i></div></div>`).join('') || '<p class="muted">No character selections recorded.</p>'}</div>
+        `<div class="usage"><div class="usage-row"><span class="stock-icon"><span>${esc(c.name[0])}</span><img src="assets/renders/${esc(sel.slug)}/stocks/${slug(c.name)}.webp" alt="" onload="this.previousElementSibling.remove()" onerror="if(!this.dataset.fallback){this.dataset.fallback='png';this.src=this.src.replace('.webp','.png')}else{this.parentElement.remove()}"></span><span>${esc(c.name)}</span><span class="mono usage-percent">${Number(c.usage).toFixed(1)}%</span></div><div class="bar"><i style="width:${Number(c.usage) || 0}%"></i></div></div>`).join('') || '<p class="muted">No character selections recorded.</p>'}</div>
       <div class="panel glass"><h2>Notable wins</h2>${notableWins.map(x => {
         const tournamentName = ((x.event || x.detail?.split(' · ').slice(1).join(' · ') || '').split(' · ')[0]);
         let dateStr = x.date;
