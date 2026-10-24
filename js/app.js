@@ -9,6 +9,7 @@ const ord = n => {
 const slug = x => String(x || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const fmt = d => d ? new Date(`${d}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
+const fmtMonthYear = d => d ? new Date(d.includes('T') ? d : `${d}T00:00:00`).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : '';
 const profileId = new URLSearchParams(location.search).get('player');
 let data;
 let resultPage = 1;
@@ -162,9 +163,27 @@ function render() {
     stats.push(['ACTIVE FOR', singleEventResult ? '1 Event' : activeDuration, activityPeriod],
       ['MOST-PLAYED OPPONENT', oppName, opp ? `${opp.sets} sets · ${opp.wins}–${opp.sets - opp.wins} · ${opp.games} game${opp.games === 1 ? '' : 's'}` : 'No set data']);
   }
-  const notableWins = (sel?.notableWins || []).filter((win, index, wins) =>
-    wins.findIndex(item => String(item.opponent || '').trim().replace(/\s+/g, ' ').toLocaleLowerCase()
-      === String(win.opponent || '').trim().replace(/\s+/g, ' ').toLocaleLowerCase()) === index).slice(0, 4);
+  const notableWinsList = [];
+  const seenOpponents = new Map();
+  for (const win of sel?.notableWins || []) {
+    const oppKey = String(win.opponent || '').trim().replace(/\s+/g, ' ').toLowerCase();
+    if (!oppKey) continue;
+    if (!seenOpponents.has(oppKey)) {
+      const entry = { ...win, count: Number(win.count) || 1 };
+      seenOpponents.set(oppKey, entry);
+      notableWinsList.push(entry);
+    } else {
+      const existing = seenOpponents.get(oppKey);
+      existing.count = (existing.count || 1) + 1;
+      if (win.date && (!existing.date || win.date > existing.date)) {
+        existing.event = win.event;
+        existing.date = win.date;
+        existing.score = win.score;
+        existing.detail = win.detail;
+      }
+    }
+  }
+  const notableWins = notableWinsList.slice(0, 4);
   const mainCharacter = sel?.characters?.find(c => String(c.name || '').toLowerCase() !== 'other');
   const characterFeatureTile = sel
     ? `<div class="tile glass character-feature-tile">${mainCharacter ? `<img src="assets/renders/${esc(sel.slug)}/full/${slug(mainCharacter.name)}.png" alt="${esc(mainCharacter.name)}" onerror="this.remove()">` : ''}</div>`
@@ -196,8 +215,21 @@ function render() {
     middle = `<div class="row2">
       <div class="panel glass"><h2>Character usage</h2>${(sel.characters || []).map(c =>
         `<div class="usage"><div class="usage-row"><span class="stock-icon"><span>${esc(c.name[0])}</span><img src="assets/renders/${esc(sel.slug)}/stocks/${slug(c.name)}.webp" alt="" onload="this.previousElementSibling.remove()" onerror="if(!this.dataset.fallback){this.dataset.fallback='png';this.src=this.src.replace('.webp','.png')}else{this.parentElement.remove()}"></span><span>${esc(c.name)}</span><span class="mono usage-percent">${esc(c.usage)}%</span></div><div class="bar"><i style="width:${Number(c.usage) || 0}%"></i></div></div>`).join('') || '<p class="muted">No character selections recorded.</p>'}</div>
-      <div class="panel glass"><h2>Notable wins</h2>${notableWins.map(x =>
-        `<div class="win"><span class="win-main"><b class="win-opponent">${esc(x.opponent)}</b><small class="win-meta" title="Seed ${esc(x.seed ?? '—')} · ${(esc(x.event || x.detail?.split(' · ').slice(1).join(' · ') || '').split(' · ')[0])}">Seed ${esc(x.seed ?? '—')} <span aria-hidden="true">·</span> ${(esc(x.event || x.detail?.split(' · ').slice(1).join(' · ') || '').split(' · ')[0])}</small></span><span class="mono muted win-detail">${esc(x.score || x.detail?.split(' · ')[0] || '—')}</span></div>`).join('') || '<p class="muted">No notable wins recorded.</p>'}</div>
+      <div class="panel glass"><h2>Notable wins</h2>${notableWins.map(x => {
+        const tournamentName = ((x.event || x.detail?.split(' · ').slice(1).join(' · ') || '').split(' · ')[0]);
+        let dateStr = x.date;
+        if (!dateStr && sel?.results) {
+          const matchResult = sel.results.find(r => (r.event || '').split(' · ')[0] === tournamentName);
+          if (matchResult) dateStr = matchResult.date;
+        }
+        const dateFmt = fmtMonthYear(dateStr);
+        const count = Number(x.count) || 1;
+        const tourneyAndDate = `${esc(tournamentName)}${dateFmt ? ` <span aria-hidden="true">·</span> ${esc(dateFmt)}` : ''}`;
+        const metaHtml = count > 1
+          ? `${count} times <span aria-hidden="true">·</span> Latest: ${tourneyAndDate}`
+          : tourneyAndDate;
+        return `<div class="win"><span class="win-main"><b class="win-opponent">${esc(x.opponent)}</b><small class="win-meta">${metaHtml}</small></span><span class="mono muted win-detail">${esc(x.score || x.detail?.split(' · ')[0] || '—')}</span></div>`;
+      }).join('') || '<p class="muted">No notable wins recorded.</p>'}</div>
     </div>
     <div class="panel glass"><h2>Placement history</h2>${chart(sel)}</div>`;
   }
