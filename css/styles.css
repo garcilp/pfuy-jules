@@ -2,6 +2,7 @@
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;color:var(--text);font:400 16px 'Space Grotesk',system-ui,sans-serif;background:radial-gradient(60% 50% at 12% 6%,rgba(0,56,168,.7),transparent 70%),radial-gradient(50% 45% at 92% 18%,rgba(245,197,66,.22),transparent 70%),radial-gradient(55% 50% at 68% 96%,rgba(120,190,255,.3),transparent 70%),var(--bg) fixed}
 a{color:var(--muted);text-decoration:none}a:hover{color:var(--text)}
+.opponent-link{color:var(--sky);text-decoration:none}.opponent-link:hover{text-decoration:underline;color:var(--text)}
 h1,h2,p{margin:0}.mono{font-family:'JetBrains Mono',monospace}.muted{color:var(--muted)}
 
 /* Liquid Glass material */
@@ -90,6 +91,19 @@ h1,h2,p{margin:0}.mono{font-family:'JetBrains Mono',monospace}.muted{color:var(-
 .set-empty{padding:4px 8px 10px;font-size:14px}
 .top3{font-weight:700;color:var(--gold)}
 svg{width:100%;height:auto}svg text{fill:var(--muted);font:12px 'JetBrains Mono',monospace}
+.chart-container{position:relative;width:100%;user-select:none}
+.chart-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.chart-controls{display:flex;align-items:center;gap:6px}
+.chart-controls button{min-height:32px;padding:0 10px;font-size:13px;line-height:1}
+.chart-svg-wrap{position:relative;width:100%;overflow:hidden;border-radius:16px;background:rgba(0,0,0,.15);cursor:grab}
+.chart-svg-wrap:active{cursor:grabbing}
+.chart-point{cursor:pointer;outline:none}
+.chart-point circle{transition:r 150ms ease,fill 150ms ease,stroke 150ms ease;fill:var(--sky);stroke:var(--bg);stroke-width:2px}
+.chart-point:hover circle,.chart-point:focus-visible circle{r:8px;fill:var(--gold);stroke:#fff;stroke-width:3px}
+.chart-tooltip{position:absolute;pointer-events:none;z-index:10;padding:8px 12px;border-radius:12px;background:rgba(5,11,31,.92);border:1px solid rgba(255,255,255,.3);box-shadow:0 8px 24px rgba(0,0,0,.5);font-size:13px;color:var(--text);white-space:nowrap;transform:translate(-50%,-100%);margin-top:-10px;transition:opacity 150ms ease}
+.chart-tooltip b{display:block;color:var(--text);font-size:14px;margin-bottom:2px}
+.chart-tooltip small{display:block;color:var(--muted);font-size:12px}
+.chart-tooltip .chart-place{font-weight:700;color:var(--gold);margin-top:2px}
 .foot{max-width:1240px;margin:0 auto;padding:0 32px 48px;font-size:12px}
 
 
