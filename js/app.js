@@ -143,7 +143,7 @@ function render() {
       ? '—'
       : activeDurationYears < 1
         ? `${activeDurationMonths} month${activeDurationMonths === 1 ? '' : 's'}`
-        : `${activeDurationYears.toFixed(1)} years`;
+        : `${activeDurationYears.toFixed(1).replace(/\.0$/, '')} years`;
     const formatActivityDate = date => date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
     const activityPeriod = singleEventResult
       ? (singleEventResult.event || '').split(' · ')[0]
