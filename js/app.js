@@ -235,8 +235,10 @@ function render() {
       const sets = r.sets || [];
       const setRows = sets.length ? sets.map(set => {
         const outcome = ['win', 'loss'].includes(set.outcome) ? set.outcome : 'unknown';
+        const isPools = set.phase && /\bpools\b/i.test(set.phase);
+        const roundHtml = (!isPools && set.round) ? `<small>${esc(set.round)}</small>` : '';
         return `<div class="set-row">
-          <span class="set-phase"><b>${esc(set.phase || 'Phase not recorded')}</b>${set.round ? `<small>${esc(set.round)}</small>` : ''}</span>
+          <span class="set-phase"><b>${esc(set.phase || 'Phase not recorded')}</b>${roundHtml}</span>
           <span class="set-opponent">${esc(set.opponent || 'Unknown')}</span>
           <span class="set-score">${esc(set.score || '—')}</span>
           <span class="set-result ${outcome}">${outcome === 'unknown' ? 'RESULT UNKNOWN' : outcome.toUpperCase()}</span>
