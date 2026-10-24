@@ -731,19 +731,26 @@ def profile_for_player(connection, player_id, display_tag, profile_slug):
                     "phaseOrder": item.get("phaseOrder"),
                     "roundOrder": item.get("roundOrder"),
                 })
-        notable_wins.sort(key=lambda item: item["date"], reverse=True)
-        notable_wins.sort(key=lambda item: item["priority"])
-        unique_notable_wins = []
-        seen_opponents = set()
+        from collections import defaultdict
+        wins_by_opponent = defaultdict(list)
         for item in notable_wins:
             opponent_key = " ".join(str(item["opponent"]).split()).casefold()
-            if opponent_key in seen_opponents:
-                continue
-            seen_opponents.add(opponent_key)
-            unique_notable_wins.append(item)
+            wins_by_opponent[opponent_key].append(item)
+
+        aggregated_notable_wins = []
+        for opponent_key, wins in wins_by_opponent.items():
+            sorted_wins = sorted(wins, key=lambda w: w["date"] or "", reverse=True)
+            latest_win = dict(sorted_wins[0])
+            latest_win["count"] = len(wins)
+            latest_win["priority"] = min(w["priority"] for w in wins)
+            aggregated_notable_wins.append(latest_win)
+
+        aggregated_notable_wins.sort(key=lambda item: item["date"] or "", reverse=True)
+        aggregated_notable_wins.sort(key=lambda item: item["priority"])
+
         game["notableWins"] = [{key: value for key, value in item.items()
                                  if key not in {"phaseOrder", "roundOrder", "priority"}}
-                                for item in unique_notable_wins[:4]]
+                                for item in aggregated_notable_wins[:4]]
     profile["games"] = [game for game in profile["games"]
                         if game.get("id") not in player_excluded_games
                         and game.get("slug") not in player_excluded_games]
