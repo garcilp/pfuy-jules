@@ -394,23 +394,64 @@ function setupInteractiveChart() {
   const baseWidth = 640;
   const baseHeight = 150;
 
+  chartZoom = 1;
+  chartPanX = 0;
+
+  const chartSpan = 580;
+
   function updateTransform() {
     chartZoom = Math.max(1, Math.min(5, chartZoom));
-    const visibleWidth = baseWidth / chartZoom;
-    const maxPanX = baseWidth - visibleWidth;
+    const maxPanX = (chartZoom - 1) * chartSpan;
     chartPanX = Math.max(0, Math.min(maxPanX, chartPanX));
-    svg.setAttribute('viewBox', `${chartPanX} 0 ${visibleWidth} ${baseHeight}`);
+
+    svg.setAttribute('viewBox', '0 0 640 150');
+
+    const points = container.querySelectorAll('.chart-point');
+    const polyline = container.querySelector('polyline');
+
+    const pointCoords = [];
+    points.forEach(point => {
+      const baseX = parseFloat(point.dataset.baseX);
+      const relX = baseX - 40;
+      const xTrans = Math.round((40 + relX * chartZoom - chartPanX) * 100) / 100;
+      const circle = point.querySelector('circle');
+      if (circle) {
+        circle.setAttribute('cx', xTrans);
+        const cy = circle.getAttribute('cy');
+        pointCoords.push(`${xTrans},${cy}`);
+      }
+    });
+
+    if (polyline) {
+      polyline.setAttribute('points', pointCoords.join(' '));
+    }
+
+    if (!tooltip.hidden) {
+      tooltip.hidden = true;
+    }
+  }
+
+  function zoomAt(targetSvgX, zoomFactor) {
+    const mouseRelX = targetSvgX - 40;
+    const relXTarget = (mouseRelX + chartPanX) / chartZoom;
+    const newZoom = Math.max(1, Math.min(5, chartZoom * zoomFactor));
+    chartPanX = relXTarget * newZoom - mouseRelX;
+    chartZoom = newZoom;
+    updateTransform();
   }
 
   $('#main .chart-zoom-in')?.addEventListener('click', () => {
-    chartZoom *= 1.4;
-    updateTransform();
+    zoomAt(330, 1.4);
   });
 
   $('#main .chart-zoom-out')?.addEventListener('click', () => {
-    chartZoom /= 1.4;
-    if (chartZoom <= 1) { chartZoom = 1; chartPanX = 0; }
-    updateTransform();
+    if (chartZoom <= 1.05) {
+      chartZoom = 1;
+      chartPanX = 0;
+      updateTransform();
+    } else {
+      zoomAt(330, 1 / 1.4);
+    }
   });
 
   $('#main .chart-zoom-reset')?.addEventListener('click', () => {
@@ -424,12 +465,10 @@ function setupInteractiveChart() {
   wrap?.addEventListener('wheel', e => {
     e.preventDefault();
     const zoomFactor = e.deltaY < 0 ? 1.2 : 1 / 1.2;
-    const mouseX = e.offsetX / wrap.clientWidth;
-    const oldVisibleWidth = baseWidth / chartZoom;
-    chartZoom = Math.max(1, Math.min(5, chartZoom * zoomFactor));
-    const newVisibleWidth = baseWidth / chartZoom;
-    chartPanX += (oldVisibleWidth - newVisibleWidth) * mouseX;
-    updateTransform();
+    const wrapRect = wrap.getBoundingClientRect();
+    const mouseXInWrap = e.clientX - wrapRect.left;
+    const targetSvgX = (mouseXInWrap / wrapRect.width) * 640;
+    zoomAt(targetSvgX, zoomFactor);
   }, { passive: false });
 
   // Pan dragging
@@ -447,8 +486,8 @@ function setupInteractiveChart() {
     if (!isDragging) return;
     const dx = e.clientX - startX;
     startX = e.clientX;
-    const visibleWidth = baseWidth / chartZoom;
-    const svgDx = (dx / wrap.clientWidth) * visibleWidth;
+    const wrapRect = wrap.getBoundingClientRect();
+    const svgDx = (dx / wrapRect.width) * 640;
     chartPanX -= svgDx;
     updateTransform();
   });
@@ -465,6 +504,13 @@ function setupInteractiveChart() {
   // Hover Tooltip for points
   container.querySelectorAll('.chart-point').forEach(point => {
     const showTooltip = () => {
+      const circle = point.querySelector('circle');
+      if (!circle) return;
+      const cx = parseFloat(circle.getAttribute('cx'));
+      if (cx < 35 || cx > 625) {
+        tooltip.hidden = true;
+        return;
+      }
       const tourney = point.dataset.tourney;
       const date = point.dataset.date;
       const place = point.dataset.place;
@@ -530,7 +576,7 @@ function chart(g) {
   const polylinePoints = pts.map(p => `${p.x},${p.y}`).join(' ');
   const pointsHtml = pts.map(p => {
     const tourneyName = (p.result.event || '').split(' · ')[0];
-    return `<g class="chart-point" tabindex="0" data-tourney="${esc(tourneyName)}" data-date="${esc(p.result.date)}" data-place="${esc(p.result.place)}">
+    return `<g class="chart-point" tabindex="0" data-base-x="${p.x}" data-tourney="${esc(tourneyName)}" data-date="${esc(p.result.date)}" data-place="${esc(p.result.place)}">
       <circle cx="${p.x}" cy="${p.y}" r="5" />
     </g>`;
   }).join('');
@@ -538,12 +584,19 @@ function chart(g) {
   return `<div class="chart-container">
     <div class="chart-svg-wrap">
       <svg viewBox="0 0 640 150" role="img" aria-label="Placement over recent events">
+        <defs>
+          <clipPath id="chart-clip">
+            <rect x="35" y="0" width="590" height="150" />
+          </clipPath>
+        </defs>
         <line x1="40" y1="15" x2="620" y2="15" stroke="rgba(255,255,255,.2)"/>
         <line x1="40" y1="105" x2="620" y2="105" stroke="rgba(255,255,255,.2)"/>
         <text x="0" y="19">1st</text>
         <text x="0" y="109">${ord(maxP)}</text>
-        <polyline points="${polylinePoints}" fill="none" stroke="#9FD6FF" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
-        ${pointsHtml}
+        <g clip-path="url(#chart-clip)">
+          <polyline points="${polylinePoints}" fill="none" stroke="#9FD6FF" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+          ${pointsHtml}
+        </g>
         <text x="40" y="140">Oldest</text>
         <text x="560" y="140">Latest</text>
       </svg>
