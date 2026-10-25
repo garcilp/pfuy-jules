@@ -8,9 +8,12 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
+import sqlite3
+
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 MANIFEST = PROJECT_ROOT / "events.json"
 RAW_DIR = PROJECT_ROOT / "startgg-data" / "raw"
+DATABASE = PROJECT_ROOT / "startgg-data" / "platfighters.sqlite3"
 API_URL = "https://api.start.gg/gql/alpha"
 
 # Keep pages modest: nested set games, slots, participants, and selections all
@@ -177,6 +180,20 @@ query EventSets($eventId: ID!, $page: Int!, $perPage: Int!) {
   }
 }
 """
+
+
+def get_processed_event_ids(db_path=DATABASE):
+    if not db_path.is_file():
+        return set()
+    try:
+        connection = sqlite3.connect(db_path)
+        cursor = connection.cursor()
+        cursor.execute("SELECT event_id FROM import_markers")
+        rows = cursor.fetchall()
+        connection.close()
+        return {str(row[0]) for row in rows if row[0] is not None}
+    except Exception:
+        return set()
 
 
 def event_slug_from_url(url):
@@ -384,6 +401,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--images-only", action="store_true",
                         help="refresh tournament profile images without fetching entrants, standings, or sets")
+    parser.add_argument("--force", action="store_true",
+                        help="force re-fetching of all events even if already imported and processed")
     args = parser.parse_args()
     token = os.environ.get("STARTGG_API_TOKEN")
     if not token:
@@ -418,14 +437,40 @@ def main():
             raise SystemExit(f"Finished with {failures} tournament image request(s) that failed.")
         return
 
+    processed_event_ids = get_processed_event_ids()
+
     for game in config["games"]:
         for event_ref in game.get("events", []):
             url = event_ref["url"] if isinstance(event_ref, dict) else event_ref
             slug = event_slug_from_url(url)
             output_dir = RAW_DIR / game["slug"] / slug.replace("/", "__")
+
+            event_id = None
+            event_name = None
+            event_file = output_dir / "event.json"
+            if event_file.is_file():
+                try:
+                    with event_file.open(encoding="utf-8-sig") as file:
+                        raw_event_data = json.load(file)
+                    event_obj = raw_event_data.get("response", {}).get("data", {}).get("event") or {}
+                    if event_obj.get("id") is not None:
+                        event_id = str(event_obj["id"])
+                        event_name = event_obj.get("name")
+                except Exception:
+                    pass
+
+            if not args.force and event_id and event_id in processed_event_ids:
+                print(f"Skipping already imported and processed event {event_name or slug} (ID {event_id}): {url}")
+                continue
+
             print(f"Fetching {game['name']}: {url}")
             try:
                 event = fetch_event(url, token, output_dir)
+                event_id = str(event["id"])
+                if not args.force and event_id in processed_event_ids:
+                    print(f"  Skipping already imported and processed event {event['name']} (ID {event_id})")
+                    continue
+
                 entrants = fetch_entrants(event["id"], event["name"], url, token, output_dir)
                 standings = fetch_standings(event["id"], event["name"], url, token, output_dir)
                 sets = fetch_sets(event["id"], event["name"], url, token, output_dir)
