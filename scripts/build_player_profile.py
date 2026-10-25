@@ -911,6 +911,294 @@ def write_profile(connection, player_id, display_tag, profile_slug):
     return {"playerId": str(player_id), "tag": profile["player"]["tag"], "slug": profile_slug}
 
 
+def character_stock_icon(game_slug, character_name):
+    if not character_name or not game_slug:
+        return None
+    c_slug = safe_slug(character_name)
+    stocks_dir = PROJECT_ROOT / "assets" / "renders" / game_slug / "stocks"
+    if not stocks_dir.is_dir():
+        return None
+    for ext in (".webp", ".png"):
+        if (stocks_dir / f"{c_slug}{ext}").is_file():
+            return f"assets/renders/{game_slug}/stocks/{c_slug}{ext}"
+    aliases = {
+        "simon-belmont": "simon",
+        "shovel-knight": "shovelknight",
+        "sheik-zelda": "sheik",
+        "rob": "r-o-b",
+    }
+    if c_slug in aliases:
+        alt_slug = aliases[c_slug]
+        for ext in (".webp", ".png"):
+            if (stocks_dir / f"{alt_slug}{ext}").is_file():
+                return f"assets/renders/{game_slug}/stocks/{alt_slug}{ext}"
+    for ext in (".webp", ".png"):
+        if (stocks_dir / f"other{ext}").is_file():
+            return f"assets/renders/{game_slug}/stocks/other{ext}"
+    return None
+
+
+def get_most_played_character(connection, event_id, entrant_id):
+    row = connection.execute(
+        "SELECT c.name, COUNT(*) AS count "
+        "FROM set_game_selections sel "
+        "JOIN set_games g ON g.id = sel.set_game_id "
+        "JOIN sets st ON st.id = g.set_id "
+        "JOIN characters c ON c.videogame_slug = sel.videogame_slug AND c.id = sel.character_id "
+        "WHERE st.event_id = ? AND sel.entrant_id = ? "
+        "GROUP BY c.id ORDER BY count DESC LIMIT 1",
+        (event_id, entrant_id),
+    ).fetchone()
+    if row and row["name"]:
+        return row["name"]
+    return None
+
+
+def get_phase_standings(connection, phase_id, event_id, game_slug, merges, latest_tags):
+    sets = connection.execute(
+        "SELECT s.id, s.full_round_text, s.round, s.winner_entrant_id "
+        "FROM sets s JOIN phase_groups pg ON pg.id = s.phase_group_id "
+        "WHERE pg.phase_id = ?",
+        (phase_id,),
+    ).fetchall()
+
+    placements_map = {}
+    for st in sets:
+        w = text_id(st["winner_entrant_id"]) if st["winner_entrant_id"] is not None else None
+        entrants = connection.execute(
+            "SELECT entrant_id FROM set_entrants WHERE set_id = ?", (st["id"],)
+        ).fetchall()
+        e_ids = [text_id(e[0]) for e in entrants if e[0] is not None]
+        loser = next((e for e in e_ids if e != w), None)
+        if not w or not loser:
+            continue
+        round_text = (st["full_round_text"] or "").casefold()
+        if "grand final" in round_text:
+            placements_map[w] = 1
+            placements_map[loser] = 2
+        elif "losers final" in round_text or "loser's final" in round_text:
+            placements_map[loser] = 3
+        elif "losers semi" in round_text or "loser's semi" in round_text:
+            placements_map[loser] = 4
+        elif "losers quarter" in round_text or "loser's quarter" in round_text:
+            placements_map[loser] = 5
+        elif "losers round 3" in round_text or "loser's round 3" in round_text:
+            placements_map[loser] = 7
+
+    standings = []
+    for entrant_id, place in sorted(placements_map.items(), key=lambda x: x[1]):
+        if place > 8:
+            continue
+        row = connection.execute(
+            "SELECT en.name, p.player_id, p.gamer_tag "
+            "FROM entrants en "
+            "LEFT JOIN entrant_participants ep ON ep.entrant_id = en.id "
+            "LEFT JOIN participants p ON p.id = ep.participant_id "
+            "WHERE en.id = ?",
+            (entrant_id,),
+        ).fetchone()
+        if not row:
+            continue
+        p_key = canonical_id(text_id(row["player_id"]), merges) if row["player_id"] is not None else None
+        tag = latest_tags.get(p_key) or row["gamer_tag"] or row["name"] or "Unknown"
+        char_name = get_most_played_character(connection, event_id, entrant_id)
+        stock_icon = character_stock_icon(game_slug, char_name) if char_name else None
+        standings.append({
+            "placement": place,
+            "tag": tag,
+            "playerId": p_key,
+            "character": {
+                "name": char_name,
+                "stockIcon": stock_icon,
+            } if char_name else None,
+        })
+    return standings
+
+
+def write_event_details(connection):
+    """Write individual tournament JSON files under data/events/<tournamentSlug>.json."""
+    events_dir = PROJECT_ROOT / "data" / "events"
+    events_dir.mkdir(parents=True, exist_ok=True)
+
+    excluded_events = visibility_exclusions()["events"]
+    merges = identity_merges()
+    latest_tags = current_player_tags(connection, merges)
+    amateur_cfg = amateur_brackets_config()
+    event_links = event_group_overrides()
+
+    tournament_images = {}
+    if RAW_EVENT_DIR.is_dir():
+        for raw_path in RAW_EVENT_DIR.rglob("event.json"):
+            try:
+                with raw_path.open(encoding="utf-8-sig") as file:
+                    response = json.load(file).get("response", {}).get("data", {}).get("event") or {}
+                tournament = response.get("tournament") or {}
+                slug = (tournament.get("slug") or "").rsplit("/", 1)[-1]
+                images = tournament.get("images") or []
+                image_url = next((image.get("url") for image in images if image.get("url")), None)
+                if slug and image_url:
+                    tournament_images[slug] = image_url
+            except (OSError, json.JSONDecodeError, AttributeError, TypeError):
+                continue
+
+    tournaments = connection.execute(
+        "SELECT slug, startgg_id, name, start_at FROM tournaments"
+    ).fetchall()
+
+    written_count = 0
+    for t in tournaments:
+        t_slug = t["slug"]
+        e_rows = connection.execute(
+            "SELECT e.id, e.videogame_slug, v.name AS game_name, e.name AS event_name, "
+            "e.num_entrants, e.source_url, e.is_temporary, "
+            "COALESCE(t.start_at, (SELECT MIN(COALESCE(s.started_at, s.start_at, s.completed_at)) "
+            "FROM sets s WHERE s.event_id=e.id)) AS event_timestamp "
+            "FROM events e JOIN videogames v ON v.slug=e.videogame_slug "
+            "JOIN tournaments t ON t.slug=e.tournament_slug "
+            "WHERE e.tournament_slug=?", (t_slug,)
+        ).fetchall()
+
+        valid_events = []
+        for er in e_rows:
+            key = normalize_event_key(er["source_url"])
+            if key in excluded_events:
+                continue
+            is_temp = bool(er["is_temporary"])
+            date_str = date_from_epoch(er["event_timestamp"])
+            today_iso = datetime.now(timezone.utc).date().isoformat()
+            if is_temp and date_str and date_str < today_iso:
+                continue
+            valid_events.append(er)
+
+        if not valid_events:
+            continue
+
+        t_name = t["name"] or display_tournament(t_slug)
+        image_url = tournament_images.get(t_slug) or ""
+        startgg_url = f"https://www.start.gg/tournament/{t_slug}"
+
+        dates = [date_from_epoch(er["event_timestamp"]) for er in valid_events if er["event_timestamp"]]
+        t_date = min(dates) if dates else None
+
+        games_map = {}
+        for er in valid_events:
+            games_map[er["videogame_slug"]] = er["game_name"]
+        games_list = [{"slug": slug, "name": name} for slug, name in sorted(games_map.items(), key=lambda x: x[1])]
+
+        sub_events = []
+        for er in valid_events:
+            event_id = text_id(er["id"])
+            game_slug = er["videogame_slug"]
+            game_name = er["game_name"]
+            key = normalize_event_key(er["source_url"])
+            entrant_count = er["num_entrants"]
+            if entrant_count is None:
+                entrant_count = connection.execute(
+                    "SELECT COUNT(*) FROM entrants WHERE event_id=?", (event_id,)
+                ).fetchone()[0]
+
+            is_event_amateur = is_amateur_bracket(key, None, amateur_cfg, event_links) or (key in event_links and event_links[key].get("is_amateur"))
+            phases = connection.execute(
+                "SELECT id, name FROM phases WHERE event_id=?", (event_id,)
+            ).fetchall()
+            amateur_phases = [] if is_event_amateur else [p for p in phases if is_amateur_bracket(key, p["name"], amateur_cfg, event_links)]
+
+            main_standings_rows = connection.execute(
+                "SELECT es.placement, en.id AS entrant_id, en.name AS entrant_name, p.player_id, p.gamer_tag "
+                "FROM event_standings es "
+                "JOIN entrants en ON en.id=es.entrant_id "
+                "LEFT JOIN entrant_participants ep ON ep.entrant_id=en.id "
+                "LEFT JOIN participants p ON p.id=ep.participant_id "
+                "WHERE es.event_id=? AND es.placement <= 8 "
+                "ORDER BY es.placement ASC", (event_id,)
+            ).fetchall()
+
+            main_standings = []
+            for sr in main_standings_rows:
+                p_key = canonical_id(text_id(sr["player_id"]), merges) if sr["player_id"] is not None else None
+                tag = latest_tags.get(p_key) or sr["gamer_tag"] or sr["entrant_name"] or "Unknown"
+                char_name = get_most_played_character(connection, event_id, text_id(sr["entrant_id"]))
+                stock_icon = character_stock_icon(game_slug, char_name) if char_name else None
+                main_standings.append({
+                    "placement": sr["placement"],
+                    "tag": tag,
+                    "playerId": p_key,
+                    "character": {
+                        "name": char_name,
+                        "stockIcon": stock_icon,
+                    } if char_name else None,
+                })
+
+            if amateur_phases:
+                sub_events.append({
+                    "id": f"{event_id}-main",
+                    "title": "Main event" if len(valid_events) == 1 else f"Main event ({game_name})",
+                    "game": game_name,
+                    "gameSlug": game_slug,
+                    "entrants": entrant_count,
+                    "isAmateur": False,
+                    "standings": main_standings,
+                })
+                for aph in amateur_phases:
+                    amateur_standings = get_phase_standings(connection, aph["id"], event_id, game_slug, merges, latest_tags)
+                    # Entrants count in amateur phase can be retrieved from phase sets count
+                    phase_entrants = connection.execute(
+                        "SELECT COUNT(DISTINCT se.entrant_id) "
+                        "FROM set_entrants se JOIN sets s ON s.id=se.set_id "
+                        "JOIN phase_groups pg ON pg.id=s.phase_group_id "
+                        "WHERE pg.phase_id=?", (aph["id"],)
+                    ).fetchone()[0]
+                    sub_events.append({
+                        "id": f"{event_id}-phase-{aph['id']}",
+                        "title": "Categoria B",
+                        "game": game_name,
+                        "gameSlug": game_slug,
+                        "entrants": phase_entrants or len(amateur_standings),
+                        "isAmateur": True,
+                        "standings": amateur_standings,
+                    })
+            else:
+                is_amateur = is_event_amateur or (key in event_links and event_links[key].get("is_amateur"))
+                if is_amateur:
+                    title = "Categoria B"
+                else:
+                    if len(valid_events) > 1 and len(games_map) > 1:
+                        title = f"Main event ({game_name})"
+                    else:
+                        title = "Main event"
+                sub_events.append({
+                    "id": event_id,
+                    "title": title,
+                    "game": game_name,
+                    "gameSlug": game_slug,
+                    "entrants": entrant_count,
+                    "isAmateur": bool(is_amateur),
+                    "standings": main_standings,
+                })
+
+        main_sub_events = [se for se in sub_events if not se["isAmateur"]]
+        total_entrants = sum(se["entrants"] for se in main_sub_events) or sum(se["entrants"] for se in sub_events)
+
+        t_data = {
+            "tournamentSlug": t_slug,
+            "tournament": t_name,
+            "image": image_url,
+            "startggUrl": startgg_url,
+            "date": t_date,
+            "totalEntrants": total_entrants,
+            "games": games_list,
+            "subEvents": sub_events,
+        }
+
+        out_path = events_dir / f"{t_slug}.json"
+        with out_path.open("w", encoding="utf-8") as file:
+            json.dump(t_data, file, indent=2, ensure_ascii=False)
+            file.write("\n")
+        written_count += 1
+
+    print(f"Wrote {written_count} tournament event detail files to {events_dir.relative_to(PROJECT_ROOT)}")
+
+
 def write_event_index(connection):
     """Write the public event directory from the imported tournament database."""
     excluded_events = visibility_exclusions()["events"]
@@ -983,6 +1271,7 @@ def write_event_index(connection):
         json.dump(event_index, file, indent=2, ensure_ascii=False)
         file.write("\n")
     print(f"Wrote {output.relative_to(PROJECT_ROOT)}: {len(event_index)} events")
+    write_event_details(connection)
 
 
 def main():

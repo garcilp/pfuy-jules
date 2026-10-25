@@ -1,0 +1,32 @@
+{
+  "tournamentSlug": "test-past-tourney",
+  "tournament": "Past Tourney",
+  "image": "",
+  "startggUrl": "https://www.start.gg/tournament/test-past-tourney",
+  "date": "2026-10-15",
+  "totalEntrants": 8,
+  "games": [
+    {
+      "slug": "test-game",
+      "name": "Test Game"
+    }
+  ],
+  "subEvents": [
+    {
+      "id": "999904",
+      "title": "Main event",
+      "game": "Test Game",
+      "gameSlug": "test-game",
+      "entrants": 8,
+      "isAmateur": false,
+      "standings": [
+        {
+          "placement": 1,
+          "tag": "TestPlayer",
+          "playerId": "999999",
+          "character": null
+        }
+      ]
+    }
+  ]
+}
