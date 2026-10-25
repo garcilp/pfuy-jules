@@ -231,7 +231,8 @@ function render() {
     : '';
   const tiles = stats.map(([a, b, c]) => {
     const tileClass = `tile glass${a === 'MOST-PLAYED OPPONENT' ? ' tile-opponent' : a === 'BEST PLACING' ? ' tile-best-placement' : a === 'ACTIVE FOR' ? ' tile-active-for' : a === 'CLOSEST UPSET' ? ' tile-upset-fallback' : ''}`;
-    const contents = `<span class="label">${esc(a)}</span><span class="val">${esc(b)}</span>${c ? `<span class="sub">${esc(c)}</span>` : ''}`;
+    const valHtml = (a === 'MOST-PLAYED OPPONENT' || a === 'CLOSEST UPSET') ? b : esc(b);
+    const contents = `<span class="label">${esc(a)}</span><span class="val">${valHtml}</span>${c ? `<span class="sub">${esc(c)}</span>` : ''}`;
     return a === 'MOST-PLAYED OPPONENT' && mostPlayedOpponent
       ? `<button class="${tileClass} opponent-tile-button" type="button" aria-expanded="${selectedOpponent === mostPlayedOpponent}" aria-controls="opponent-history">${contents}</button>`
       : a === 'BEST PLACING' && sel && bestPlace !== null
