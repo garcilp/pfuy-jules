@@ -1,5 +1,5 @@
 const $ = selector => document.querySelector(selector);
-const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>:': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const fmt = dateStr => dateStr ? new Date(`${dateStr}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
 const ord = n => {
   if (!Number.isFinite(Number(n)) || Number(n) < 1) return '—';
@@ -72,7 +72,7 @@ function renderBracketCard(sub, tournament) {
 
         return `
           <div class="standing-row">
-            <span class="placement-badge ${isTop3 ? 'top3' : 'muted'} mono">${ord(st.placement)}</span>
+            <span class="placement-badge p${st.placement} ${isTop3 ? 'top3' : 'muted'} mono">${ord(st.placement)}</span>
             ${stockIconHtml}
             ${playerHtml}
           </div>

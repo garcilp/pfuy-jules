@@ -1137,6 +1137,7 @@ def write_event_details(connection):
                     "gameSlug": game_slug,
                     "entrants": entrant_count,
                     "isAmateur": False,
+                    "hasAmateur": True,
                     "standings": main_standings,
                 })
                 for aph in amateur_phases:
@@ -1155,29 +1156,37 @@ def write_event_details(connection):
                         "gameSlug": game_slug,
                         "entrants": phase_entrants or len(amateur_standings),
                         "isAmateur": True,
+                        "hasAmateur": True,
                         "standings": amateur_standings,
                     })
             else:
                 is_amateur = is_event_amateur or (key in event_links and event_links[key].get("is_amateur"))
-                if is_amateur:
-                    title = "Categoria B"
-                else:
-                    if len(valid_events) > 1 and len(games_map) > 1:
-                        title = f"Main event ({game_name})"
-                    else:
-                        title = "Main event"
                 sub_events.append({
                     "id": event_id,
-                    "title": title,
+                    "title": "Categoria B" if is_amateur else game_name,
                     "game": game_name,
                     "gameSlug": game_slug,
                     "entrants": entrant_count,
                     "isAmateur": bool(is_amateur),
+                    "hasAmateur": False,
                     "standings": main_standings,
                 })
 
-        main_sub_events = [se for se in sub_events if not se["isAmateur"]]
-        total_entrants = sum(se["entrants"] for se in main_sub_events) or sum(se["entrants"] for se in sub_events)
+        # If any sub-event in this tournament has an amateur bracket, update titles of main events that didn't have phase-level amateur brackets if needed
+        has_any_amateur = any(se["isAmateur"] for se in sub_events)
+        if has_any_amateur:
+            for se in sub_events:
+                if not se["isAmateur"] and se["title"] == se["game"]:
+                    se["title"] = "Main event" if len(valid_events) == 1 else f"Main event ({se['game']})"
+
+        # Total attendees is distinct participants in the entire tournament
+        tot_row = connection.execute(
+            "SELECT COUNT(DISTINCT ep.participant_id) "
+            "FROM events e JOIN entrants en ON en.event_id=e.id "
+            "JOIN entrant_participants ep ON ep.entrant_id=en.id "
+            "WHERE e.tournament_slug=?", (t_slug,)
+        ).fetchone()
+        total_entrants = tot_row[0] if tot_row and tot_row[0] else sum(se["entrants"] for se in sub_events if not se["isAmateur"])
 
         t_data = {
             "tournamentSlug": t_slug,
