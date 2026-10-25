@@ -17,6 +17,7 @@ let playerTagToIdMap = new Map();
 let resultPage = 1;
 let selectedOpponent = null;
 let selectedBestPlacement = null;
+let isOpponentListOpen = false;
 
 async function loadPlayerDirectory() {
   try {
@@ -194,13 +195,19 @@ function render() {
         : '';
     const tot = {};
     games.forEach(g => (g.headToHead || []).forEach(h => {
-      const t = tot[h.opponent] ||= { sets: 0, wins: 0, games: 0 };
+      const normKey = String(h.opponent || '').trim().replace(/\s+/g, ' ').toLowerCase();
+      if (!normKey) return;
+      const t = tot[normKey] ||= { name: h.opponent, sets: 0, wins: 0, games: 0 };
       t.sets += h.sets; t.wins += h.wins; t.games++;
     }));
-    const [oppName, opp] = Object.entries(tot).sort((x, y) => y[1].sets - x[1].sets)[0] || ['—', null];
-    mostPlayedOpponent = opp ? oppName : null;
+    const topOpponents = Object.values(tot)
+      .sort((a, b) => b.sets - a.sets || b.wins - a.wins || a.name.localeCompare(b.name))
+      .slice(0, 5);
+    const opp = topOpponents[0] || null;
+    const oppName = opp ? opp.name : null;
+    mostPlayedOpponent = oppName;
     stats.push(['ACTIVE FOR', singleEventResult ? '1 Event' : activeDuration, activityPeriod],
-      ['MOST-PLAYED OPPONENT', linkifyOpponent(oppName), opp ? `${opp.sets} sets · ${opp.wins}–${opp.sets - opp.wins} · ${opp.games} game${opp.games === 1 ? '' : 's'}` : 'No set data']);
+      ['MOST-PLAYED OPPONENT', oppName || '—', opp ? `${opp.sets} sets · ${opp.wins}–${opp.sets - opp.wins} · ${opp.games} game${opp.games === 1 ? '' : 's'}` : 'No set data']);
   }
   const notableWinsList = [];
   const seenOpponents = new Map();
@@ -231,10 +238,10 @@ function render() {
     : '';
   const tiles = stats.map(([a, b, c]) => {
     const tileClass = `tile glass${a === 'MOST-PLAYED OPPONENT' ? ' tile-opponent' : a === 'BEST PLACING' ? ' tile-best-placement' : a === 'ACTIVE FOR' ? ' tile-active-for' : a === 'CLOSEST UPSET' ? ' tile-upset-fallback' : ''}`;
-    const valHtml = (a === 'MOST-PLAYED OPPONENT' || a === 'CLOSEST UPSET') ? b : esc(b);
+    const valHtml = a === 'CLOSEST UPSET' ? b : esc(b);
     const contents = `<span class="label">${esc(a)}</span><span class="val">${valHtml}</span>${c ? `<span class="sub">${esc(c)}</span>` : ''}`;
     return a === 'MOST-PLAYED OPPONENT' && mostPlayedOpponent
-      ? `<button class="${tileClass} opponent-tile-button" type="button" aria-expanded="${selectedOpponent === mostPlayedOpponent}" aria-controls="opponent-history">${contents}</button>`
+      ? `<button class="${tileClass} opponent-tile-button" type="button" aria-expanded="${isOpponentListOpen}" aria-controls="opponent-history">${contents}</button>`
       : a === 'BEST PLACING' && sel && bestPlace !== null
         ? `<button class="${tileClass} best-placement-tile-button" type="button" aria-expanded="${selectedBestPlacement === sel.id}" aria-controls="best-placement-history">${contents}</button>`
       : `<div class="${tileClass}">${contents}</div>`;
@@ -286,16 +293,47 @@ function render() {
     </div>`;
   }
 
-  const opponentHistory = !sel && selectedOpponent && selectedOpponent === mostPlayedOpponent
+  const topOpponents = !sel ? (() => {
+    const tot = {};
+    games.forEach(g => (g.headToHead || []).forEach(h => {
+      const normKey = String(h.opponent || '').trim().replace(/\s+/g, ' ').toLowerCase();
+      if (!normKey) return;
+      const t = tot[normKey] ||= { name: h.opponent, sets: 0, wins: 0, games: 0 };
+      t.sets += h.sets; t.wins += h.wins; t.games++;
+    }));
+    return Object.values(tot)
+      .sort((a, b) => b.sets - a.sets || b.wins - a.wins || a.name.localeCompare(b.name))
+      .slice(0, 5);
+  })() : [];
+
+  const opponentHistory = !sel && isOpponentListOpen
     ? (() => {
-      const normalize = value => String(value || '').trim().replace(/\s+/g, ' ').toLocaleLowerCase();
-      const sets = games.flatMap(game => (game.results || []).flatMap(result =>
-        (result.sets || []).filter(set => String(set.opponent || '').split(/\s*[,/]\s*/)
-          .some(name => normalize(name) === normalize(selectedOpponent)))
-          .map(set => ({ ...set, game: game.name, event: result.event, date: result.date }))))
-        .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-      const rows = sets.map(set => `<div class="opponent-set-row"><span class="opponent-set-context"><b>${esc((set.event || '').split(' · ')[0])}</b><small>${esc(set.game)}${set.round ? ` · ${esc(set.round)}` : ''}</small></span><span class="opponent-set-score">${esc(set.score || '—')}</span><span class="set-result ${['win', 'loss'].includes(set.outcome) ? set.outcome : 'unknown'}">${set.outcome === 'win' ? 'WIN' : set.outcome === 'loss' ? 'LOSS' : 'UNKNOWN'}</span></div>`).join('');
-      return `<div class="panel glass opponent-history" id="opponent-history"><div class="opponent-history-heading"><h2>Sets vs ${linkifyOpponent(selectedOpponent)}</h2><button class="quiet-button close-opponent-history" type="button">Close</button></div>${rows || '<p class="muted">No set details were recorded against this opponent.</p>'}</div>`;
+      const topOpponentRows = topOpponents.map(o => {
+        const isSelected = selectedOpponent && selectedOpponent.toLowerCase() === o.name.toLowerCase();
+        return `<button class="opponent-row-button${isSelected ? ' active' : ''}" type="button" data-opponent="${esc(o.name)}">
+          <span class="opponent-row-name">${linkifyOpponent(o.name)}</span>
+          <span class="opponent-row-sets mono muted">${o.sets} set${o.sets === 1 ? '' : 's'}</span>
+          <span class="opponent-row-record mono">${o.wins}–${o.sets - o.wins}</span>
+        </button>`;
+      }).join('');
+
+      let selectedOpponentSetsHtml = '';
+      if (selectedOpponent) {
+        const normalize = value => String(value || '').trim().replace(/\s+/g, ' ').toLocaleLowerCase();
+        const sets = games.flatMap(game => (game.results || []).flatMap(result =>
+          (result.sets || []).filter(set => String(set.opponent || '').split(/\s*[,/]\s*/)
+            .some(name => normalize(name) === normalize(selectedOpponent)))
+            .map(set => ({ ...set, game: game.name, event: result.event, date: result.date }))))
+          .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+        const rows = sets.map(set => `<div class="opponent-set-row"><span class="opponent-set-context"><b>${esc((set.event || '').split(' · ')[0])}</b><small>${esc(set.game)}${set.round ? ` · ${esc(set.round)}` : ''}</small></span><span class="opponent-set-score">${esc(set.score || '—')}</span><span class="set-result ${['win', 'loss'].includes(set.outcome) ? set.outcome : 'unknown'}">${set.outcome === 'win' ? 'WIN' : set.outcome === 'loss' ? 'LOSS' : 'UNKNOWN'}</span></div>`).join('');
+        selectedOpponentSetsHtml = `<div class="opponent-history-subheading"><h3>Sets vs ${linkifyOpponent(selectedOpponent)}</h3></div>${rows || '<p class="muted">No set details were recorded against this opponent.</p>'}`;
+      }
+
+      return `<div class="panel glass opponent-history" id="opponent-history">
+        <div class="opponent-history-heading"><h2>Most Played Opponents</h2><button class="quiet-button close-opponent-history" type="button">Close</button></div>
+        <div class="most-played-list">${topOpponentRows || '<p class="muted">No set data available.</p>'}</div>
+        ${selectedOpponentSetsHtml}
+      </div>`;
     })()
     : '';
   const bestPlacementHistory = sel && selectedBestPlacement === sel.id
@@ -352,13 +390,29 @@ function render() {
     render();
   });
   $('#main').querySelector('.opponent-tile-button')?.addEventListener('click', () => {
-    selectedOpponent = selectedOpponent === mostPlayedOpponent ? null : mostPlayedOpponent;
+    isOpponentListOpen = !isOpponentListOpen;
+    if (!isOpponentListOpen) selectedOpponent = null;
     render();
-    if (selectedOpponent) $('#opponent-history')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    if (isOpponentListOpen) $('#opponent-history')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   });
   $('#main').querySelector('.close-opponent-history')?.addEventListener('click', () => {
+    isOpponentListOpen = false;
     selectedOpponent = null;
     render();
+  });
+  $('#main').querySelectorAll('.opponent-row-button').forEach(btn => {
+    btn.addEventListener('click', e => {
+      if (e.target.closest('.opponent-link')) return;
+      const oppName = btn.dataset.opponent;
+      const normalize = value => String(value || '').trim().replace(/\s+/g, ' ').toLocaleLowerCase();
+      selectedOpponent = (selectedOpponent && normalize(selectedOpponent) === normalize(oppName)) ? null : oppName;
+      render();
+    });
+  });
+  $('#main').querySelectorAll('.opponent-history .opponent-link').forEach(link => {
+    link.addEventListener('click', e => {
+      e.stopPropagation();
+    });
   });
   $('#main').querySelector('.best-placement-tile-button')?.addEventListener('click', () => {
     selectedBestPlacement = selectedBestPlacement === sel.id ? null : sel.id;
