@@ -70,8 +70,11 @@ function renderCard(event) {
   const avatar = `<span class="event-avatar" aria-hidden="true">${esc((event.tournament || '?').slice(0, 1))}${event.image ? `<img src="${esc(event.image)}" alt="" loading="lazy">` : ''}</span>`;
   const gameDate = [event.games.map(game => game.name).join(' · '), event.date].filter(Boolean).join(' · ');
   const body = `<span class="event-card-copy"><b>${esc(event.tournament)}</b><span>${esc(gameDate)}</span></span>${avatar}`;
-  return event.url
-    ? `<a class="event-card glass" href="${esc(event.url)}" target="_blank" rel="noopener noreferrer">${body}</a>`
+  const internalUrl = event.tournamentSlug
+    ? `event.html?tournament=${encodeURIComponent(event.tournamentSlug)}`
+    : (event.url || '');
+  return internalUrl
+    ? `<a class="event-card glass" href="${esc(internalUrl)}">${body}</a>`
     : `<article class="event-card glass">${body}</article>`;
 }
 
