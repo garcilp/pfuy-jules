@@ -311,8 +311,10 @@ function render() {
       const topOpponentRows = topOpponents.map(o => {
         const isSelected = selectedOpponent && selectedOpponent.toLowerCase() === o.name.toLowerCase();
         return `<button class="opponent-row-button${isSelected ? ' active' : ''}" type="button" data-opponent="${esc(o.name)}">
-          <span class="opponent-row-name">${linkifyOpponent(o.name)}</span>
-          <span class="opponent-row-sets mono muted">${o.sets} set${o.sets === 1 ? '' : 's'}</span>
+          <span class="opponent-row-info">
+            <span class="opponent-row-name">${esc(o.name)}</span>
+            <span class="opponent-row-sets mono muted">${o.sets} set${o.sets === 1 ? '' : 's'}</span>
+          </span>
           <span class="opponent-row-record mono">${o.wins}–${o.sets - o.wins}</span>
         </button>`;
       }).join('');
