@@ -99,7 +99,10 @@ h1,h2,p{margin:0}.mono{font-family:'JetBrains Mono',monospace}.muted{color:var(-
 .set-score,.set-result{font:12px 'JetBrains Mono',monospace;white-space:nowrap}
 .set-result{font-weight:500}.set-result.win{color:var(--sky)}.set-result.loss{color:var(--muted)}
 .set-empty{padding:4px 8px 10px;font-size:14px}
-.top3{font-weight:700;color:var(--gold)}
+.top3{font-weight:700}
+.p1{color:var(--gold)}
+.p2{color:#C0C0C0}
+.p3{color:#CD7F32}
 svg{width:100%;height:auto}svg text{fill:var(--muted);font:12px 'JetBrains Mono',monospace}
 .chart-container{position:relative;width:100%;user-select:none}
 .chart-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
@@ -113,7 +116,7 @@ svg{width:100%;height:auto}svg text{fill:var(--muted);font:12px 'JetBrains Mono'
 .chart-tooltip{position:absolute;pointer-events:none;z-index:10;padding:8px 12px;border-radius:12px;background:rgba(5,11,31,.92);border:1px solid rgba(255,255,255,.3);box-shadow:0 8px 24px rgba(0,0,0,.5);font-size:13px;color:var(--text);white-space:nowrap;transform:translate(-50%,-100%);margin-top:-10px;transition:opacity 150ms ease}
 .chart-tooltip b{display:block;color:var(--text);font-size:14px;margin-bottom:2px}
 .chart-tooltip small{display:block;color:var(--muted);font-size:12px}
-.chart-tooltip .chart-place{font-weight:700;color:var(--gold);margin-top:2px}
+.chart-tooltip .chart-place{font-weight:700;margin-top:2px}
 .foot{max-width:1240px;margin:0 auto;padding:0 32px 48px;font-size:12px}
 
 
