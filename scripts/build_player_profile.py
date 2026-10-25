@@ -66,6 +66,77 @@ def normalize_event_key(value):
     return "/".join(parts[:4])
 
 
+def amateur_brackets_config():
+    path = PROFILE_DIR / "amateur_brackets.json"
+    try:
+        with path.open(encoding="utf-8") as file:
+            value = json.load(file)
+        events = {normalize_event_key(item) for item in value.get("events", []) if normalize_event_key(item)}
+        phases = set()
+        for item in value.get("phases", []):
+            if isinstance(item, str) and "#" in item:
+                key, phase_name = item.split("#", 1)
+                norm_key = normalize_event_key(key)
+                if norm_key and phase_name.strip():
+                    phases.add(f"{norm_key}#{phase_name.strip()}")
+        non_amateur_phases = set()
+        for item in value.get("nonAmateurPhases", []):
+            if isinstance(item, str) and "#" in item:
+                key, phase_name = item.split("#", 1)
+                norm_key = normalize_event_key(key)
+                if norm_key and phase_name.strip():
+                    non_amateur_phases.add(f"{norm_key}#{phase_name.strip()}")
+        return {"events": events, "phases": phases, "nonAmateurPhases": non_amateur_phases}
+    except (OSError, json.JSONDecodeError, AttributeError, TypeError):
+        return {"events": set(), "phases": set(), "nonAmateurPhases": set()}
+
+
+def is_amateur_name(name):
+    if not isinstance(name, str) or not name.strip():
+        return False
+    normalized = " ".join(name.strip().split()).casefold()
+    if normalized in {"bracket b", "categoria b", "amateur bracket", "singles b", "categoria bits", "falsa b"}:
+        return True
+    return bool(re.search(r"\b(bracket\s*b|categoria\s*b|amateur|singles\s*b|categoria\s*bits|falsa\s*b)\b", normalized))
+
+
+def is_amateur_bracket(event_key, phase_name=None, amateur_cfg=None, event_links=None):
+    if amateur_cfg is None:
+        amateur_cfg = amateur_brackets_config()
+    if event_links is None:
+        event_links = event_group_overrides()
+
+    norm_key = normalize_event_key(event_key) if event_key else None
+
+    # Check phase-level non-amateur explicit override
+    if norm_key and phase_name and f"{norm_key}#{phase_name.strip()}" in amateur_cfg.get("nonAmateurPhases", set()):
+        return False
+
+    # Check phase-level explicit amateur flag
+    if norm_key and phase_name and f"{norm_key}#{phase_name.strip()}" in amateur_cfg.get("phases", set()):
+        return True
+
+    # Check event-level explicit amateur flag
+    if norm_key and norm_key in amateur_cfg.get("events", set()):
+        return True
+
+    # Check event_groups linked event explicitly configured as amateur
+    if norm_key and norm_key in event_links:
+        link_info = event_links[norm_key]
+        if isinstance(link_info, dict) and link_info.get("is_amateur") is True:
+            return True
+        if isinstance(link_info, dict) and link_info.get("is_amateur") is False:
+            return False
+
+    # Name-based compatibility fallback
+    if phase_name and is_amateur_name(phase_name):
+        return True
+    if norm_key and is_amateur_name(norm_key.rsplit("/", 1)[-1].replace("-", " ")):
+        return True
+
+    return False
+
+
 def event_group_overrides():
     path = PROFILE_DIR / "event_groups.json"
     try:
@@ -76,8 +147,12 @@ def event_group_overrides():
             child_key = normalize_event_key(child)
             parent_key = normalize_event_key(value.get("parent")) if isinstance(value, dict) else None
             phase = value.get("phase") if isinstance(value, dict) else None
+            is_amateur = value.get("is_amateur") if isinstance(value, dict) else None
             if child_key and parent_key and child_key != parent_key and isinstance(phase, str) and phase.strip():
-                normalized[child_key] = {"parent": parent_key, "phase": phase.strip()}
+                item = {"parent": parent_key, "phase": phase.strip()}
+                if isinstance(is_amateur, bool):
+                    item["is_amateur"] = is_amateur
+                normalized[child_key] = item
         return normalized
     except (OSError, json.JSONDecodeError, AttributeError):
         return {}
@@ -98,7 +173,9 @@ def visibility_exclusions():
         return {"events": set(), "playerGames": {}}
 
 
-def combine_linked_events(results, links, labels):
+def combine_linked_events(results, links, labels, amateur_cfg=None, event_entrants=None):
+    if event_entrants is None:
+        event_entrants = {}
     buckets = {}
     for result in results:
         key = result.get("eventKey")
@@ -110,6 +187,32 @@ def combine_linked_events(results, links, labels):
         event_result = dict(primary)
         event_result["event"] = labels.get(root, primary["event"])
         event_result["eventKey"] = root
+
+        main_entrants = event_entrants.get(root) or primary.get("entrants") or 0
+
+        source_events = []
+        for item in linked:
+            item_sources = item.get("sourceEvents", [{
+                "eventKey": item.get("eventKey"), "event": item.get("event"),
+                "date": item.get("date"), "seed": item.get("seed"),
+                "place": item.get("place"), "entrants": item.get("entrants"),
+                "characterCounts": item.get("characterCounts", {}),
+            }])
+            for source in item_sources:
+                sc = dict(source)
+                s_key = sc.get("eventKey")
+                if s_key != root and is_amateur_bracket(s_key, None, amateur_cfg, links):
+                    if sc.get("place") is not None and sc["place"] <= main_entrants:
+                        sc["place"] = main_entrants + sc["place"]
+                source_events.append(sc)
+
+        primary_source = next((s for s in source_events if s.get("eventKey") == root), None)
+        if primary_source and primary_source.get("place") is not None:
+            event_result["place"] = primary_source["place"]
+        else:
+            places = [s["place"] for s in source_events if s.get("place") is not None]
+            event_result["place"] = min(places) if places else None
+
         event_result["sets"] = sorted(
             [set_data for item in linked for set_data in item.get("sets", [])],
             key=lambda item: (
@@ -120,16 +223,8 @@ def combine_linked_events(results, links, labels):
             ),
         )
         character_counts = {}
-        source_events = []
         for item in linked:
-            source_events.extend(item.get("sourceEvents", [{
-                "eventKey": item.get("eventKey"), "event": item.get("event"),
-                "date": item.get("date"), "seed": item.get("seed"),
-                "place": item.get("place"), "entrants": item.get("entrants"),
-                "characterCounts": item.get("characterCounts", {}),
-            }]))
-        for source in source_events:
-            for name, count in source.get("characterCounts", {}).items():
+            for name, count in item.get("characterCounts", {}).items():
                 character_counts[name] = character_counts.get(name, 0) + count
         event_result["characterCounts"] = character_counts
         event_result["sourceEvents"] = source_events
@@ -272,8 +367,9 @@ def profile_for_player(connection, player_id, display_tag, profile_slug):
 
     event_links = event_group_overrides()
     event_labels = {}
+    event_entrants = {}
     for event_row in connection.execute(
-        "SELECT e.name AS event_name, e.source_url, t.name AS tournament_name, t.slug AS tournament_slug "
+        "SELECT e.name AS event_name, e.num_entrants, e.source_url, t.name AS tournament_name, t.slug AS tournament_slug "
         "FROM events e JOIN tournaments t ON t.slug=e.tournament_slug"
     ):
         key = normalize_event_key(event_row["source_url"])
@@ -282,6 +378,8 @@ def profile_for_player(connection, player_id, display_tag, profile_slug):
             if event_row["event_name"] and event_row["event_name"].lower() not in label.lower():
                 label = f"{label} · {event_row['event_name']}"
             event_labels[key] = label
+            if event_row["num_entrants"] is not None:
+                event_entrants[key] = event_row["num_entrants"]
 
     aliases = [row[0] for row in connection.execute(
         f"SELECT DISTINCT gamer_tag FROM participants WHERE player_id IN ({player_placeholders}) AND gamer_tag IS NOT NULL "
@@ -405,7 +503,9 @@ def profile_for_player(connection, player_id, display_tag, profile_slug):
             opponent_ids = list(opponent_names)
             own_seed = None
             opponent_seed = None
-            if set_row["phase_id"] is not None:
+            phase_display_name = phase_override or set_row["phase_name"] or "Phase not recorded"
+            set_is_amateur = is_amateur_bracket(current_event_key, set_row["phase_name"]) or is_amateur_bracket(current_event_key, phase_display_name)
+            if set_row["phase_id"] is not None and not set_is_amateur:
                 own_seed_rows = connection.execute(
                     f"SELECT seed_num FROM phase_seeds WHERE phase_id=? AND entrant_id IN ({placeholders}) AND seed_num IS NOT NULL",
                     [set_row["phase_id"], *own_entrants],
@@ -479,6 +579,35 @@ def profile_for_player(connection, player_id, display_tag, profile_slug):
         placements = [r[0] for r in standing_rows]
         place = min(placements) if placements else None
 
+        all_sets_amateur = event_sets and all(
+            is_amateur_bracket(current_event_key, s.get("phase")) for s in event_sets
+        )
+        is_event_amateur = is_amateur_bracket(current_event_key, None)
+        is_linked_child = current_event_key in event_links
+
+        if (all_sets_amateur or is_event_amateur) and not is_linked_child and place is not None:
+            main_phase_rows = connection.execute(
+                "SELECT id, name FROM phases WHERE event_id=?", (event_id,)
+            ).fetchall()
+            non_amateur_phase_ids = [
+                p["id"] for p in main_phase_rows
+                if not is_amateur_bracket(current_event_key, p["name"])
+            ]
+            if non_amateur_phase_ids:
+                count_main_sets = connection.execute(
+                    f"SELECT COUNT(DISTINCT se.entrant_id) FROM sets s "
+                    f"JOIN set_entrants se ON se.set_id=s.id "
+                    f"JOIN phase_groups pg ON pg.id=s.phase_group_id "
+                    f"WHERE s.event_id=? AND pg.phase_id IN ({ids_clause(non_amateur_phase_ids)})",
+                    [event_id, *non_amateur_phase_ids],
+                ).fetchone()[0]
+                n_main = max(row["num_entrants"] or 0, count_main_sets)
+            else:
+                n_main = row["num_entrants"] or 0
+
+            if place <= n_main:
+                place = n_main + place
+
         timing = connection.execute(
             f"SELECT MIN(s.started_at), MIN(s.start_at), MIN(s.completed_at) "
             f"FROM sets s JOIN set_entrants se ON se.set_id=s.id "
@@ -543,9 +672,10 @@ def profile_for_player(connection, player_id, display_tag, profile_slug):
             group["events"][-1]["characterCounts"][selection["name"]] = selection["uses"]
             group["events"][-1]["sourceEvents"][0]["characterCounts"][selection["name"]] = selection["uses"]
 
+    amateur_cfg = amateur_brackets_config()
     all_dates = []
     for group in by_game.values():
-        group["events"] = combine_linked_events(group["events"], event_links, event_labels)
+        group["events"] = combine_linked_events(group["events"], event_links, event_labels, amateur_cfg, event_entrants)
         results = group["events"]
         if not results:
             continue
@@ -702,11 +832,14 @@ def profile_for_player(connection, player_id, display_tag, profile_slug):
             ] if total_uses else []
         notable_wins = []
         for result in remaining_results:
+            res_event_key = result.get("eventKey")
             for item in result.get("sets", []):
                 own_seed = item.get("ownSeed")
                 opponent_seed = item.get("opponentSeed")
                 phase_name = str(item.get("phase") or "")
-                if ("pools" in phase_name.casefold()
+                set_event_key = item.get("eventKey") or res_event_key
+                if (is_amateur_bracket(set_event_key, phase_name)
+                        or "pools" in phase_name.casefold()
                         or item.get("outcome") != "win"
                         or opponent_seed is None
                         or int(opponent_seed) < 1):
