@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rankings · Platfighters.uy</title>
+<link rel="icon" href="assets/logo.jpg">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<header class="topbar glass pill">
+  <a class="brand" href="index.html"><img src="assets/logo.jpg" alt="">Platfighters<span class="tld">.uy</span></a>
+  <span class="spacer"></span>
+  <nav><a href="players.html">Players</a><a href="events.html">Events</a><a class="nav-active" href="rankings.html" aria-current="page">Rankings</a></nav>
+  <span class="badge">RANKINGS &amp; PR</span>
+</header>
+<main class="page-single">
+  <section class="directory-head">
+    <div>
+      <div class="eyebrow mono">COMPETITIVE PLATFORM-FIGHTER STATS</div>
+      <h1>Rankings</h1>
+      <p class="muted">Compare statistical models, build custom weighted rankings, and explore official community Power Rankings.</p>
+    </div>
+    <div class="directory-controls">
+      <div class="directory-filter-row">
+        <label class="game-filter-wrap">
+          <span class="sr-only">Filter by game</span>
+          <select id="game-filter" class="game-filter glass" aria-label="Filter rankings by game">
+            <option value="all">All games</option>
+            <option value="ultimate">Ultimate</option>
+            <option value="rivals-of-aether">Rivals of Aether</option>
+            <option value="melee">Melee</option>
+            <option value="rivals-2">Rivals 2</option>
+            <option value="project-plus">Project+</option>
+          </select>
+        </label>
+      </div>
+    </div>
+  </section>
+
+  <!-- Area Switcher Navigation -->
+  <div class="panel glass" style="padding: 12px; margin-bottom: 20px;">
+    <div class="ranking-nav-tabs" style="display: flex; gap: 8px; flex-wrap: wrap;">
+      <button id="tab-comparison" class="action-button" type="button">Statistical Comparison</button>
+      <button id="tab-power-rankings" class="quiet-button" type="button">Power Rankings</button>
+      <button id="tab-archive" class="quiet-button" type="button">Historical Archive</button>
+    </div>
+  </div>
+
+  <!-- AREA A: Statistical Comparison & Custom Ranking Builder -->
+  <section id="area-comparison" class="ranking-area">
+    <div class="panel glass" style="margin-bottom: 20px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 16px;">
+        <h2>Statistical Ranking Models</h2>
+        <button id="btn-explain-models" class="quiet-button" type="button">Explain Methodologies</button>
+      </div>
+
+      <div class="directory-controls" style="width: 100%; margin-bottom: 16px;">
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; width: 100%;">
+          <label class="search glass" style="flex: 1; min-width: 240px;">
+            <span aria-hidden="true">⌕</span>
+            <input id="player-search" type="search" placeholder="Search player tag..." autocomplete="off" aria-label="Search players in ranking">
+          </label>
+          <select id="time-period-filter" class="game-filter glass" aria-label="Filter by time period" style="flex: 0 0 auto;">
+            <option value="all-time" selected>All-time</option>
+            <option value="2025">Calendar Year 2025</option>
+            <option value="2024">Calendar Year 2024</option>
+            <option value="rolling-12">Rolling 12 Months</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table" style="margin-top: 10px;">
+        <div class="tr head" style="grid-template-columns: 2fr 1fr 1fr 1fr 1fr;">
+          <span>PLAYER</span>
+          <span>TRUESKILL (μ - 3σ)</span>
+          <span>GLICKO-2 (r - 2RD)</span>
+          <span>PLACINGS (PTS)</span>
+          <span>STRENGTH OF FIELD</span>
+        </div>
+        <div id="comparison-table-body">
+          <p class="muted" style="padding: 16px;">Loading statistical rankings…</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Custom Ranking Builder Panel -->
+    <div class="panel glass">
+      <h2>Custom Ranking Builder</h2>
+      <p class="muted" style="margin-bottom: 16px;">
+        Combine all 4 statistical ranking methodologies using custom weights. Component scores are normalized to a 0–100 scale before combination.
+      </p>
+
+      <div class="form-grid" style="margin-bottom: 20px;">
+        <label>
+          Tournament Placings (<span id="weight-placing-val">40</span>%)
+          <input id="weight-placing" type="range" min="0" max="100" value="40" step="5">
+        </label>
+        <label>
+          TrueSkill (<span id="weight-ts-val">30</span>%)
+          <input id="weight-ts" type="range" min="0" max="100" value="30" step="5">
+        </label>
+        <label>
+          Glicko-2 (<span id="weight-glicko-val">20</span>%)
+          <input id="weight-glicko" type="range" min="0" max="100" value="20" step="5">
+        </label>
+        <label>
+          Strength of Field (<span id="weight-sof-val">10</span>%)
+          <input id="weight-sof" type="range" min="0" max="100" value="10" step="5">
+        </label>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+        <span class="badge" style="background: rgba(159, 214, 255, 0.15); color: var(--sky);">
+          CUSTOM USER RANKING (NOT OFFICIAL)
+        </span>
+        <div style="display: flex; gap: 8px;">
+          <button id="btn-reset-weights" class="quiet-button" type="button">Reset Weights</button>
+          <button id="btn-share-custom" class="quiet-button" type="button">Share Configuration URL</button>
+        </div>
+      </div>
+
+      <div class="table">
+        <div class="tr head" style="grid-template-columns: .5fr 2fr 1fr 1.5fr;">
+          <span>RANK</span>
+          <span>PLAYER</span>
+          <span>CUSTOM SCORE</span>
+          <span>COMPONENT BREAKDOWN</span>
+        </div>
+        <div id="custom-table-body">
+          <p class="muted" style="padding: 16px;">Adjust sliders above to build a custom weighted ranking.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AREA B: Official Power Rankings View -->
+  <section id="area-power-rankings" class="ranking-area" hidden>
+    <div id="power-ranking-container">
+      <div class="panel glass">
+        <p class="muted">Loading official power rankings…</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- AREA C: Historical Ranking Archive -->
+  <section id="area-archive" class="ranking-area" hidden>
+    <div class="panel glass" style="margin-bottom: 20px;">
+      <h2>Historical Ranking Archive</h2>
+      <p class="muted" style="margin-bottom: 16px;">
+        Explore preserved historical Power Ranking editions and statistical ranking snapshots. Snapshots remain immutable.
+      </p>
+
+      <div id="archive-list-container">
+        <p class="muted">Loading archived editions…</p>
+      </div>
+    </div>
+
+    <!-- Comparative Edition Viewer -->
+    <div id="archive-comparison-container" class="panel glass" hidden>
+      <h2>Compare Editions</h2>
+      <p class="muted" style="margin-bottom: 16px;">Compare two historical power ranking editions side-by-side to track rises, falls, and new entries.</p>
+      <div id="archive-comparison-content"></div>
+    </div>
+  </section>
+
+  <!-- Methodology Explanation Modal -->
+  <dialog id="modal-methodology" class="panel glass" style="max-width: 680px; width: 90%; color: var(--text); border: 1px solid rgba(255,255,255,.3);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <h2>Ranking Methodologies Explained</h2>
+      <button id="btn-close-modal" class="quiet-button" type="button" style="min-height: 32px; padding: 0 10px;">✕</button>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 16px; font-size: 14px; max-height: 70vh; overflow-y: auto; padding-right: 8px;">
+      <div>
+        <b style="color: var(--sky); font-size: 16px;">1. TrueSkill — Skill Estimation with Uncertainty</b>
+        <p style="margin-top: 4px;">
+          Calculates Bayesian skill estimate (mean μ) and uncertainty (variance σ) from 1v1 match results. The conservative display score <b>μ - 3σ</b> ensures unproven players with high uncertainty do not dominate the leaderboard.
+        </p>
+      </div>
+      <div>
+        <b style="color: var(--sky); font-size: 16px;">2. Glicko-2 — Rating, Deviation &amp; Volatility</b>
+        <p style="margin-top: 4px;">
+          Standard Glicko-2 model tracking skill rating <i>r</i>, rating deviation <i>RD</i>, and volatility <i>σ</i>. Inactivity increases uncertainty (RD) over time without arbitrarily reducing rating. Displayed conservative score is <b>r - 2RD</b>.
+        </p>
+      </div>
+      <div>
+        <b style="color: var(--sky); font-size: 16px;">3. Tournament Placings — Results-Based Ranking</b>
+        <p style="margin-top: 4px;">
+          Awards points based on final tournament placements (1st=1000, 2nd=700, 3rd=500, etc.), scaled by entrant count multiplier. Directly reflects overall tournament finishes over the selected period.
+        </p>
+      </div>
+      <div>
+        <b style="color: var(--sky); font-size: 16px;">4. Strength of Field — Field-Adjusted Performance</b>
+        <p style="margin-top: 4px;">
+          Evaluates placement relative to the competitive strength of event entrants, using pre-event ratings calculated prior to the tournament. Distinguishes deep regional brackets from casual beginner events.
+        </p>
+      </div>
+    </div>
+  </dialog>
+</main>
+<footer class="foot mono muted">Platfighters.uy · Rankings &amp; Power Rankings</footer>
+<script src="js/rankings.js"></script>
+</body>
+</html>
