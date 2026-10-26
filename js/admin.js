@@ -24,11 +24,12 @@ function showEditor(authed) {
 
 async function loadProfiles(selected = '') {
   try {
-    const [{ profiles }, { merges }, { eventGroups }, { exclusions }] = await Promise.all([
-      api('/api/admin/profiles'), api('/api/admin/merges'), api('/api/admin/event-groups'), api('/api/admin/exclusions')
+    const [{ profiles }, { merges }, { eventGroups }, { exclusions }, { events }] = await Promise.all([
+      api('/api/admin/profiles'), api('/api/admin/merges'), api('/api/admin/event-groups'), api('/api/admin/exclusions'), api('/api/admin/events').catch(() => ({ events: [] }))
     ]);
     renderEventGroups(eventGroups);
     renderExcludedEvents(exclusions.events || []);
+    renderEventSelects(events || []);
     const select = $('#profile-select');
     select.innerHTML = profiles.map(p => `<option value="${esc(p.slug)}">${esc(p.tag)} · ${esc(p.playerId || 'local profile')}</option>`).join('');
     const source = $('#merge-source');
@@ -45,6 +46,22 @@ async function loadProfiles(selected = '') {
     select.value = selected || profiles[0].slug;
     await loadProfile(select.value);
   } catch (error) { $('#save-message').textContent = error.message; }
+}
+
+function renderEventSelects(events = []) {
+  const parentSelect = $('#event-parent-url');
+  const childSelect = $('#event-child-url');
+  if (!parentSelect || !childSelect) return;
+  if (events.length) {
+    const options = '<option value="" disabled selected>Select an event…</option>' +
+      events.map(e => `<option value="${esc(e.sourceUrl)}">${esc(e.tournamentName)} · ${esc(e.eventName)} (${esc(e.gameName)})</option>`).join('');
+    parentSelect.innerHTML = options;
+    childSelect.innerHTML = options;
+  } else {
+    const empty = '<option value="" disabled selected>No imported events available</option>';
+    parentSelect.innerHTML = empty;
+    childSelect.innerHTML = empty;
+  }
 }
 
 function renderEventGroups(groups = {}) {

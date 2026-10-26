@@ -50,10 +50,10 @@
     </section>
     <section class="merge-panel" aria-labelledby="event-group-heading">
       <h3 id="event-group-heading">Group an additional event</h3>
-      <p class="muted admin-copy">Attach an event such as an amateur bracket to its main event. Enter the start.gg event URLs; this can be configured before the event data is imported. Sets from the added event will appear under the main event with your phase label.</p>
+      <p class="muted admin-copy">Attach an event such as an amateur bracket to its main event. Select events from currently imported tournaments. Sets from the added event will appear under the main event with your phase label.</p>
       <form id="event-group-form" class="admin-form merge-form">
-        <label>Main event URL<input id="event-parent-url" type="url" placeholder="https://start.gg/tournament/.../event/smash-ultimate-singles" required></label>
-        <label>Additional event URL<input id="event-child-url" type="url" placeholder="https://start.gg/tournament/.../event/categoria-b" required></label>
+        <label>Main event<select id="event-parent-url" required></select></label>
+        <label>Additional event<select id="event-child-url" required></select></label>
         <label>Phase label<input id="event-phase-label" type="text" maxlength="80" placeholder="Categoria B" required></label>
         <div class="form-actions"><button class="action-button" type="submit">Save event grouping</button><p id="event-group-message" class="form-message mono" role="status"></p></div>
       </form>
