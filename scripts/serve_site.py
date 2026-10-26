@@ -234,6 +234,31 @@ class Handler(SimpleHTTPRequestHandler):
             if not self.require_admin():
                 return
             self.send_json(200, {"eventGroups": event_groups()})
+        elif parsed.path in {"/api/admin/events", "/api/admin/imported-events"}:
+            if not self.require_admin():
+                return
+            try:
+                with sqlite3.connect(DATABASE) as connection:
+                    rows = connection.execute(
+                        "SELECT e.source_url, t.name, e.name, v.name, t.start_at "
+                        "FROM events e "
+                        "JOIN tournaments t ON e.tournament_slug = t.slug "
+                        "JOIN videogames v ON e.videogame_slug = v.slug "
+                        "ORDER BY t.start_at DESC, t.name ASC, e.name ASC"
+                    ).fetchall()
+                events = [
+                    {
+                        "sourceUrl": row[0],
+                        "tournamentName": row[1],
+                        "eventName": row[2],
+                        "gameName": row[3],
+                        "startAt": row[4],
+                    }
+                    for row in rows
+                ]
+                self.send_json(200, {"events": events})
+            except sqlite3.Error as error:
+                self.send_json(500, {"error": f"Could not load imported events: {error}"})
         elif parsed.path == "/api/admin/exclusions":
             if not self.require_admin():
                 return
