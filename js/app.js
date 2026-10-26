@@ -327,7 +327,11 @@ function render() {
             .some(name => normalize(name) === normalize(selectedOpponent)))
             .map(set => ({ ...set, game: game.name, event: result.event, date: result.date }))))
           .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-        const rows = sets.map(set => `<div class="opponent-set-row"><span class="opponent-set-context"><b>${esc((set.event || '').split(' · ')[0])}</b><small>${esc(set.game)}${set.round ? ` · ${esc(set.round)}` : ''}</small></span><span class="opponent-set-score">${esc(set.score || '—')}</span><span class="set-result ${['win', 'loss'].includes(set.outcome) ? set.outcome : 'unknown'}">${set.outcome === 'win' ? 'WIN' : set.outcome === 'loss' ? 'LOSS' : 'UNKNOWN'}</span></div>`).join('');
+        const rows = sets.map(set => {
+          const dateFmt = fmtMonthYear(set.date);
+          const metaParts = [dateFmt, set.game, set.round].filter(Boolean).map(esc).join(' · ');
+          return `<div class="opponent-set-row"><span class="opponent-set-context"><b>${esc((set.event || '').split(' · ')[0])}</b><small>${metaParts}</small></span><span class="opponent-set-score">${esc(set.score || '—')}</span><span class="set-result ${['win', 'loss'].includes(set.outcome) ? set.outcome : 'unknown'}">${set.outcome === 'win' ? 'WIN' : set.outcome === 'loss' ? 'LOSS' : 'UNKNOWN'}</span></div>`;
+        }).join('');
         selectedOpponentSetsHtml = `<div class="opponent-history-subheading"><h3>Sets vs ${linkifyOpponent(selectedOpponent)}</h3></div>${rows || '<p class="muted">No set details were recorded against this opponent.</p>'}`;
       }
 
@@ -349,7 +353,7 @@ function render() {
         : validResults
           .sort((a, b) => Number(a.place) - Number(b.place) || (b.date || '').localeCompare(a.date || ''))
           .slice(0, 5);
-      const rows = tournaments.map(result => `<div class="opponent-set-row"><span class="opponent-set-context"><b>${esc((result.event || '').split(' · ')[0])}</b><small>${fmt(result.date)}${result.entrants ? ` · ${result.entrants} entrants` : ''}</small></span><span class="opponent-set-score">${ord(result.place)}</span></div>`).join('');
+      const rows = tournaments.map(result => `<div class="opponent-set-row"><span class="opponent-set-context"><b>${esc((result.event || '').split(' · ')[0])}</b><small>${fmt(result.date)}${result.entrants ? ` · ${result.entrants} entrants` : ''}</small></span><span class="opponent-set-score ${result.place <= 3 ? `top3 p${result.place}` : ''}">${ord(result.place)}</span></div>`).join('');
       return `<div class="panel glass opponent-history" id="best-placement-history"><div class="opponent-history-heading"><h2>Best finishes</h2><button class="quiet-button close-best-placement-history" type="button">Close</button></div>${rows || '<p class="muted">No tournaments recorded for this placement.</p>'}</div>`;
     })()
     : '';
@@ -376,7 +380,7 @@ function render() {
       }).join('') : '<p class="set-empty muted">No set details were recorded for this event.</p>';
       return `<div class="result-entry">
         <button class="tr result-toggle" type="button" aria-expanded="false" aria-controls="${detailsId}">
-          <span>${esc((r.event || '').split(' · ')[0])}${sel ? '' : `<small>${esc(r.game)}</small>`}</span><span>${fmt(r.date)}</span><span>${esc(r.seed ?? '—')}</span><span class="${r.place <= 3 ? 'top3' : ''}">${ord(r.place)}</span><span>${esc(r.entrants ?? '—')}<small class="expand-hint">${sets.length} set${sets.length === 1 ? '' : 's'}</small></span>
+          <span>${esc((r.event || '').split(' · ')[0])}${sel ? '' : `<small>${esc(r.game)}</small>`}</span><span>${fmt(r.date)}</span><span>${esc(r.seed ?? '—')}</span><span class="${r.place <= 3 ? `top3 p${r.place}` : ''}">${ord(r.place)}</span><span>${esc(r.entrants ?? '—')}<small class="expand-hint">${sets.length} set${sets.length === 1 ? '' : 's'}</small></span>
         </button>
         <div class="set-details" id="${detailsId}" hidden>
           <div class="set-head"><span>PHASE</span><span>OPPONENT</span><span>SCORE</span><span>RESULT</span></div>
@@ -482,6 +486,15 @@ function setupInteractiveChart() {
       polyline.setAttribute('points', pointCoords.join(' '));
     }
 
+    const gridLines = container.querySelectorAll('.chart-grid-line');
+    gridLines.forEach(line => {
+      const baseX = parseFloat(line.dataset.baseX);
+      const relX = baseX - 40;
+      const xTrans = Math.round((40 + relX * chartZoom - chartPanX) * 100) / 100;
+      line.setAttribute('x1', xTrans);
+      line.setAttribute('x2', xTrans);
+    });
+
     if (!tooltip.hidden) {
       tooltip.hidden = true;
     }
@@ -570,7 +583,7 @@ function setupInteractiveChart() {
       const tourney = point.dataset.tourney;
       const date = point.dataset.date;
       const place = point.dataset.place;
-      tooltip.innerHTML = `<b>${esc(tourney)}</b><small>${fmt(date)}</small><div class="chart-place">${ord(place)} Place</div>`;
+      tooltip.innerHTML = `<b>${esc(tourney)}</b><small>${fmt(date)}</small><div class="chart-place ${place <= 3 ? `top3 p${place}` : ''}">${ord(place)} Place</div>`;
       tooltip.hidden = false;
 
       const rect = point.getBoundingClientRect();
@@ -629,6 +642,47 @@ function chart(g) {
     return { x: Math.round(x), y: Math.round(y), result: r };
   });
 
+  const gridLines = [];
+  if (rs.length >= 2) {
+    const dates = rs.map(r => new Date(`${r.date}T00:00:00`).getTime());
+    const minTime = dates[0];
+    const maxTime = dates[dates.length - 1];
+
+    if (maxTime > minTime) {
+      const startDate = new Date(`${rs[0].date}T00:00:00`);
+      const endDate = new Date(`${rs[rs.length - 1].date}T00:00:00`);
+
+      let cur = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 1);
+      while (cur.getTime() <= endDate.getTime()) {
+        const curTime = cur.getTime();
+        let i = 0;
+        while (i < dates.length - 1 && dates[i + 1] < curTime) {
+          i++;
+        }
+        if (i < dates.length - 1) {
+          const t1 = dates[i];
+          const t2 = dates[i + 1];
+          const x1 = pts[i].x;
+          const x2 = pts[i + 1].x;
+          const ratio = t2 === t1 ? 0 : (curTime - t1) / (t2 - t1);
+          const baseX = Math.round((x1 + ratio * (x2 - x1)) * 100) / 100;
+
+          const isYear = cur.getMonth() === 0;
+          gridLines.push({ baseX, isYear });
+        }
+        cur.setMonth(cur.getMonth() + 1);
+      }
+    }
+  }
+
+  const gridLinesHtml = gridLines.map(g => {
+    if (g.isYear) {
+      return `<line class="chart-grid-line chart-year-line" data-base-x="${g.baseX}" x1="${g.baseX}" y1="15" x2="${g.baseX}" y2="105" stroke="rgba(255,255,255,.35)" stroke-width="2" />`;
+    } else {
+      return `<line class="chart-grid-line" data-base-x="${g.baseX}" x1="${g.baseX}" y1="15" x2="${g.baseX}" y2="105" stroke="rgba(255,255,255,.15)" stroke-width="1" stroke-dasharray="3 3" />`;
+    }
+  }).join('');
+
   const polylinePoints = pts.map(p => `${p.x},${p.y}`).join(' ');
   const pointsHtml = pts.map(p => {
     const tourneyName = (p.result.event || '').split(' · ')[0];
@@ -650,6 +704,7 @@ function chart(g) {
         <text x="0" y="19">1st</text>
         <text x="0" y="109">${ord(maxP)}</text>
         <g clip-path="url(#chart-clip)">
+          ${gridLinesHtml}
           <polyline points="${polylinePoints}" fill="none" stroke="#9FD6FF" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
           ${pointsHtml}
         </g>

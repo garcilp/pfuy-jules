@@ -1132,7 +1132,7 @@ def write_event_details(connection):
             if amateur_phases:
                 sub_events.append({
                     "id": f"{event_id}-main",
-                    "title": "Main event" if len(valid_events) == 1 else f"Main event ({game_name})",
+                    "title": "Main event" if len(games_map) == 1 else f"Main event ({game_name})",
                     "game": game_name,
                     "gameSlug": game_slug,
                     "entrants": entrant_count,
@@ -1177,7 +1177,7 @@ def write_event_details(connection):
         if has_any_amateur:
             for se in sub_events:
                 if not se["isAmateur"] and se["title"] == se["game"]:
-                    se["title"] = "Main event" if len(valid_events) == 1 else f"Main event ({se['game']})"
+                    se["title"] = "Main event" if len(games_map) == 1 else f"Main event ({se['game']})"
 
         # Total attendees is distinct participants in the entire tournament
         tot_row = connection.execute(
