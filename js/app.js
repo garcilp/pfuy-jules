@@ -18,6 +18,43 @@ let resultPage = 1;
 let selectedOpponent = null;
 let selectedBestPlacement = null;
 let isOpponentListOpen = false;
+let playerRankingData = null;
+
+async function loadPlayerRankings(playerId) {
+  if (!playerId) return { statistical: null, powerRankings: [] };
+  let statistical = null;
+  let powerRankings = [];
+  try {
+    const [statRes, prRes] = await Promise.all([
+      fetch(`/api/rankings?game=all`),
+      fetch(`/api/rankings/power?game=all`)
+    ]);
+    if (statRes.ok) {
+      const json = await statRes.json();
+      statistical = (json.players || []).find(x => String(x.canonical_id) === String(playerId)) || null;
+    }
+    if (prRes.ok) {
+      const json = await prRes.json();
+      (json.power_rankings || []).forEach(pr => {
+        const entry = (pr.entries || []).find(e => String(e.canonical_player_id) === String(playerId));
+        if (entry) {
+          powerRankings.push({
+            pr_id: pr.id,
+            title: pr.title,
+            game_slug: pr.game_slug,
+            publication_date: pr.publication_date,
+            assigned_position: entry.assigned_position,
+            written_analysis: entry.written_analysis,
+            highlights: entry.highlights
+          });
+        }
+      });
+    }
+  } catch (e) {
+    console.error('Could not load player rankings', e);
+  }
+  return { statistical, powerRankings };
+}
 
 async function loadPlayerDirectory() {
   try {
@@ -85,8 +122,10 @@ async function loadProfile() {
   return response.json();
 }
 
-Promise.all([loadProfile(), loadPlayerDirectory()]).then(([d]) => {
+Promise.all([loadProfile(), loadPlayerDirectory()]).then(async ([d]) => {
   data = d;
+  const targetId = data?.player?.startggPlayerId || profileId;
+  playerRankingData = await loadPlayerRankings(targetId);
   render();
   addEventListener('hashchange', () => { resultPage = 1; render(); });
 }).catch(error => {
@@ -143,6 +182,10 @@ function render() {
     ...(!sel ? [['EVENTS ENTERED', ev, ev === 1 ? '' : `Across ${G.length} game${G.length === 1 ? '' : 's'}`]] : []),
     ['SET RECORD', `${w}–${l}`, `${w + l ? Math.round(100 * w / (w + l)) : 0}% set win rate`]
   ];
+  if (playerRankingData && playerRankingData.statistical) {
+    const stat = playerRankingData.statistical;
+    stats.push(['STATISTICAL RATINGS', `TS: ${stat.trueskill.conservative} · G2: ${stat.glicko2.conservative}`, `Field Strength: ${stat.strength_of_field.score} pts`]);
+  }
   let mostPlayedOpponent = null;
   if (sel) {
     const upsetCount = Number(sel.upsets) || 0;
@@ -248,8 +291,25 @@ function render() {
   }).join('') + characterFeatureTile;
 
   let middle;
+  let powerRankingSection = '';
+  if (playerRankingData && playerRankingData.powerRankings && playerRankingData.powerRankings.length > 0) {
+    powerRankingSection = `<div class="panel glass" style="margin-bottom: 24px;">
+      <h2>Power Ranking Appearances</h2>
+      ${playerRankingData.powerRankings.map(pr => `
+        <div class="win" style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed rgba(255,255,255,0.06);">
+          <span class="win-main">
+            <b><a href="rankings.html" style="color: inherit; text-decoration: none;">${esc(pr.title)}</a></b>
+            <small class="win-meta">Game: ${esc(pr.game_slug)} · Published: ${esc(pr.publication_date)}</small>
+            ${pr.written_analysis ? `<p class="muted" style="margin: 4px 0 0 0; font-size: 0.9rem;">"${esc(pr.written_analysis)}"</p>` : ''}
+          </span>
+          <span class="badge-rank badge-rank-${pr.assigned_position <= 3 ? pr.assigned_position : ''}" style="margin-left: 12px; font-size: 1.1rem; width: 36px; height: 36px;">#${pr.assigned_position}</span>
+        </div>
+      `).join('')}
+    </div>`;
+  }
+
   if (!sel) {
-    middle = `<h2 class="sec" style="margin:4px 4px 0">Games played</h2><div class="cards">` +
+    middle = powerRankingSection + `<h2 class="sec" style="margin:4px 4px 0">Games played</h2><div class="cards">` +
       gamesBySetsPlayed.map(g => {
           const character = g.characters?.[0]?.name || 'other';
         const eventWins = (g.results || []).filter(result => Number(result.place) === 1).length;
@@ -261,7 +321,7 @@ function render() {
         <span class="rec">${g.wins}–${g.losses}</span><span class="muted">${bestLabel}</span></a>`;
       }).join('') + `</div>`;
   } else {
-    middle = `<div class="row2">
+    middle = powerRankingSection + `<div class="row2">
       <div class="panel glass"><h2>Character usage</h2>${(sel.characters || []).map(c =>
         `<div class="usage"><div class="usage-row"><span class="stock-icon"><span>${esc(c.name[0])}</span><img src="assets/renders/${esc(sel.slug)}/stocks/${slug(c.name)}.webp" alt="" onload="this.previousElementSibling.remove()" onerror="if(!this.dataset.fallback){this.dataset.fallback='png';this.src=this.src.replace('.webp','.png')}else{this.parentElement.remove()}"></span><span>${esc(c.name)}</span><span class="mono usage-percent">${Number(c.usage).toFixed(1)}%</span></div><div class="bar"><i style="width:${Number(c.usage) || 0}%"></i></div></div>`).join('') || '<p class="muted">No character selections recorded.</p>'}</div>
       <div class="panel glass"><h2>Notable wins</h2>${notableWins.map(x => {

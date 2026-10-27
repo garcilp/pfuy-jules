@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rankings · Platfighters.uy</title>
+<link rel="icon" href="assets/logo.jpg">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="css/styles.css">
+<style>
+/* Additional styles for Rankings section */
+.rankings-header { margin-bottom: 24px; }
+.rankings-nav-tabs { display: flex; gap: 12px; border-bottom: 1px solid var(--border, rgba(255,255,255,0.1)); margin-bottom: 24px; padding-bottom: 8px; }
+.rankings-nav-tabs button { background: none; border: none; color: var(--muted, #888); font-size: 1rem; font-weight: 500; padding: 8px 16px; cursor: pointer; border-radius: 6px; }
+.rankings-nav-tabs button.active { background: rgba(255,255,255,0.1); color: #fff; }
+.filter-card { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; background: rgba(255,255,255,0.03); padding: 16px; border-radius: 12px; margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.06); }
+.filter-group { display: flex; flex-direction: column; gap: 4px; }
+.filter-group label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted, #888); }
+.weight-sliders { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; width: 100%; margin-top: 12px; padding-top: 12px; border-top: 1px dashed rgba(255,255,255,0.1); }
+.slider-group { display: flex; flex-direction: column; gap: 4px; }
+.slider-group div { display: flex; justify-content: space-between; font-size: 0.85rem; }
+.rankings-table { width: 100%; border-collapse: collapse; text-align: left; margin-top: 16px; }
+.rankings-table th, .rankings-table td { padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.rankings-table th { font-size: 0.8rem; text-transform: uppercase; color: var(--muted, #888); background: rgba(0,0,0,0.2); }
+.rankings-table tr:hover { background: rgba(255,255,255,0.02); }
+.badge-rank { font-weight: 700; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(255,255,255,0.1); font-size: 0.9rem; }
+.badge-rank-1 { background: gold; color: #000; }
+.badge-rank-2 { background: silver; color: #000; }
+.badge-rank-3 { background: #cd7f32; color: #000; }
+.methodology-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+.methodology-card { background: #18181b; padding: 24px; border-radius: 12px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); }
+.methodology-card h2 { margin-top: 0; }
+.methodology-card button.close-btn { float: right; background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; }
+.power-ranking-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+.power-ranking-card h2 { margin-top: 0; margin-bottom: 4px; }
+.power-ranking-meta { font-size: 0.85rem; color: var(--muted, #888); margin-bottom: 16px; }
+.pr-entry-row { display: flex; gap: 16px; align-items: flex-start; padding: 12px 0; border-bottom: 1px dashed rgba(255,255,255,0.06); }
+.pr-entry-pos { font-size: 1.5rem; font-weight: bold; width: 40px; text-align: center; }
+.pr-entry-content h3 { margin: 0 0 4px 0; font-size: 1.1rem; }
+.pr-entry-content p { margin: 0; color: #ccc; font-size: 0.95rem; }
+</style>
+</head>
+<body>
+<header class="topbar glass pill">
+  <a class="brand" href="index.html"><img src="assets/logo.jpg" alt="">Platfighters<span class="tld">.uy</span></a>
+  <span class="spacer"></span>
+  <nav>
+    <a href="players.html">Players</a>
+    <a href="events.html">Events</a>
+    <a class="nav-active" href="rankings.html" aria-current="page">Rankings</a>
+  </nav>
+  <span class="badge">RANKINGS</span>
+</header>
+<main class="directory page-single">
+  <section class="rankings-header">
+    <div class="eyebrow mono">PLATFIGHTERS RANKINGS SYSTEM</div>
+    <h1>Competitive Leaderboards & Power Rankings</h1>
+    <p class="muted">Explore statistical player ratings, compare methodology models, create custom weighted rankings, and view official community power rankings.</p>
+  </section>
+
+  <nav class="rankings-nav-tabs">
+    <button id="tab-comparison" class="active">Ranking Comparison & Custom Builder</button>
+    <button id="tab-power">Power Rankings</button>
+    <button id="tab-archive">Historical Archive</button>
+  </nav>
+
+  <!-- Area 1: Comparison & Custom Ranking -->
+  <section id="area-comparison">
+    <div class="filter-card">
+      <div class="filter-group">
+        <label for="filter-game">Game</label>
+        <select id="filter-game" class="game-filter glass">
+          <option value="all">All Games</option>
+          <option value="ultimate">Super Smash Bros. Ultimate</option>
+          <option value="melee">Super Smash Bros. Melee</option>
+          <option value="rivals-2">Rivals 2</option>
+          <option value="rivals-of-aether">Rivals of Aether</option>
+          <option value="project-plus">Project+</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="filter-period">Time Period</label>
+        <select id="filter-period" class="game-filter glass">
+          <option value="all-time">All-Time</option>
+          <option value="rolling-12">Rolling 12 Months</option>
+          <option value="2025">2025 Season</option>
+          <option value="2024">2024 Season</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="search-player">Search Player</label>
+        <input id="search-player" type="search" placeholder="Player tag..." class="game-filter glass" style="padding: 6px 12px;">
+      </div>
+
+      <div class="filter-group" style="margin-left: auto;">
+        <label>&nbsp;</label>
+        <button id="btn-explain" class="glass" style="padding: 8px 16px; cursor: pointer;">Methodology Info</button>
+      </div>
+
+      <div class="weight-sliders">
+        <div style="grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center;">
+          <strong style="font-size: 0.9rem;">Custom Ranking System Weights (Total: <span id="weight-total">100</span>%)</strong>
+          <button id="btn-reset-weights" class="glass" style="padding: 4px 10px; font-size: 0.8rem; cursor: pointer;">Reset Weights</button>
+        </div>
+
+        <div class="slider-group">
+          <div><span>TrueSkill (Skill + Uncertainty)</span><span id="val-ts">30%</span></div>
+          <input type="range" id="weight-ts" min="0" max="100" value="30">
+        </div>
+
+        <div class="slider-group">
+          <div><span>Glicko-2 (Rating + Volatility)</span><span id="val-g2">30%</span></div>
+          <input type="range" id="weight-g2" min="0" max="100" value="30">
+        </div>
+
+        <div class="slider-group">
+          <div><span>Tournament Placings</span><span id="val-tp">20%</span></div>
+          <input type="range" id="weight-tp" min="0" max="100" value="20">
+        </div>
+
+        <div class="slider-group">
+          <div><span>Strength of Field</span><span id="val-sof">20%</span></div>
+          <input type="range" id="weight-sof" min="0" max="100" value="20">
+        </div>
+      </div>
+    </div>
+
+    <div style="overflow-x: auto;">
+      <table class="rankings-table">
+        <thead>
+          <tr>
+            <th style="width: 80px;">Rank</th>
+            <th>Player</th>
+            <th style="text-align: right;">Custom Score</th>
+            <th style="text-align: right;">TrueSkill</th>
+            <th style="text-align: right;">Glicko-2</th>
+            <th style="text-align: right;">Placings</th>
+            <th style="text-align: right;">Field Strength</th>
+            <th style="text-align: right;">Matches</th>
+          </tr>
+        </thead>
+        <tbody id="comparison-tbody">
+          <tr><td colspan="8" class="muted" style="text-align: center; padding: 24px;">Loading rankings...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Area 2: Power Rankings -->
+  <section id="area-power" style="display: none;">
+    <div id="power-rankings-list">
+      <p class="muted">Loading community power rankings...</p>
+    </div>
+  </section>
+
+  <!-- Area 3: Historical Archive -->
+  <section id="area-archive" style="display: none;">
+    <div id="archive-list">
+      <p class="muted">Loading archived editions...</p>
+    </div>
+  </section>
+
+  <!-- Archived Edition Detail Modal -->
+  <div id="archive-modal" class="methodology-modal" style="display: none;">
+    <div class="methodology-card" style="max-width: 800px;">
+      <button class="close-btn" id="archive-modal-close">&times;</button>
+      <div id="archive-modal-content">
+        <p class="muted">Loading edition details...</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Methodology Modal -->
+<div id="methodology-modal" class="methodology-modal" style="display: none;">
+  <div class="methodology-card">
+    <button class="close-btn" id="modal-close">&times;</button>
+    <h2>Ranking Methodologies</h2>
+    <h3>1. TrueSkill (Skill Estimation with Uncertainty)</h3>
+    <p>Maintains skill mean (&mu;) and uncertainty (&sigma;). Displayed score is conservative estimate (&mu; - 3&sigma;). Higher uncertainty lowers the conservative rank until more matches are played.</p>
+
+    <h3>2. Glicko-2 (Rating, Deviation, Volatility)</h3>
+    <p>Standard rating algorithm tracking rating ($r$), rating deviation ($RD$), and volatility ($\sigma$). Displayed conservative score is $r - 2RD$. Inactivity increases $RD$.</p>
+
+    <h3>3. Tournament Placings (Results-Based)</h3>
+    <p>Awards placement points for event finishes scaled logarithmically by event entrant count ($1 + \log_{10}(\text{entrants})$). Evaluates total competitive accomplishments.</p>
+
+    <h3>4. Strength of Field (Field-Adjusted Performance)</h3>
+    <p>Evaluates placement points weighted by the pre-event TrueSkill ratings of fellow entrants, distinguishing equal placements in stacked tournaments versus smaller events.</p>
+
+    <h3>Normalization in Custom Ranking Builder</h3>
+    <p>Each system score is min-max normalized (0 to 100) across active players before applying user-selected weights.</p>
+  </div>
+</div>
+
+<footer class="foot mono muted">Platfighters.uy · Rankings Platform</footer>
+<script src="js/rankings.js"></script>
+</body>
+</html>
