@@ -88,8 +88,14 @@ def visibility_exclusions():
 
 def rebuild_profiles():
     builder = ROOT / "scripts" / "build_player_profile.py"
-    return subprocess.run([sys.executable, str(builder), "--all"], cwd=ROOT,
-                          capture_output=True, text=True)
+    res = subprocess.run([sys.executable, str(builder), "--all"], cwd=ROOT,
+                         capture_output=True, text=True)
+    try:
+        from scripts.rankings_calculator import export_default_rankings
+        export_default_rankings()
+    except Exception as err:
+        print(f"Warning: could not export default rankings: {err}")
+    return res
 
 
 def safe_slug(value):
@@ -263,6 +269,65 @@ class Handler(SimpleHTTPRequestHandler):
             if not self.require_admin():
                 return
             self.send_json(200, {"exclusions": visibility_exclusions()})
+        elif parsed.path == "/api/games":
+            try:
+                with sqlite3.connect(DATABASE) as connection:
+                    rows = connection.execute("SELECT slug, name FROM videogames ORDER BY name ASC").fetchall()
+                self.send_json(200, {"games": [{"slug": r[0], "name": r[1]} for r in rows]})
+            except sqlite3.Error as error:
+                self.send_json(500, {"error": f"Could not load games: {error}"})
+        elif parsed.path == "/api/rankings":
+            qs = parse_qs(parsed.query)
+            game = qs.get("game", ["ultimate"])[0]
+            system = qs.get("system", ["trueskill"])[0]
+            mode = qs.get("mode", ["historical"])[0]
+            start_date = qs.get("start_date", qs.get("start", [None]))[0]
+            end_date = qs.get("end_date", qs.get("end", [None]))[0]
+
+            try:
+                from scripts.rankings_calculator import RankingEngine
+                engine = RankingEngine()
+                data = engine.calculate(
+                    game_slug=game,
+                    system=system,
+                    mode=mode,
+                    start_date=start_date,
+                    end_date=end_date,
+                )
+                self.send_json(200, data)
+            except ValueError as error:
+                self.send_json(400, {"error": str(error)})
+            except Exception as error:
+                self.send_json(500, {"error": f"Could not calculate rankings: {error}"})
+        elif parsed.path == "/api/rankings/diagnostic":
+            qs = parse_qs(parsed.query)
+            game = qs.get("game", ["ultimate"])[0]
+            system = qs.get("system", ["trueskill"])[0]
+            mode = qs.get("mode", ["historical"])[0]
+            start_date = qs.get("start_date", qs.get("start", [None]))[0]
+            end_date = qs.get("end_date", qs.get("end", [None]))[0]
+            player_id = qs.get("player_id", qs.get("playerId", [None]))[0]
+
+            if not player_id:
+                self.send_json(400, {"error": "player_id parameter is required for diagnostic view."})
+                return
+
+            try:
+                from scripts.rankings_calculator import RankingEngine
+                engine = RankingEngine()
+                data = engine.calculate(
+                    game_slug=game,
+                    system=system,
+                    mode=mode,
+                    start_date=start_date,
+                    end_date=end_date,
+                    target_player_id=player_id,
+                )
+                self.send_json(200, data)
+            except ValueError as error:
+                self.send_json(400, {"error": str(error)})
+            except Exception as error:
+                self.send_json(500, {"error": f"Could not calculate diagnostic rankings: {error}"})
         elif parsed.path == "/api/admin/player-games":
             if not self.require_admin():
                 return
