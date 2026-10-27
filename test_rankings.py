@@ -229,13 +229,20 @@ def test_quality_wins_system(mock_db):
     assert p101["wins"] == 2
     assert p101["totalQualityWins"] > 0
 
-def test_loss_quality_system(mock_db):
+def test_loss_quality_consistency_system(mock_db):
     conn, engine = mock_db
     res_lq = engine.calculate("ultimate", system="loss_quality")
     assert res_lq["system"] == "loss_quality"
+
+    # Undefeated test: player with 0 losses gets 100.0 score
     p101 = next(p for p in res_lq["rankings"] if p["playerId"] == "101")
     assert p101["losses"] == 1
-    assert p101["avgCloseness"] == 0.5  # 1-2 loss score ratio (1 / 2)
+    assert p101["matches"] == 3
+    assert p101["score"] < 100.0
+
+    p_undefeated = [p for p in res_lq["rankings"] if p["losses"] == 0]
+    for p in p_undefeated:
+        assert p["score"] == 100.0
 
 def test_merges_and_canonical_id():
     merges = {"2002": "1001", "3003": "2002"}

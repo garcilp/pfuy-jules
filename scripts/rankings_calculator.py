@@ -357,7 +357,7 @@ class RankingEngine:
 
         return valid_sets
 
-    def calculate(self, game_slug, system="glicko2", mode="historical", start_date=None, end_date=None, target_player_id=None):
+    def calculate(self, game_slug, system="glicko2", mode="historical", start_date=None, end_date=None, target_player_id=None, alpha=2.0):
         """Calculates rankings for a specific game, system, mode, and date range."""
         valid_sets = self.load_sets_for_game(game_slug)
 
@@ -368,7 +368,7 @@ class RankingEngine:
         elif system == "quality_wins":
             return self._calculate_quality_wins(valid_sets, mode, start_date, end_date, target_player_id, game_slug)
         elif system == "loss_quality":
-            return self._calculate_loss_quality(valid_sets, mode, start_date, end_date, target_player_id, game_slug)
+            return self._calculate_loss_quality(valid_sets, mode, start_date, end_date, target_player_id, game_slug, alpha=alpha)
         else:
             raise ValueError(f"Unknown ranking system: {system}")
 
@@ -828,15 +828,20 @@ class RankingEngine:
         return result
 
     # -------------------------------------------------------------------------
-    # System 4: Loss Quality
+    # System 4: Loss Quality (Consistency Ranking)
     # -------------------------------------------------------------------------
 
-    def _calculate_loss_quality(self, sets, mode, start_date, end_date, target_player_id, game_slug):
-        """Loss Quality: Measures closeness and opponent difficulty for competitive losses."""
+    def _calculate_loss_quality(self, sets, mode, start_date, end_date, target_player_id, game_slug, alpha=2.0):
+        """Loss Quality (Consistency): Measures competitive consistency relative to expectations.
+
+        Penalty per loss = expected_score ^ alpha (using pre-match Glicko-2 expected win probability).
+        Consistency score = 100 * (1 - total_loss_penalty / match_count), bounded [0, 100].
+        Undefeated players receive a score of 100.
+        """
         pre_match_ratings = self._compute_pre_match_glicko_ratings(sets)
         calc = self.glicko_calc
 
-        player_lq = {}
+        player_data = {}
         diagnostic_history = {}
 
         for s in sets:
@@ -851,47 +856,45 @@ class RankingEngine:
             w_pre = pre_match_ratings.get((s["setId"], w_id), calc.initial_rating())
             l_pre = pre_match_ratings.get((s["setId"], l_id), calc.initial_rating())
 
-            # Expected score of loser before match
+            # Expected win probabilities before match
+            e_win = calc.expected_score_original(w_pre["r"], w_pre["rd"], l_pre["r"], l_pre["rd"])
             e_loss = calc.expected_score_original(l_pre["r"], l_pre["rd"], w_pre["r"], w_pre["rd"])
-            difficulty = 1.0 - e_loss  # = e_win of opponent against loser
 
-            w_score = s["winnerScore"]
-            l_score = s["loserScore"]
+            # Loss penalty for loser = expected_score ^ alpha
+            loss_penalty = (e_loss ** alpha)
 
-            has_scores = (w_score is not None and l_score is not None and w_score > 0)
-            if has_scores:
-                closeness_ratio = max(0.0, min(1.0, float(l_score) / float(w_score)))
-                # Combined multiplier weighting closeness and difficulty
-                multiplier = 0.5 + 0.5 * closeness_ratio
-            else:
-                closeness_ratio = 0.0
-                multiplier = 1.0  # Measure opposition strength without claiming match closeness
+            # Record for winner (win = 0 penalty)
+            if w_id not in player_data:
+                player_data[w_id] = {"wins": 0, "losses": 0, "matches": 0, "totalPenalty": 0.0}
+            player_data[w_id]["wins"] += 1
+            player_data[w_id]["matches"] += 1
 
-            loss_quality_pts = difficulty * multiplier
+            # Record for loser
+            if l_id not in player_data:
+                player_data[l_id] = {"wins": 0, "losses": 0, "matches": 0, "totalPenalty": 0.0}
+            player_data[l_id]["losses"] += 1
+            player_data[l_id]["matches"] += 1
+            player_data[l_id]["totalPenalty"] += loss_penalty
 
-            if l_id not in player_lq:
-                player_lq[l_id] = {
-                    "totalLossQuality": 0.0,
-                    "losses": 0,
-                    "scoredLosses": 0,
-                    "scoresSum": 0.0,
+            # Diagnostic traces
+            if target_player_id is None or w_id == target_player_id:
+                trace_w = {
+                    "setId": s["setId"],
+                    "event": f"{s['tournamentName']} · {s['eventName']}",
+                    "date": s["date"],
+                    "phase": s["phaseName"],
+                    "round": s["roundText"],
+                    "opponentId": l_id,
+                    "opponentTag": self.latest_tags.get(l_id, f"Player {l_id}"),
+                    "opponentPreRating": round(l_pre["r"], 1),
+                    "expectedScore": round(e_win, 3),
+                    "penalty": 0.0,
+                    "outcome": "win",
                 }
-            player_lq[l_id]["totalLossQuality"] += loss_quality_pts
-            player_lq[l_id]["losses"] += 1
-            if has_scores:
-                player_lq[l_id]["scoredLosses"] += 1
-                player_lq[l_id]["scoresSum"] += closeness_ratio
-
-            if w_id not in player_lq:
-                player_lq[w_id] = {
-                    "totalLossQuality": 0.0,
-                    "losses": 0,
-                    "scoredLosses": 0,
-                    "scoresSum": 0.0,
-                }
+                diagnostic_history.setdefault(w_id, []).append(trace_w)
 
             if target_player_id is None or l_id == target_player_id:
-                trace = {
+                trace_l = {
                     "setId": s["setId"],
                     "event": f"{s['tournamentName']} · {s['eventName']}",
                     "date": s["date"],
@@ -900,33 +903,37 @@ class RankingEngine:
                     "opponentId": w_id,
                     "opponentTag": self.latest_tags.get(w_id, f"Player {w_id}"),
                     "opponentPreRating": round(w_pre["r"], 1),
-                    "difficulty": round(difficulty, 3),
-                    "scoreDisplay": s["displayScore"] or (f"{w_score}-{l_score}" if has_scores else "N/A"),
-                    "closenessRatio": round(closeness_ratio, 2) if has_scores else None,
-                    "credit": round(loss_quality_pts, 3),
+                    "expectedScore": round(e_loss, 3),
+                    "penalty": round(loss_penalty, 3),
                     "outcome": "loss",
                 }
-                diagnostic_history.setdefault(l_id, []).append(trace)
+                diagnostic_history.setdefault(l_id, []).append(trace_l)
 
         rankings = []
-        for pid, data in player_lq.items():
-            losses = data["losses"]
-            total = data["totalLossQuality"]
-            avg_lq = total / losses if losses > 0 else 0.0
-            avg_closeness = data["scoresSum"] / data["scoredLosses"] if data["scoredLosses"] > 0 else None
+        for pid, data in player_data.items():
+            matches = data["matches"]
+            if matches == 0:
+                continue
+
+            tot_penalty = data["totalPenalty"]
+            avg_penalty = tot_penalty / matches if matches > 0 else 0.0
+
+            consistency_score = max(0.0, min(100.0, 100.0 * (1.0 - tot_penalty / matches)))
 
             rankings.append({
                 "playerId": pid,
                 "playerTag": self.latest_tags.get(pid, f"Player {pid}"),
-                "score": round(avg_lq, 3),  # Present per-loss average to measure quality efficiency
-                "totalLossQuality": round(total, 2),
-                "avgLossQuality": round(avg_lq, 3),
-                "avgCloseness": round(avg_closeness, 2) if avg_closeness is not None else None,
-                "losses": losses,
-                "matches": losses,
+                "score": round(consistency_score, 1),
+                "totalLossPenalty": round(tot_penalty, 3),
+                "avgLossPenalty": round(avg_penalty, 3),
+                "wins": data["wins"],
+                "losses": data["losses"],
+                "matches": matches,
+                "winRate": round(100.0 * data["wins"] / max(1, matches), 1),
             })
 
-        rankings.sort(key=lambda x: (x["score"], x["losses"]), reverse=True)
+        # Rank by consistency score descending, then match count descending
+        rankings.sort(key=lambda x: (x["score"], x["matches"]), reverse=True)
         for idx, item in enumerate(rankings, 1):
             item["rank"] = idx
 
@@ -940,14 +947,13 @@ class RankingEngine:
             "rankings": rankings,
             "algorithm": {
                 "version": ALGORITHM_VERSION,
-                "name": "Loss Quality",
-                "description": "Measures how competitive losses were against opposition strength. Combines opponent difficulty (1 - expected_score) with game closeness ratio.",
-                "limitations": "Where set/game scores are missing, measures opposition strength without claiming game closeness.",
+                "name": "Loss Quality (Consistency)",
+                "description": "Measures competitive consistency relative to pre-match expectations. Lower penalties for expected losses to stronger opponents; higher penalties for unexpected upset losses. Undefeated players receive a score of 100.",
+                "limitations": "Measures consistency relative to pre-match expectations rather than absolute skill. Undefeated players receive 100 regardless of sample size.",
                 "parameters": {
-                    "difficultyFormula": "1 - expected_score (pre-match Glicko-2)",
-                    "closenessFactor": "loser_score / winner_score (when set score available)",
-                    "multiplier": "0.5 + 0.5 * closeness_factor when score present; 1.0 when score missing",
-                    "displayedScore": "Average Loss Quality per loss (distinguishes efficiency from loss volume)",
+                    "alpha": alpha,
+                    "penaltyFormula": f"expected_score ^ {alpha} for losses, 0 for wins",
+                    "scoreFormula": "100 * (1 - total_loss_penalty / eligible_matches) bounded [0, 100]",
                 },
             },
         }

@@ -261,7 +261,7 @@ function renderOverview() {
     { key: 'glicko2', title: 'Glicko-2', desc: 'Core player skill ratings (r - 2*RD conservative rating)', color: 'var(--gold)' },
     { key: 'sof', title: 'Strength of Field', desc: 'Pre-event competitive opponent strength and performance', color: 'var(--sky)' },
     { key: 'quality_wins', title: 'Quality Wins', desc: 'Credit gained from beating opponents based on expected win probability', color: 'var(--sky)' },
-    { key: 'loss_quality', title: 'Loss Quality', desc: 'Competitiveness of losses against opposition strength and game closeness', color: 'var(--text)' }
+    { key: 'loss_quality', title: 'Loss Quality (Consistency)', desc: 'Measures consistency relative to pre-match expectations. Undefeated = 100.', color: 'var(--text)' }
   ];
 
   systemConfigs.forEach(sys => {
@@ -349,7 +349,7 @@ function renderIndividualSystem(systemKey) {
           <span class="sortable" onclick="changeSort('playerTag')">PLAYER ${sortCol === 'playerTag' ? (sortAsc ? '▲' : '▼') : ''}</span>
           <span class="sortable" onclick="changeSort('score')">SCORE ${sortCol === 'score' ? (sortAsc ? '▲' : '▼') : ''}</span>
           <span>KEY METRICS</span>
-          <span class="sortable" onclick="changeSort('winRate')">WIN / EFF % ${sortCol === 'winRate' ? (sortAsc ? '▲' : '▼') : ''}</span>
+          <span class="sortable" onclick="changeSort('winRate')">WIN % ${sortCol === 'winRate' ? (sortAsc ? '▲' : '▼') : ''}</span>
           <span>MATCHES</span>
           <span>ACTIONS</span>
         </div>
@@ -395,7 +395,7 @@ function getSystemDescription(systemKey) {
     case 'quality_wins':
       return 'Quality Wins sums (1 - expected_score) across wins against opponents based on pre-match Glicko ratings.';
     case 'loss_quality':
-      return 'Loss Quality evaluates competitiveness of losses based on opponent difficulty and set/game closeness.';
+      return 'Loss Quality measures competitive consistency relative to pre-match expectations. Undefeated players receive 100.';
     default:
       return '';
   }
@@ -414,7 +414,7 @@ function formatMetrics(p, systemKey) {
   } else if (systemKey === 'quality_wins') {
     return `Total:${p.totalQualityWins} Avg/Win:${p.avgQualityWin}`;
   } else if (systemKey === 'loss_quality') {
-    return `Total:${p.totalLossQuality} Avg/Loss:${p.avgLossQuality}${p.avgCloseness !== null && p.avgCloseness !== undefined ? ' Closeness:' + p.avgCloseness : ''}`;
+    return `W:${p.wins} L:${p.losses} Penalty:${p.totalLossPenalty}`;
   }
   return '';
 }
@@ -565,8 +565,8 @@ window.openDiagnosticModal = async function(playerId) {
         <span>ROUND / PHASE</span>
         <span>OPPONENT</span>
         <span>OUTCOME</span>
-        <span>SCORE / DIFF</span>
-        <span>CONTRIBUTION / CREDIT</span>
+        <span>EXPECTED / DIFF</span>
+        <span>CONTRIBUTION / PENALTY</span>
       </div>
       ${diag.history && diag.history.length ? diag.history.map(item => `
         <div class="tr diag-tr">
@@ -574,9 +574,9 @@ window.openDiagnosticModal = async function(playerId) {
           <span>${esc(item.phase || '')} <small>${esc(item.round || '')}</small></span>
           <span><b>${esc(item.opponentTag)}</b> <small>Pre:${item.opponentPreRating}</small></span>
           <span class="mono ${item.outcome === 'win' ? 'win' : 'loss'}">${item.outcome.toUpperCase()}</span>
-          <span class="mono">${item.scoreDisplay || item.displayScore || (item.expectedScore !== undefined ? 'E:' + item.expectedScore : (item.preScore !== undefined ? item.preScore + '→' + item.postScore : '-'))}</span>
-          <span class="mono ${item.credit !== undefined ? 'win' : (item.change !== undefined && item.change >= 0 ? 'win' : 'loss')}">
-            ${item.credit !== undefined ? '+' + item.credit : (item.change !== undefined ? (item.change >= 0 ? '+' + item.change : item.change) : (item.contribution !== undefined ? item.contribution : '-'))}
+          <span class="mono">${item.expectedScore !== undefined ? 'E:' + item.expectedScore : (item.scoreDisplay || item.displayScore || (item.preScore !== undefined ? item.preScore + '→' + item.postScore : '-'))}</span>
+          <span class="mono ${item.penalty !== undefined ? (item.penalty > 0 ? 'loss' : 'win') : (item.credit !== undefined ? 'win' : (item.change !== undefined && item.change >= 0 ? 'win' : 'loss'))}">
+            ${item.penalty !== undefined ? '-' + item.penalty : (item.credit !== undefined ? '+' + item.credit : (item.change !== undefined ? (item.change >= 0 ? '+' + item.change : item.change) : (item.contribution !== undefined ? item.contribution : '-')))}
           </span>
         </div>
       `).join('') : '<div class="empty-state"><p class="muted">No contributing sets recorded in this date range.</p></div>'}
