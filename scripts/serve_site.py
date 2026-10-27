@@ -395,6 +395,8 @@ class Handler(SimpleHTTPRequestHandler):
                 atomic_json(PROFILE_DIR / "merges.json", merges)
                 self.send_json(500, {"error": "Could not rebuild profiles after merging. " + (result.stderr[-1000:] or result.stdout[-1000:])})
                 return
+            if hasattr(Handler, "rankings_cache"):
+                Handler.rankings_cache.clear()
             refresh_index()
             self.send_json(200, {"merged": source, "into": target, "profiles": profile_entries()})
         elif parsed.path == "/api/admin/event-group":
@@ -483,6 +485,8 @@ class Handler(SimpleHTTPRequestHandler):
                 atomic_json(EXCLUSIONS_PATH, previous)
                 self.send_json(500, {"error": "Could not rebuild profiles after updating exclusions. " + (result.stderr[-1000:] or result.stdout[-1000:])})
                 return
+            if hasattr(Handler, "rankings_cache"):
+                Handler.rankings_cache.clear()
             refresh_index()
             self.send_json(200, {"exclusions": config})
         elif parsed.path == "/api/admin/power-ranking/save":
