@@ -12,7 +12,7 @@
 <header class="topbar glass pill">
   <a class="brand" href="index.html"><img src="assets/logo.jpg" alt="">Platfighters<span class="tld">.uy</span></a>
   <span class="spacer"></span>
-  <nav><a href="players.html">Players</a><a href="events.html">Events</a><a href="rankings.html">Rankings</a></nav>
+  <nav><a href="players.html">Players</a><a href="events.html">Events</a><a href="#">Rankings</a></nav>
   <span class="badge">ADMIN</span>
 </header>
 <main class="admin-page page-single">
@@ -68,46 +68,6 @@
         <div class="form-actions"><button class="action-button" type="submit">Save event visibility</button><p id="event-exclusion-message" class="form-message mono" role="status"></p></div>
       </form>
       <div id="event-exclusion-list" class="event-exclusion-list" aria-live="polite"></div>
-    </section>
-
-    <section class="merge-panel" aria-labelledby="pr-heading">
-      <h3 id="pr-heading">Power Ranking Design Tool</h3>
-      <p class="muted admin-copy">Create, edit, and publish official community power rankings with optional statistical suggestions.</p>
-      <form id="pr-form" class="admin-form">
-        <label>Title<input id="pr-title" type="text" placeholder="Uruguay Smash Ultimate PR - Season 1" required></label>
-        <label>Subtitle / Season<input id="pr-subtitle" type="text" placeholder="Q1 2025"></label>
-        <label>Game
-          <select id="pr-game" required>
-            <option value="ultimate">Super Smash Bros. Ultimate</option>
-            <option value="melee">Super Smash Bros. Melee</option>
-            <option value="rivals-2">Rivals 2</option>
-            <option value="rivals-of-aether">Rivals of Aether</option>
-            <option value="project-plus">Project+</option>
-          </select>
-        </label>
-        <label>Publication Status
-          <select id="pr-status">
-            <option value="draft">Draft (Private)</option>
-            <option value="published">Published (Public)</option>
-          </select>
-        </label>
-        <label>Introduction / Commentary<textarea id="pr-intro" rows="3" placeholder="Welcome to the official rankings..."></textarea></label>
-        <div style="margin-top: 16px; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
-          <h4 style="margin: 0 0 8px 0;">Add Player to Power Ranking</h4>
-          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-            <select id="pr-add-player-select" style="flex: 1; min-width: 200px; padding: 8px; border-radius: 6px; background: rgba(0,0,0,0.4); color: white; border: 1px solid rgba(255,255,255,0.1);"></select>
-            <button id="btn-pr-add-player" class="quiet-button" type="button">+ Add Selected Player</button>
-            <button id="btn-pr-load-suggestions" class="quiet-button" type="button">Load Statistical Suggestions</button>
-          </div>
-        </div>
-        <div class="form-actions" style="margin-top: 16px; gap: 12px; display: flex; align-items: center;">
-          <button class="action-button" type="submit">Save Power Ranking</button>
-          <p id="pr-message" class="form-message mono" role="status"></p>
-        </div>
-        <div id="pr-entries-container" style="margin-top: 16px;">
-          <p class="muted">Click "Load Statistical Suggestions" to import top statistical players as starting entries, or manage manually.</p>
-        </div>
-      </form>
     </section>
   </section>
 </main>
