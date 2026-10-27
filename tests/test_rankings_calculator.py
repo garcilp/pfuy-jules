@@ -130,3 +130,54 @@ def test_player_merges_data_integrity(tmp_path):
     assert '1002' in res
     assert res['1002']['tag'] == 'CanonicalTag'
     assert res['1002']['matches_count'] == 1
+
+
+def test_visibility_exclusions_in_rankings(tmp_path, monkeypatch):
+    db_file = str(tmp_path / "test_exclusions.sqlite3")
+    init_db(db_file)
+
+    conn = sqlite3.connect(db_file)
+    cur = conn.cursor()
+
+    cur.execute("CREATE TABLE IF NOT EXISTS videogames (slug TEXT PRIMARY KEY, name TEXT)")
+    cur.execute("CREATE TABLE IF NOT EXISTS tournaments (slug TEXT PRIMARY KEY, name TEXT, start_at INTEGER)")
+    cur.execute("CREATE TABLE IF NOT EXISTS events (id INTEGER PRIMARY KEY, tournament_slug TEXT, videogame_slug TEXT, name TEXT, source_url TEXT, num_entrants INTEGER)")
+    cur.execute("CREATE TABLE IF NOT EXISTS participants (id INTEGER PRIMARY KEY, player_id TEXT, gamer_tag TEXT)")
+    cur.execute("CREATE TABLE IF NOT EXISTS entrants (id INTEGER PRIMARY KEY, event_id INTEGER, name TEXT)")
+    cur.execute("CREATE TABLE IF NOT EXISTS entrant_participants (entrant_id INTEGER, participant_id INTEGER)")
+    cur.execute("CREATE TABLE IF NOT EXISTS sets (id INTEGER PRIMARY KEY, event_id INTEGER, winner_entrant_id INTEGER)")
+    cur.execute("CREATE TABLE IF NOT EXISTS set_entrants (set_id INTEGER, entrant_id INTEGER)")
+    cur.execute("CREATE TABLE IF NOT EXISTS event_standings (event_id INTEGER, entrant_id INTEGER, placement INTEGER)")
+
+    cur.execute("INSERT INTO videogames (slug, name) VALUES ('ultimate', 'Super Smash Bros. Ultimate')")
+    cur.execute("INSERT INTO tournaments (slug, name, start_at) VALUES ('tourney1', 'Tournament 1', 1736505600)")
+    cur.execute("INSERT INTO events (id, tournament_slug, videogame_slug, name, source_url, num_entrants) VALUES (1, 'tourney1', 'ultimate', 'Singles', 'https://www.start.gg/tournament/tourney1/event/singles', 8)")
+
+    cur.execute("INSERT INTO participants (id, player_id, gamer_tag) VALUES (101, '1001', 'PlayerOne')")
+    cur.execute("INSERT INTO participants (id, player_id, gamer_tag) VALUES (102, '1002', 'PlayerTwo')")
+
+    cur.execute("INSERT INTO entrants (id, event_id, name) VALUES (1, 1, 'PlayerOne')")
+    cur.execute("INSERT INTO entrants (id, event_id, name) VALUES (2, 1, 'PlayerTwo')")
+
+    cur.execute("INSERT INTO entrant_participants (entrant_id, participant_id) VALUES (1, 101)")
+    cur.execute("INSERT INTO entrant_participants (entrant_id, participant_id) VALUES (2, 102)")
+
+    cur.execute("INSERT INTO sets (id, event_id, winner_entrant_id) VALUES (50, 1, 1)")
+    cur.execute("INSERT INTO set_entrants (set_id, entrant_id) VALUES (50, 1)")
+    cur.execute("INSERT INTO set_entrants (set_id, entrant_id) VALUES (50, 2)")
+
+    cur.execute("INSERT INTO event_standings (event_id, entrant_id, placement) VALUES (1, 1, 1)")
+    cur.execute("INSERT INTO event_standings (event_id, entrant_id, placement) VALUES (1, 2, 2)")
+
+    conn.commit()
+    conn.close()
+
+    # Mock exclusions
+    mock_exclusions = {
+        "events": {"tournament/tourney1/event/singles"},
+        "playerGames": {}
+    }
+    monkeypatch.setattr("scripts.rankings_calculator.load_visibility_exclusions", lambda: mock_exclusions)
+
+    res = calculate_statistical_rankings(db_file, game_slug='ultimate')
+    assert len(res) == 0
