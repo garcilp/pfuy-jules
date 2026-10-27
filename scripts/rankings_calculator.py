@@ -4,12 +4,8 @@ import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
 
-from urllib.parse import urlsplit
-
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-MERGES_FILE = PROJECT_ROOT / "data" / "profiles" / "merges.json"
-FALLBACK_MERGES_FILE = PROJECT_ROOT / "data" / "player_merges.json"
-EXCLUSIONS_FILE = PROJECT_ROOT / "data" / "profiles" / "exclusions.json"
+MERGES_FILE = PROJECT_ROOT / "data" / "player_merges.json"
 
 # Default TrueSkill Parameters
 TRUESKILL_MU0 = 25.0
@@ -26,59 +22,14 @@ GLICKO_TAU = 0.5
 GLICKO_SCALE = 173.7178
 
 def load_player_merges():
-    target = MERGES_FILE if MERGES_FILE.exists() else FALLBACK_MERGES_FILE
-    if not target.exists():
+    if not MERGES_FILE.exists():
         return {}
     try:
-        with target.open("r", encoding="utf-8") as f:
+        with MERGES_FILE.open("r", encoding="utf-8") as f:
             data = json.load(f)
             return {str(k): str(v) for k, v in data.items()}
     except Exception:
         return {}
-
-def normalize_event_key(value):
-    if not isinstance(value, str) or not value.strip():
-        return None
-    raw = value.strip()
-    parsed = urlsplit(raw if "://" in raw else f"https://www.start.gg/{raw.lstrip('/')}")
-    if parsed.netloc and parsed.netloc.lower() not in {"start.gg", "www.start.gg"}:
-        return None
-    parts = parsed.path.strip("/").lower().split("/")
-    if len(parts) < 4 or parts[0] != "tournament" or parts[2] != "event":
-        return None
-    return "/".join(parts[:4])
-
-def load_visibility_exclusions():
-    if not EXCLUSIONS_FILE.exists():
-        return {"events": set(), "playerGames": {}}
-    try:
-        with EXCLUSIONS_FILE.open("r", encoding="utf-8") as f:
-            data = json.load(f)
-            events = data.get("events", []) if isinstance(data, dict) else []
-            player_games = data.get("playerGames", {}) if isinstance(data, dict) else {}
-            excluded_events = {key for item in events if (key := normalize_event_key(item))}
-            return {
-                "events": excluded_events,
-                "playerGames": player_games if isinstance(player_games, dict) else {}
-            }
-    except Exception:
-        return {"events": set(), "playerGames": {}}
-
-def load_profile_tags():
-    index_file = PROJECT_ROOT / "data" / "profiles" / "index.json"
-    tags = {}
-    if index_file.exists():
-        try:
-            with index_file.open("r", encoding="utf-8") as f:
-                entries = json.load(f)
-                for entry in entries:
-                    pid = str(entry.get("playerId") or "")
-                    tag = entry.get("tag")
-                    if pid and tag:
-                        tags[pid] = tag
-        except Exception:
-            pass
-    return tags
 
 def canonical_id(player_id, merges):
     if player_id is None:
@@ -326,9 +277,6 @@ def calculate_placement_points(placement, num_entrants):
 def calculate_statistical_rankings(db_path="startgg-data/platfighters.sqlite3", game_slug="all", cutoff_date=None, start_date=None, player_merges=None):
     init_db(db_path)
     merges = player_merges if player_merges is not None else load_player_merges()
-    exclusions = load_visibility_exclusions()
-    excluded_event_keys = exclusions["events"]
-    player_game_exclusions = exclusions["playerGames"]
 
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
@@ -336,7 +284,7 @@ def calculate_statistical_rankings(db_path="startgg-data/platfighters.sqlite3", 
 
     # Query events
     query_events = """
-        SELECT e.id, e.videogame_slug, e.num_entrants, e.source_url, t.start_at
+        SELECT e.id, e.videogame_slug, e.num_entrants, t.start_at
         FROM events e
         LEFT JOIN tournaments t ON e.tournament_slug = t.slug
         WHERE 1=1
@@ -361,10 +309,6 @@ def calculate_statistical_rankings(db_path="startgg-data/platfighters.sqlite3", 
         if start_date and dt_str and dt_str < start_date:
             continue
 
-        event_key = normalize_event_key(ev['source_url'])
-        if event_key and event_key in excluded_event_keys:
-            continue
-
         filtered_events.append({
             "id": str(ev['id']),
             "game_slug": ev['videogame_slug'],
@@ -376,20 +320,14 @@ def calculate_statistical_rankings(db_path="startgg-data/platfighters.sqlite3", 
         conn.close()
         return {}
 
-    # Build player tags, preferring data/profiles/index.json if available
-    profile_tags = load_profile_tags()
-    player_tags = dict(profile_tags)
+    # Build player tags
     cur.execute("SELECT player_id, gamer_tag FROM participants WHERE player_id IS NOT NULL AND gamer_tag IS NOT NULL AND TRIM(gamer_tag) != ''")
     participants_rows = cur.fetchall()
+    player_tags = {}
     for r in participants_rows:
-        pid = str(r['player_id'])
-        cid = canonical_id(pid, merges)
-        tag = r['gamer_tag']
-        if cid:
-            if cid not in player_tags:
-                player_tags[cid] = tag
-            elif cid not in profile_tags and pid == cid:
-                player_tags[cid] = tag
+        cid = canonical_id(r['player_id'], merges)
+        if cid and (cid not in player_tags or r['gamer_tag']):
+            player_tags[cid] = r['gamer_tag']
 
     # Entrant ID to canonical Player ID mapping
     cur.execute("""
@@ -441,11 +379,6 @@ def calculate_statistical_rankings(db_path="startgg-data/platfighters.sqlite3", 
             if not cid:
                 continue
 
-            # Check player game exclusions
-            excluded_games_for_player = player_game_exclusions.get(cid, [])
-            if ev['game_slug'] in excluded_games_for_player:
-                continue
-
             pos = st['placement']
             pts = calculate_placement_points(pos, num_entrants)
             placement_scores[cid] = placement_scores.get(cid, 0.0) + pts
@@ -490,12 +423,6 @@ def calculate_statistical_rankings(db_path="startgg-data/platfighters.sqlite3", 
             l_cid = entrant_player_map.get(l_ent_id)
 
             if not w_cid or not l_cid or w_cid == l_cid:
-                continue
-
-            # Check player game exclusions for match processing
-            w_excluded = ev['game_slug'] in player_game_exclusions.get(w_cid, [])
-            l_excluded = ev['game_slug'] in player_game_exclusions.get(l_cid, [])
-            if w_excluded or l_excluded:
                 continue
 
             # TrueSkill update

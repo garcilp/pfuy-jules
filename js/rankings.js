@@ -176,12 +176,10 @@
     const normTP = (val) => (maxTP > minTP) ? ((val - minTP) / (maxTP - minTP)) * 100 : 50;
     const normSOF = (val) => (maxSOF > minSOF) ? ((val - minSOF) / (maxSOF - minSOF)) * 100 : 50;
 
-    const rawSum = parseInt(wTS.value) + parseInt(wG2.value) + parseInt(wTP.value) + parseInt(wSOF.value);
-    const weightNorm = rawSum > 0 ? (100 / rawSum) : 1;
-    const tsW = (parseInt(wTS.value) * weightNorm) / 100;
-    const g2W = (parseInt(wG2.value) * weightNorm) / 100;
-    const tpW = (parseInt(wTP.value) * weightNorm) / 100;
-    const sofW = (parseInt(wSOF.value) * weightNorm) / 100;
+    const tsW = parseInt(wTS.value) / 100;
+    const g2W = parseInt(wG2.value) / 100;
+    const tpW = parseInt(wTP.value) / 100;
+    const sofW = parseInt(wSOF.value) / 100;
 
     let processed = currentRawPlayers.map(p => {
       const nTS = normTS(p.trueskill.conservative);
