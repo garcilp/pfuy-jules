@@ -3,7 +3,7 @@ import socketserver
 import threading
 import time
 import os
-from playwright.sync_api import sync_playwright, expect
+from playwright.sync_api import sync_playwright
 
 os.makedirs("verification", exist_ok=True)
 
@@ -29,13 +29,19 @@ def run():
             page.screenshot(path="verification/rankings_overview.png")
             print("Captured rankings_overview.png")
 
-            # 2. TrueSkill Tab
-            page.click("button[data-system='trueskill']")
+            # 2. Glicko-2 Tab
+            page.click("button[data-system='glicko2']")
             page.wait_for_selector(".ranking-row")
-            page.screenshot(path="verification/rankings_trueskill.png")
-            print("Captured rankings_trueskill.png")
+            page.screenshot(path="verification/rankings_glicko2.png")
+            print("Captured rankings_glicko2.png")
 
-            # 3. Comparison Tab
+            # 3. Quality Wins Tab
+            page.click("button[data-system='quality_wins']")
+            page.wait_for_selector(".ranking-row")
+            page.screenshot(path="verification/rankings_quality_wins.png")
+            print("Captured rankings_quality_wins.png")
+
+            # 4. Comparison Tab
             page.click("button[data-system='comparison']")
             page.wait_for_selector(".comparison-row")
             page.screenshot(path="verification/rankings_comparison.png")

@@ -1148,13 +1148,16 @@
     }
   ],
   "algorithm": {
-    "version": "1.0.0",
+    "version": "2.0.0",
     "name": "Glicko-2",
+    "description": "Measures player skill ratings (r, RD, volatility). Conservative rating = r - 2*RD.",
+    "limitations": "Measures skill rating rather than cumulative event achievements or individual match closeness.",
     "parameters": {
       "initialRating": 1500.0,
       "initialRD": 350.0,
       "initialVolatility": 0.06,
-      "tau": 0.5
+      "tau": 0.5,
+      "formula": "r - 2 * RD"
     }
   }
 }

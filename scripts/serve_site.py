@@ -279,7 +279,7 @@ class Handler(SimpleHTTPRequestHandler):
         elif parsed.path == "/api/rankings":
             qs = parse_qs(parsed.query)
             game = qs.get("game", ["ultimate"])[0]
-            system = qs.get("system", ["trueskill"])[0]
+            system = qs.get("system", ["glicko2"])[0]
             mode = qs.get("mode", ["historical"])[0]
             start_date = qs.get("start_date", qs.get("start", [None]))[0]
             end_date = qs.get("end_date", qs.get("end", [None]))[0]
@@ -302,7 +302,7 @@ class Handler(SimpleHTTPRequestHandler):
         elif parsed.path == "/api/rankings/diagnostic":
             qs = parse_qs(parsed.query)
             game = qs.get("game", ["ultimate"])[0]
-            system = qs.get("system", ["trueskill"])[0]
+            system = qs.get("system", ["glicko2"])[0]
             mode = qs.get("mode", ["historical"])[0]
             start_date = qs.get("start_date", qs.get("start", [None]))[0]
             end_date = qs.get("end_date", qs.get("end", [None]))[0]
