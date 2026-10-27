@@ -514,9 +514,23 @@ class Handler(SimpleHTTPRequestHandler):
             # 1 year ago approximation
             start_date = time.strftime("%Y-%m-%d", time.gmtime(time.time() - 365*86400))
 
+        cache_key = f"{game_slug}:{period}:{cutoff_date}:{start_date}"
+        now = time.time()
+        if hasattr(self, "rankings_cache") and cache_key in self.rankings_cache:
+            cached_time, cached_data = self.rankings_cache[cache_key]
+            if now - cached_time < 300: # 5 minute cache
+                self.send_json(200, cached_data)
+                return
+
         res = calculate_statistical_rankings(DATABASE, game_slug=game_slug, cutoff_date=cutoff_date, start_date=start_date)
         players_list = list(res.values())
-        self.send_json(200, {"game": game_slug, "period": period, "players": players_list})
+        resp_data = {"game": game_slug, "period": period, "players": players_list}
+
+        if not hasattr(Handler, "rankings_cache"):
+            Handler.rankings_cache = {}
+        Handler.rankings_cache[cache_key] = (now, resp_data)
+
+        self.send_json(200, resp_data)
 
     def handle_get_power_rankings(self, parsed):
         params = parse_qs(parsed.query)

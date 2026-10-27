@@ -388,21 +388,31 @@ def calculate_statistical_rankings(db_path="startgg-data/platfighters.sqlite3", 
 
         # 2. Match processing
         cur.execute("""
-            SELECT s.id, s.winner_entrant_id
+            SELECT s.id AS set_id, s.winner_entrant_id, se.entrant_id
             FROM sets s
+            JOIN set_entrants se ON s.id = se.set_id
             WHERE s.event_id = ? AND s.winner_entrant_id IS NOT NULL
+            ORDER BY s.id ASC
         """, (eid,))
-        sets_rows = cur.fetchall()
+        set_ent_rows = cur.fetchall()
+
+        # Group entrants by set_id
+        sets_dict = {}
+        for row in set_ent_rows:
+            sid = str(row['set_id'])
+            if sid not in sets_dict:
+                sets_dict[sid] = {
+                    "winner_entrant_id": str(row['winner_entrant_id']),
+                    "entrants": []
+                }
+            if row['entrant_id']:
+                sets_dict[sid]["entrants"].append(str(row['entrant_id']))
 
         glicko_period_matches = {}
 
-        for srow in sets_rows:
-            sid = str(srow['id'])
-            w_ent_id = str(srow['winner_entrant_id'])
-
-            cur.execute("SELECT entrant_id FROM set_entrants WHERE set_id = ?", (sid,))
-            se_rows = cur.fetchall()
-            ent_ids = [str(r['entrant_id']) for r in se_rows if r['entrant_id']]
+        for sid, sdata in sets_dict.items():
+            w_ent_id = sdata["winner_entrant_id"]
+            ent_ids = sdata["entrants"]
 
             if len(ent_ids) < 2:
                 continue

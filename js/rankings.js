@@ -214,18 +214,18 @@
     tbody.innerHTML = processed.map((p, idx) => {
       const rank = idx + 1;
       const rankBadgeClass = rank <= 3 ? `badge-rank-${rank}` : '';
-      const profileLink = p.canonical_id ? `index.html?p=${encodeURIComponent(p.canonical_id)}` : '#';
+      const profileLink = p.canonical_id ? `index.html?player=${encodeURIComponent(p.canonical_id)}` : '#';
 
       return `
         <tr>
           <td><span class="badge-rank ${rankBadgeClass}">${rank}</span></td>
-          <td><a href="${profileLink}" style="font-weight: 500; color: inherit; text-decoration: none;">${p.tag}</a></td>
-          <td><strong style="color: #646cff;">${p.customScore}</strong></td>
-          <td>${p.trueskill.conservative} <span class="badge mono" style="font-size:0.75rem;">#${p.tsRank}</span></td>
-          <td>${p.glicko2.conservative} <span class="badge mono" style="font-size:0.75rem;">#${p.g2Rank}</span></td>
-          <td>${p.placings.points} <span class="badge mono" style="font-size:0.75rem;">#${p.tpRank}</span></td>
-          <td>${p.strength_of_field.score} <span class="badge mono" style="font-size:0.75rem;">#${p.sofRank}</span></td>
-          <td class="muted">${p.matches_count} matches</td>
+          <td><a href="${profileLink}" style="font-weight: 600; color: inherit; text-decoration: none;">${p.tag}</a></td>
+          <td style="text-align: right;"><strong style="color: #646cff; font-size: 1.05rem;">${p.customScore}</strong></td>
+          <td style="text-align: right;">${p.trueskill.conservative} <span class="badge mono" style="font-size:0.75rem; margin-left:4px;">#${p.tsRank}</span></td>
+          <td style="text-align: right;">${p.glicko2.conservative} <span class="badge mono" style="font-size:0.75rem; margin-left:4px;">#${p.g2Rank}</span></td>
+          <td style="text-align: right;">${p.placings.points} <span class="badge mono" style="font-size:0.75rem; margin-left:4px;">#${p.tpRank}</span></td>
+          <td style="text-align: right;">${p.strength_of_field.score} <span class="badge mono" style="font-size:0.75rem; margin-left:4px;">#${p.sofRank}</span></td>
+          <td style="text-align: right;" class="muted">${p.matches_count}</td>
         </tr>
       `;
     }).join('');
@@ -340,7 +340,7 @@
             <div class="pr-entry-row">
               <div class="pr-entry-pos">#${e.assigned_position}</div>
               <div class="pr-entry-content">
-                <h3><a href="${e.canonical_player_id ? 'index.html?p=' + encodeURIComponent(e.canonical_player_id) : '#'}" style="color: inherit; text-decoration: none;">${e.tag || 'Player ' + e.canonical_player_id}</a></h3>
+                <h3><a href="${e.canonical_player_id ? 'index.html?player=' + encodeURIComponent(e.canonical_player_id) : '#'}" style="color: inherit; text-decoration: none;">${e.tag || 'Player ' + e.canonical_player_id}</a></h3>
                 ${e.written_analysis ? `<p>${e.written_analysis}</p>` : ''}
                 ${e.highlights ? `<p class="muted" style="font-size:0.85rem; margin-top:4px;">${e.highlights}</p>` : ''}
               </div>
