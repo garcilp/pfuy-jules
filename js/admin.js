@@ -37,6 +37,11 @@ async function loadProfiles(selected = '') {
     const options = profiles.filter(p => p.playerId).map(p => `<option value="${esc(p.playerId)}">${esc(p.tag)} · ${esc(p.playerId)}</option>`).join('');
     source.innerHTML = options;
     target.innerHTML = options;
+
+    const prAddSelect = $('#pr-add-player-select');
+    if (prAddSelect) {
+      prAddSelect.innerHTML = profiles.filter(p => p.playerId).map(p => `<option value="${esc(p.playerId)}" data-tag="${esc(p.tag)}">${esc(p.tag)} (${esc(p.playerId)})</option>`).join('');
+    }
     if (source.options.length > 1) source.selectedIndex = 1;
     if (target.options.length) target.selectedIndex = 0;
     if (Object.keys(merges).length) {
@@ -272,6 +277,144 @@ $('#profile-form').addEventListener('submit', async event => {
 
 $('#signout').addEventListener('click', async () => {
   try { await api('/api/admin/logout', { method: 'POST', body: '{}' }); } finally { showEditor(false); }
+});
+
+let currentPrEntries = [];
+
+function renderPrEntries() {
+  const container = $('#pr-entries-container');
+  if (!container) return;
+  if (currentPrEntries.length === 0) {
+    container.innerHTML = '<p class="muted">No player entries added. Click "Load Statistical Suggestions" above.</p>';
+    return;
+  }
+
+  container.innerHTML = `
+    <h4>Power Ranking Player Entries (${currentPrEntries.length})</h4>
+    <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 8px;">
+      ${currentPrEntries.map((e, idx) => `
+        <div class="glass" style="padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);">
+          <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 8px;">
+            <strong>#${idx + 1}</strong>
+            <span style="font-weight: 500;">${esc(e.tag)}</span>
+            <span class="muted mono" style="font-size:0.8rem;">(ID: ${esc(e.canonical_player_id)})</span>
+            <div style="margin-left: auto; display: flex; gap: 4px;">
+              <button class="quiet-button" type="button" data-pr-move="${idx}" data-dir="up" ${idx === 0 ? 'disabled' : ''}>↑ Up</button>
+              <button class="quiet-button" type="button" data-pr-move="${idx}" data-dir="down" ${idx === currentPrEntries.length - 1 ? 'disabled' : ''}>↓ Down</button>
+              <button class="quiet-button" type="button" style="color: #ff6b6b;" data-pr-remove="${idx}">Remove</button>
+            </div>
+          </div>
+          <label style="font-size: 0.85rem; display: block; margin-bottom: 4px;">Editorial Analysis / Commentary
+            <textarea data-pr-analysis="${idx}" rows="2" style="width: 100%; margin-top: 4px;">${esc(e.written_analysis || '')}</textarea>
+          </label>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+$('#btn-pr-add-player')?.addEventListener('click', () => {
+  const select = $('#pr-add-player-select');
+  if (!select || !select.value) return;
+  const canonical_id = select.value;
+  const selectedOpt = select.selectedOptions[0];
+  const tag = selectedOpt ? selectedOpt.dataset.tag : select.value;
+
+  if (currentPrEntries.some(e => String(e.canonical_player_id) === String(canonical_id))) {
+    alert('This player is already included in the power ranking.');
+    return;
+  }
+
+  currentPrEntries.push({
+    assigned_position: currentPrEntries.length + 1,
+    canonical_player_id: canonical_id,
+    tag: tag,
+    written_analysis: ''
+  });
+  renderPrEntries();
+});
+
+$('#btn-pr-load-suggestions')?.addEventListener('click', async () => {
+  const game = $('#pr-game').value;
+  const msg = $('#pr-message');
+  msg.textContent = 'Loading top statistical suggestions…';
+  try {
+    const res = await api(`/api/admin/ranking-suggestions?game=${encodeURIComponent(game)}`);
+    const suggestions = res.suggestions || [];
+    currentPrEntries = suggestions.slice(0, 10).map((s, idx) => ({
+      assigned_position: idx + 1,
+      canonical_player_id: s.canonical_id,
+      tag: s.tag,
+      written_analysis: `Top statistical contender with ${s.matches_count} matches in dataset.`
+    }));
+    renderPrEntries();
+    msg.textContent = `Loaded top ${currentPrEntries.length} statistical suggestions.`;
+  } catch (err) {
+    msg.textContent = err.message;
+  }
+});
+
+$('#pr-entries-container')?.addEventListener('click', (e) => {
+  const removeBtn = e.target.closest('[data-pr-remove]');
+  if (removeBtn) {
+    const idx = parseInt(removeBtn.dataset.prRemove, 10);
+    currentPrEntries.splice(idx, 1);
+    currentPrEntries.forEach((item, i) => item.assigned_position = i + 1);
+    renderPrEntries();
+    return;
+  }
+
+  const moveBtn = e.target.closest('[data-pr-move]');
+  if (moveBtn) {
+    const idx = parseInt(moveBtn.dataset.prMove, 10);
+    const dir = moveBtn.dataset.dir;
+    if (dir === 'up' && idx > 0) {
+      const temp = currentPrEntries[idx];
+      currentPrEntries[idx] = currentPrEntries[idx - 1];
+      currentPrEntries[idx - 1] = temp;
+    } else if (dir === 'down' && idx < currentPrEntries.length - 1) {
+      const temp = currentPrEntries[idx];
+      currentPrEntries[idx] = currentPrEntries[idx + 1];
+      currentPrEntries[idx + 1] = temp;
+    }
+    currentPrEntries.forEach((item, i) => item.assigned_position = i + 1);
+    renderPrEntries();
+  }
+});
+
+$('#pr-entries-container')?.addEventListener('input', (e) => {
+  const textarea = e.target.closest('[data-pr-analysis]');
+  if (textarea) {
+    const idx = parseInt(textarea.dataset.prAnalysis, 10);
+    if (currentPrEntries[idx]) {
+      currentPrEntries[idx].written_analysis = textarea.value;
+    }
+  }
+});
+
+$('#pr-form')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const msg = $('#pr-message');
+  msg.textContent = 'Saving power ranking…';
+
+  const payload = {
+    title: $('#pr-title').value,
+    subtitle: $('#pr-subtitle').value,
+    game_slug: $('#pr-game').value,
+    status: $('#pr-status').value,
+    introduction: $('#pr-intro').value,
+    entries: currentPrEntries
+  };
+
+  try {
+    await api('/api/admin/power-ranking/save', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+    msg.textContent = 'Power ranking saved successfully!';
+  } catch (err) {
+    msg.textContent = err.message;
+  }
 });
 
 api('/api/admin/session').then(({ authenticated }) => showEditor(authenticated)).catch(() => showEditor(false));

@@ -17,6 +17,8 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
+from scripts.rankings_calculator import calculate_statistical_rankings, init_db
+
 ROOT = Path(__file__).resolve().parent.parent
 PROFILE_DIR = ROOT / "data" / "profiles"
 EVENT_GROUPS_PATH = PROFILE_DIR / "event_groups.json"
@@ -289,6 +291,18 @@ class Handler(SimpleHTTPRequestHandler):
                 return
             excluded = visibility_exclusions()["playerGames"].get(player_id, [])
             self.send_json(200, {"games": [{"id": row[0], "name": row[1]} for row in games], "excluded": excluded})
+        elif parsed.path.startswith("/api/rankings/power/detail"):
+            self.handle_power_ranking_detail(parsed)
+        elif parsed.path.startswith("/api/rankings/power"):
+            self.handle_get_power_rankings(parsed)
+        elif parsed.path.startswith("/api/rankings/archive"):
+            self.handle_get_ranking_archive(parsed)
+        elif parsed.path.startswith("/api/rankings"):
+            self.handle_get_statistical_rankings(parsed)
+        elif parsed.path.startswith("/api/admin/ranking-suggestions"):
+            if not self.require_admin():
+                return
+            self.handle_admin_ranking_suggestions(parsed)
         elif parsed.path.startswith("/api/"):
             self.send_json(404, {"error": "Not found."})
         else:
@@ -471,8 +485,228 @@ class Handler(SimpleHTTPRequestHandler):
                 return
             refresh_index()
             self.send_json(200, {"exclusions": config})
+        elif parsed.path == "/api/admin/power-ranking/save":
+            if not self.require_admin():
+                return
+            self.handle_admin_power_ranking_save(body)
+        elif parsed.path == "/api/admin/power-ranking/delete":
+            if not self.require_admin():
+                return
+            self.handle_admin_power_ranking_delete(body)
         else:
             self.send_json(404, {"error": "Not found."})
+
+    def handle_get_statistical_rankings(self, parsed):
+        params = parse_qs(parsed.query)
+        game_slug = params.get("game", ["all"])[0]
+        period = params.get("period", ["all-time"])[0]
+        cutoff = params.get("cutoff", [None])[0]
+
+        start_date = None
+        cutoff_date = cutoff
+
+        if period == "2025":
+            start_date, cutoff_date = "2025-01-01", "2025-12-31"
+        elif period == "2024":
+            start_date, cutoff_date = "2024-01-01", "2024-12-31"
+        elif period == "rolling-12":
+            cutoff_date = time.strftime("%Y-%m-%d")
+            # 1 year ago approximation
+            start_date = time.strftime("%Y-%m-%d", time.gmtime(time.time() - 365*86400))
+
+        res = calculate_statistical_rankings(DATABASE, game_slug=game_slug, cutoff_date=cutoff_date, start_date=start_date)
+        players_list = list(res.values())
+        self.send_json(200, {"game": game_slug, "period": period, "players": players_list})
+
+    def handle_get_power_rankings(self, parsed):
+        params = parse_qs(parsed.query)
+        game_slug = params.get("game", ["all"])[0]
+
+        init_db(DATABASE)
+        conn = sqlite3.connect(DATABASE)
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+
+        query = "SELECT * FROM power_rankings WHERE status = 'published'"
+        args = []
+        if game_slug and game_slug != "all":
+            query += " AND game_slug = ?"
+            args.append(game_slug)
+        query += " ORDER BY publication_date DESC, id DESC"
+
+        cur.execute(query, args)
+        rows = [dict(r) for r in cur.fetchall()]
+
+        for pr in rows:
+            cur.execute("""
+                SELECT e.assigned_position, e.canonical_player_id, e.written_analysis, e.highlights, e.position_change, part.gamer_tag as tag
+                FROM power_ranking_entries e
+                LEFT JOIN participants part ON e.canonical_player_id = part.player_id
+                WHERE e.power_ranking_id = ?
+                GROUP BY e.id
+                ORDER BY e.assigned_position ASC
+            """, (pr["id"],))
+            pr["entries"] = [dict(r) for r in cur.fetchall()]
+
+        conn.close()
+        self.send_json(200, {"power_rankings": rows})
+
+    def handle_power_ranking_detail(self, parsed):
+        params = parse_qs(parsed.query)
+        pr_id = params.get("id", [None])[0]
+
+        if not pr_id:
+            self.send_json(400, {"error": "Missing id parameter"})
+            return
+
+        init_db(DATABASE)
+        conn = sqlite3.connect(DATABASE)
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+
+        cur.execute("SELECT * FROM power_rankings WHERE id = ?", (pr_id,))
+        pr_row = cur.fetchone()
+
+        if not pr_row:
+            conn.close()
+            self.send_json(404, {"error": "Power ranking not found"})
+            return
+
+        pr_dict = dict(pr_row)
+
+        cur.execute("""
+            SELECT e.*, part.gamer_tag as tag
+            FROM power_ranking_entries e
+            LEFT JOIN participants part ON e.canonical_player_id = part.player_id
+            WHERE e.power_ranking_id = ?
+            GROUP BY e.id
+            ORDER BY e.assigned_position ASC
+        """, (pr_id,))
+        entries = [dict(r) for r in cur.fetchall()]
+        pr_dict["entries"] = entries
+
+        conn.close()
+        self.send_json(200, {"power_ranking": pr_dict})
+
+    def handle_get_ranking_archive(self, parsed):
+        params = parse_qs(parsed.query)
+        game_slug = params.get("game", ["all"])[0]
+
+        init_db(DATABASE)
+        conn = sqlite3.connect(DATABASE)
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+
+        query = "SELECT * FROM power_rankings WHERE 1=1"
+        args = []
+        if game_slug and game_slug != "all":
+            query += " AND game_slug = ?"
+            args.append(game_slug)
+
+        query += " ORDER BY publication_date DESC, id DESC"
+        cur.execute(query, args)
+        prs = [dict(r) for r in cur.fetchall()]
+
+        for pr in prs:
+            cur.execute("""
+                SELECT e.assigned_position, e.canonical_player_id, e.written_analysis, e.highlights, e.position_change, part.gamer_tag as tag
+                FROM power_ranking_entries e
+                LEFT JOIN participants part ON e.canonical_player_id = part.player_id
+                WHERE e.power_ranking_id = ?
+                GROUP BY e.id
+                ORDER BY e.assigned_position ASC
+            """, (pr["id"],))
+            pr["entries"] = [dict(r) for r in cur.fetchall()]
+
+        conn.close()
+        self.send_json(200, {"archive": prs})
+
+    def handle_admin_ranking_suggestions(self, parsed):
+        params = parse_qs(parsed.query)
+        game_slug = params.get("game", ["all"])[0]
+
+        res = calculate_statistical_rankings(DATABASE, game_slug=game_slug)
+        players_list = list(res.values())
+        self.send_json(200, {"suggestions": players_list})
+
+    def handle_admin_power_ranking_save(self, body):
+        title = body.get("title")
+        game_slug = body.get("game_slug")
+        status = body.get("status", "draft")
+        entries = body.get("entries", [])
+        pr_id = body.get("id")
+
+        if not title or not game_slug:
+            self.send_json(400, {"error": "Title and game_slug are required"})
+            return
+
+        init_db(DATABASE)
+        conn = sqlite3.connect(DATABASE)
+        cur = conn.cursor()
+
+        now_str = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+        pub_date = body.get("publication_date") or time.strftime("%Y-%m-%d")
+
+        if pr_id:
+            cur.execute("""
+                UPDATE power_rankings
+                SET title=?, subtitle=?, game_slug=?, coverage_period=?, publication_date=?, season=?,
+                    introduction=?, closing_commentary=?, featured_image=?, author=?, status=?, updated_at=?
+                WHERE id=?
+            """, (title, body.get("subtitle"), game_slug, body.get("coverage_period"), pub_date,
+                  body.get("season"), body.get("introduction"), body.get("closing_commentary"),
+                  body.get("featured_image"), body.get("author"), status, now_str, pr_id))
+            cur.execute("DELETE FROM power_ranking_entries WHERE power_ranking_id=?", (pr_id,))
+        else:
+            cur.execute("""
+                INSERT INTO power_rankings (title, subtitle, game_slug, coverage_period, publication_date, season,
+                                            introduction, closing_commentary, featured_image, author, status, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (title, body.get("subtitle"), game_slug, body.get("coverage_period"), pub_date,
+                  body.get("season"), body.get("introduction"), body.get("closing_commentary"),
+                  body.get("featured_image"), body.get("author"), status, now_str, now_str))
+            pr_id = cur.lastrowid
+
+        for idx, entry in enumerate(entries, start=1):
+            pos = entry.get("assigned_position", idx)
+            cid = entry.get("canonical_player_id")
+            if not cid:
+                continue
+            cur.execute("""
+                INSERT INTO power_ranking_entries (power_ranking_id, canonical_player_id, assigned_position,
+                                                    written_analysis, image_url, highlights, position_change)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (pr_id, cid, pos, entry.get("written_analysis"), entry.get("image_url"),
+                  entry.get("highlights"), entry.get("position_change", 0)))
+
+        cur.execute("SELECT COUNT(*) FROM power_ranking_revisions WHERE power_ranking_id=?", (pr_id,))
+        rev_num = cur.fetchone()[0] + 1
+        cur.execute("""
+            INSERT INTO power_ranking_revisions (power_ranking_id, revision_number, editor, revised_at, snapshot_data)
+            VALUES (?, ?, ?, ?, ?)
+        """, (pr_id, rev_num, "admin", now_str, json.dumps(body)))
+
+        conn.commit()
+        conn.close()
+
+        self.send_json(200, {"status": "ok", "id": pr_id})
+
+    def handle_admin_power_ranking_delete(self, body):
+        pr_id = body.get("id")
+        if not pr_id:
+            self.send_json(400, {"error": "Missing id"})
+            return
+
+        init_db(DATABASE)
+        conn = sqlite3.connect(DATABASE)
+        cur = conn.cursor()
+        cur.execute("DELETE FROM power_rankings WHERE id=?", (pr_id,))
+        cur.execute("DELETE FROM power_ranking_entries WHERE power_ranking_id=?", (pr_id,))
+        cur.execute("DELETE FROM power_ranking_revisions WHERE power_ranking_id=?", (pr_id,))
+        conn.commit()
+        conn.close()
+
+        self.send_json(200, {"status": "ok"})
 
     def do_PUT(self):
         if urlsplit(self.path).path != "/api/admin/profile":
