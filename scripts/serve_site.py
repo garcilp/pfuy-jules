@@ -259,6 +259,29 @@ class Handler(SimpleHTTPRequestHandler):
                 self.send_json(200, {"events": events})
             except sqlite3.Error as error:
                 self.send_json(500, {"error": f"Could not load imported events: {error}"})
+        elif parsed.path in {"/api/rankings", "/api/admin/rankings/audit"}:
+            if parsed.path == "/api/admin/rankings/audit" and not self.require_admin():
+                return
+            qs = parse_qs(parsed.query)
+            game_slug = qs.get("game", ["ultimate"])[0]
+            system = qs.get("system", ["trueskill"])[0]
+            mode = qs.get("mode", ["historical"])[0]
+            start_date = qs.get("startDate", [None])[0] or None
+            end_date = qs.get("endDate", [None])[0] or None
+            try:
+                from scripts.rankings_calculator import calculate_rankings
+                result = calculate_rankings(game_slug, system, mode, start_date, end_date)
+                if parsed.path == "/api/rankings":
+                    # Trim audit trail for public endpoint
+                    result_public = dict(result)
+                    result_public["auditTrail"] = result_public.get("auditTrail", [])[:10]
+                    self.send_json(200, result_public)
+                else:
+                    self.send_json(200, result)
+            except ValueError as error:
+                self.send_json(400, {"error": str(error)})
+            except Exception as error:
+                self.send_json(500, {"error": f"Could not calculate rankings: {error}"})
         elif parsed.path == "/api/admin/exclusions":
             if not self.require_admin():
                 return

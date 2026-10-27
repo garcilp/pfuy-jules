@@ -217,6 +217,29 @@ a.event-card:hover{color:var(--text);background:rgba(255,255,255,.14);border-col
 .event-exclusion-item small{display:block;margin-top:3px;color:var(--muted);font:11px 'JetBrains Mono',monospace}
 .form-message{min-height:18px;font-size:11px;color:var(--sky)}
 
+/* Rankings Page */
+.rankings-controls-panel { margin-bottom: 20px; }
+.field-wrap { display: flex; flex-direction: column; gap: 6px; }
+.button-wrap { justify-content: flex-end; }
+.glass-input { width: 100%; min-height: 44px; padding: 8px 14px; border: 1px solid rgba(255,255,255,.2); border-radius: 14px; background: rgba(255,255,255,.08); color: var(--text); font: 500 14px 'Space Grotesk', system-ui, sans-serif; }
+.glass-input option { background: #101a38; color: var(--text); }
+.btn.primary { background: var(--blue); border-color: rgba(255,255,255,.3); color: var(--text); }
+.btn.primary:hover { background: #0045c8; }
+.system-info-panel { margin-bottom: 20px; font-size: 13px; line-height: 1.5; padding: 16px 20px; border-radius: 16px; }
+.rankings-table { width: 100%; border-collapse: collapse; }
+.rankings-table th { padding: 12px 14px; border-bottom: 1px solid var(--line); font-size: 12px; }
+.rankings-table td { padding: 14px; border-bottom: 1px solid var(--line); }
+.rankings-table tr:last-child td { border-bottom: 0; }
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.7); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+.modal-content { max-width: 760px; width: 100%; max-height: 85vh; display: flex; flex-direction: column; padding: 24px; border-radius: 24px; }
+.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.modal-header h2 { font-size: 20px; margin: 0; }
+.modal-body { overflow-y: auto; flex: 1; }
+.glass-btn { padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.1); color: var(--text); cursor: pointer; }
+.glass-btn:hover { background: rgba(255,255,255,.2); }
+
 /* Individual Event Page */
 .event-header-panel{padding:24px 28px;margin-bottom:20px}
 .event-header-top{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
