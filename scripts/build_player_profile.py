@@ -1348,5 +1348,11 @@ def main():
                 parser.error("--slug must contain only lowercase letters, numbers, and hyphens")
             write_profile(connection, args.player_id, args.tag, profile_slug)
 
+    try:
+        from scripts.rankings_calculator import export_default_rankings
+        export_default_rankings()
+    except Exception as err:
+        print(f"Warning: could not export default rankings: {err}")
+
 if __name__ == "__main__":
     main()

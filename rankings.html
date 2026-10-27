@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rankings · Platfighters.uy</title>
+<link rel="icon" href="assets/logo.jpg">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<header class="topbar glass pill">
+  <a class="brand" href="index.html"><img src="assets/logo.jpg" alt="">Platfighters<span class="tld">.uy</span></a>
+  <span class="spacer"></span>
+  <nav>
+    <a href="players.html">Players</a>
+    <a href="events.html">Events</a>
+    <a class="nav-active" href="rankings.html" aria-current="page">Rankings</a>
+  </nav>
+  <span class="badge">RANKINGS ENGINE</span>
+</header>
+
+<main class="directory page-single">
+  <section class="directory-head">
+    <div>
+      <div class="eyebrow mono">COMPETITIVE STANDINGS</div>
+      <h1>Rankings</h1>
+      <p class="muted">TrueSkill, Glicko-2, Tournament Placings &amp; Strength of Field ratings.</p>
+    </div>
+  </section>
+
+  <!-- View Subnav Tabs -->
+  <nav id="system-tabs" class="ranking-system-tabs" aria-label="Ranking Systems">
+    <button class="ranking-tab active" data-system="overview">Overview</button>
+    <button class="ranking-tab" data-system="trueskill">TrueSkill</button>
+    <button class="ranking-tab" data-system="glicko2">Glicko-2</button>
+    <button class="ranking-tab" data-system="placings">Tournament Placings</button>
+    <button class="ranking-tab" data-system="sof">Strength of Field</button>
+    <button class="ranking-tab" data-system="comparison">System Comparison</button>
+  </nav>
+
+  <!-- Filter & Controls Drawer -->
+  <section class="panel glass ranking-controls-panel">
+    <div class="ranking-controls-grid">
+      <label class="ranking-control-group">
+        <span class="control-label mono">GAME</span>
+        <select id="game-filter" class="game-filter glass" aria-label="Select Game"></select>
+      </label>
+
+      <label class="ranking-control-group">
+        <span class="control-label mono">CALCULATION MODE</span>
+        <select id="mode-filter" class="game-filter glass" aria-label="Calculation Mode">
+          <option value="historical" selected>Historical rating (as of end date)</option>
+          <option value="period_only">Period-only (neutral start in period)</option>
+          <option value="period_performance">Period performance (start from pre-period rating)</option>
+        </select>
+      </label>
+
+      <label class="ranking-control-group">
+        <span class="control-label mono">START DATE</span>
+        <input id="start-date-input" type="date" class="date-input glass" aria-label="Start Date">
+      </label>
+
+      <label class="ranking-control-group">
+        <span class="control-label mono">END DATE</span>
+        <input id="end-date-input" type="date" class="date-input glass" aria-label="End Date">
+      </label>
+
+      <label class="ranking-control-group search-group">
+        <span class="control-label mono">SEARCH PLAYER</span>
+        <div class="search glass">
+          <span aria-hidden="true">⌕</span>
+          <input id="player-search" type="search" placeholder="Search tag or player" autocomplete="off" aria-label="Search players">
+        </div>
+      </label>
+    </div>
+
+    <div class="ranking-presets-row">
+      <span class="mono muted">Presets:</span>
+      <button class="preset-btn quiet-button" data-preset="all">All time</button>
+      <button class="preset-btn quiet-button" data-preset="2025">2025</button>
+      <button class="preset-btn quiet-button" data-preset="2024">2024</button>
+      <button class="preset-btn quiet-button" data-preset="6m">Last 6 months</button>
+    </div>
+  </section>
+
+  <p id="ranking-status" class="directory-status mono muted" aria-live="polite">Calculating rankings…</p>
+
+  <!-- Main Content Render Area -->
+  <section id="rankings-content" class="rankings-content"></section>
+</main>
+
+<!-- Diagnostic / Player Detail Modal -->
+<dialog id="diagnostic-modal" class="diagnostic-modal glass">
+  <div class="modal-header">
+    <div id="modal-player-info" class="modal-player-info"></div>
+    <button id="modal-close-btn" class="quiet-button close-btn" aria-label="Close modal">✕</button>
+  </div>
+  <div id="modal-body" class="modal-body"></div>
+</dialog>
+
+<footer class="foot mono muted">Platfighters.uy · Rankings Engine</footer>
+<script src="js/rankings.js"></script>
+</body>
+</html>
