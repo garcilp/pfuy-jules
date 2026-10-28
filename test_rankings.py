@@ -8,7 +8,6 @@ import pytest
 
 from scripts.rankings_calculator import (
     RankingEngine,
-    TrueSkillCalculator,
     Glicko2Calculator,
     canonical_id,
     identity_merges,
@@ -134,7 +133,7 @@ def mock_db():
     cursor.execute("INSERT INTO event_standings VALUES ('e101', 'ent_102_e101', 3)")
     cursor.execute("INSERT INTO event_standings VALUES ('e101', 'ent_104_e101', 4)")
 
-    # Event 102 (Feb 10, 2024): Player 102 beats Player 101
+    # Event 102 (Feb 10, 2024): Player 102 beats Player 101 (2 - 1)
     for p_id in [101, 102]:
         cursor.execute("INSERT INTO entrants VALUES (?, ?)", (f"ent_{p_id}_e102", 'e102'))
         cursor.execute("INSERT INTO entrant_participants VALUES (?, ?)", (f"ent_{p_id}_e102", f"part_{p_id}"))
@@ -164,18 +163,6 @@ def mock_db():
     yield conn, engine
     conn.close()
 
-def test_trueskill_math():
-    ts = TrueSkillCalculator()
-    init = ts.initial_rating()
-    assert init["mu"] == 25.0
-    assert abs(init["sigma"] - 8.3333) < 0.001
-
-    w, l = ts.update(25.0, 8.3333, 25.0, 8.3333)
-    assert w["mu"] > 25.0
-    assert l["mu"] < 25.0
-    assert w["sigma"] < 8.3333
-    assert l["sigma"] < 8.3333
-
 def test_glicko2_math():
     g2 = Glicko2Calculator()
     init = g2.initial_rating()
@@ -189,8 +176,8 @@ def test_glicko2_math():
 
 def test_game_isolation(mock_db):
     conn, engine = mock_db
-    res_smash = engine.calculate(game_slug="ultimate", system="trueskill")
-    res_sf6 = engine.calculate(game_slug="sf6", system="trueskill")
+    res_smash = engine.calculate(game_slug="ultimate", system="glicko2")
+    res_sf6 = engine.calculate(game_slug="sf6", system="glicko2")
 
     smash_ids = {p["playerId"] for p in res_smash["rankings"]}
     sf6_ids = {p["playerId"] for p in res_sf6["rankings"]}
@@ -201,7 +188,7 @@ def test_game_isolation(mock_db):
 
 def test_dq_matches_filtered(mock_db):
     conn, engine = mock_db
-    res = engine.calculate(game_slug="ultimate", system="trueskill")
+    res = engine.calculate(game_slug="ultimate", system="glicko2")
     p101 = next(p for p in res["rankings"] if p["playerId"] == "101")
     assert p101["matches"] == 3
     assert p101["wins"] == 2
@@ -211,37 +198,47 @@ def test_calculation_modes(mock_db):
     conn, engine = mock_db
 
     # Range covering Feb 1 - Feb 28, 2024 (contains Event e102)
-    res_hist = engine.calculate("ultimate", system="trueskill", mode="historical", start_date="2024-02-01", end_date="2024-02-28")
+    res_hist = engine.calculate("ultimate", system="glicko2", mode="historical", start_date="2024-02-01", end_date="2024-02-28")
     p101_hist = next(p for p in res_hist["rankings"] if p["playerId"] == "101")
     assert p101_hist["matches"] == 3
 
-    res_po = engine.calculate("ultimate", system="trueskill", mode="period_only", start_date="2024-02-01", end_date="2024-02-28")
+    res_po = engine.calculate("ultimate", system="glicko2", mode="period_only", start_date="2024-02-01", end_date="2024-02-28")
     p101_po = next(p for p in res_po["rankings"] if p["playerId"] == "101")
     assert p101_po["matches"] == 1
     assert p101_po["losses"] == 1
 
-    res_pp = engine.calculate("ultimate", system="trueskill", mode="period_performance", start_date="2024-02-01", end_date="2024-02-28")
+    res_pp = engine.calculate("ultimate", system="glicko2", mode="period_performance", start_date="2024-02-01", end_date="2024-02-28")
     p101_pp = next(p for p in res_pp["rankings"] if p["playerId"] == "101")
     assert p101_pp["matches"] == 1
     assert p101_pp["baselineScore"] > 0
 
-def test_sof_uses_preevent_ratings(mock_db):
+def test_sof_incorporates_placements_and_field_strength(mock_db):
     conn, engine = mock_db
     res_sof = engine.calculate("ultimate", system="sof")
     assert res_sof["system"] == "sof"
     assert len(res_sof["rankings"]) > 0
-    for p in res_sof["rankings"]:
-        assert "avgOpponentRating" in p
-        assert "score" in p
+    # Winner of e101 (101) should rank higher than early exit (104)
+    p101 = next(p for p in res_sof["rankings"] if p["playerId"] == "101")
+    p104 = next(p for p in res_sof["rankings"] if p["playerId"] == "104")
+    assert p101["score"] > p104["score"]
 
-def test_placings_system(mock_db):
+def test_quality_wins_system(mock_db):
     conn, engine = mock_db
-    res_placings = engine.calculate("ultimate", system="placings")
-    assert res_placings["system"] == "placings"
-    p101 = next(p for p in res_placings["rankings"] if p["playerId"] == "101")
-    assert p101["events"] == 2
-    assert p101["bestPlace"] == 1
-    assert p101["score"] > 0
+    res_qw = engine.calculate("ultimate", system="quality_wins")
+    assert res_qw["system"] == "quality_wins"
+    p101 = next(p for p in res_qw["rankings"] if p["playerId"] == "101")
+    assert p101["wins"] == 2
+    assert p101["totalQualityWins"] > 0
+
+def test_loss_quality_consistency_system(mock_db):
+    conn, engine = mock_db
+    res_lq = engine.calculate("ultimate", system="loss_quality")
+    assert res_lq["system"] == "loss_quality"
+
+    # Player 101 (2-1) vs Player 104 (0-1)
+    p101 = next(p for p in res_lq["rankings"] if p["playerId"] == "101")
+    p104 = next(p for p in res_lq["rankings"] if p["playerId"] == "104")
+    assert p101["score"] > p104["score"]
 
 def test_merges_and_canonical_id():
     merges = {"2002": "1001", "3003": "2002"}
@@ -268,17 +265,17 @@ def test_server_api_endpoints(http_server):
     assert "games" in games_data
 
     # GET /api/rankings
-    req = urllib.request.urlopen(f"{http_server}/api/rankings?game=ultimate&system=trueskill")
+    req = urllib.request.urlopen(f"{http_server}/api/rankings?game=ultimate&system=glicko2")
     assert req.status == 200
     rankings_data = json.loads(req.read().decode("utf-8"))
     assert rankings_data["gameSlug"] == "ultimate"
-    assert rankings_data["system"] == "trueskill"
+    assert rankings_data["system"] == "glicko2"
     assert "rankings" in rankings_data
 
     # GET /api/rankings/diagnostic
     if rankings_data["rankings"]:
         pid = rankings_data["rankings"][0]["playerId"]
-        req = urllib.request.urlopen(f"{http_server}/api/rankings/diagnostic?game=ultimate&system=trueskill&player_id={pid}")
+        req = urllib.request.urlopen(f"{http_server}/api/rankings/diagnostic?game=ultimate&system=glicko2&player_id={pid}")
         assert req.status == 200
         diag_data = json.loads(req.read().decode("utf-8"))
         assert "diagnostic" in diag_data

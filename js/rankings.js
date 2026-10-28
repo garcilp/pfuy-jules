@@ -173,7 +173,7 @@ async function loadData() {
 
   if (system === 'comparison' || system === 'overview') {
     // Load all 4 systems
-    const systems = ['trueskill', 'glicko2', 'placings', 'sof'];
+    const systems = ['glicko2', 'sof', 'quality_wins', 'loss_quality'];
     comparisonData = {};
     for (const sys of systems) {
       comparisonData[sys] = await fetchSystemData(game, sys, mode, start, end);
@@ -193,7 +193,6 @@ async function loadData() {
 }
 
 async function fetchSystemData(game, system, mode, start, end) {
-  // Try API first
   const apiURL = `/api/rankings?game=${encodeURIComponent(game)}&system=${encodeURIComponent(system)}&mode=${encodeURIComponent(mode)}${start ? `&start_date=${encodeURIComponent(start)}` : ''}${end ? `&end_date=${encodeURIComponent(end)}` : ''}`;
   try {
     const res = await fetch(apiURL);
@@ -201,10 +200,9 @@ async function fetchSystemData(game, system, mode, start, end) {
       return await res.json();
     }
   } catch (err) {
-    // API not available, fallback to static JSON snapshot if historical
+    // Fallback
   }
 
-  // Fallback to pre-computed static JSON snapshot
   const staticURL = `data/rankings/${encodeURIComponent(game)}-${encodeURIComponent(system)}-historical.json`;
   try {
     const res = await fetch(staticURL);
@@ -248,7 +246,7 @@ function renderOverview() {
     <div class="overview-grid">
       <div class="panel glass overview-banner">
         <h2>Rankings Overview — ${esc(gameName)}</h2>
-        <p class="muted">Calculated using 4 independent systems. Select a system tab for detailed standings and diagnostic traces.</p>
+        <p class="muted">Calculated using 4 distinct ranking systems anchored on pre-match Glicko-2 ratings. Select any system for detailed standings and calculation traces.</p>
         <div class="mode-indicator mono">
           <span>Mode: <b>${esc(modeFilter.value)}</b></span>
           ${startDateInput.value ? `<span>From: <b>${esc(startDateInput.value)}</b></span>` : ''}
@@ -260,10 +258,10 @@ function renderOverview() {
   `;
 
   const systemConfigs = [
-    { key: 'trueskill', title: 'TrueSkill', desc: 'Bayesian skill estimation (μ - 3σ conservative rating)', color: 'var(--sky)' },
-    { key: 'glicko2', title: 'Glicko-2', desc: 'Rating deviation & volatility model (r - 2RD rating)', color: 'var(--gold)' },
-    { key: 'placings', title: 'Tournament Placings', desc: 'Entrant-scaled placement points', color: 'var(--text)' },
-    { key: 'sof', title: 'Strength of Field', desc: 'Pre-event competitive opponent strength', color: 'var(--sky)' }
+    { key: 'glicko2', title: 'Glicko-2', desc: 'Core player skill ratings (r - 2*RD conservative rating)', color: 'var(--gold)' },
+    { key: 'sof', title: 'Strength of Field', desc: 'Evaluates tournament performance against pre-event field strengths and entrant scaling', color: 'var(--sky)' },
+    { key: 'quality_wins', title: 'Quality Wins', desc: 'Credit gained from beating opponents based on expected win probability', color: 'var(--sky)' },
+    { key: 'loss_quality', title: 'Loss Quality (Consistency)', desc: 'Measures consistency against expectations with Bayesian sample dampening', color: 'var(--text)' }
   ];
 
   systemConfigs.forEach(sys => {
@@ -305,7 +303,7 @@ window.switchToSystem = function(sysKey) {
 // Individual System View
 function renderIndividualSystem(systemKey) {
   if (!currentData || !currentData.rankings) {
-    rankingsContent.innerHTML = '<div class="panel glass empty-state"><h2>No ranking results</h2><p class="muted">No matches or tournament entries found for this game and date range.</p></div>';
+    rankingsContent.innerHTML = '<div class="panel glass empty-state"><h2>No ranking results</h2><p class="muted">No matches found for this game and date range.</p></div>';
     return;
   }
 
@@ -335,9 +333,10 @@ function renderIndividualSystem(systemKey) {
     <div class="panel glass system-banner">
       <div class="system-banner-head">
         <h2>${esc(sysInfo.name || systemKey)} Rankings</h2>
-        <span class="badge mono">Version ${esc(sysInfo.version || '1.0.0')}</span>
+        <span class="badge mono">Version ${esc(sysInfo.version || '2.1.0')}</span>
       </div>
-      <p class="muted">${getSystemDescription(systemKey)}</p>
+      <p class="muted">${esc(sysInfo.description || getSystemDescription(systemKey))}</p>
+      ${sysInfo.limitations ? `<p class="muted mono"><b>Note:</b> ${esc(sysInfo.limitations)}</p>` : ''}
       <div class="params-row mono">
         ${formatAlgorithmParams(sysInfo.parameters)}
       </div>
@@ -351,7 +350,7 @@ function renderIndividualSystem(systemKey) {
           <span class="sortable" onclick="changeSort('score')">SCORE ${sortCol === 'score' ? (sortAsc ? '▲' : '▼') : ''}</span>
           <span>KEY METRICS</span>
           <span class="sortable" onclick="changeSort('winRate')">WIN % ${sortCol === 'winRate' ? (sortAsc ? '▲' : '▼') : ''}</span>
-          <span>MATCHES</span>
+          <span>MATCHES / EVENTS</span>
           <span>ACTIONS</span>
         </div>
         ${paginated.length ? paginated.map(p => `
@@ -365,8 +364,8 @@ function renderIndividualSystem(systemKey) {
             </div>
             <span class="score-col mono font-bold">${p.score}</span>
             <span class="metrics-col mono muted">${formatMetrics(p, systemKey)}</span>
-            <span class="winrate-col mono">${p.winRate !== undefined ? p.winRate + '%' : 'N/A'}</span>
-            <span class="matches-col mono">${p.matches !== undefined ? p.matches : (p.events !== undefined ? p.events + ' events' : '-')}</span>
+            <span class="winrate-col mono">${p.winRate !== undefined ? p.winRate + '%' : (p.avgQualityWin !== undefined ? 'Avg:' + p.avgQualityWin : '-')}</span>
+            <span class="matches-col mono">${p.matches !== undefined ? p.matches + ' m' + (p.events !== undefined ? ' / ' + p.events + ' ev' : '') : '-'}</span>
             <div class="actions-col">
               <button class="quiet-button diagnostic-btn" onclick="openDiagnosticModal('${esc(p.playerId)}')">Diagnostic</button>
             </div>
@@ -389,14 +388,14 @@ function renderIndividualSystem(systemKey) {
 
 function getSystemDescription(systemKey) {
   switch (systemKey) {
-    case 'trueskill':
-      return 'TrueSkill models player skill as a Gaussian distribution (mean μ and uncertainty σ). Conservative score = μ - 3σ.';
     case 'glicko2':
       return 'Glicko-2 models rating r, rating deviation RD, and volatility σ. Conservative rating = r - 2RD.';
-    case 'placings':
-      return 'Tournament Placings awards points based on placement and tournament size scaling: log2(entrants + 1) / 3.0.';
     case 'sof':
-      return 'Strength of Field measures average pre-event competitive strength of opponents faced in sets.';
+      return 'Strength of Field evaluates tournament accomplishment relative to field strengths, placements, and entrant counts.';
+    case 'quality_wins':
+      return 'Quality Wins sums (1 - expected_score) across wins against opponents based on pre-match Glicko ratings.';
+    case 'loss_quality':
+      return 'Loss Quality measures competitive consistency relative to pre-match expectations with Bayesian sample dampening.';
     default:
       return '';
   }
@@ -408,14 +407,14 @@ function formatAlgorithmParams(params) {
 }
 
 function formatMetrics(p, systemKey) {
-  if (systemKey === 'trueskill') {
-    return `μ:${p.mu} σ:${p.sigma}`;
-  } else if (systemKey === 'glicko2') {
-    return `r:${p.rating} RD:${p.rd}`;
-  } else if (systemKey === 'placings') {
-    return `Avg:${p.avgPoints} Best:#${p.bestPlace || '-'}`;
+  if (systemKey === 'glicko2') {
+    return `r:${p.rating} RD:${p.rd} vol:${p.volatility}`;
   } else if (systemKey === 'sof') {
-    return `Opponent Pre-Rating:${p.avgOpponentRating}`;
+    return `Avg Field:${p.avgFieldStrength}`;
+  } else if (systemKey === 'quality_wins') {
+    return `Total:${p.totalQualityWins} Avg/Win:${p.avgQualityWin}`;
+  } else if (systemKey === 'loss_quality') {
+    return `W:${p.wins} L:${p.losses} NetPts:${p.totalPoints}`;
   }
   return '';
 }
@@ -442,10 +441,9 @@ function renderComparison() {
     return;
   }
 
-  // Get combined set of player IDs across all 4 systems
   const playersMap = new Map();
+  const systems = ['glicko2', 'sof', 'quality_wins', 'loss_quality'];
 
-  const systems = ['trueskill', 'glicko2', 'placings', 'sof'];
   systems.forEach(sys => {
     const sysData = comparisonData[sys];
     if (sysData && sysData.rankings) {
@@ -462,27 +460,26 @@ function renderComparison() {
   const query = playerSearch.value.trim().toLowerCase();
   list = list.filter(p => p.playerTag.toLowerCase().includes(query));
 
-  // Default sort by TrueSkill rank or lowest average rank
   list.sort((a, b) => {
-    const rA = a.trueskill ? a.trueskill.rank : 999;
-    const rB = b.trueskill ? b.trueskill.rank : 999;
+    const rA = a.glicko2 ? a.glicko2.rank : 999;
+    const rB = b.glicko2 ? b.glicko2.rank : 999;
     return rA - rB;
   });
 
   let html = `
     <div class="panel glass system-banner">
       <h2>System Comparison View</h2>
-      <p class="muted">Side-by-side player ranks and scores across all 4 systems. Raw rating scales differ by design and are shown on their native scales.</p>
+      <p class="muted">Side-by-side player ranks and scores across all 4 distinct systems. Each metric measures a different competitive dimension and raw values are presented on their native scales.</p>
     </div>
 
     <div class="panel glass ranking-table-panel">
       <div class="table">
         <div class="tr head comparison-head">
           <span>PLAYER</span>
-          <span>TRUESKILL</span>
           <span>GLICKO-2</span>
-          <span>PLACINGS</span>
           <span>STRENGTH OF FIELD</span>
+          <span>QUALITY WINS</span>
+          <span>LOSS QUALITY</span>
           <span>ACTIONS</span>
         </div>
         ${list.length ? list.map(p => `
@@ -492,10 +489,10 @@ function renderComparison() {
                 <b>${esc(p.playerTag)}</b>
               </a>
             </div>
-            <span class="mono">${p.trueskill ? `#${p.trueskill.rank} (${p.trueskill.score})` : '-'}</span>
             <span class="mono">${p.glicko2 ? `#${p.glicko2.rank} (${p.glicko2.score})` : '-'}</span>
-            <span class="mono">${p.placings ? `#${p.placings.rank} (${p.placings.score})` : '-'}</span>
             <span class="mono">${p.sof ? `#${p.sof.rank} (${p.sof.score})` : '-'}</span>
+            <span class="mono">${p.quality_wins ? `#${p.quality_wins.rank} (${p.quality_wins.score})` : '-'}</span>
+            <span class="mono">${p.loss_quality ? `#${p.loss_quality.rank} (${p.loss_quality.score})` : '-'}</span>
             <div>
               <button class="quiet-button diagnostic-btn" onclick="openDiagnosticModal('${esc(p.playerId)}')">Diagnostic</button>
             </div>
@@ -511,7 +508,7 @@ function renderComparison() {
 // Diagnostic Modal
 window.openDiagnosticModal = async function(playerId) {
   const game = gameFilter.value;
-  const system = getActiveSystem() === 'overview' || getActiveSystem() === 'comparison' ? 'trueskill' : getActiveSystem();
+  const system = getActiveSystem() === 'overview' || getActiveSystem() === 'comparison' ? 'glicko2' : getActiveSystem();
   const mode = modeFilter.value;
   const start = startDateInput.value;
   const end = endDateInput.value;
@@ -522,7 +519,6 @@ window.openDiagnosticModal = async function(playerId) {
 
   let diagData = null;
 
-  // Try dynamic diagnostic endpoint
   const apiURL = `/api/rankings/diagnostic?game=${encodeURIComponent(game)}&system=${encodeURIComponent(system)}&mode=${encodeURIComponent(mode)}${start ? `&start_date=${encodeURIComponent(start)}` : ''}${end ? `&end_date=${encodeURIComponent(end)}` : ''}&player_id=${encodeURIComponent(playerId)}`;
   try {
     const res = await fetch(apiURL);
@@ -530,7 +526,7 @@ window.openDiagnosticModal = async function(playerId) {
       diagData = await res.json();
     }
   } catch (err) {
-    // API not available
+    // Fallback
   }
 
   if (!diagData || !diagData.diagnostic) {
@@ -554,23 +550,23 @@ window.openDiagnosticModal = async function(playerId) {
 
   let historyHtml = `
     <div class="diag-summary panel glass">
-      <h3>Algorithm Configuration</h3>
+      <h3>Algorithm Configuration &amp; Limitations</h3>
       <div class="mono muted">
-        <span>Version: <b>${esc(algo.version || '1.0.0')}</b></span><br>
+        <span>Description: <b>${esc(algo.description || '')}</b></span><br>
+        ${algo.limitations ? `<span>Limitations: <b>${esc(algo.limitations)}</b></span><br>` : ''}
         <span>Parameters: ${formatAlgorithmParams(algo.parameters)}</span>
       </div>
     </div>
 
-    <h3>Step-by-Step Calculation Trace (${diag.history ? diag.history.length : 0} sets processed)</h3>
+    <h3>Step-by-Step Calculation Trace (${diag.history ? diag.history.length : 0} sets recorded)</h3>
     <div class="table diag-table">
       <div class="tr head diag-tr">
         <span>DATE &amp; EVENT</span>
         <span>ROUND / PHASE</span>
         <span>OPPONENT</span>
         <span>OUTCOME</span>
-        <span>PRE-SCORE</span>
-        <span>POST-SCORE</span>
-        <span>CHANGE</span>
+        <span>EXPECTED / DIFF</span>
+        <span>CONTRIBUTION / PENALTY</span>
       </div>
       ${diag.history && diag.history.length ? diag.history.map(item => `
         <div class="tr diag-tr">
@@ -578,9 +574,10 @@ window.openDiagnosticModal = async function(playerId) {
           <span>${esc(item.phase || '')} <small>${esc(item.round || '')}</small></span>
           <span><b>${esc(item.opponentTag)}</b> <small>Pre:${item.opponentPreRating}</small></span>
           <span class="mono ${item.outcome === 'win' ? 'win' : 'loss'}">${item.outcome.toUpperCase()}</span>
-          <span class="mono">${item.preScore}</span>
-          <span class="mono">${item.postScore}</span>
-          <span class="mono ${item.change >= 0 ? 'win' : 'loss'}">${item.change >= 0 ? '+' + item.change : item.change}</span>
+          <span class="mono">${item.expectedScore !== undefined ? 'E:' + item.expectedScore : (item.scoreDisplay || item.displayScore || (item.preScore !== undefined ? item.preScore + '→' + item.postScore : '-'))}</span>
+          <span class="mono ${item.penalty !== undefined ? (item.penalty > 0 ? 'loss' : 'win') : (item.credit !== undefined ? 'win' : (item.change !== undefined && item.change >= 0 ? 'win' : 'loss'))}">
+            ${item.penalty !== undefined ? '-' + item.penalty : (item.credit !== undefined ? '+' + item.credit : (item.change !== undefined ? (item.change >= 0 ? '+' + item.change : item.change) : (item.contribution !== undefined ? item.contribution : '-')))}
+          </span>
         </div>
       `).join('') : '<div class="empty-state"><p class="muted">No contributing sets recorded in this date range.</p></div>'}
     </div>
