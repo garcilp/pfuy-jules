@@ -379,7 +379,9 @@ class RankingEngine:
     def _compute_pre_match_glicko_ratings(self, sets):
         """Reconstructs pre-match Glicko-2 ratings for every set in chronological order by event.
 
-        Returns dict mapping (setId, playerId) -> pre-match rating dict {"r": ..., "rd": ..., "vol": ...}
+        Returns (pre_match_ratings, event_field_strengths)
+        pre_match_ratings: (setId, playerId) -> pre-match rating dict {"r": ..., "rd": ..., "vol": ...}
+        event_field_strengths: eventId -> float (average pre-event Glicko-2 rating of participants)
         """
         calc = self.glicko_calc
         ratings = {}  # pid -> rating dict
@@ -394,9 +396,14 @@ class RankingEngine:
             event_sets_map.setdefault(s["eventId"], []).append(s)
 
         pre_match_ratings = {}
+        event_field_strengths = {}
 
         for e_id, e_sets in event_sets_map.items():
-            # Snapshot pre-event ratings of active participants
+            event_players = set()
+            for s in e_sets:
+                event_players.add(s["winnerId"])
+                event_players.add(s["loserId"])
+
             player_matches = {}
             set_pre_snapshots = {}
 
@@ -411,14 +418,15 @@ class RankingEngine:
                 player_matches.setdefault(w_id, []).append((l_rat["r"], l_rat["rd"], 1.0))
                 player_matches.setdefault(l_id, []).append((w_rat["r"], w_rat["rd"], 0.0))
 
-            # Store pre-match ratings for sets in this event
             pre_match_ratings.update(set_pre_snapshots)
 
-            # Update player ratings at the end of event rating period
+            if event_players:
+                event_field_strengths[e_id] = sum(get_rating(pid)["r"] for pid in event_players) / len(event_players)
+
             for pid, p_m in player_matches.items():
                 ratings[pid] = calc.update_period(ratings[pid]["r"], ratings[pid]["rd"], ratings[pid]["vol"], p_m)
 
-        return pre_match_ratings
+        return pre_match_ratings, event_field_strengths
 
     # -------------------------------------------------------------------------
     # System 1: Glicko-2 Player Skill Ratings
@@ -598,8 +606,8 @@ class RankingEngine:
     # -------------------------------------------------------------------------
 
     def _calculate_sof(self, sets, mode, start_date, end_date, target_player_id, game_slug):
-        """Evaluates tournament performance against competitive field strength using pre-event Glicko ratings."""
-        pre_match_ratings = self._compute_pre_match_glicko_ratings(sets)
+        """Evaluates opposition strength faced based strictly on average pre-match Glicko-2 opponent ratings."""
+        pre_match_ratings, event_field_strengths = self._compute_pre_match_glicko_ratings(sets)
         calc = self.glicko_calc
 
         player_sof = {}
@@ -658,26 +666,28 @@ class RankingEngine:
             if not data["oppRatings"]:
                 continue
 
+            # Primary score = exact average pre-match Glicko-2 rating of opponents faced
             avg_opp_r = sum(data["oppRatings"]) / len(data["oppRatings"])
             total_matches = data["wins"] + data["losses"]
             win_rate = data["wins"] / total_matches if total_matches > 0 else 0.0
 
-            # SoF Score Formula: Avg Opponent Pre-Match Glicko Rating + (Win Rate - 0.5) * 100
-            sof_score = avg_opp_r + (win_rate - 0.5) * 100.0
+            player_events = data["events"]
+            avg_field = (sum(event_field_strengths[e_id] for e_id in player_events if e_id in event_field_strengths) / len(player_events)) if player_events else 0.0
 
             rankings.append({
                 "playerId": pid,
                 "playerTag": self.latest_tags.get(pid, f"Player {pid}"),
-                "score": round(sof_score, 1),
+                "score": round(avg_opp_r, 1),
                 "avgOpponentRating": round(avg_opp_r, 1),
+                "avgFieldStrength": round(avg_field, 1),
                 "winRate": round(100.0 * win_rate, 1),
                 "matches": total_matches,
                 "wins": data["wins"],
                 "losses": data["losses"],
-                "events": len(data["events"]),
+                "events": len(player_events),
             })
 
-        rankings.sort(key=lambda x: x["score"], reverse=True)
+        rankings.sort(key=lambda x: (x["score"], x["matches"]), reverse=True)
         for idx, item in enumerate(rankings, 1):
             item["rank"] = idx
 
@@ -692,11 +702,11 @@ class RankingEngine:
             "algorithm": {
                 "version": ALGORITHM_VERSION,
                 "name": "Strength of Field (SoF)",
-                "description": "Evaluates competition faced using pre-match Glicko-2 opponent ratings combined with win rate performance.",
-                "limitations": "Measures opposition strength and match success rather than rating deviation or absolute skill level.",
+                "description": "Measures the strength of competition faced, calculated strictly as the average pre-match Glicko-2 rating of opponents actually faced in eligible matches.",
+                "limitations": "Measures opposition strength faced, not overall player skill or tournament placement success.",
                 "parameters": {
-                    "opponentMetric": "Pre-match Glicko-2 rating (r_0=1500, RD_0=350)",
-                    "formula": "Avg Opponent Pre-Match Rating + (Win Rate - 0.5) * 100",
+                    "primaryScore": "Average pre-match Glicko-2 rating of opponents faced in eligible matches",
+                    "fieldStrengthContext": "Average pre-event Glicko-2 rating of entrants across attended events",
                 },
             },
         }
@@ -719,7 +729,7 @@ class RankingEngine:
 
     def _calculate_quality_wins(self, sets, mode, start_date, end_date, target_player_id, game_slug):
         """Quality Wins: Sum of (1 - expected_score) across wins using pre-match Glicko ratings."""
-        pre_match_ratings = self._compute_pre_match_glicko_ratings(sets)
+        pre_match_ratings, _ = self._compute_pre_match_glicko_ratings(sets)
         calc = self.glicko_calc
 
         player_qw = {}
@@ -838,7 +848,7 @@ class RankingEngine:
         Consistency score = 100 * (1 - total_loss_penalty / match_count), bounded [0, 100].
         Undefeated players receive a score of 100.
         """
-        pre_match_ratings = self._compute_pre_match_glicko_ratings(sets)
+        pre_match_ratings, _ = self._compute_pre_match_glicko_ratings(sets)
         calc = self.glicko_calc
 
         player_data = {}
