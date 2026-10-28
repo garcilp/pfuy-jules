@@ -212,14 +212,15 @@ def test_calculation_modes(mock_db):
     assert p101_pp["matches"] == 1
     assert p101_pp["baselineScore"] > 0
 
-def test_sof_uses_preevent_ratings(mock_db):
+def test_sof_incorporates_placements_and_field_strength(mock_db):
     conn, engine = mock_db
     res_sof = engine.calculate("ultimate", system="sof")
     assert res_sof["system"] == "sof"
     assert len(res_sof["rankings"]) > 0
-    for p in res_sof["rankings"]:
-        assert "avgOpponentRating" in p
-        assert "score" in p
+    # Winner of e101 (101) should rank higher than early exit (104)
+    p101 = next(p for p in res_sof["rankings"] if p["playerId"] == "101")
+    p104 = next(p for p in res_sof["rankings"] if p["playerId"] == "104")
+    assert p101["score"] > p104["score"]
 
 def test_quality_wins_system(mock_db):
     conn, engine = mock_db
@@ -234,15 +235,10 @@ def test_loss_quality_consistency_system(mock_db):
     res_lq = engine.calculate("ultimate", system="loss_quality")
     assert res_lq["system"] == "loss_quality"
 
-    # Undefeated test: player with 0 losses gets 100.0 score
+    # Player 101 (2-1) vs Player 104 (0-1)
     p101 = next(p for p in res_lq["rankings"] if p["playerId"] == "101")
-    assert p101["losses"] == 1
-    assert p101["matches"] == 3
-    assert p101["score"] < 100.0
-
-    p_undefeated = [p for p in res_lq["rankings"] if p["losses"] == 0]
-    for p in p_undefeated:
-        assert p["score"] == 100.0
+    p104 = next(p for p in res_lq["rankings"] if p["playerId"] == "104")
+    assert p101["score"] > p104["score"]
 
 def test_merges_and_canonical_id():
     merges = {"2002": "1001", "3003": "2002"}

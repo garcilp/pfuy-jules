@@ -259,9 +259,9 @@ function renderOverview() {
 
   const systemConfigs = [
     { key: 'glicko2', title: 'Glicko-2', desc: 'Core player skill ratings (r - 2*RD conservative rating)', color: 'var(--gold)' },
-    { key: 'sof', title: 'Strength of Field', desc: 'Pre-event competitive opponent strength and performance', color: 'var(--sky)' },
+    { key: 'sof', title: 'Strength of Field', desc: 'Evaluates tournament performance against pre-event field strengths and entrant scaling', color: 'var(--sky)' },
     { key: 'quality_wins', title: 'Quality Wins', desc: 'Credit gained from beating opponents based on expected win probability', color: 'var(--sky)' },
-    { key: 'loss_quality', title: 'Loss Quality (Consistency)', desc: 'Measures consistency relative to pre-match expectations. Undefeated = 100.', color: 'var(--text)' }
+    { key: 'loss_quality', title: 'Loss Quality (Consistency)', desc: 'Measures consistency against expectations with Bayesian sample dampening', color: 'var(--text)' }
   ];
 
   systemConfigs.forEach(sys => {
@@ -333,7 +333,7 @@ function renderIndividualSystem(systemKey) {
     <div class="panel glass system-banner">
       <div class="system-banner-head">
         <h2>${esc(sysInfo.name || systemKey)} Rankings</h2>
-        <span class="badge mono">Version ${esc(sysInfo.version || '2.0.0')}</span>
+        <span class="badge mono">Version ${esc(sysInfo.version || '2.1.0')}</span>
       </div>
       <p class="muted">${esc(sysInfo.description || getSystemDescription(systemKey))}</p>
       ${sysInfo.limitations ? `<p class="muted mono"><b>Note:</b> ${esc(sysInfo.limitations)}</p>` : ''}
@@ -350,7 +350,7 @@ function renderIndividualSystem(systemKey) {
           <span class="sortable" onclick="changeSort('score')">SCORE ${sortCol === 'score' ? (sortAsc ? '▲' : '▼') : ''}</span>
           <span>KEY METRICS</span>
           <span class="sortable" onclick="changeSort('winRate')">WIN % ${sortCol === 'winRate' ? (sortAsc ? '▲' : '▼') : ''}</span>
-          <span>MATCHES</span>
+          <span>MATCHES / EVENTS</span>
           <span>ACTIONS</span>
         </div>
         ${paginated.length ? paginated.map(p => `
@@ -365,7 +365,7 @@ function renderIndividualSystem(systemKey) {
             <span class="score-col mono font-bold">${p.score}</span>
             <span class="metrics-col mono muted">${formatMetrics(p, systemKey)}</span>
             <span class="winrate-col mono">${p.winRate !== undefined ? p.winRate + '%' : (p.avgQualityWin !== undefined ? 'Avg:' + p.avgQualityWin : '-')}</span>
-            <span class="matches-col mono">${p.matches !== undefined ? p.matches : '-'}</span>
+            <span class="matches-col mono">${p.matches !== undefined ? p.matches + ' m' + (p.events !== undefined ? ' / ' + p.events + ' ev' : '') : '-'}</span>
             <div class="actions-col">
               <button class="quiet-button diagnostic-btn" onclick="openDiagnosticModal('${esc(p.playerId)}')">Diagnostic</button>
             </div>
@@ -391,11 +391,11 @@ function getSystemDescription(systemKey) {
     case 'glicko2':
       return 'Glicko-2 models rating r, rating deviation RD, and volatility σ. Conservative rating = r - 2RD.';
     case 'sof':
-      return 'Strength of Field evaluates competitive strength of opponents faced in sets using pre-match Glicko ratings.';
+      return 'Strength of Field evaluates tournament accomplishment relative to field strengths, placements, and entrant counts.';
     case 'quality_wins':
       return 'Quality Wins sums (1 - expected_score) across wins against opponents based on pre-match Glicko ratings.';
     case 'loss_quality':
-      return 'Loss Quality measures competitive consistency relative to pre-match expectations. Undefeated players receive 100.';
+      return 'Loss Quality measures competitive consistency relative to pre-match expectations with Bayesian sample dampening.';
     default:
       return '';
   }
@@ -410,11 +410,11 @@ function formatMetrics(p, systemKey) {
   if (systemKey === 'glicko2') {
     return `r:${p.rating} RD:${p.rd} vol:${p.volatility}`;
   } else if (systemKey === 'sof') {
-    return `Opponent Pre-Rating:${p.avgOpponentRating}`;
+    return `Avg Field:${p.avgFieldStrength}`;
   } else if (systemKey === 'quality_wins') {
     return `Total:${p.totalQualityWins} Avg/Win:${p.avgQualityWin}`;
   } else if (systemKey === 'loss_quality') {
-    return `W:${p.wins} L:${p.losses} Penalty:${p.totalLossPenalty}`;
+    return `W:${p.wins} L:${p.losses} NetPts:${p.totalPoints}`;
   }
   return '';
 }

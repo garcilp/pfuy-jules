@@ -17,7 +17,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATABASE = PROJECT_ROOT / "startgg-data" / "platfighters.sqlite3"
 PROFILE_DIR = PROJECT_ROOT / "data" / "profiles"
 RANKINGS_DIR = PROJECT_ROOT / "data" / "rankings"
-ALGORITHM_VERSION = "2.0.0"
+ALGORITHM_VERSION = "2.2.0"
 
 
 # -----------------------------------------------------------------------------
@@ -357,6 +357,58 @@ class RankingEngine:
 
         return valid_sets
 
+    def load_event_placements_for_game(self, game_slug):
+        """Loads event standings and entrant counts for SoF calculations."""
+        rows = self.connection.execute(
+            "SELECT es.event_id, es.entrant_id, es.placement, e.num_entrants, "
+            "e.source_url, e.name AS event_name, t.slug AS tournament_slug, t.name AS tournament_name, "
+            "COALESCE(t.start_at, (SELECT MIN(COALESCE(s.started_at, s.start_at, s.completed_at)) "
+            "FROM sets s WHERE s.event_id=e.id)) AS event_timestamp "
+            "FROM event_standings es "
+            "JOIN events e ON e.id = es.event_id "
+            "JOIN tournaments t ON t.slug = e.tournament_slug "
+            "WHERE e.videogame_slug = ? AND e.is_temporary = 0 AND es.placement IS NOT NULL "
+            "ORDER BY event_timestamp ASC",
+            (game_slug,),
+        ).fetchall()
+
+        event_placements = []
+        for row in rows:
+            event_key = normalize_event_key(row["source_url"])
+            if event_key and event_key in self.exclusions["events"]:
+                continue
+
+            p_row = self.connection.execute(
+                "SELECT p.player_id FROM entrant_participants ep "
+                "JOIN participants p ON p.id = ep.participant_id "
+                "WHERE ep.entrant_id = ? AND p.player_id IS NOT NULL",
+                (text_id(row["entrant_id"]),),
+            ).fetchone()
+
+            if not p_row or not p_row["player_id"]:
+                continue
+
+            player_id = canonical_id(text_id(p_row["player_id"]), self.merges)
+            if game_slug in self.exclusions["playerGames"].get(player_id, []):
+                continue
+
+            date_str = date_from_epoch(row["event_timestamp"])
+            entrants_count = row["num_entrants"] or 1
+
+            event_placements.append({
+                "eventId": text_id(row["event_id"]),
+                "eventKey": event_key,
+                "eventName": row["event_name"],
+                "tournamentName": row["tournament_name"],
+                "playerId": player_id,
+                "placement": row["placement"],
+                "entrants": entrants_count,
+                "date": date_str,
+                "timestamp": row["event_timestamp"] or 0,
+            })
+
+        return event_placements
+
     def calculate(self, game_slug, system="glicko2", mode="historical", start_date=None, end_date=None, target_player_id=None, alpha=2.0):
         """Calculates rankings for a specific game, system, mode, and date range."""
         valid_sets = self.load_sets_for_game(game_slug)
@@ -376,18 +428,22 @@ class RankingEngine:
     # Pre-Match Glicko Rating Pre-pass
     # -------------------------------------------------------------------------
 
-    def _compute_pre_match_glicko_ratings(self, sets):
+    def _compute_pre_match_glicko_ratings(self, sets, mode="historical", start_date=None):
         """Reconstructs pre-match Glicko-2 ratings for every set in chronological order by event.
+
+        Respects calculation mode:
+        - historical / period_performance: reconstruct ratings from start of history.
+        - period_only: reset all initial ratings to neutral (1500, 350) for sets on/after start_date.
 
         Returns (pre_match_ratings, event_field_strengths)
         pre_match_ratings: (setId, playerId) -> pre-match rating dict {"r": ..., "rd": ..., "vol": ...}
         event_field_strengths: eventId -> float (average pre-event Glicko-2 rating of participants)
         """
         calc = self.glicko_calc
-        ratings = {}  # pid -> rating dict
+        ratings = {}
 
-        def get_rating(pid):
-            if pid not in ratings:
+        def get_rating(pid, is_period_start=False):
+            if pid not in ratings or (is_period_start and mode == "period_only"):
                 ratings[pid] = calc.initial_rating()
             return ratings[pid]
 
@@ -399,6 +455,9 @@ class RankingEngine:
         event_field_strengths = {}
 
         for e_id, e_sets in event_sets_map.items():
+            e_date = e_sets[0]["date"] if e_sets else None
+            is_in_period = not (start_date and e_date and e_date < start_date)
+
             event_players = set()
             for s in e_sets:
                 event_players.add(s["winnerId"])
@@ -409,8 +468,8 @@ class RankingEngine:
 
             for s in e_sets:
                 w_id, l_id = s["winnerId"], s["loserId"]
-                w_rat = get_rating(w_id)
-                l_rat = get_rating(l_id)
+                w_rat = get_rating(w_id, is_period_start=(mode == "period_only" and is_in_period))
+                l_rat = get_rating(l_id, is_period_start=(mode == "period_only" and is_in_period))
 
                 set_pre_snapshots[(s["setId"], w_id)] = dict(w_rat)
                 set_pre_snapshots[(s["setId"], l_id)] = dict(l_rat)
@@ -606,47 +665,51 @@ class RankingEngine:
     # -------------------------------------------------------------------------
 
     def _calculate_sof(self, sets, mode, start_date, end_date, target_player_id, game_slug):
-        """Evaluates opposition strength faced based strictly on average pre-match Glicko-2 opponent ratings."""
-        pre_match_ratings, event_field_strengths = self._compute_pre_match_glicko_ratings(sets)
-        calc = self.glicko_calc
+        """Evaluates competitive accomplishments in tournaments against pre-event field strengths."""
+        pre_match_ratings, event_field_strengths = self._compute_pre_match_glicko_ratings(sets, mode=mode, start_date=start_date)
+        event_placements = self.load_event_placements_for_game(game_slug)
 
-        player_sof = {}
+        player_events = {}
+        for p in event_placements:
+            p_date = p["date"]
+            if end_date and p_date and p_date > end_date:
+                continue
+            if mode in ("period_only", "period_performance") and start_date and p_date and p_date < start_date:
+                continue
+
+            pid = p["playerId"]
+            e_id = p["eventId"]
+            f_strength = event_field_strengths.get(e_id, 1500.0)
+
+            player_events.setdefault(pid, []).append({
+                "eventId": e_id,
+                "eventName": p["eventName"],
+                "tournamentName": p["tournamentName"],
+                "placement": p["placement"],
+                "entrants": p["entrants"],
+                "fieldStrength": f_strength,
+                "date": p_date,
+            })
+
+        # Match counts per player in date range
+        player_matches = {}
         diagnostic_history = {}
 
         for s in sets:
             s_date = s["date"]
             if end_date and s_date and s_date > end_date:
                 continue
-
-            if start_date and s_date and s_date < start_date:
+            if mode in ("period_only", "period_performance") and start_date and s_date and s_date < start_date:
                 continue
 
             w_id, l_id = s["winnerId"], s["loserId"]
-            w_pre = pre_match_ratings.get((s["setId"], w_id), calc.initial_rating())
-            l_pre = pre_match_ratings.get((s["setId"], l_id), calc.initial_rating())
+            player_matches.setdefault(w_id, []).append((s, True))
+            player_matches.setdefault(l_id, []).append((s, False))
 
-            w_pre_r = w_pre["r"]
-            l_pre_r = l_pre["r"]
-
-            for pid, is_win, opp_id, opp_pre_r in [
-                (w_id, True, l_id, l_pre_r),
-                (l_id, False, w_id, w_pre_r),
-            ]:
-                if pid not in player_sof:
-                    player_sof[pid] = {
-                        "oppRatings": [],
-                        "wins": 0,
-                        "losses": 0,
-                        "events": set(),
-                    }
-                player_sof[pid]["oppRatings"].append(opp_pre_r)
-                player_sof[pid]["events"].add(s["eventId"])
-                if is_win:
-                    player_sof[pid]["wins"] += 1
-                else:
-                    player_sof[pid]["losses"] += 1
-
+            for pid in (w_id, l_id):
                 if target_player_id is None or pid == target_player_id:
+                    opp_id = l_id if pid == w_id else w_id
+                    opp_pre = pre_match_ratings.get((s["setId"], opp_id), self.glicko_calc.initial_rating())["r"]
                     trace = {
                         "setId": s["setId"],
                         "event": f"{s['tournamentName']} · {s['eventName']}",
@@ -655,36 +718,44 @@ class RankingEngine:
                         "round": s["roundText"],
                         "opponentId": opp_id,
                         "opponentTag": self.latest_tags.get(opp_id, f"Player {opp_id}"),
-                        "opponentPreRating": round(opp_pre_r, 1),
-                        "outcome": "win" if is_win else "loss",
-                        "contribution": round(opp_pre_r, 1),
+                        "opponentPreRating": round(opp_pre, 1),
+                        "outcome": "win" if pid == w_id else "loss",
                     }
                     diagnostic_history.setdefault(pid, []).append(trace)
 
         rankings = []
-        for pid, data in player_sof.items():
-            if not data["oppRatings"]:
+        for pid, evs in player_events.items():
+            matches_info = player_matches.get(pid, [])
+            m_count = len(matches_info)
+            if m_count == 0:
                 continue
 
-            # Primary score = exact average pre-match Glicko-2 rating of opponents faced
-            avg_opp_r = sum(data["oppRatings"]) / len(data["oppRatings"])
-            total_matches = data["wins"] + data["losses"]
-            win_rate = data["wins"] / total_matches if total_matches > 0 else 0.0
+            wins = sum(1 for m in matches_info if m[1])
+            losses = m_count - wins
 
-            player_events = data["events"]
-            avg_field = (sum(event_field_strengths[e_id] for e_id in player_events if e_id in event_field_strengths) / len(player_events)) if player_events else 0.0
+            # Evaluate tournament event accomplishment: FieldStrength * (1 / sqrt(placement)) * log2(entrants+1) / 3.0
+            event_pts = 0.0
+            for e in evs:
+                p_weight = 1.0 / math.sqrt(e["placement"])
+                e_weight = math.log2(e["entrants"] + 1) / 3.0
+                event_pts += e["fieldStrength"] * p_weight * e_weight
+
+            # Sample volume dampening for small match counts (dampens < 15 matches)
+            sample_dampener = min(1.0, m_count / 15.0)
+            avg_event_score = (event_pts / len(evs)) * sample_dampener
+
+            avg_field = sum(e["fieldStrength"] for e in evs) / len(evs) if evs else 1500.0
 
             rankings.append({
                 "playerId": pid,
                 "playerTag": self.latest_tags.get(pid, f"Player {pid}"),
-                "score": round(avg_opp_r, 1),
-                "avgOpponentRating": round(avg_opp_r, 1),
+                "score": round(avg_event_score, 1),
                 "avgFieldStrength": round(avg_field, 1),
-                "winRate": round(100.0 * win_rate, 1),
-                "matches": total_matches,
-                "wins": data["wins"],
-                "losses": data["losses"],
-                "events": len(player_events),
+                "winRate": round(100.0 * wins / max(1, m_count), 1),
+                "matches": m_count,
+                "wins": wins,
+                "losses": losses,
+                "events": len(evs),
             })
 
         rankings.sort(key=lambda x: (x["score"], x["matches"]), reverse=True)
@@ -702,11 +773,11 @@ class RankingEngine:
             "algorithm": {
                 "version": ALGORITHM_VERSION,
                 "name": "Strength of Field (SoF)",
-                "description": "Measures the strength of competition faced, calculated strictly as the average pre-match Glicko-2 rating of opponents actually faced in eligible matches.",
-                "limitations": "Measures opposition strength faced, not overall player skill or tournament placement success.",
+                "description": "Evaluates competitive accomplishment relative to tournament field strengths, placements, and entrant scaling. Higher placements in strong fields earn top scores.",
+                "limitations": "Measures tournament progression in strong fields rather than raw match win-rates.",
                 "parameters": {
-                    "primaryScore": "Average pre-match Glicko-2 rating of opponents faced in eligible matches",
-                    "fieldStrengthContext": "Average pre-event Glicko-2 rating of entrants across attended events",
+                    "eventAccomplishment": "FieldStrength * (1 / sqrt(placement)) * log2(entrants + 1) / 3.0",
+                    "sampleDampening": "min(1.0, matches / 15.0)",
                 },
             },
         }
@@ -729,7 +800,7 @@ class RankingEngine:
 
     def _calculate_quality_wins(self, sets, mode, start_date, end_date, target_player_id, game_slug):
         """Quality Wins: Sum of (1 - expected_score) across wins using pre-match Glicko ratings."""
-        pre_match_ratings, _ = self._compute_pre_match_glicko_ratings(sets)
+        pre_match_ratings, _ = self._compute_pre_match_glicko_ratings(sets, mode=mode, start_date=start_date)
         calc = self.glicko_calc
 
         player_qw = {}
@@ -740,7 +811,7 @@ class RankingEngine:
             if end_date and s_date and s_date > end_date:
                 continue
 
-            if start_date and s_date and s_date < start_date:
+            if mode in ("period_only", "period_performance") and start_date and s_date and s_date < start_date:
                 continue
 
             w_id, l_id = s["winnerId"], s["loserId"]
@@ -751,23 +822,17 @@ class RankingEngine:
             e_win = calc.expected_score_original(w_pre["r"], w_pre["rd"], l_pre["r"], l_pre["rd"])
             credit = 1.0 - e_win
 
+            # Record for winner
             if w_id not in player_qw:
-                player_qw[w_id] = {
-                    "totalQuality": 0.0,
-                    "wins": 0,
-                    "credits": [],
-                }
+                player_qw[w_id] = {"totalQuality": 0.0, "wins": 0, "losses": 0, "credits": []}
             player_qw[w_id]["totalQuality"] += credit
             player_qw[w_id]["wins"] += 1
             player_qw[w_id]["credits"].append(credit)
 
-            # Ensure loser exists in dataset tracking even if 0 quality wins
+            # Record for loser to track total matches accurately
             if l_id not in player_qw:
-                player_qw[l_id] = {
-                    "totalQuality": 0.0,
-                    "wins": 0,
-                    "credits": [],
-                }
+                player_qw[l_id] = {"totalQuality": 0.0, "wins": 0, "losses": 0, "credits": []}
+            player_qw[l_id]["losses"] += 1
 
             if target_player_id is None or w_id == target_player_id:
                 trace = {
@@ -788,6 +853,8 @@ class RankingEngine:
         rankings = []
         for pid, data in player_qw.items():
             wins = data["wins"]
+            losses = data["losses"]
+            matches = wins + losses
             total = data["totalQuality"]
             avg_credit = total / wins if wins > 0 else 0.0
 
@@ -798,7 +865,9 @@ class RankingEngine:
                 "totalQualityWins": round(total, 2),
                 "avgQualityWin": round(avg_credit, 3),
                 "wins": wins,
-                "matches": wins,  # Total wins evaluated
+                "losses": losses,
+                "matches": matches,  # Accurately reflect total matches
+                "winRate": round(100.0 * wins / max(1, matches), 1),
             })
 
         rankings.sort(key=lambda x: (x["score"], x["wins"]), reverse=True)
@@ -844,11 +913,12 @@ class RankingEngine:
     def _calculate_loss_quality(self, sets, mode, start_date, end_date, target_player_id, game_slug, alpha=2.0):
         """Loss Quality (Consistency): Measures competitive consistency relative to expectations.
 
-        Penalty per loss = expected_score ^ alpha (using pre-match Glicko-2 expected win probability).
-        Consistency score = 100 * (1 - total_loss_penalty / match_count), bounded [0, 100].
-        Undefeated players receive a score of 100.
+        Winning gains credit (1 - expected_win_prob).
+        Losing incurs penalty (expected_win_prob ^ alpha).
+        Performance Points = Sum(Win Credit) - Sum(Loss Penalty).
+        Consistency Score = 50.0 + (100.0 * Performance Points / (Matches + 10.0)).
         """
-        pre_match_ratings, _ = self._compute_pre_match_glicko_ratings(sets)
+        pre_match_ratings, _ = self._compute_pre_match_glicko_ratings(sets, mode=mode, start_date=start_date)
         calc = self.glicko_calc
 
         player_data = {}
@@ -859,7 +929,7 @@ class RankingEngine:
             if end_date and s_date and s_date > end_date:
                 continue
 
-            if start_date and s_date and s_date < start_date:
+            if mode in ("period_only", "period_performance") and start_date and s_date and s_date < start_date:
                 continue
 
             w_id, l_id = s["winnerId"], s["loserId"]
@@ -870,21 +940,22 @@ class RankingEngine:
             e_win = calc.expected_score_original(w_pre["r"], w_pre["rd"], l_pre["r"], l_pre["rd"])
             e_loss = calc.expected_score_original(l_pre["r"], l_pre["rd"], w_pre["r"], w_pre["rd"])
 
-            # Loss penalty for loser = expected_score ^ alpha
+            win_credit = 1.0 - e_win
             loss_penalty = (e_loss ** alpha)
 
-            # Record for winner (win = 0 penalty)
+            # Record for winner
             if w_id not in player_data:
-                player_data[w_id] = {"wins": 0, "losses": 0, "matches": 0, "totalPenalty": 0.0}
+                player_data[w_id] = {"wins": 0, "losses": 0, "matches": 0, "totalPoints": 0.0}
             player_data[w_id]["wins"] += 1
             player_data[w_id]["matches"] += 1
+            player_data[w_id]["totalPoints"] += win_credit
 
             # Record for loser
             if l_id not in player_data:
-                player_data[l_id] = {"wins": 0, "losses": 0, "matches": 0, "totalPenalty": 0.0}
+                player_data[l_id] = {"wins": 0, "losses": 0, "matches": 0, "totalPoints": 0.0}
             player_data[l_id]["losses"] += 1
             player_data[l_id]["matches"] += 1
-            player_data[l_id]["totalPenalty"] += loss_penalty
+            player_data[l_id]["totalPoints"] -= loss_penalty
 
             # Diagnostic traces
             if target_player_id is None or w_id == target_player_id:
@@ -898,7 +969,7 @@ class RankingEngine:
                     "opponentTag": self.latest_tags.get(l_id, f"Player {l_id}"),
                     "opponentPreRating": round(l_pre["r"], 1),
                     "expectedScore": round(e_win, 3),
-                    "penalty": 0.0,
+                    "credit": round(win_credit, 3),
                     "outcome": "win",
                 }
                 diagnostic_history.setdefault(w_id, []).append(trace_w)
@@ -925,24 +996,20 @@ class RankingEngine:
             if matches == 0:
                 continue
 
-            tot_penalty = data["totalPenalty"]
-            avg_penalty = tot_penalty / matches if matches > 0 else 0.0
-
-            consistency_score = max(0.0, min(100.0, 100.0 * (1.0 - tot_penalty / matches)))
+            tot_pts = data["totalPoints"]
+            consistency_score = round(50.0 + (100.0 * tot_pts / (matches + 10.0)), 1)
 
             rankings.append({
                 "playerId": pid,
                 "playerTag": self.latest_tags.get(pid, f"Player {pid}"),
-                "score": round(consistency_score, 1),
-                "totalLossPenalty": round(tot_penalty, 3),
-                "avgLossPenalty": round(avg_penalty, 3),
+                "score": consistency_score,
+                "totalPoints": round(tot_pts, 3),
                 "wins": data["wins"],
                 "losses": data["losses"],
                 "matches": matches,
                 "winRate": round(100.0 * data["wins"] / max(1, matches), 1),
             })
 
-        # Rank by consistency score descending, then match count descending
         rankings.sort(key=lambda x: (x["score"], x["matches"]), reverse=True)
         for idx, item in enumerate(rankings, 1):
             item["rank"] = idx
@@ -958,12 +1025,13 @@ class RankingEngine:
             "algorithm": {
                 "version": ALGORITHM_VERSION,
                 "name": "Loss Quality (Consistency)",
-                "description": "Measures competitive consistency relative to pre-match expectations. Lower penalties for expected losses to stronger opponents; higher penalties for unexpected upset losses. Undefeated players receive a score of 100.",
-                "limitations": "Measures consistency relative to pre-match expectations rather than absolute skill. Undefeated players receive 100 regardless of sample size.",
+                "description": "Measures competitive consistency relative to pre-match expectations. Wins gain credit, expected losses carry small penalties, and unexpected upset losses carry higher penalties.",
+                "limitations": "Measures consistency relative to pre-match expectations rather than absolute skill.",
                 "parameters": {
                     "alpha": alpha,
-                    "penaltyFormula": f"expected_score ^ {alpha} for losses, 0 for wins",
-                    "scoreFormula": "100 * (1 - total_loss_penalty / eligible_matches) bounded [0, 100]",
+                    "winCredit": "1 - expected_score",
+                    "lossPenalty": f"expected_score ^ {alpha}",
+                    "scoreFormula": "50.0 + (100.0 * PerformancePoints / (Matches + 10.0))",
                 },
             },
         }
