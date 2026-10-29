@@ -409,7 +409,7 @@ class RankingEngine:
 
         return event_placements
 
-    def calculate(self, game_slug, system="glicko2", mode="historical", start_date=None, end_date=None, target_player_id=None, alpha=2.0):
+    def calculate(self, game_slug, system="glicko2", mode="historical", start_date=None, end_date=None, target_player_id=None, alpha=2.0, weights=None):
         """Calculates rankings for a specific game, system, mode, and date range."""
         if start_date and end_date and start_date > end_date:
             raise ValueError("Start date must be before or on end date.")
@@ -428,6 +428,8 @@ class RankingEngine:
             return self._calculate_quality_wins(valid_sets, mode, start_date, end_date, target_player_id, game_slug, raw_target_player_id=raw_target_player_id)
         elif system == "loss_quality":
             return self._calculate_loss_quality(valid_sets, mode, start_date, end_date, target_player_id, game_slug, alpha=alpha, raw_target_player_id=raw_target_player_id)
+        elif system in ("custom", "power_rankings"):
+            return self._calculate_custom(valid_sets, mode, start_date, end_date, target_player_id, game_slug, weights=weights, raw_target_player_id=raw_target_player_id)
         else:
             raise ValueError(f"Unknown ranking system: {system}")
 
@@ -718,6 +720,177 @@ class RankingEngine:
                     "startDate": start_date,
                     "endDate": end_date,
                     "formula": "Conservative Rating = Rating (r) - 2 * Rating Deviation (RD)",
+                    "parameters": alg_params,
+                    "breakdown": breakdown_dict,
+                },
+            }
+
+        return result
+
+    # -------------------------------------------------------------------------
+    # System 5: Custom Power Rankings
+    # -------------------------------------------------------------------------
+
+    def _calculate_custom(self, sets, mode, start_date, end_date, target_player_id, game_slug, weights=None, raw_target_player_id=None):
+        """Power Rankings: Combines normalized component scores across Glicko-2, SoF, Quality Wins, and Loss Quality."""
+        if weights is None:
+            weights = {"glicko2": 50, "quality_wins": 25, "sof": 15, "loss_quality": 10}
+        elif isinstance(weights, str):
+            try:
+                weights = json.loads(weights)
+            except Exception:
+                weights = {"glicko2": 50, "quality_wins": 25, "sof": 15, "loss_quality": 10}
+
+        known_systems = ["glicko2", "quality_wins", "sof", "loss_quality"]
+        clean_weights = {}
+        for sys in known_systems:
+            try:
+                clean_weights[sys] = max(0.0, float(weights.get(sys, 0)))
+            except (ValueError, TypeError):
+                clean_weights[sys] = 0.0
+
+        total_w = sum(clean_weights.values())
+        if total_w > 0:
+            clean_weights = {k: (v / total_w) * 100.0 for k, v in clean_weights.items()}
+        else:
+            clean_weights = {"glicko2": 25.0, "quality_wins": 25.0, "sof": 25.0, "loss_quality": 25.0}
+
+        res_g2 = self._calculate_glicko2(sets, mode, start_date, end_date, None, game_slug)
+        res_sof = self._calculate_sof(sets, mode, start_date, end_date, None, game_slug)
+        res_qw = self._calculate_quality_wins(sets, mode, start_date, end_date, None, game_slug)
+        res_lq = self._calculate_loss_quality(sets, mode, start_date, end_date, None, game_slug)
+
+        sys_results = {
+            "glicko2": res_g2,
+            "sof": res_sof,
+            "quality_wins": res_qw,
+            "loss_quality": res_lq,
+        }
+
+        players_map = {}
+        for sys_key, sys_res in sys_results.items():
+            for p in sys_res.get("rankings", []):
+                pid = p["playerId"]
+                if pid not in players_map:
+                    players_map[pid] = {
+                        "playerId": pid,
+                        "playerTag": p["playerTag"],
+                        "rawScores": {},
+                        "matches": 0,
+                        "events": 0,
+                    }
+                players_map[pid]["rawScores"][sys_key] = p["score"]
+                players_map[pid]["matches"] = max(players_map[pid]["matches"], p.get("matches", 0))
+                players_map[pid]["events"] = max(players_map[pid]["events"], p.get("events", 0))
+
+        stats_min_max = {}
+        for sys_key in known_systems:
+            scores = [p_info["rawScores"].get(sys_key, 0.0) for p_info in players_map.values()]
+            if scores:
+                stats_min_max[sys_key] = {"min": min(scores), "max": max(scores)}
+            else:
+                stats_min_max[sys_key] = {"min": 0.0, "max": 100.0}
+
+        rankings = []
+        for pid, p_info in players_map.items():
+            norm_scores = {}
+            weighted_contribs = {}
+            final_score = 0.0
+
+            for sys_key in known_systems:
+                raw_val = p_info["rawScores"].get(sys_key, 0.0)
+                mn = stats_min_max[sys_key]["min"]
+                mx = stats_min_max[sys_key]["max"]
+                if mx > mn:
+                    norm_val = ((raw_val - mn) / (mx - mn)) * 100.0
+                else:
+                    norm_val = 100.0
+                norm_scores[sys_key] = round(norm_val, 1)
+
+                w = clean_weights[sys_key]
+                contrib = norm_val * (w / 100.0)
+                weighted_contribs[sys_key] = round(contrib, 2)
+                final_score += contrib
+
+            rankings.append({
+                "playerId": pid,
+                "playerTag": p_info["playerTag"],
+                "score": round(final_score, 1),
+                "normalizedScores": norm_scores,
+                "weightedContributions": weighted_contribs,
+                "weights": {k: round(v, 1) for k, v in clean_weights.items()},
+                "matches": p_info["matches"],
+                "events": p_info["events"],
+            })
+
+        rankings.sort(key=lambda x: x["score"], reverse=True)
+        for idx, item in enumerate(rankings, 1):
+            item["rank"] = idx
+
+        result = {
+            "gameSlug": game_slug,
+            "system": "custom",
+            "mode": mode,
+            "startDate": start_date,
+            "endDate": end_date,
+            "totalPlayers": len(rankings),
+            "weights": {k: round(v, 1) for k, v in clean_weights.items()},
+            "rankings": rankings,
+            "algorithm": {
+                "version": ALGORITHM_VERSION,
+                "name": "Power Rankings",
+                "description": "Combines normalized component scores across Glicko-2, Strength of Field, Quality Wins, and Consistency into a custom weighted score.",
+                "limitations": "Dependent on configured weighting budget and component normalization across eligible players.",
+                "parameters": {
+                    "weights": {k: f"{round(v, 1)}%" for k, v in clean_weights.items()},
+                    "formula": "Final Score = Sum(NormalizedScore_k * Weight_k / 100)",
+                },
+            },
+        }
+
+        if target_player_id:
+            p_rank = next((item for item in rankings if item["playerId"] == target_player_id), None)
+            alg_params = {k: f"{round(v, 1)}%" for k, v in clean_weights.items()}
+            breakdown_dict = {
+                "finalScore": p_rank["score"] if p_rank else None,
+                "normalizedScores": p_rank["normalizedScores"] if p_rank else {},
+                "weightedContributions": p_rank["weightedContributions"] if p_rank else {},
+                "weights": p_rank["weights"] if p_rank else {},
+            }
+
+            result["diagnostic"] = {
+                "context": {
+                    "playerId": raw_target_player_id or target_player_id,
+                    "canonicalPlayerId": canonical_id(target_player_id, self.merges),
+                    "playerTag": self.latest_tags.get(target_player_id, f"Player {target_player_id}"),
+                    "gameSlug": game_slug,
+                    "system": "custom",
+                    "mode": mode,
+                    "startDate": start_date,
+                    "endDate": end_date,
+                    "finalScore": p_rank["score"] if p_rank else None,
+                    "rank": p_rank["rank"] if p_rank else None,
+                    "totalResultsConsidered": len(sets),
+                    "totalResultsIncluded": p_rank["matches"] if p_rank else 0,
+                },
+                "playerId": raw_target_player_id or target_player_id,
+                "playerTag": self.latest_tags.get(target_player_id, f"Player {target_player_id}"),
+                "playerRank": p_rank["rank"] if p_rank else None,
+                "finalScore": p_rank["score"] if p_rank else None,
+                "algorithmParameters": alg_params,
+                "breakdown": breakdown_dict,
+                "evidence": {
+                    "tournaments": [],
+                    "matches": [],
+                },
+                "events": [],
+                "history": [],
+                "summary": {
+                    "system": "custom",
+                    "mode": mode,
+                    "startDate": start_date,
+                    "endDate": end_date,
+                    "formula": "Custom Score = Sum(NormalizedScore_k * Weight_k / 100)",
                     "parameters": alg_params,
                     "breakdown": breakdown_dict,
                 },
