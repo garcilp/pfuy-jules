@@ -303,7 +303,7 @@ function renderOverview() {
     { key: 'glicko2', title: 'Glicko-2', desc: 'Core player skill ratings (r - 2*RD conservative rating)', color: 'var(--gold)' },
     { key: 'sof', title: 'Strength of Field', desc: 'Evaluates tournament performance against pre-event field strengths and entrant scaling', color: 'var(--sky)' },
     { key: 'quality_wins', title: 'Quality Wins', desc: 'Cumulative quality points from victories using pre-match opponent effective ratings', color: 'var(--sky)' },
-    { key: 'loss_quality', title: 'Loss Quality (Consistency)', desc: 'Measures consistency against expectations with Bayesian sample dampening', color: 'var(--text)' }
+    { key: 'loss_quality', title: 'Loss Quality', desc: 'Measures consistency against expectations with Bayesian sample dampening', color: 'var(--text)' }
   ];
 
   systemConfigs.forEach(sys => {
@@ -325,7 +325,7 @@ function renderOverview() {
             <div class="top-standing-item">
               <span class="rank-num p${p.rank && p.rank <= 3 ? p.rank : ''}">${p.rank ? '#' + p.rank : '-'}</span>
               <a href="index.html?player=${encodeURIComponent(p.playerId)}" class="player-link"><b>${esc(p.playerTag)}</b></a>
-              <span class="score-val mono">${p.score}${p.wins !== undefined ? ' <small class="muted">(' + p.wins + 'W)</small>' : ''}</span>
+              <span class="score-val mono">${p.score}</span>
             </div>
           `).join('') : '<p class="muted">No matching ranked players</p>'}
         </div>
@@ -411,11 +411,10 @@ function renderIndividualSystem(systemKey) {
 
     <div class="panel glass ranking-table-panel">
       <div class="table">
-        <div class="tr head">
+        <div class="tr head ranking-row">
           <span class="sortable" onclick="changeSort('rank')">RANK ${sortCol === 'rank' ? (sortAsc ? '▲' : '▼') : ''}</span>
           <span class="sortable" onclick="changeSort('playerTag')">PLAYER ${sortCol === 'playerTag' ? (sortAsc ? '▲' : '▼') : ''}</span>
           <span class="sortable" onclick="changeSort('score')">SCORE ${sortCol === 'score' ? (sortAsc ? '▲' : '▼') : ''}</span>
-          <span>KEY METRICS</span>
           <span class="sortable" onclick="changeSort('winRate')">WIN % ${sortCol === 'winRate' ? (sortAsc ? '▲' : '▼') : ''}</span>
           <span>MATCHES / EVENTS</span>
           <span>ACTIONS</span>
@@ -432,7 +431,6 @@ function renderIndividualSystem(systemKey) {
               </a>
             </div>
             <span class="score-col mono font-bold">${p.isUnranked ? '-' : p.score}</span>
-            <span class="metrics-col mono muted">${formatMetrics(p, systemKey)}</span>
             <span class="winrate-col mono">${p.winRate !== undefined ? p.winRate + '%' : '-'}</span>
             <span class="matches-col mono">${p.wins !== undefined && systemKey === 'quality_wins' ? p.wins + ' W / ' + p.losses + ' L' : (p.matches !== undefined ? p.matches + ' m' + (p.events !== undefined ? ' / ' + p.events + ' ev' : '') : '-')}</span>
             <div class="actions-col">
@@ -471,7 +469,9 @@ function getSystemDescription(systemKey) {
 
 function formatAlgorithmParams(params) {
   if (!params) return '';
-  return Object.entries(params).map(([k, v]) => `<span>${esc(k)}: <b>${esc(v)}</b></span>`).join(' · ');
+  return Object.entries(params)
+    .filter(([k]) => !/(formula|Formula|Credit|Penalty|Accomplishment|Dampening)/.test(k))
+    .map(([k, v]) => `<span>${esc(k)}: <b>${esc(v)}</b></span>`).join(' · ');
 }
 
 function formatMetrics(p, systemKey) {

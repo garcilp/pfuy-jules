@@ -252,7 +252,8 @@ a.event-card:hover{color:var(--text);background:rgba(255,255,255,.14);border-col
 .control-label{font-size:11px;color:var(--muted);letter-spacing:.04em}
 .date-input{min-height:54px;padding:0 14px;border:1px solid rgba(255,255,255,.2);border-radius:20px;background-color:rgba(255,255,255,.08);color:var(--text);font:500 14px 'Space Grotesk',system-ui,sans-serif;cursor:pointer}
 .date-input::-webkit-calendar-picker-indicator{filter:invert(1)}
-.search-group{grid-column:span 1}
+.search-group{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.search-group .search{width:100%}
 .ranking-presets-row{display:flex;align-items:center;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line);flex-wrap:wrap;font-size:13px}
 .preset-btn{min-height:34px;padding:0 12px;font-size:12px;border-radius:12px}
 
@@ -271,7 +272,7 @@ a.event-card:hover{color:var(--text);background:rgba(255,255,255,.14);border-col
 .view-sys-btn{margin-top:auto;width:100%;text-align:center}
 
 .ranking-table-panel{padding:16px 20px}
-.ranking-row{grid-template-columns:60px minmax(180px,1.8fr) 110px minmax(150px,1.5fr) 90px 90px 110px;padding:12px 6px}
+.ranking-row{grid-template-columns:60px minmax(180px,1.8fr) 110px 90px 140px 110px;padding:12px 6px}
 .comparison-head,.comparison-row{grid-template-columns:minmax(180px,1.8fr) repeat(4,minmax(110px,1fr)) 100px}
 .rank-col{font-size:18px}.font-bold{font-weight:700}.font-normal{font-weight:400}
 .player-col{display:flex;align-items:center;gap:10px;min-width:0}

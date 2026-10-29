@@ -206,8 +206,9 @@ function render() {
     const opp = topOpponents[0] || null;
     const oppName = opp ? opp.name : null;
     mostPlayedOpponent = oppName;
+    const gameCountLabel = opp ? (opp.games > 1 ? ` · ${opp.games} games` : '') : '';
     stats.push(['ACTIVE FOR', singleEventResult ? '1 Event' : activeDuration, activityPeriod],
-      ['MOST-PLAYED OPPONENT', oppName || '—', opp ? `${opp.sets} sets · ${opp.wins}–${opp.sets - opp.wins} · ${opp.games} game${opp.games === 1 ? '' : 's'}` : 'No set data']);
+      ['MOST-PLAYED OPPONENT', oppName || '—', opp ? `${opp.sets} sets · ${opp.wins}–${opp.sets - opp.wins}${gameCountLabel}` : 'No set data']);
   }
   const notableWinsList = [];
   const seenOpponents = new Map();
