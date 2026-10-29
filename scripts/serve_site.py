@@ -284,6 +284,11 @@ class Handler(SimpleHTTPRequestHandler):
             start_date = qs.get("start_date", qs.get("start", [None]))[0]
             end_date = qs.get("end_date", qs.get("end", [None]))[0]
 
+            if not start_date or not start_date.strip():
+                start_date = None
+            if not end_date or not end_date.strip():
+                end_date = None
+
             try:
                 from scripts.rankings_calculator import RankingEngine
                 engine = RankingEngine()
@@ -307,6 +312,13 @@ class Handler(SimpleHTTPRequestHandler):
             start_date = qs.get("start_date", qs.get("start", [None]))[0]
             end_date = qs.get("end_date", qs.get("end", [None]))[0]
             player_id = qs.get("player_id", qs.get("playerId", [None]))[0]
+
+            if not start_date or not start_date.strip():
+                start_date = None
+            if not end_date or not end_date.strip():
+                end_date = None
+            if player_id is not None:
+                player_id = player_id.strip() or None
 
             if not player_id:
                 self.send_json(400, {"error": "player_id parameter is required for diagnostic view."})

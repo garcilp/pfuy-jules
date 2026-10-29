@@ -12,12 +12,14 @@ import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlsplit
+from zoneinfo import ZoneInfo
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATABASE = PROJECT_ROOT / "startgg-data" / "platfighters.sqlite3"
 PROFILE_DIR = PROJECT_ROOT / "data" / "profiles"
 RANKINGS_DIR = PROJECT_ROOT / "data" / "rankings"
 ALGORITHM_VERSION = "2.2.0"
+MONTEVIDEO_TZ = ZoneInfo("America/Montevideo")
 
 
 # -----------------------------------------------------------------------------
@@ -45,7 +47,7 @@ def date_from_epoch(value):
     if value is None:
         return None
     try:
-        return datetime.fromtimestamp(value, timezone.utc).date().isoformat()
+        return datetime.fromtimestamp(value, MONTEVIDEO_TZ).date().isoformat()
     except (ValueError, OverflowError, OSError):
         return None
 
@@ -176,11 +178,7 @@ class Glicko2Calculator:
         return self.E(mu1, mu2, phi2)
 
     def update_period(self, r, rd, vol, matches):
-        """Update a player's rating for a single rating period.
-
-        matches: list of tuples (opponent_r, opponent_rd, outcome_s)
-                 outcome_s is 1.0 for win, 0.0 for loss.
-        """
+        """Update a player's rating for a single rating period."""
         mu, phi = self.to_glicko2_scale(r, rd)
 
         if not matches:
@@ -342,6 +340,7 @@ class RankingEngine:
                 "setId": text_id(row["set_id"]),
                 "eventId": text_id(row["event_id"]),
                 "eventKey": event_key,
+                "tournamentSlug": row["tournament_slug"],
                 "eventName": row["event_name"],
                 "tournamentName": row["tournament_name"],
                 "date": date_str,
@@ -398,6 +397,7 @@ class RankingEngine:
             event_placements.append({
                 "eventId": text_id(row["event_id"]),
                 "eventKey": event_key,
+                "tournamentSlug": row["tournament_slug"],
                 "eventName": row["event_name"],
                 "tournamentName": row["tournament_name"],
                 "playerId": player_id,
@@ -411,16 +411,23 @@ class RankingEngine:
 
     def calculate(self, game_slug, system="glicko2", mode="historical", start_date=None, end_date=None, target_player_id=None, alpha=2.0):
         """Calculates rankings for a specific game, system, mode, and date range."""
+        if start_date and end_date and start_date > end_date:
+            raise ValueError("Start date must be before or on end date.")
+
+        raw_target_player_id = text_id(target_player_id) if target_player_id is not None else None
+        if target_player_id is not None:
+            target_player_id = canonical_id(target_player_id, self.merges)
+
         valid_sets = self.load_sets_for_game(game_slug)
 
         if system == "glicko2":
-            return self._calculate_glicko2(valid_sets, mode, start_date, end_date, target_player_id, game_slug)
+            return self._calculate_glicko2(valid_sets, mode, start_date, end_date, target_player_id, game_slug, raw_target_player_id=raw_target_player_id)
         elif system == "sof":
-            return self._calculate_sof(valid_sets, mode, start_date, end_date, target_player_id, game_slug)
+            return self._calculate_sof(valid_sets, mode, start_date, end_date, target_player_id, game_slug, raw_target_player_id=raw_target_player_id)
         elif system == "quality_wins":
-            return self._calculate_quality_wins(valid_sets, mode, start_date, end_date, target_player_id, game_slug)
+            return self._calculate_quality_wins(valid_sets, mode, start_date, end_date, target_player_id, game_slug, raw_target_player_id=raw_target_player_id)
         elif system == "loss_quality":
-            return self._calculate_loss_quality(valid_sets, mode, start_date, end_date, target_player_id, game_slug, alpha=alpha)
+            return self._calculate_loss_quality(valid_sets, mode, start_date, end_date, target_player_id, game_slug, alpha=alpha, raw_target_player_id=raw_target_player_id)
         else:
             raise ValueError(f"Unknown ranking system: {system}")
 
@@ -434,10 +441,6 @@ class RankingEngine:
         Respects calculation mode:
         - historical / period_performance: reconstruct ratings from start of history.
         - period_only: reset all initial ratings to neutral (1500, 350) for sets on/after start_date.
-
-        Returns (pre_match_ratings, event_field_strengths)
-        pre_match_ratings: (setId, playerId) -> pre-match rating dict {"r": ..., "rd": ..., "vol": ...}
-        event_field_strengths: eventId -> float (average pre-event Glicko-2 rating of participants)
         """
         calc = self.glicko_calc
         ratings = {}
@@ -491,7 +494,7 @@ class RankingEngine:
     # System 1: Glicko-2 Player Skill Ratings
     # -------------------------------------------------------------------------
 
-    def _calculate_glicko2(self, sets, mode, start_date, end_date, target_player_id, game_slug):
+    def _calculate_glicko2(self, sets, mode, start_date, end_date, target_player_id, game_slug, raw_target_player_id=None):
         calc = self.glicko_calc
 
         pre_period_events = {}
@@ -577,6 +580,8 @@ class RankingEngine:
                                 trace = {
                                     "setId": s["setId"],
                                     "event": f"{s['tournamentName']} · {s['eventName']}",
+                                    "eventKey": s["eventKey"],
+                                    "tournamentSlug": s["tournamentSlug"],
                                     "date": s["date"],
                                     "phase": s["phaseName"],
                                     "round": s["roundText"],
@@ -625,6 +630,8 @@ class RankingEngine:
         for idx, item in enumerate(rankings, 1):
             item["rank"] = idx
 
+        total_sets_considered = sum(len(e) for e in period_events.values())
+
         result = {
             "gameSlug": game_slug,
             "system": "glicko2",
@@ -632,6 +639,7 @@ class RankingEngine:
             "startDate": start_date,
             "endDate": end_date,
             "totalPlayers": len(rankings),
+            "totalResultsConsidered": total_sets_considered,
             "rankings": rankings,
             "algorithm": {
                 "version": ALGORITHM_VERSION,
@@ -650,12 +658,66 @@ class RankingEngine:
 
         if target_player_id:
             p_rank = next((item for item in rankings if item["playerId"] == target_player_id), None)
+            p_hist = diagnostic_history.get(target_player_id, [])
+            p_r = ratings.get(target_player_id, calc.initial_rating())
+            p_stat = stats.get(target_player_id, {"wins": 0, "losses": 0, "matches": 0})
+            final_sc = round(p_rank["score"], 1) if p_rank else None
+
+            alg_params = {
+                "tau": calc.tau,
+                "initialRating": calc.r_0,
+                "initialRD": calc.rd_0,
+                "formula": "Conservative Rating = Rating (r) - 2 * Rating Deviation (RD)",
+            }
+            breakdown_dict = {
+                "rating": round(p_r["r"], 1),
+                "rd": round(p_r["rd"], 1),
+                "volatility": round(p_r["vol"], 4),
+                "conservativeScore": final_sc,
+                "matches": p_stat["matches"],
+                "wins": p_stat["wins"],
+                "losses": p_stat["losses"],
+            }
+
             result["diagnostic"] = {
-                "playerId": target_player_id,
+                "context": {
+                    "playerId": raw_target_player_id or target_player_id,
+                    "canonicalPlayerId": canonical_id(target_player_id, self.merges),
+                    "playerTag": self.latest_tags.get(target_player_id, f"Player {target_player_id}"),
+                    "gameSlug": game_slug,
+                    "system": "glicko2",
+                    "mode": mode,
+                    "startDate": start_date,
+                    "endDate": end_date,
+                    "finalScore": final_sc,
+                    "rank": p_rank["rank"] if p_rank else None,
+                    "totalResultsConsidered": total_sets_considered,
+                    "totalResultsIncluded": p_stat["matches"],
+                },
+                "playerId": raw_target_player_id or target_player_id,
                 "playerTag": self.latest_tags.get(target_player_id, f"Player {target_player_id}"),
                 "playerRank": p_rank["rank"] if p_rank else None,
-                "finalScore": p_rank["score"] if p_rank else None,
-                "history": diagnostic_history.get(target_player_id, []),
+                "finalScore": final_sc,
+                "totalMatches": p_stat["matches"],
+                "wins": p_stat["wins"],
+                "losses": p_stat["losses"],
+                "algorithmParameters": alg_params,
+                "breakdown": breakdown_dict,
+                "evidence": {
+                    "tournaments": [],
+                    "matches": p_hist,
+                },
+                "history": p_hist,
+                "events": [],
+                "summary": {
+                    "system": "glicko2",
+                    "mode": mode,
+                    "startDate": start_date,
+                    "endDate": end_date,
+                    "formula": "Conservative Rating = Rating (r) - 2 * Rating Deviation (RD)",
+                    "parameters": alg_params,
+                    "breakdown": breakdown_dict,
+                },
             }
 
         return result
@@ -664,7 +726,7 @@ class RankingEngine:
     # System 2: Strength of Field (SoF)
     # -------------------------------------------------------------------------
 
-    def _calculate_sof(self, sets, mode, start_date, end_date, target_player_id, game_slug):
+    def _calculate_sof(self, sets, mode, start_date, end_date, target_player_id, game_slug, raw_target_player_id=None):
         """Evaluates competitive accomplishments in tournaments against pre-event field strengths."""
         pre_match_ratings, event_field_strengths = self._compute_pre_match_glicko_ratings(sets, mode=mode, start_date=start_date)
         event_placements = self.load_event_placements_for_game(game_slug)
@@ -681,17 +743,25 @@ class RankingEngine:
             e_id = p["eventId"]
             f_strength = event_field_strengths.get(e_id, 1500.0)
 
+            p_weight = 1.0 / math.sqrt(p["placement"])
+            e_weight = math.log2(p["entrants"] + 1) / 3.0
+            raw_pts = f_strength * p_weight * e_weight
+
             player_events.setdefault(pid, []).append({
                 "eventId": e_id,
                 "eventName": p["eventName"],
                 "tournamentName": p["tournamentName"],
+                "eventKey": p["eventKey"],
+                "tournamentSlug": p["tournamentSlug"],
                 "placement": p["placement"],
                 "entrants": p["entrants"],
-                "fieldStrength": f_strength,
+                "fieldStrength": round(f_strength, 1),
+                "placementWeight": round(p_weight, 3),
+                "entrantWeight": round(e_weight, 3),
+                "eventPoints": round(raw_pts, 1),
                 "date": p_date,
             })
 
-        # Match counts per player in date range
         player_matches = {}
         diagnostic_history = {}
 
@@ -713,6 +783,8 @@ class RankingEngine:
                     trace = {
                         "setId": s["setId"],
                         "event": f"{s['tournamentName']} · {s['eventName']}",
+                        "eventKey": s["eventKey"],
+                        "tournamentSlug": s["tournamentSlug"],
                         "date": s["date"],
                         "phase": s["phaseName"],
                         "round": s["roundText"],
@@ -733,24 +805,18 @@ class RankingEngine:
             wins = sum(1 for m in matches_info if m[1])
             losses = m_count - wins
 
-            # Evaluate tournament event accomplishment: FieldStrength * (1 / sqrt(placement)) * log2(entrants+1) / 3.0
-            event_pts = 0.0
-            for e in evs:
-                p_weight = 1.0 / math.sqrt(e["placement"])
-                e_weight = math.log2(e["entrants"] + 1) / 3.0
-                event_pts += e["fieldStrength"] * p_weight * e_weight
-
-            # Sample volume dampening for small match counts (dampens < 15 matches)
+            event_pts = sum(e["eventPoints"] for e in evs)
             sample_dampener = min(1.0, m_count / 15.0)
             avg_event_score = (event_pts / len(evs)) * sample_dampener
-
             avg_field = sum(e["fieldStrength"] for e in evs) / len(evs) if evs else 1500.0
 
             rankings.append({
                 "playerId": pid,
                 "playerTag": self.latest_tags.get(pid, f"Player {pid}"),
                 "score": round(avg_event_score, 1),
+                "totalEventPoints": round(event_pts, 1),
                 "avgFieldStrength": round(avg_field, 1),
+                "sampleDampener": round(sample_dampener, 3),
                 "winRate": round(100.0 * wins / max(1, m_count), 1),
                 "matches": m_count,
                 "wins": wins,
@@ -784,12 +850,57 @@ class RankingEngine:
 
         if target_player_id:
             p_rank = next((item for item in rankings if item["playerId"] == target_player_id), None)
+            evs = player_events.get(target_player_id, [])
+            hist = diagnostic_history.get(target_player_id, [])
+
+            alg_params = {"minSampleMatches": 15}
+            breakdown_dict = {
+                "totalEventPoints": p_rank["totalEventPoints"] if p_rank else 0.0,
+                "eventsCount": len(evs),
+                "avgFieldStrength": p_rank["avgFieldStrength"] if p_rank else 0.0,
+                "sampleDampener": p_rank["sampleDampener"] if p_rank else 0.0,
+                "matches": p_rank["matches"] if p_rank else 0,
+            }
+
             result["diagnostic"] = {
-                "playerId": target_player_id,
+                "context": {
+                    "playerId": raw_target_player_id or target_player_id,
+                    "canonicalPlayerId": canonical_id(target_player_id, self.merges),
+                    "playerTag": self.latest_tags.get(target_player_id, f"Player {target_player_id}"),
+                    "gameSlug": game_slug,
+                    "system": "sof",
+                    "mode": mode,
+                    "startDate": start_date,
+                    "endDate": end_date,
+                    "finalScore": p_rank["score"] if p_rank else None,
+                    "rank": p_rank["rank"] if p_rank else None,
+                    "totalResultsConsidered": len(event_placements),
+                    "totalResultsIncluded": len(evs),
+                },
+                "playerId": raw_target_player_id or target_player_id,
                 "playerTag": self.latest_tags.get(target_player_id, f"Player {target_player_id}"),
                 "playerRank": p_rank["rank"] if p_rank else None,
                 "finalScore": p_rank["score"] if p_rank else None,
-                "history": diagnostic_history.get(target_player_id, []),
+                "totalMatches": p_rank["matches"] if p_rank else 0,
+                "wins": p_rank["wins"] if p_rank else 0,
+                "losses": p_rank["losses"] if p_rank else 0,
+                "algorithmParameters": alg_params,
+                "breakdown": breakdown_dict,
+                "evidence": {
+                    "tournaments": evs,
+                    "matches": hist,
+                },
+                "events": evs,
+                "history": hist,
+                "summary": {
+                    "system": "sof",
+                    "mode": mode,
+                    "startDate": start_date,
+                    "endDate": end_date,
+                    "formula": "Score = (Sum(EventPoints) / EventCount) * min(1.0, Matches / 15.0)",
+                    "parameters": alg_params,
+                    "breakdown": breakdown_dict,
+                },
             }
 
         return result
@@ -798,7 +909,7 @@ class RankingEngine:
     # System 3: Quality Wins
     # -------------------------------------------------------------------------
 
-    def _calculate_quality_wins(self, sets, mode, start_date, end_date, target_player_id, game_slug):
+    def _calculate_quality_wins(self, sets, mode, start_date, end_date, target_player_id, game_slug, raw_target_player_id=None):
         """Quality Wins: Sum of (1 - expected_score) across wins using pre-match Glicko ratings."""
         pre_match_ratings, _ = self._compute_pre_match_glicko_ratings(sets, mode=mode, start_date=start_date)
         calc = self.glicko_calc
@@ -818,18 +929,15 @@ class RankingEngine:
             w_pre = pre_match_ratings.get((s["setId"], w_id), calc.initial_rating())
             l_pre = pre_match_ratings.get((s["setId"], l_id), calc.initial_rating())
 
-            # Expected score of winner before match
             e_win = calc.expected_score_original(w_pre["r"], w_pre["rd"], l_pre["r"], l_pre["rd"])
             credit = 1.0 - e_win
 
-            # Record for winner
             if w_id not in player_qw:
                 player_qw[w_id] = {"totalQuality": 0.0, "wins": 0, "losses": 0, "credits": []}
             player_qw[w_id]["totalQuality"] += credit
             player_qw[w_id]["wins"] += 1
             player_qw[w_id]["credits"].append(credit)
 
-            # Record for loser to track total matches accurately
             if l_id not in player_qw:
                 player_qw[l_id] = {"totalQuality": 0.0, "wins": 0, "losses": 0, "credits": []}
             player_qw[l_id]["losses"] += 1
@@ -838,6 +946,8 @@ class RankingEngine:
                 trace = {
                     "setId": s["setId"],
                     "event": f"{s['tournamentName']} · {s['eventName']}",
+                    "eventKey": s["eventKey"],
+                    "tournamentSlug": s["tournamentSlug"],
                     "date": s["date"],
                     "phase": s["phaseName"],
                     "round": s["roundText"],
@@ -849,6 +959,25 @@ class RankingEngine:
                     "outcome": "win",
                 }
                 diagnostic_history.setdefault(w_id, []).append(trace)
+
+            if target_player_id is None or l_id == target_player_id:
+                e_loss = calc.expected_score_original(l_pre["r"], l_pre["rd"], w_pre["r"], w_pre["rd"])
+                trace_l = {
+                    "setId": s["setId"],
+                    "event": f"{s['tournamentName']} · {s['eventName']}",
+                    "eventKey": s["eventKey"],
+                    "tournamentSlug": s["tournamentSlug"],
+                    "date": s["date"],
+                    "phase": s["phaseName"],
+                    "round": s["roundText"],
+                    "opponentId": w_id,
+                    "opponentTag": self.latest_tags.get(w_id, f"Player {w_id}"),
+                    "opponentPreRating": round(w_pre["r"], 1),
+                    "expectedScore": round(e_loss, 3),
+                    "credit": 0.0,
+                    "outcome": "loss",
+                }
+                diagnostic_history.setdefault(l_id, []).append(trace_l)
 
         rankings = []
         for pid, data in player_qw.items():
@@ -866,7 +995,7 @@ class RankingEngine:
                 "avgQualityWin": round(avg_credit, 3),
                 "wins": wins,
                 "losses": losses,
-                "matches": matches,  # Accurately reflect total matches
+                "matches": matches,
                 "winRate": round(100.0 * wins / max(1, matches), 1),
             })
 
@@ -896,12 +1025,56 @@ class RankingEngine:
 
         if target_player_id:
             p_rank = next((item for item in rankings if item["playerId"] == target_player_id), None)
+            hist = diagnostic_history.get(target_player_id, [])
+
+            alg_params = {"expectedScoreFormula": "Glicko-2 E(mu_1, mu_2, phi_2)"}
+            breakdown_dict = {
+                "totalQualityWins": p_rank["totalQualityWins"] if p_rank else 0.0,
+                "avgQualityWin": p_rank["avgQualityWin"] if p_rank else 0.0,
+                "wins": p_rank["wins"] if p_rank else 0,
+                "losses": p_rank["losses"] if p_rank else 0,
+                "matches": p_rank["matches"] if p_rank else 0,
+            }
+
             result["diagnostic"] = {
-                "playerId": target_player_id,
+                "context": {
+                    "playerId": raw_target_player_id or target_player_id,
+                    "canonicalPlayerId": canonical_id(target_player_id, self.merges),
+                    "playerTag": self.latest_tags.get(target_player_id, f"Player {target_player_id}"),
+                    "gameSlug": game_slug,
+                    "system": "quality_wins",
+                    "mode": mode,
+                    "startDate": start_date,
+                    "endDate": end_date,
+                    "finalScore": p_rank["score"] if p_rank else None,
+                    "rank": p_rank["rank"] if p_rank else None,
+                    "totalResultsConsidered": len(sets),
+                    "totalResultsIncluded": p_rank["matches"] if p_rank else 0,
+                },
+                "playerId": raw_target_player_id or target_player_id,
                 "playerTag": self.latest_tags.get(target_player_id, f"Player {target_player_id}"),
                 "playerRank": p_rank["rank"] if p_rank else None,
                 "finalScore": p_rank["score"] if p_rank else None,
-                "history": diagnostic_history.get(target_player_id, []),
+                "totalMatches": p_rank["matches"] if p_rank else 0,
+                "wins": p_rank["wins"] if p_rank else 0,
+                "losses": p_rank["losses"] if p_rank else 0,
+                "algorithmParameters": alg_params,
+                "breakdown": breakdown_dict,
+                "evidence": {
+                    "tournaments": [],
+                    "matches": hist,
+                },
+                "events": [],
+                "history": hist,
+                "summary": {
+                    "system": "quality_wins",
+                    "mode": mode,
+                    "startDate": start_date,
+                    "endDate": end_date,
+                    "formula": "Quality Wins Score = Sum(1.0 - ExpectedWinProbability)",
+                    "parameters": alg_params,
+                    "breakdown": breakdown_dict,
+                },
             }
 
         return result
@@ -910,7 +1083,7 @@ class RankingEngine:
     # System 4: Loss Quality (Consistency Ranking)
     # -------------------------------------------------------------------------
 
-    def _calculate_loss_quality(self, sets, mode, start_date, end_date, target_player_id, game_slug, alpha=2.0):
+    def _calculate_loss_quality(self, sets, mode, start_date, end_date, target_player_id, game_slug, alpha=2.0, raw_target_player_id=None):
         """Loss Quality (Consistency): Measures competitive consistency relative to expectations.
 
         Winning gains credit (1 - expected_win_prob).
@@ -936,32 +1109,32 @@ class RankingEngine:
             w_pre = pre_match_ratings.get((s["setId"], w_id), calc.initial_rating())
             l_pre = pre_match_ratings.get((s["setId"], l_id), calc.initial_rating())
 
-            # Expected win probabilities before match
             e_win = calc.expected_score_original(w_pre["r"], w_pre["rd"], l_pre["r"], l_pre["rd"])
             e_loss = calc.expected_score_original(l_pre["r"], l_pre["rd"], w_pre["r"], w_pre["rd"])
 
             win_credit = 1.0 - e_win
             loss_penalty = (e_loss ** alpha)
 
-            # Record for winner
             if w_id not in player_data:
-                player_data[w_id] = {"wins": 0, "losses": 0, "matches": 0, "totalPoints": 0.0}
+                player_data[w_id] = {"wins": 0, "losses": 0, "matches": 0, "totalPoints": 0.0, "winCredits": 0.0, "lossPenalties": 0.0}
             player_data[w_id]["wins"] += 1
             player_data[w_id]["matches"] += 1
             player_data[w_id]["totalPoints"] += win_credit
+            player_data[w_id]["winCredits"] += win_credit
 
-            # Record for loser
             if l_id not in player_data:
-                player_data[l_id] = {"wins": 0, "losses": 0, "matches": 0, "totalPoints": 0.0}
+                player_data[l_id] = {"wins": 0, "losses": 0, "matches": 0, "totalPoints": 0.0, "winCredits": 0.0, "lossPenalties": 0.0}
             player_data[l_id]["losses"] += 1
             player_data[l_id]["matches"] += 1
             player_data[l_id]["totalPoints"] -= loss_penalty
+            player_data[l_id]["lossPenalties"] += loss_penalty
 
-            # Diagnostic traces
             if target_player_id is None or w_id == target_player_id:
                 trace_w = {
                     "setId": s["setId"],
                     "event": f"{s['tournamentName']} · {s['eventName']}",
+                    "eventKey": s["eventKey"],
+                    "tournamentSlug": s["tournamentSlug"],
                     "date": s["date"],
                     "phase": s["phaseName"],
                     "round": s["roundText"],
@@ -978,6 +1151,8 @@ class RankingEngine:
                 trace_l = {
                     "setId": s["setId"],
                     "event": f"{s['tournamentName']} · {s['eventName']}",
+                    "eventKey": s["eventKey"],
+                    "tournamentSlug": s["tournamentSlug"],
                     "date": s["date"],
                     "phase": s["phaseName"],
                     "round": s["roundText"],
@@ -1004,6 +1179,8 @@ class RankingEngine:
                 "playerTag": self.latest_tags.get(pid, f"Player {pid}"),
                 "score": consistency_score,
                 "totalPoints": round(tot_pts, 3),
+                "winCredits": round(data["winCredits"], 3),
+                "lossPenalties": round(data["lossPenalties"], 3),
                 "wins": data["wins"],
                 "losses": data["losses"],
                 "matches": matches,
@@ -1038,12 +1215,61 @@ class RankingEngine:
 
         if target_player_id:
             p_rank = next((item for item in rankings if item["playerId"] == target_player_id), None)
+            hist = diagnostic_history.get(target_player_id, [])
+
+            alg_params = {
+                "alpha": alpha,
+                "winCredit": "1 - expected_win_prob",
+                "lossPenalty": f"expected_win_prob ^ {alpha}",
+            }
+            breakdown_dict = {
+                "winCreditsTotal": p_rank["winCredits"] if p_rank else 0.0,
+                "lossPenaltiesTotal": p_rank["lossPenalties"] if p_rank else 0.0,
+                "totalPoints": p_rank["totalPoints"] if p_rank else 0.0,
+                "matches": p_rank["matches"] if p_rank else 0,
+                "wins": p_rank["wins"] if p_rank else 0,
+                "losses": p_rank["losses"] if p_rank else 0,
+            }
+
             result["diagnostic"] = {
-                "playerId": target_player_id,
+                "context": {
+                    "playerId": raw_target_player_id or target_player_id,
+                    "canonicalPlayerId": canonical_id(target_player_id, self.merges),
+                    "playerTag": self.latest_tags.get(target_player_id, f"Player {target_player_id}"),
+                    "gameSlug": game_slug,
+                    "system": "loss_quality",
+                    "mode": mode,
+                    "startDate": start_date,
+                    "endDate": end_date,
+                    "finalScore": p_rank["score"] if p_rank else None,
+                    "rank": p_rank["rank"] if p_rank else None,
+                    "totalResultsConsidered": len(sets),
+                    "totalResultsIncluded": p_rank["matches"] if p_rank else 0,
+                },
+                "playerId": raw_target_player_id or target_player_id,
                 "playerTag": self.latest_tags.get(target_player_id, f"Player {target_player_id}"),
                 "playerRank": p_rank["rank"] if p_rank else None,
                 "finalScore": p_rank["score"] if p_rank else None,
-                "history": diagnostic_history.get(target_player_id, []),
+                "totalMatches": p_rank["matches"] if p_rank else 0,
+                "wins": p_rank["wins"] if p_rank else 0,
+                "losses": p_rank["losses"] if p_rank else 0,
+                "algorithmParameters": alg_params,
+                "breakdown": breakdown_dict,
+                "evidence": {
+                    "tournaments": [],
+                    "matches": hist,
+                },
+                "events": [],
+                "history": hist,
+                "summary": {
+                    "system": "loss_quality",
+                    "mode": mode,
+                    "startDate": start_date,
+                    "endDate": end_date,
+                    "formula": "Consistency Score = 50.0 + (100.0 * TotalPoints / (Matches + 10.0))",
+                    "parameters": alg_params,
+                    "breakdown": breakdown_dict,
+                },
             }
 
         return result
