@@ -302,7 +302,7 @@ function renderOverview() {
   const systemConfigs = [
     { key: 'glicko2', title: 'Glicko-2', desc: 'Core player skill ratings (r - 2*RD conservative rating)', color: 'var(--gold)' },
     { key: 'sof', title: 'Strength of Field', desc: 'Evaluates tournament performance against pre-event field strengths and entrant scaling', color: 'var(--sky)' },
-    { key: 'quality_wins', title: 'Quality Wins', desc: 'Credit gained from beating opponents based on expected win probability', color: 'var(--sky)' },
+    { key: 'quality_wins', title: 'Quality Wins', desc: 'Average quality per win (1 - Expected Score) based on pre-match Glicko-2 ratings', color: 'var(--sky)' },
     { key: 'loss_quality', title: 'Loss Quality (Consistency)', desc: 'Measures consistency against expectations with Bayesian sample dampening', color: 'var(--text)' }
   ];
 
@@ -323,9 +323,9 @@ function renderOverview() {
         <div class="top-standings-list">
           ${top3.length ? top3.map((p) => `
             <div class="top-standing-item">
-              <span class="rank-num p${p.rank <= 3 ? p.rank : ''}">#${p.rank}</span>
+              <span class="rank-num p${p.rank && p.rank <= 3 ? p.rank : ''}">${p.rank ? '#' + p.rank : '-'}</span>
               <a href="index.html?player=${encodeURIComponent(p.playerId)}" class="player-link"><b>${esc(p.playerTag)}</b></a>
-              <span class="score-val mono">${p.score}</span>
+              <span class="score-val mono">${p.score}${p.wins !== undefined ? ' <small class="muted">(' + p.wins + 'W)</small>' : ''}</span>
             </div>
           `).join('') : '<p class="muted">No matching ranked players</p>'}
         </div>
@@ -422,17 +422,19 @@ function renderIndividualSystem(systemKey) {
         </div>
         ${visibleList.length ? visibleList.map(p => `
           <div class="tr ranking-row">
-            <span class="rank-col font-bold ${p.rank <= 3 ? 'p' + p.rank : ''}">#${p.rank}</span>
+            <span class="rank-col font-bold ${p.rank && p.rank <= 3 ? 'p' + p.rank : ''}">${p.rank ? '#' + p.rank : 'Unranked'}</span>
             <div class="player-col">
               <a href="index.html?player=${encodeURIComponent(p.playerId)}" class="player-card-link">
                 <span class="player-avatar mini"><img src="assets/players/${esc(p.playerId)}.png" alt="" onerror="this.remove()"></span>
                 <b>${esc(p.playerTag)}</b>
+                ${p.isProvisional ? `<span class="badge warning mono" style="font-size:0.75rem; padding:0.1rem 0.4rem; margin-left:0.4rem;" title="Provisional ranking (< 3 eligible wins)">Provisional</span>` : ''}
+                ${p.isUnranked ? `<span class="badge muted mono" style="font-size:0.75rem; padding:0.1rem 0.4rem; margin-left:0.4rem;" title="No eligible wins recorded">Unranked</span>` : ''}
               </a>
             </div>
-            <span class="score-col mono font-bold">${p.score}</span>
+            <span class="score-col mono font-bold">${p.isUnranked ? '-' : p.score}</span>
             <span class="metrics-col mono muted">${formatMetrics(p, systemKey)}</span>
-            <span class="winrate-col mono">${p.winRate !== undefined ? p.winRate + '%' : (p.avgQualityWin !== undefined ? 'Avg:' + p.avgQualityWin : '-')}</span>
-            <span class="matches-col mono">${p.matches !== undefined ? p.matches + ' m' + (p.events !== undefined ? ' / ' + p.events + ' ev' : '') : '-'}</span>
+            <span class="winrate-col mono">${p.winRate !== undefined ? p.winRate + '%' : '-'}</span>
+            <span class="matches-col mono">${p.wins !== undefined && systemKey === 'quality_wins' ? p.wins + ' W / ' + p.losses + ' L' : (p.matches !== undefined ? p.matches + ' m' + (p.events !== undefined ? ' / ' + p.events + ' ev' : '') : '-')}</span>
             <div class="actions-col">
               <button class="quiet-button diagnostic-btn" onclick="openDiagnosticModal('${esc(p.playerId)}')">Diagnostic</button>
             </div>
@@ -459,7 +461,7 @@ function getSystemDescription(systemKey) {
     case 'sof':
       return 'Strength of Field evaluates tournament performance against pre-event field strengths and entrant scaling.';
     case 'quality_wins':
-      return 'Quality Wins sums (1 - expected_score) across wins against opponents based on pre-match Glicko ratings.';
+      return 'Ranks players by the average quality of their eligible wins (Win Quality = 1 - Expected Score based on pre-match Glicko-2 ratings). Higher scores indicate more impressive wins relative to expectations.';
     case 'loss_quality':
       return 'Loss Quality measures competitive consistency relative to pre-match expectations with Bayesian sample dampening.';
     default:
@@ -478,7 +480,7 @@ function formatMetrics(p, systemKey) {
   } else if (systemKey === 'sof') {
     return `Avg Field:${p.avgFieldStrength}`;
   } else if (systemKey === 'quality_wins') {
-    return `Total:${p.totalQualityWins} Avg/Win:${p.avgQualityWin}`;
+    return `Eligible Wins:${p.wins} · Total Q:${p.totalQualityWins} · Avg Opp:${p.avgOpponentWinRating || '-'}`;
   } else if (systemKey === 'loss_quality') {
     return `W:${p.wins} L:${p.losses} NetPts:${p.totalPoints}`;
   }
@@ -556,10 +558,10 @@ function renderComparison() {
                 <b>${esc(p.playerTag)}</b>
               </a>
             </div>
-            <span class="mono">${p.glicko2 ? `#${p.glicko2.rank} (${p.glicko2.score})` : '-'}</span>
-            <span class="mono">${p.sof ? `#${p.sof.rank} (${p.sof.score})` : '-'}</span>
-            <span class="mono">${p.quality_wins ? `#${p.quality_wins.rank} (${p.quality_wins.score})` : '-'}</span>
-            <span class="mono">${p.loss_quality ? `#${p.loss_quality.rank} (${p.loss_quality.score})` : '-'}</span>
+            <span class="mono">${p.glicko2 ? (p.glicko2.rank ? `#${p.glicko2.rank} (${p.glicko2.score})` : `- (${p.glicko2.score})`) : '-'}</span>
+            <span class="mono">${p.sof ? (p.sof.rank ? `#${p.sof.rank} (${p.sof.score})` : `- (${p.sof.score})`) : '-'}</span>
+            <span class="mono">${p.quality_wins ? (p.quality_wins.rank ? `#${p.quality_wins.rank} (${p.quality_wins.score})` : `Unranked (${p.quality_wins.score})`) : '-'}</span>
+            <span class="mono">${p.loss_quality ? (p.loss_quality.rank ? `#${p.loss_quality.rank} (${p.loss_quality.score})` : `- (${p.loss_quality.score})`) : '-'}</span>
             <div>
               <button class="quiet-button diagnostic-btn" onclick="openDiagnosticModal('${esc(p.playerId)}')">Diagnostic</button>
             </div>
@@ -700,11 +702,11 @@ window.openDiagnosticModal = async function(playerId) {
             <b>${item.eventKey ? `<a href="https://www.start.gg/${esc(item.eventKey)}" target="_blank" class="player-link">${esc(item.event || '')}</a>` : esc(item.event || '')}</b>
           </span>
           <span>${esc(item.phase || '')} <small>${esc(item.round || '')}</small></span>
-          <span><b>${esc(item.opponentTag)}</b> <small>Pre:${item.opponentPreRating}</small></span>
+          <span><b>${esc(item.opponentTag)}</b> <small>Pre:${item.opponentPreRating !== undefined ? item.opponentPreRating : '-'}${item.playerPreRating !== undefined ? ' | You:' + item.playerPreRating : ''}</small></span>
           <span class="mono ${item.outcome === 'win' ? 'win' : 'loss'}">${item.outcome.toUpperCase()}</span>
           <span class="mono">${item.expectedScore !== undefined ? 'E:' + item.expectedScore : (item.scoreDisplay || item.displayScore || (item.preScore !== undefined ? item.preScore + '→' + item.postScore : '-'))}</span>
-          <span class="mono ${item.penalty !== undefined ? (item.penalty > 0 ? 'loss' : 'win') : (item.credit !== undefined ? 'win' : (item.change !== undefined && item.change >= 0 ? 'win' : 'loss'))}">
-            ${item.penalty !== undefined ? '-' + item.penalty : (item.credit !== undefined ? '+' + item.credit : (item.change !== undefined ? (item.change >= 0 ? '+' + item.change : item.change) : (item.contribution !== undefined ? item.contribution : '-')))}
+          <span class="mono ${item.penalty !== undefined ? (item.penalty > 0 ? 'loss' : 'win') : (item.credit !== undefined && item.outcome === 'win' ? 'win' : (item.change !== undefined && item.change >= 0 ? 'win' : 'muted'))}">
+            ${item.penalty !== undefined ? '-' + item.penalty : (item.credit !== undefined ? (item.outcome === 'win' ? '+' + item.credit : '0.0 (' + (item.exclusionReason || 'Excluded') + ')') : (item.change !== undefined ? (item.change >= 0 ? '+' + item.change : item.change) : (item.contribution !== undefined ? item.contribution : '-')))}
           </span>
         </div>
       `).join('') : '<div class="empty-state"><p class="muted">No contributing sets recorded in this date range.</p></div>'}
@@ -732,10 +734,12 @@ function formatBreakdown(systemKey, b) {
     `;
   } else if (systemKey === 'quality_wins') {
     return `
-      <span>Total Quality Wins: <b>${b.totalQualityWins}</b></span> ·
-      <span>Avg Credit / Win: <b>${b.avgQualityWin}</b></span><br>
-      <span>Wins: <b>${b.wins}</b></span> ·
-      <span>Losses: <b>${b.losses}</b></span>
+      <span>Average Quality per Win: <b>${b.finalAverageQuality !== undefined ? b.finalAverageQuality : b.avgQualityWin}</b></span> ·
+      <span>Total Quality Wins: <b>${b.totalQualityWins}</b></span><br>
+      <span>Eligible Wins: <b>${b.eligibleWins !== undefined ? b.eligibleWins : b.wins}</b></span> ·
+      <span>Losses: <b>${b.losses}</b> ·
+      <span>Avg Opponent Win Rating: <b>${b.avgOpponentWinRating || '-'}</b></span><br>
+      <span>Status: <b>${b.isUnranked ? 'Unranked (0 Wins)' : (b.isProvisional ? 'Provisional (< 3 Wins)' : 'Ranked')}</b></span>
     `;
   } else if (systemKey === 'loss_quality') {
     return `

@@ -1,19 +1,16 @@
-import http.server
 import socketserver
 import threading
 import time
 import os
+from http.server import ThreadingHTTPServer
 from playwright.sync_api import sync_playwright
+import scripts.serve_site as serve_site
 
 os.makedirs("verification", exist_ok=True)
 
-class QuietHandler(http.server.SimpleHTTPRequestHandler):
-    def log_message(self, format, *args):
-        pass
-
 def run():
     PORT = 8089
-    server = socketserver.TCPServer(("127.0.0.1", PORT), QuietHandler)
+    server = ThreadingHTTPServer(("127.0.0.1", PORT), serve_site.Handler)
     server_thread = threading.Thread(target=server.serve_forever)
     server_thread.daemon = True
     server_thread.start()
@@ -40,6 +37,15 @@ def run():
             page.wait_for_selector(".ranking-row")
             page.screenshot(path="verification/rankings_quality_wins.png")
             print("Captured rankings_quality_wins.png")
+
+            # 3b. Quality Wins Diagnostic Modal
+            page.click(".diagnostic-btn")
+            page.wait_for_selector(".diag-summary")
+            page.screenshot(path="verification/rankings_quality_wins_diagnostic.png")
+            print("Captured rankings_quality_wins_diagnostic.png")
+
+            # Close modal
+            page.click("#modal-close-btn")
 
             # 4. Comparison Tab
             page.click("button[data-system='comparison']")
