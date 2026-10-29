@@ -20,9 +20,9 @@ def run():
             browser = p.chromium.launch(headless=True)
             page = browser.new_page(viewport={"width": 1280, "height": 900})
 
-            # 1. Overview Tab
+            # 1. Overview Tab (Side-by-side system comparison)
             page.goto(f"http://127.0.0.1:{PORT}/rankings.html")
-            page.wait_for_selector(".overview-system-card")
+            page.wait_for_selector(".comparison-row")
             page.screenshot(path="verification/rankings_overview.png")
             print("Captured rankings_overview.png")
 
@@ -46,12 +46,6 @@ def run():
 
             # Close modal
             page.click("#modal-close-btn")
-
-            # 4. Comparison Tab
-            page.click("button[data-system='comparison']")
-            page.wait_for_selector(".comparison-row")
-            page.screenshot(path="verification/rankings_comparison.png")
-            print("Captured rankings_comparison.png")
 
             browser.close()
     finally:

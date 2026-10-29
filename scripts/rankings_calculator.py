@@ -526,7 +526,7 @@ class RankingEngine:
         def get_rating(pid):
             if pid not in ratings:
                 ratings[pid] = calc.initial_rating()
-                stats[pid] = {"wins": 0, "losses": 0, "matches": 0}
+                stats[pid] = {"wins": 0, "losses": 0, "matches": 0, "events": set()}
             return ratings[pid]
 
         def process_event_dict(event_dict, is_period):
@@ -554,6 +554,8 @@ class RankingEngine:
                         stats[w_id]["matches"] += 1
                         stats[l_id]["losses"] += 1
                         stats[l_id]["matches"] += 1
+                        stats[w_id]["events"].add(e_id)
+                        stats[l_id]["events"].add(e_id)
 
                 new_ratings = {}
                 for pid, p_m in player_matches.items():
@@ -624,6 +626,7 @@ class RankingEngine:
                 "wins": stats[pid]["wins"],
                 "losses": stats[pid]["losses"],
                 "winRate": round(100.0 * stats[pid]["wins"] / max(1, stats[pid]["matches"]), 1),
+                "events": len(stats[pid]["events"]),
             })
 
         rankings.sort(key=lambda x: x["score"], reverse=True)
@@ -952,15 +955,17 @@ class RankingEngine:
             q_points_w = math.pow(max(0.0, (eff_rating_l - 1500.0) / 100.0), 2)
 
             if w_id not in player_qw:
-                player_qw[w_id] = {"totalQuality": 0.0, "wins": 0, "losses": 0, "points": [], "winOpponentRatingsSum": 0.0}
+                player_qw[w_id] = {"totalQuality": 0.0, "wins": 0, "losses": 0, "points": [], "winOpponentRatingsSum": 0.0, "events": set()}
             player_qw[w_id]["totalQuality"] += q_points_w
             player_qw[w_id]["wins"] += 1
             player_qw[w_id]["points"].append(q_points_w)
             player_qw[w_id]["winOpponentRatingsSum"] += l_pre["r"]
+            player_qw[w_id]["events"].add(s["eventId"])
 
             if l_id not in player_qw:
-                player_qw[l_id] = {"totalQuality": 0.0, "wins": 0, "losses": 0, "points": [], "winOpponentRatingsSum": 0.0}
+                player_qw[l_id] = {"totalQuality": 0.0, "wins": 0, "losses": 0, "points": [], "winOpponentRatingsSum": 0.0, "events": set()}
             player_qw[l_id]["losses"] += 1
+            player_qw[l_id]["events"].add(s["eventId"])
 
             if target_player_id is None or w_id == target_player_id:
                 trace = {
@@ -1030,6 +1035,7 @@ class RankingEngine:
                 "matches": matches,
                 "winRate": round(100.0 * wins / max(1, matches), 1),
                 "isProvisional": is_provisional,
+                "events": len(data["events"]),
             })
 
         rankings.sort(
@@ -1167,18 +1173,20 @@ class RankingEngine:
             loss_penalty = (e_loss ** alpha)
 
             if w_id not in player_data:
-                player_data[w_id] = {"wins": 0, "losses": 0, "matches": 0, "totalPoints": 0.0, "winCredits": 0.0, "lossPenalties": 0.0}
+                player_data[w_id] = {"wins": 0, "losses": 0, "matches": 0, "totalPoints": 0.0, "winCredits": 0.0, "lossPenalties": 0.0, "events": set()}
             player_data[w_id]["wins"] += 1
             player_data[w_id]["matches"] += 1
             player_data[w_id]["totalPoints"] += win_credit
             player_data[w_id]["winCredits"] += win_credit
+            player_data[w_id]["events"].add(s["eventId"])
 
             if l_id not in player_data:
-                player_data[l_id] = {"wins": 0, "losses": 0, "matches": 0, "totalPoints": 0.0, "winCredits": 0.0, "lossPenalties": 0.0}
+                player_data[l_id] = {"wins": 0, "losses": 0, "matches": 0, "totalPoints": 0.0, "winCredits": 0.0, "lossPenalties": 0.0, "events": set()}
             player_data[l_id]["losses"] += 1
             player_data[l_id]["matches"] += 1
             player_data[l_id]["totalPoints"] -= loss_penalty
             player_data[l_id]["lossPenalties"] += loss_penalty
+            player_data[l_id]["events"].add(s["eventId"])
 
             if target_player_id is None or w_id == target_player_id:
                 trace_w = {
@@ -1236,6 +1244,7 @@ class RankingEngine:
                 "losses": data["losses"],
                 "matches": matches,
                 "winRate": round(100.0 * data["wins"] / max(1, matches), 1),
+                "events": len(data["events"]),
             })
 
         rankings.sort(key=lambda x: (x["score"], x["matches"]), reverse=True)

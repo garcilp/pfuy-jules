@@ -205,7 +205,7 @@ async function loadData() {
     }
     if (requestId !== currentRequestId) return;
     comparisonData = newCompData;
-    rankingStatus.textContent = `Displaying ${system === 'overview' ? 'rankings overview' : 'system comparison'} for ${getGameName(game)}`;
+    rankingStatus.textContent = `Displaying rankings overview for ${getGameName(game)}`;
     render();
     return;
   }
@@ -264,87 +264,12 @@ function getGameName(slug) {
 // Render Router
 function render() {
   const system = getActiveSystem();
-  if (system === 'overview') {
-    renderOverview();
-  } else if (system === 'comparison') {
+  if (system === 'overview' || system === 'comparison') {
     renderComparison();
   } else {
     renderIndividualSystem(system);
   }
 }
-
-// Overview View
-function renderOverview() {
-  if (!comparisonData || !Object.keys(comparisonData).length) {
-    rankingsContent.innerHTML = '<div class="panel glass empty-state"><h2>No data available</h2><p class="muted">Check filter parameters or server connection.</p></div>';
-    return;
-  }
-
-  const gameName = getGameName(gameFilter.value);
-  const query = playerSearch.value.trim().toLowerCase();
-
-  let html = `
-    <div class="overview-grid">
-      <div class="panel glass overview-banner">
-        <h2>Rankings Overview — ${esc(gameName)}</h2>
-        <p class="muted">Calculated using 4 distinct ranking systems anchored on pre-match Glicko-2 ratings. Select any system for detailed standings and calculation traces.</p>
-        <div class="mode-indicator mono">
-          <span>Mode: <b>${esc(modeFilter.value)}</b></span>
-          ${startDateInput.value ? `<span>From: <b>${esc(startDateInput.value)}</b></span>` : ''}
-          ${endDateInput.value ? `<span>To: <b>${esc(endDateInput.value)}</b></span>` : ''}
-          ${query ? `<span>Filter: <b>"${esc(query)}"</b></span>` : ''}
-        </div>
-      </div>
-
-      <div class="cards overview-cards-grid">
-  `;
-
-  const systemConfigs = [
-    { key: 'glicko2', title: 'Glicko-2', desc: 'Core player skill ratings (r - 2*RD conservative rating)', color: 'var(--gold)' },
-    { key: 'sof', title: 'Strength of Field', desc: 'Evaluates tournament performance against pre-event field strengths and entrant scaling', color: 'var(--sky)' },
-    { key: 'quality_wins', title: 'Quality Wins', desc: 'Cumulative quality points from victories using pre-match opponent effective ratings', color: 'var(--sky)' },
-    { key: 'loss_quality', title: 'Loss Quality', desc: 'Measures consistency against expectations with Bayesian sample dampening', color: 'var(--text)' }
-  ];
-
-  systemConfigs.forEach(sys => {
-    const sysData = comparisonData[sys.key];
-    let topStandings = (sysData && sysData.rankings) ? sysData.rankings : [];
-    if (query) {
-      topStandings = topStandings.filter(p => p.playerTag.toLowerCase().includes(query));
-    }
-    const top3 = topStandings.slice(0, 3);
-
-    html += `
-      <div class="card glass overview-system-card">
-        <div class="system-card-head">
-          <h3>${esc(sys.title)}</h3>
-          <p class="muted">${esc(sys.desc)}</p>
-        </div>
-        <div class="top-standings-list">
-          ${top3.length ? top3.map((p) => `
-            <div class="top-standing-item">
-              <span class="rank-num p${p.rank && p.rank <= 3 ? p.rank : ''}">${p.rank ? '#' + p.rank : '-'}</span>
-              <a href="index.html?player=${encodeURIComponent(p.playerId)}" class="player-link"><b>${esc(p.playerTag)}</b></a>
-              <span class="score-val mono">${p.score}</span>
-            </div>
-          `).join('') : '<p class="muted">No matching ranked players</p>'}
-        </div>
-        <button class="action-button view-sys-btn" onclick="switchToSystem('${sys.key}')">View ${esc(sys.title)} Rankings →</button>
-      </div>
-    `;
-  });
-
-  html += `</div></div>`;
-  rankingsContent.innerHTML = html;
-}
-
-window.switchToSystem = function(sysKey) {
-  $$('.ranking-tab').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.system === sysKey);
-  });
-  visibleCount = batchSize;
-  onFilterChange();
-};
 
 function cleanupObserver() {
   if (scrollObserver) {
@@ -432,7 +357,7 @@ function renderIndividualSystem(systemKey) {
             </div>
             <span class="score-col mono font-bold">${p.isUnranked ? '-' : p.score}</span>
             <span class="winrate-col mono">${p.winRate !== undefined ? p.winRate + '%' : '-'}</span>
-            <span class="matches-col mono">${p.wins !== undefined && systemKey === 'quality_wins' ? p.wins + ' W / ' + p.losses + ' L' : (p.matches !== undefined ? p.matches + ' m' + (p.events !== undefined ? ' / ' + p.events + ' ev' : '') : '-')}</span>
+            <span class="matches-col mono">${p.matches !== undefined ? `${p.matches}${p.events !== undefined ? ` (${p.events} event${p.events === 1 ? '' : 's'})` : ''}` : '-'}</span>
             <div class="actions-col">
               <button class="quiet-button diagnostic-btn" onclick="openDiagnosticModal('${esc(p.playerId)}')">Diagnostic</button>
             </div>
@@ -537,7 +462,7 @@ function renderComparison() {
 
   let html = `
     <div class="panel glass system-banner">
-      <h2>System Comparison View</h2>
+      <h2>Rankings Overview</h2>
       <p class="muted">Side-by-side player ranks and scores across all 4 distinct systems. Each metric measures a different competitive dimension and raw values are presented on their native scales.</p>
     </div>
 
