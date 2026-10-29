@@ -302,7 +302,7 @@ function renderOverview() {
   const systemConfigs = [
     { key: 'glicko2', title: 'Glicko-2', desc: 'Core player skill ratings (r - 2*RD conservative rating)', color: 'var(--gold)' },
     { key: 'sof', title: 'Strength of Field', desc: 'Evaluates tournament performance against pre-event field strengths and entrant scaling', color: 'var(--sky)' },
-    { key: 'quality_wins', title: 'Quality Wins', desc: 'Average quality per win (1 - Expected Score) based on pre-match Glicko-2 ratings', color: 'var(--sky)' },
+    { key: 'quality_wins', title: 'Quality Wins', desc: 'Cumulative quality points from victories using pre-match opponent effective ratings', color: 'var(--sky)' },
     { key: 'loss_quality', title: 'Loss Quality (Consistency)', desc: 'Measures consistency against expectations with Bayesian sample dampening', color: 'var(--text)' }
   ];
 
@@ -461,7 +461,7 @@ function getSystemDescription(systemKey) {
     case 'sof':
       return 'Strength of Field evaluates tournament performance against pre-event field strengths and entrant scaling.';
     case 'quality_wins':
-      return 'Ranks players by the average quality of their eligible wins (Win Quality = 1 - Expected Score based on pre-match Glicko-2 ratings). Higher scores indicate more impressive wins relative to expectations.';
+      return 'Ranks players by cumulative quality points earned from victories, based on opponent pre-match effective ratings (Rating - 0.5 * RD). Victories against higher-rated opponents award disproportionately higher points.';
     case 'loss_quality':
       return 'Loss Quality measures competitive consistency relative to pre-match expectations with Bayesian sample dampening.';
     default:
@@ -480,7 +480,7 @@ function formatMetrics(p, systemKey) {
   } else if (systemKey === 'sof') {
     return `Avg Field:${p.avgFieldStrength}`;
   } else if (systemKey === 'quality_wins') {
-    return `Eligible Wins:${p.wins} · Total Q:${p.totalQualityWins} · Avg Opp:${p.avgOpponentWinRating || '-'}`;
+    return `Wins:${p.wins} · Total QoW:${p.totalQualityWins} · Avg Opp Win Rating:${p.avgOpponentWinRating || '-'}`;
   } else if (systemKey === 'loss_quality') {
     return `W:${p.wins} L:${p.losses} NetPts:${p.totalPoints}`;
   }
@@ -734,11 +734,10 @@ function formatBreakdown(systemKey, b) {
     `;
   } else if (systemKey === 'quality_wins') {
     return `
-      <span>Average Quality per Win: <b>${b.finalAverageQuality !== undefined ? b.finalAverageQuality : b.avgQualityWin}</b></span> ·
-      <span>Total Quality Wins: <b>${b.totalQualityWins}</b></span><br>
+      <span>Cumulative QoW Points: <b>${b.totalQualityWins}</b></span> ·
       <span>Eligible Wins: <b>${b.eligibleWins !== undefined ? b.eligibleWins : b.wins}</b></span> ·
-      <span>Losses: <b>${b.losses}</b> ·
-      <span>Avg Opponent Win Rating: <b>${b.avgOpponentWinRating || '-'}</b></span><br>
+      <span>Losses: <b>${b.losses}</b><br>
+      <span>Avg Opponent Win Rating: <b>${b.avgOpponentWinRating || '-'}</b></span> ·
       <span>Status: <b>${b.isUnranked ? 'Unranked (0 Wins)' : (b.isProvisional ? 'Provisional (< 3 Wins)' : 'Ranked')}</b></span>
     `;
   } else if (systemKey === 'loss_quality') {
