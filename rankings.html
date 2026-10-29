@@ -23,16 +23,22 @@
 <main class="directory page-single">
   <section class="directory-head">
     <div>
+      <nav id="ranking-breadcrumbs" class="ranking-breadcrumbs mono muted" aria-label="Breadcrumb"></nav>
       <div class="eyebrow mono">COMPETITIVE STANDINGS</div>
       <h1>Rankings</h1>
       <p class="muted">Glicko-2, Strength of Field, Quality Wins &amp; Loss Quality metrics.</p>
     </div>
   </section>
 
-  <!-- View Subnav Tabs -->
-  <nav id="system-tabs" class="ranking-system-tabs" aria-label="Ranking Systems">
+  <!-- Top-Level Navigation Tabs -->
+  <nav id="section-tabs" class="ranking-section-tabs" aria-label="Ranking Destinations">
+    <button class="ranking-section-tab active" data-section="systems">Ranking Systems</button>
+    <button class="ranking-section-tab" data-section="power_rankings">Power Rankings</button>
+  </nav>
+
+  <!-- Secondary Subsection Tabs (for Ranking Systems) -->
+  <nav id="system-tabs" class="ranking-subsection-tabs" aria-label="Ranking Systems Subsections">
     <button class="ranking-tab active" data-system="overview">Overview</button>
-    <button class="ranking-tab" data-system="custom">Power Rankings</button>
     <button class="ranking-tab" data-system="glicko2">Glicko-2</button>
     <button class="ranking-tab" data-system="sof">Strength of Field</button>
     <button class="ranking-tab" data-system="quality_wins">Quality Wins</button>

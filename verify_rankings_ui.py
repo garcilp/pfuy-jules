@@ -20,16 +20,29 @@ def run():
             browser = p.chromium.launch(headless=True)
             page = browser.new_page(viewport={"width": 1280, "height": 900})
 
-            # 1. Overview Tab (Side-by-side system comparison)
+            # 1. Ranking Systems destination & Overview Tab (Side-by-side system comparison)
             page.goto(f"http://127.0.0.1:{PORT}/rankings.html")
             page.wait_for_selector(".comparison-row")
+            page.wait_for_selector("#section-tabs")
+
+            # Verify top-level Ranking Systems active and breadcrumb
+            systems_sec = page.locator("button[data-section='systems']")
+            assert "active" in systems_sec.get_attribute("class")
+            bc_text = " ".join(page.locator("#ranking-breadcrumbs").text_content().split())
+            assert "Rankings / Ranking Systems / Overview" in bc_text
+
             page.screenshot(path="verification/rankings_overview.png")
             print("Captured rankings_overview.png")
 
-            # 2. Power Rankings Tab (Custom weights & contribution indicators)
-            page.click("button[data-system='custom']")
+            # 2. Top-level Power Rankings Tab (Custom weights & contribution indicators)
+            page.click("button[data-section='power_rankings']")
             page.wait_for_selector(".pr-setup-panel")
             page.wait_for_selector(".ranking-row")
+
+            pr_sec = page.locator("button[data-section='power_rankings']")
+            assert "active" in pr_sec.get_attribute("class")
+            pr_bc_text = " ".join(page.locator("#ranking-breadcrumbs").text_content().split())
+            assert "Rankings / Power Rankings" in pr_bc_text
 
             # Verify default weights (55/20/15/10)
             glicko_badge = page.locator(".pr-card-badge[data-sys='glicko2']").text_content()
@@ -67,7 +80,8 @@ def run():
             reset_glicko = page.locator(".pr-card-badge[data-sys='glicko2']").text_content()
             assert reset_glicko == "55%"
 
-            # 3. Glicko-2 Tab
+            # 3. Glicko-2 Tab (Under Ranking Systems)
+            page.click("button[data-section='systems']")
             page.click("button[data-system='glicko2']")
             page.wait_for_selector(".ranking-row")
             page.screenshot(path="verification/rankings_glicko2.png")
