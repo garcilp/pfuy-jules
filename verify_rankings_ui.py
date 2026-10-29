@@ -26,7 +26,21 @@ def run():
             page.screenshot(path="verification/rankings_overview.png")
             print("Captured rankings_overview.png")
 
-            # 2. Glicko-2 Tab
+            # 2. Power Rankings Tab (Custom weights & contribution indicators)
+            page.click("button[data-system='custom']")
+            page.wait_for_selector(".pr-setup-panel")
+            page.wait_for_selector(".ranking-row")
+            page.screenshot(path="verification/rankings_power_rankings.png")
+            print("Captured rankings_power_rankings.png")
+
+            # 2b. Adjust weight slider and verify live UI update
+            slider = page.locator(".pr-slider").first
+            slider.fill("70")
+            page.wait_for_timeout(300)
+            page.screenshot(path="verification/rankings_power_rankings_adjusted.png")
+            print("Captured rankings_power_rankings_adjusted.png")
+
+            # 3. Glicko-2 Tab
             page.click("button[data-system='glicko2']")
             page.wait_for_selector(".ranking-row")
             page.screenshot(path="verification/rankings_glicko2.png")

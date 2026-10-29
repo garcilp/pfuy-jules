@@ -283,6 +283,7 @@ class Handler(SimpleHTTPRequestHandler):
             mode = qs.get("mode", ["historical"])[0]
             start_date = qs.get("start_date", qs.get("start", [None]))[0]
             end_date = qs.get("end_date", qs.get("end", [None]))[0]
+            weights_param = qs.get("weights", [None])[0]
 
             if not start_date or not start_date.strip():
                 start_date = None
@@ -298,6 +299,7 @@ class Handler(SimpleHTTPRequestHandler):
                     mode=mode,
                     start_date=start_date,
                     end_date=end_date,
+                    weights=weights_param,
                 )
                 self.send_json(200, data)
             except ValueError as error:
@@ -312,6 +314,7 @@ class Handler(SimpleHTTPRequestHandler):
             start_date = qs.get("start_date", qs.get("start", [None]))[0]
             end_date = qs.get("end_date", qs.get("end", [None]))[0]
             player_id = qs.get("player_id", qs.get("playerId", [None]))[0]
+            weights_param = qs.get("weights", [None])[0]
 
             if not start_date or not start_date.strip():
                 start_date = None
@@ -334,6 +337,7 @@ class Handler(SimpleHTTPRequestHandler):
                     start_date=start_date,
                     end_date=end_date,
                     target_player_id=player_id,
+                    weights=weights_param,
                 )
                 self.send_json(200, data)
             except ValueError as error:

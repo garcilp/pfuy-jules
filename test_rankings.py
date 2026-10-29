@@ -477,3 +477,134 @@ def test_server_api_endpoints_and_errors(http_server):
         assert "diagnostic" in diag_data
         context = diag_data["diagnostic"]["context"]
         assert context["playerId"] == pid
+
+def test_power_rankings_calculation_and_reconciliation(mock_db):
+    conn, engine = mock_db
+    weights = {"glicko2": 50, "quality_wins": 25, "sof": 15, "loss_quality": 10}
+    res = engine.calculate("ultimate", system="custom", weights=weights)
+
+    assert res["system"] == "custom"
+    assert res["totalPlayers"] > 0
+    assert sum(res["weights"].values()) == pytest.approx(100.0)
+
+    for player in res["rankings"]:
+        contribs = player["weightedContributions"]
+        sum_contribs = sum(contribs.values())
+        # Score must reconcile with sum of weighted contributions
+        assert round(sum_contribs, 1) == pytest.approx(player["score"], abs=0.1)
+
+def test_power_rankings_zero_weights_and_one_component(mock_db):
+    conn, engine = mock_db
+    weights = {"glicko2": 100, "quality_wins": 0, "sof": 0, "loss_quality": 0}
+    res = engine.calculate("ultimate", system="custom", weights=weights)
+
+    assert res["weights"]["glicko2"] == 100.0
+    assert res["weights"]["quality_wins"] == 0.0
+
+    for player in res["rankings"]:
+        contribs = player["weightedContributions"]
+        assert contribs["quality_wins"] == 0.0
+        assert contribs["sof"] == 0.0
+        assert contribs["loss_quality"] == 0.0
+        assert round(contribs["glicko2"], 1) == pytest.approx(player["score"], abs=0.1)
+
+def test_power_rankings_diagnostic_endpoint(http_server):
+    weights_json = json.dumps({"glicko2": 50, "quality_wins": 25, "sof": 15, "loss_quality": 10})
+    url = f"{http_server}/api/rankings/diagnostic?game=ultimate&system=custom&player_id=101&weights={urllib.parse.quote(weights_json)}"
+    req = urllib.request.urlopen(url)
+    assert req.status == 200
+
+    diag_data = json.loads(req.read().decode("utf-8"))
+    assert diag_data["system"] == "custom"
+    assert "diagnostic" in diag_data
+
+    breakdown = diag_data["diagnostic"]["breakdown"]
+    assert "weights" in breakdown
+    assert "normalizedScores" in breakdown
+    assert "weightedContributions" in breakdown
+
+def test_power_rankings_linked_redistribution_algorithm_suite():
+    """Simulates linked weight redistribution & rounding reconciliation."""
+
+    def redistribute(pr_weights, active_keys, changed_sys, new_val):
+        val = max(0.0, min(100.0, float(new_val)))
+        if len(active_keys) <= 1:
+            return {k: (100.0 if k in active_keys else 0.0) for k in ["glicko2", "quality_wins", "sof", "loss_quality"]}
+
+        other_keys = [k for k in active_keys if k != changed_sys]
+        sum_others = sum(pr_weights[k] for k in other_keys)
+        rem_budget = 100.0 - val
+
+        new_weights = dict(pr_weights)
+        new_weights[changed_sys] = val
+
+        if sum_others > 0:
+            for k in other_keys:
+                new_weights[k] = (pr_weights[k] / sum_others) * rem_budget
+        else:
+            eq_share = rem_budget / len(other_keys)
+            for k in other_keys:
+                new_weights[k] = eq_share
+
+        for k in ["glicko2", "quality_wins", "sof", "loss_quality"]:
+            if k not in active_keys:
+                new_weights[k] = 0.0
+
+        return new_weights
+
+    def get_displayed_integers(pr_weights, active_keys):
+        res = {k: 0 for k in ["glicko2", "quality_wins", "sof", "loss_quality"]}
+        if not active_keys:
+            return res
+
+        sum_floors = 0
+        items = []
+        for k in active_keys:
+            raw = pr_weights.get(k, 0.0)
+            fl = math.floor(raw)
+            rem = raw - fl
+            res[k] = fl
+            sum_floors += fl
+            items.append((rem, k))
+
+        deficit = 100 - sum_floors
+        items.sort(key=lambda x: (-x[0], x[1]))
+
+        for i in range(deficit):
+            res[items[i][1]] += 1
+
+        return res
+
+    # 1. Standard redistribution: Increase Glicko-2 to 70%
+    w1 = {"glicko2": 50.0, "quality_wins": 25.0, "sof": 15.0, "loss_quality": 10.0}
+    active = ["glicko2", "quality_wins", "sof", "loss_quality"]
+    w2 = redistribute(w1, active, "glicko2", 70.0)
+    assert w2["glicko2"] == 70.0
+    assert sum(w2.values()) == pytest.approx(100.0)
+    disp2 = get_displayed_integers(w2, active)
+    assert sum(disp2.values()) == 100
+
+    # 2. Set Quality Wins to 0%
+    w3 = redistribute(w2, active, "quality_wins", 0.0)
+    assert w3["quality_wins"] == 0.0
+    assert sum(w3.values()) == pytest.approx(100.0)
+    disp3 = get_displayed_integers(w3, active)
+    assert sum(disp3.values()) == 100
+
+    # 3. Single active component locked to 100%
+    single_active = ["glicko2"]
+    w_single = redistribute(w1, single_active, "glicko2", 40.0)
+    assert w_single["glicko2"] == 100.0
+    disp_single = get_displayed_integers(w_single, single_active)
+    assert disp_single["glicko2"] == 100
+
+    # 4. Redistribution when all other components are 0%
+    w_zero_others = {"glicko2": 100.0, "quality_wins": 0.0, "sof": 0.0, "loss_quality": 0.0}
+    w_redist = redistribute(w_zero_others, active, "glicko2", 40.0)
+    assert w_redist["glicko2"] == 40.0
+    assert w_redist["quality_wins"] == pytest.approx(20.0)
+    assert w_redist["sof"] == pytest.approx(20.0)
+    assert w_redist["loss_quality"] == pytest.approx(20.0)
+    assert sum(w_redist.values()) == pytest.approx(100.0)
+    disp_redist = get_displayed_integers(w_redist, active)
+    assert sum(disp_redist.values()) == 100
