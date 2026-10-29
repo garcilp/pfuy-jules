@@ -257,7 +257,58 @@ def http_server():
     server.shutdown()
     server.server_close()
 
-def test_server_api_endpoints(http_server):
+def test_invalid_date_range_raises_valueerror(mock_db):
+    conn, engine = mock_db
+    with pytest.raises(ValueError, match="Start date must be before or on end date"):
+        engine.calculate("ultimate", system="glicko2", start_date="2024-03-01", end_date="2024-02-01")
+
+def test_diagnostic_all_systems_and_reconciliation(mock_db):
+    conn, engine = mock_db
+    systems = ["glicko2", "sof", "quality_wins", "loss_quality"]
+
+    for sys in systems:
+        res = engine.calculate("ultimate", system=sys, mode="historical")
+        assert len(res["rankings"]) > 0
+        top_player = res["rankings"][0]
+        pid = top_player["playerId"]
+
+        diag_res = engine.calculate("ultimate", system=sys, target_player_id=pid, mode="historical")
+        diag = diag_res["diagnostic"]
+
+        # Calculation context check
+        context = diag["context"]
+        assert context["playerId"] == pid
+        assert context["canonicalPlayerId"] == pid
+        assert context["gameSlug"] == "ultimate"
+        assert context["system"] == sys
+        assert context["mode"] == "historical"
+
+        # Reconciliation: final score and rank must match leaderboard
+        assert round(context["finalScore"], 2) == round(top_player["score"], 2)
+        assert context["rank"] == top_player["rank"]
+
+        # Evidence check
+        evidence = diag["evidence"]
+        assert "tournaments" in evidence
+        assert "matches" in evidence
+
+        # Algorithm parameters and breakdown check
+        assert "algorithmParameters" in diag
+        assert "breakdown" in diag
+
+def test_diagnostic_merged_player_lookup(mock_db):
+    conn, engine = mock_db
+    # Pass custom merges into ranking engine
+    engine.merges = {"alias_p101": "101"}
+
+    # Request diagnostic using alias ID
+    diag_res = engine.calculate("ultimate", system="glicko2", target_player_id="alias_p101")
+    context = diag_res["diagnostic"]["context"]
+    assert context["playerId"] == "alias_p101"
+    assert context["canonicalPlayerId"] == "101"
+    assert context["totalResultsConsidered"] > 0
+
+def test_server_api_endpoints_and_errors(http_server):
     # GET /api/games
     req = urllib.request.urlopen(f"{http_server}/api/games")
     assert req.status == 200
@@ -272,6 +323,16 @@ def test_server_api_endpoints(http_server):
     assert rankings_data["system"] == "glicko2"
     assert "rankings" in rankings_data
 
+    # Test invalid date range error 400
+    try:
+        urllib.request.urlopen(f"{http_server}/api/rankings?game=ultimate&system=glicko2&start_date=2024-05-01&end_date=2024-01-01")
+        assert False, "Should have raised HTTPError 400"
+    except urllib.error.HTTPError as err:
+        assert err.code == 400
+        error_payload = json.loads(err.read().decode("utf-8"))
+        assert "error" in error_payload
+        assert "Start date must be before or on end date" in error_payload["error"]
+
     # GET /api/rankings/diagnostic
     if rankings_data["rankings"]:
         pid = rankings_data["rankings"][0]["playerId"]
@@ -279,3 +340,5 @@ def test_server_api_endpoints(http_server):
         assert req.status == 200
         diag_data = json.loads(req.read().decode("utf-8"))
         assert "diagnostic" in diag_data
+        context = diag_data["diagnostic"]["context"]
+        assert context["playerId"] == pid
