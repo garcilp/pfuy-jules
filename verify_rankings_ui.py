@@ -30,15 +30,42 @@ def run():
             page.click("button[data-system='custom']")
             page.wait_for_selector(".pr-setup-panel")
             page.wait_for_selector(".ranking-row")
+
+            # Verify default weights (55/20/15/10)
+            glicko_badge = page.locator(".pr-card-badge[data-sys='glicko2']").text_content()
+            qw_badge = page.locator(".pr-card-badge[data-sys='quality_wins']").text_content()
+            sof_badge = page.locator(".pr-card-badge[data-sys='sof']").text_content()
+            lq_badge = page.locator(".pr-card-badge[data-sys='loss_quality']").text_content()
+            print(f"Default weights verified: Glicko-2={glicko_badge}, Quality Wins={qw_badge}, SOF={sof_badge}, Consistency={lq_badge}")
+            assert glicko_badge == "55%"
+            assert qw_badge == "20%"
+            assert sof_badge == "15%"
+            assert lq_badge == "10%"
+
             page.screenshot(path="verification/rankings_power_rankings.png")
             print("Captured rankings_power_rankings.png")
 
-            # 2b. Adjust weight slider and verify live UI update
-            slider = page.locator(".pr-slider").first
-            slider.fill("70")
+            # 2b. Test smooth slider dragging (input) vs deferred commit (change)
+            slider = page.locator("input.pr-slider[data-sys='glicko2']")
+            slider.evaluate("el => { el.value = '70'; el.dispatchEvent(new Event('input', { bubbles: true })); }")
+            page.wait_for_timeout(100)
+
+            # Visual badge should update live during input drag
+            live_badge = page.locator(".pr-card-badge[data-sys='glicko2']").text_content()
+            assert live_badge == "70%"
+
+            # Trigger commit (change / drag release)
+            slider.evaluate("el => { el.dispatchEvent(new Event('change', { bubbles: true })); }")
             page.wait_for_timeout(300)
             page.screenshot(path="verification/rankings_power_rankings_adjusted.png")
             print("Captured rankings_power_rankings_adjusted.png")
+
+            # Test reset to defaults
+            reset_btn = page.locator("button:has-text('Reset to Defaults')")
+            reset_btn.click()
+            page.wait_for_timeout(200)
+            reset_glicko = page.locator(".pr-card-badge[data-sys='glicko2']").text_content()
+            assert reset_glicko == "55%"
 
             # 3. Glicko-2 Tab
             page.click("button[data-system='glicko2']")

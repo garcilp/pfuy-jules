@@ -19,6 +19,7 @@ let sortAsc = true;
 let visibleCount = 25;
 const batchSize = 25;
 let currentRequestId = 0;
+let activeFetchController = null;
 let scrollObserver = null;
 
 // URL State Sync
@@ -175,6 +176,12 @@ async function onFilterChange() {
 }
 
 async function loadData() {
+  if (activeFetchController) {
+    activeFetchController.abort();
+  }
+  activeFetchController = new AbortController();
+  const signal = activeFetchController.signal;
+
   const requestId = ++currentRequestId;
   const game = gameFilter.value;
   const system = getActiveSystem();
@@ -190,53 +197,60 @@ async function loadData() {
 
   rankingStatus.textContent = 'Calculating rankings…';
 
-  if (system === 'comparison' || system === 'overview' || system === 'custom') {
-    const systems = ['glicko2', 'sof', 'quality_wins', 'loss_quality'];
-    const newCompData = {};
-    for (const sys of systems) {
-      const data = await fetchSystemData(game, sys, mode, start, end);
-      if (requestId !== currentRequestId) return;
-      if (data && data.error) {
-        rankingStatus.textContent = `Error: ${data.error}`;
-        rankingsContent.innerHTML = `<div class="panel glass empty-state"><h2>Calculation Error</h2><p class="muted">${esc(data.error)}</p></div>`;
-        return;
+  try {
+    if (system === 'comparison' || system === 'overview' || system === 'custom') {
+      const systems = ['glicko2', 'sof', 'quality_wins', 'loss_quality'];
+      const newCompData = {};
+      for (const sys of systems) {
+        const data = await fetchSystemData(game, sys, mode, start, end, signal);
+        if (requestId !== currentRequestId || signal.aborted) return;
+        if (data && data.error) {
+          rankingStatus.textContent = `Error: ${data.error}`;
+          rankingsContent.innerHTML = `<div class="panel glass empty-state"><h2>Calculation Error</h2><p class="muted">${esc(data.error)}</p></div>`;
+          return;
+        }
+        newCompData[sys] = data;
       }
-      newCompData[sys] = data;
+      if (requestId !== currentRequestId || signal.aborted) return;
+      comparisonData = newCompData;
+      if (system === 'custom') {
+        rankingStatus.textContent = `Displaying Power Rankings for ${getGameName(game)}`;
+      } else {
+        rankingStatus.textContent = `Displaying rankings overview for ${getGameName(game)}`;
+      }
+      render();
+      return;
     }
-    if (requestId !== currentRequestId) return;
-    comparisonData = newCompData;
-    if (system === 'custom') {
-      rankingStatus.textContent = `Displaying Power Rankings for ${getGameName(game)}`;
+
+    const data = await fetchSystemData(game, system, mode, start, end, signal);
+    if (requestId !== currentRequestId || signal.aborted) return;
+
+    if (data && data.error) {
+      currentData = null;
+      rankingStatus.textContent = `Error: ${data.error}`;
+      rankingsContent.innerHTML = `<div class="panel glass empty-state"><h2>Calculation Error</h2><p class="muted">${esc(data.error)}</p></div>`;
+      return;
+    }
+
+    currentData = data;
+    if (currentData && currentData.rankings) {
+      rankingStatus.textContent = `${currentData.totalPlayers} player${currentData.totalPlayers === 1 ? '' : 's'} ranked in ${currentData.algorithm ? currentData.algorithm.name : system}`;
     } else {
-      rankingStatus.textContent = `Displaying rankings overview for ${getGameName(game)}`;
+      rankingStatus.textContent = 'No ranking data available.';
     }
     render();
-    return;
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      return;
+    }
+    rankingStatus.textContent = `Error: ${err.message}`;
   }
-
-  const data = await fetchSystemData(game, system, mode, start, end);
-  if (requestId !== currentRequestId) return;
-
-  if (data && data.error) {
-    currentData = null;
-    rankingStatus.textContent = `Error: ${data.error}`;
-    rankingsContent.innerHTML = `<div class="panel glass empty-state"><h2>Calculation Error</h2><p class="muted">${esc(data.error)}</p></div>`;
-    return;
-  }
-
-  currentData = data;
-  if (currentData && currentData.rankings) {
-    rankingStatus.textContent = `${currentData.totalPlayers} player${currentData.totalPlayers === 1 ? '' : 's'} ranked in ${currentData.algorithm ? currentData.algorithm.name : system}`;
-  } else {
-    rankingStatus.textContent = 'No ranking data available.';
-  }
-  render();
 }
 
-async function fetchSystemData(game, system, mode, start, end) {
+async function fetchSystemData(game, system, mode, start, end, signal) {
   const apiURL = `/api/rankings?game=${encodeURIComponent(game)}&system=${encodeURIComponent(system)}&mode=${encodeURIComponent(mode)}${start ? `&start_date=${encodeURIComponent(start)}` : ''}${end ? `&end_date=${encodeURIComponent(end)}` : ''}`;
   try {
-    const res = await fetch(apiURL);
+    const res = await fetch(apiURL, { signal });
     if (res.ok) {
       return await res.json();
     } else {
@@ -244,16 +258,18 @@ async function fetchSystemData(game, system, mode, start, end) {
       if (errJson.error) return { error: errJson.error };
     }
   } catch (err) {
+    if (err.name === 'AbortError') throw err;
     // Fallback
   }
 
   const staticURL = `data/rankings/${encodeURIComponent(game)}-${encodeURIComponent(system)}-historical.json`;
   try {
-    const res = await fetch(staticURL);
+    const res = await fetch(staticURL, { signal });
     if (res.ok) {
       return await res.json();
     }
   } catch (err) {
+    if (err.name === 'AbortError') throw err;
     // Snapshot not found
   }
 
@@ -274,8 +290,8 @@ const PR_COMPONENTS = {
 };
 
 const DEFAULT_PR_WEIGHTS = {
-  glicko2: 50.0,
-  quality_wins: 25.0,
+  glicko2: 55.0,
+  quality_wins: 20.0,
   sof: 15.0,
   loss_quality: 10.0
 };
@@ -334,44 +350,51 @@ function savePRState() {
   } catch (e) {}
 }
 
-function redistributePRWeights(changedSys, newWeightInput) {
+function calculateRedistributedWeights(changedSys, newWeightInput, baseWeights, activeComponents) {
   let val = Math.max(0, Math.min(100, parseFloat(newWeightInput) || 0));
+  const newWeights = { ...baseWeights };
 
-  const activeKeys = Object.keys(PR_COMPONENTS).filter(k => prActiveComponents[k]);
+  const activeKeys = Object.keys(PR_COMPONENTS).filter(k => activeComponents[k]);
   if (!activeKeys.includes(changedSys)) {
-    prActiveComponents[changedSys] = true;
     activeKeys.push(changedSys);
   }
 
   if (activeKeys.length <= 1) {
-    activeKeys.forEach(k => { prWeights[k] = 100.0; });
-    savePRState();
-    return;
+    activeKeys.forEach(k => { newWeights[k] = 100.0; });
+    return newWeights;
   }
 
   const otherKeys = activeKeys.filter(k => k !== changedSys);
-  const sumOthers = otherKeys.reduce((acc, k) => acc + prWeights[k], 0);
+  const sumOthers = otherKeys.reduce((acc, k) => acc + (baseWeights[k] || 0), 0);
   const remainingBudget = 100.0 - val;
 
-  prWeights[changedSys] = val;
+  newWeights[changedSys] = val;
 
   if (sumOthers > 0) {
     otherKeys.forEach(k => {
-      prWeights[k] = (prWeights[k] / sumOthers) * remainingBudget;
+      newWeights[k] = ((baseWeights[k] || 0) / sumOthers) * remainingBudget;
     });
   } else {
     const equalShare = remainingBudget / otherKeys.length;
     otherKeys.forEach(k => {
-      prWeights[k] = equalShare;
+      newWeights[k] = equalShare;
     });
   }
 
   Object.keys(PR_COMPONENTS).forEach(k => {
-    if (!prActiveComponents[k]) {
-      prWeights[k] = 0.0;
+    if (!activeComponents[k]) {
+      newWeights[k] = 0.0;
     }
   });
 
+  return newWeights;
+}
+
+function redistributePRWeights(changedSys, newWeightInput) {
+  if (!prActiveComponents[changedSys]) {
+    prActiveComponents[changedSys] = true;
+  }
+  prWeights = calculateRedistributedWeights(changedSys, newWeightInput, prWeights, prActiveComponents);
   savePRState();
 }
 
@@ -409,8 +432,8 @@ function togglePRComponent(sysKey, isChecked) {
   savePRState();
 }
 
-function getDisplayPRWeights() {
-  const activeKeys = Object.keys(PR_COMPONENTS).filter(k => prActiveComponents[k]);
+function getDisplayPRWeights(weights = prWeights, activeComponents = prActiveComponents) {
+  const activeKeys = Object.keys(PR_COMPONENTS).filter(k => activeComponents[k]);
   const result = { glicko2: 0, quality_wins: 0, sof: 0, loss_quality: 0 };
   if (activeKeys.length === 0) return result;
 
@@ -418,7 +441,7 @@ function getDisplayPRWeights() {
   const items = [];
 
   activeKeys.forEach(k => {
-    const rawVal = prWeights[k] || 0;
+    const rawVal = weights[k] || 0;
     const floorVal = Math.floor(rawVal);
     const rem = rawVal - floorVal;
     result[k] = floorVal;
@@ -524,9 +547,56 @@ function computePRLeaderboard() {
   return { players: computedPlayers, minMax };
 }
 
-window.onPRWeightChange = function(sysKey, value) {
+let prDraftWeights = null;
+
+window.onPRWeightInput = function(sysKey, value) {
+  prDraftWeights = calculateRedistributedWeights(sysKey, value, prWeights, prActiveComponents);
+  const displayWeights = getDisplayPRWeights(prDraftWeights, prActiveComponents);
+
+  Object.keys(PR_COMPONENTS).forEach(k => {
+    const isActive = prActiveComponents[k];
+    const dispW = displayWeights[k] || 0;
+
+    const slider = $(`input.pr-slider[data-sys="${k}"]`);
+    if (slider && document.activeElement !== slider) {
+      slider.value = dispW;
+    }
+
+    const numInput = $(`input.pr-number-input[data-sys="${k}"]`);
+    if (numInput && document.activeElement !== numInput) {
+      numInput.value = dispW;
+    }
+
+    const badge = $(`.pr-card-badge[data-sys="${k}"]`);
+    if (badge) {
+      badge.textContent = `${dispW}%`;
+    }
+
+    const fill = $(`.pr-card-contrib-fill[data-sys="${k}"]`);
+    if (fill) {
+      fill.style.width = `${dispW}%`;
+    }
+
+    const segment = $(`.pr-stacked-segment[data-sys="${k}"]`);
+    if (segment) {
+      segment.style.width = `${isActive ? dispW : 0}%`;
+    }
+
+    const legendText = $(`.pr-legend-text[data-sys="${k}"]`);
+    if (legendText) {
+      legendText.textContent = isActive ? `${dispW}%` : 'Disabled';
+    }
+  });
+};
+
+window.onPRWeightCommit = function(sysKey, value) {
   redistributePRWeights(sysKey, value);
+  prDraftWeights = null;
   renderCustomPowerRankings();
+};
+
+window.onPRWeightChange = function(sysKey, value) {
+  onPRWeightCommit(sysKey, value);
 };
 
 window.onPRToggleComponent = function(sysKey, isChecked) {
@@ -536,6 +606,13 @@ window.onPRToggleComponent = function(sysKey, isChecked) {
 
 window.onPRSelectPlayer = function(playerId) {
   selectedInspectorPlayerId = playerId;
+  renderCustomPowerRankings();
+};
+
+window.resetToDefaultPRWeights = function() {
+  prWeights = { ...DEFAULT_PR_WEIGHTS };
+  prActiveComponents = { ...DEFAULT_PR_ACTIVE };
+  savePRState();
   renderCustomPowerRankings();
 };
 
@@ -574,9 +651,8 @@ function renderCustomPowerRankings() {
 
   const stackedSegmentsHtml = Object.keys(PR_COMPONENTS).map(sysKey => {
     const w = displayWeights[sysKey] || 0;
-    if (!prActiveComponents[sysKey] || w === 0) return '';
     const color = PR_COMPONENTS[sysKey].color;
-    return `<div class="pr-stacked-segment" style="width: ${w}%; background-color: ${color};" title="${PR_COMPONENTS[sysKey].name}: ${w}%"></div>`;
+    return `<div class="pr-stacked-segment" data-sys="${sysKey}" style="width: ${prActiveComponents[sysKey] ? w : 0}%; background-color: ${color};" title="${PR_COMPONENTS[sysKey].name}: ${w}%"></div>`;
   }).join('');
 
   const legendHtml = Object.keys(PR_COMPONENTS).map(sysKey => {
@@ -586,7 +662,7 @@ function renderCustomPowerRankings() {
     return `
       <div class="pr-legend-item ${isActive ? '' : 'muted'}">
         <span class="pr-legend-swatch" style="background-color: ${isActive ? color : '#666'};"></span>
-        <span><b>${PR_COMPONENTS[sysKey].name}</b>: ${isActive ? w + '%' : 'Disabled'}</span>
+        <span><b>${PR_COMPONENTS[sysKey].name}</b>: <span class="pr-legend-text" data-sys="${sysKey}">${isActive ? w + '%' : 'Disabled'}</span></span>
       </div>
     `;
   }).join('');
@@ -603,14 +679,14 @@ function renderCustomPowerRankings() {
             <input type="checkbox" ${isActive ? 'checked' : ''} onchange="onPRToggleComponent('${sysKey}', this.checked)">
             <span>${meta.name}</span>
           </label>
-          <span class="pr-card-badge mono" style="color: ${isActive ? meta.color : 'var(--muted)'};">${dispWeight}%</span>
+          <span class="pr-card-badge mono" data-sys="${sysKey}" style="color: ${isActive ? meta.color : 'var(--muted)'};">${dispWeight}%</span>
         </div>
         <div class="pr-inputs-row">
-          <input type="range" class="pr-slider" min="0" max="100" value="${dispWeight}" ${isActive ? '' : 'disabled'} oninput="onPRWeightChange('${sysKey}', this.value)" aria-label="${meta.name} Weight Slider">
-          <input type="number" class="pr-number-input mono" min="0" max="100" value="${dispWeight}" ${isActive ? '' : 'disabled'} onchange="onPRWeightChange('${sysKey}', this.value)" aria-label="${meta.name} Weight Input">%
+          <input type="range" class="pr-slider" data-sys="${sysKey}" min="0" max="100" value="${dispWeight}" ${isActive ? '' : 'disabled'} oninput="onPRWeightInput('${sysKey}', this.value)" onchange="onPRWeightCommit('${sysKey}', this.value)" aria-label="${meta.name} Weight Slider">
+          <input type="number" class="pr-number-input mono" data-sys="${sysKey}" min="0" max="100" value="${dispWeight}" ${isActive ? '' : 'disabled'} oninput="onPRWeightInput('${sysKey}', this.value)" onchange="onPRWeightCommit('${sysKey}', this.value)" aria-label="${meta.name} Weight Input">%
         </div>
         <div class="pr-contrib-bar-wrap">
-          <div class="pr-contrib-bar-fill" style="width: ${dispWeight}%; background-color: ${isActive ? meta.color : '#555'};"></div>
+          <div class="pr-contrib-bar-fill pr-card-contrib-fill" data-sys="${sysKey}" style="width: ${dispWeight}%; background-color: ${isActive ? meta.color : '#555'};"></div>
         </div>
       </div>
     `;
@@ -681,13 +757,20 @@ function renderCustomPowerRankings() {
           <div class="eyebrow mono">CUSTOM POWER RANKINGS CREATOR</div>
           <h2 style="margin:4px 0 0; font-size:26px;">Linked Weights &amp; Formula Budget</h2>
         </div>
-        <div class="pr-total-badge mono" id="pr-total-badge">
-          TOTAL WEIGHT: <b>100%</b>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <button class="quiet-button mono" style="font-size:12px; padding:6px 12px; border:1px solid rgba(255,255,255,0.2); border-radius:6px; cursor:pointer;" onclick="resetToDefaultPRWeights()">Reset to Defaults (55/20/15/10)</button>
+          <div class="pr-total-badge mono" id="pr-total-badge">
+            TOTAL WEIGHT: <b>100%</b>
+          </div>
         </div>
       </div>
 
-      <p class="muted" style="margin-bottom:16px; font-size:14px;">
+      <p class="muted" style="margin-bottom:8px; font-size:14px;">
         Adjust percentage shares to balance component systems. Increasing one component automatically scales down others proportionally to maintain an exact 100% total.
+      </p>
+
+      <p class="mono muted" style="margin-bottom:16px; font-size:12px; color:var(--sky);">
+        💡 Recommended Starting Formula: <b>55% Glicko-2</b> · <b>20% Quality Wins</b> · <b>15% Strength of Field</b> · <b>10% Consistency</b>
       </p>
 
       <div class="pr-stacked-container">
