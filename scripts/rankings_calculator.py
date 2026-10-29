@@ -1252,7 +1252,7 @@ class RankingEngine:
             "rankings": rankings,
             "algorithm": {
                 "version": ALGORITHM_VERSION,
-                "name": "Loss Quality (Consistency)",
+                "name": "Loss Quality",
                 "description": "Measures competitive consistency relative to pre-match expectations. Wins gain credit, expected losses carry small penalties, and unexpected upset losses carry higher penalties.",
                 "limitations": "Measures consistency relative to pre-match expectations rather than absolute skill.",
                 "parameters": {
