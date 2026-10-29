@@ -14,10 +14,40 @@ const profileId = new URLSearchParams(location.search).get('player');
 let data;
 let playerDirectory = [];
 let playerTagToIdMap = new Map();
+let eventsIndexMap = new Map();
 let resultPage = 1;
 let selectedOpponent = null;
 let selectedBestPlacement = null;
+let selectedBestFinishKey = null;
 let isOpponentListOpen = false;
+
+async function loadEventsIndex() {
+  try {
+    const res = await fetch('data/events-index.json', { cache: 'no-store' });
+    if (res.ok) {
+      const items = await res.json();
+      items.forEach(item => {
+        if (item.tournament && item.tournamentSlug) {
+          const norm = String(item.tournament).trim().toLowerCase();
+          if (!eventsIndexMap.has(norm)) {
+            eventsIndexMap.set(norm, item.tournamentSlug);
+          }
+        }
+      });
+    }
+  } catch (e) {
+    console.error('Failed to load events index for tournament links', e);
+  }
+}
+
+function getTournamentSlug(result) {
+  if (result && result.eventKey && String(result.eventKey).startsWith('tournament/')) {
+    return result.eventKey.split('/')[1];
+  }
+  const title = (result?.event || '').split(' · ')[0].trim();
+  const normTitle = title.toLowerCase();
+  return eventsIndexMap.get(normTitle) || slug(title);
+}
 
 async function loadPlayerDirectory() {
   try {
@@ -85,10 +115,10 @@ async function loadProfile() {
   return response.json();
 }
 
-Promise.all([loadProfile(), loadPlayerDirectory()]).then(([d]) => {
+Promise.all([loadProfile(), loadPlayerDirectory(), loadEventsIndex()]).then(([d]) => {
   data = d;
   render();
-  addEventListener('hashchange', () => { resultPage = 1; render(); });
+  addEventListener('hashchange', () => { resultPage = 1; selectedBestPlacement = null; selectedBestFinishKey = null; render(); });
 }).catch(error => {
   $('#main').innerHTML = `<div class="panel glass"><h2>Profile unavailable</h2><p class="muted">${esc(error.message)}</p></div>`;
 });
@@ -311,35 +341,36 @@ function render() {
     ? (() => {
       const topOpponentRows = topOpponents.map(o => {
         const isSelected = selectedOpponent && selectedOpponent.toLowerCase() === o.name.toLowerCase();
-        return `<button class="opponent-row-button${isSelected ? ' active' : ''}" type="button" data-opponent="${esc(o.name)}">
-          <span class="opponent-row-info">
-            <span class="opponent-row-name">${esc(o.name)}</span>
-            <span class="opponent-row-sets mono muted">${o.sets} set${o.sets === 1 ? '' : 's'}</span>
-          </span>
-          <span class="opponent-row-record mono">${o.wins}–${o.sets - o.wins}</span>
-        </button>`;
+        let expandedSetsHtml = '';
+        if (isSelected) {
+          const normalize = value => String(value || '').trim().replace(/\s+/g, ' ').toLocaleLowerCase();
+          const sets = games.flatMap(game => (game.results || []).flatMap(result =>
+            (result.sets || []).filter(set => String(set.opponent || '').split(/\s*[,/]\s*/)
+              .some(name => normalize(name) === normalize(selectedOpponent)))
+              .map(set => ({ ...set, game: game.name, event: result.event, date: result.date }))))
+            .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+          const rows = sets.map(set => {
+            const dateFmt = fmtMonthYear(set.date);
+            const metaParts = [dateFmt, set.game, set.round].filter(Boolean).map(esc).join(' · ');
+            return `<div class="opponent-set-row"><span class="opponent-set-context"><b>${esc((set.event || '').split(' · ')[0])}</b><small>${metaParts}</small></span><span class="opponent-set-score">${esc(set.score || '—')}</span><span class="set-result ${['win', 'loss'].includes(set.outcome) ? set.outcome : 'unknown'}">${set.outcome === 'win' ? 'WIN' : set.outcome === 'loss' ? 'LOSS' : 'UNKNOWN'}</span></div>`;
+          }).join('');
+          expandedSetsHtml = `<div class="opponent-sets-expanded">${rows || '<p class="muted" style="padding:10px 4px;">No set details were recorded against this opponent.</p>'}</div>`;
+        }
+        return `<div class="opponent-row-wrap">
+          <button class="opponent-row-button${isSelected ? ' active' : ''}" type="button" data-opponent="${esc(o.name)}" aria-expanded="${isSelected}">
+            <span class="opponent-row-info">
+              <span class="opponent-row-name">${esc(o.name)}</span>
+              <span class="opponent-row-sets mono muted">${o.sets} set${o.sets === 1 ? '' : 's'}</span>
+            </span>
+            <span class="opponent-row-record mono">${o.wins}–${o.sets - o.wins}</span>
+          </button>
+          ${expandedSetsHtml}
+        </div>`;
       }).join('');
-
-      let selectedOpponentSetsHtml = '';
-      if (selectedOpponent) {
-        const normalize = value => String(value || '').trim().replace(/\s+/g, ' ').toLocaleLowerCase();
-        const sets = games.flatMap(game => (game.results || []).flatMap(result =>
-          (result.sets || []).filter(set => String(set.opponent || '').split(/\s*[,/]\s*/)
-            .some(name => normalize(name) === normalize(selectedOpponent)))
-            .map(set => ({ ...set, game: game.name, event: result.event, date: result.date }))))
-          .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-        const rows = sets.map(set => {
-          const dateFmt = fmtMonthYear(set.date);
-          const metaParts = [dateFmt, set.game, set.round].filter(Boolean).map(esc).join(' · ');
-          return `<div class="opponent-set-row"><span class="opponent-set-context"><b>${esc((set.event || '').split(' · ')[0])}</b><small>${metaParts}</small></span><span class="opponent-set-score">${esc(set.score || '—')}</span><span class="set-result ${['win', 'loss'].includes(set.outcome) ? set.outcome : 'unknown'}">${set.outcome === 'win' ? 'WIN' : set.outcome === 'loss' ? 'LOSS' : 'UNKNOWN'}</span></div>`;
-        }).join('');
-        selectedOpponentSetsHtml = `<div class="opponent-history-subheading"><h3>Sets vs ${linkifyOpponent(selectedOpponent)}</h3></div>${rows || '<p class="muted">No set details were recorded against this opponent.</p>'}`;
-      }
 
       return `<div class="panel glass opponent-history" id="opponent-history">
         <div class="opponent-history-heading"><h2>Most Played Opponents</h2><button class="quiet-button close-opponent-history" type="button">Close</button></div>
         <div class="most-played-list">${topOpponentRows || '<p class="muted">No set data available.</p>'}</div>
-        ${selectedOpponentSetsHtml}
       </div>`;
     })()
     : '';
@@ -354,8 +385,48 @@ function render() {
         : validResults
           .sort((a, b) => Number(a.place) - Number(b.place) || (b.date || '').localeCompare(a.date || ''))
           .slice(0, 5);
-      const rows = tournaments.map(result => `<div class="opponent-set-row"><span class="opponent-set-context"><b>${esc((result.event || '').split(' · ')[0])}</b><small>${fmt(result.date)}${result.entrants ? ` · ${result.entrants} entrants` : ''}</small></span><span class="opponent-set-score ${result.place <= 3 ? `top3 p${result.place}` : ''}">${ord(result.place)}</span></div>`).join('');
-      return `<div class="panel glass opponent-history" id="best-placement-history"><div class="opponent-history-heading"><h2>Best finishes</h2><button class="quiet-button close-best-placement-history" type="button">Close</button></div>${rows || '<p class="muted">No tournaments recorded for this placement.</p>'}</div>`;
+
+      const itemsHtml = tournaments.map((result, idx) => {
+        const eventTitle = (result.event || '').split(' · ')[0];
+        const tSlug = getTournamentSlug(result);
+        const eventUrl = `event.html?tournament=${encodeURIComponent(tSlug)}`;
+        const finishKey = result.eventKey || `${result.event}-${result.date}-${idx}`;
+        const isExpanded = selectedBestFinishKey === finishKey;
+
+        let expandedSetsHtml = '';
+        if (isExpanded) {
+          const sets = result.sets || [];
+          const setRows = sets.length ? sets.map(set => {
+            const outcome = ['win', 'loss'].includes(set.outcome) ? set.outcome : 'unknown';
+            const isPools = set.phase && /\bpools\b/i.test(set.phase);
+            const roundHtml = (!isPools && set.round) ? `<small>${esc(set.round)}</small>` : '';
+            return `<div class="set-row">
+              <span class="set-phase"><b>${esc(set.phase || 'Phase not recorded')}</b>${roundHtml}</span>
+              <span class="set-opponent">${linkifyOpponent(set.opponent || 'Unknown')}</span>
+              <span class="set-score">${esc(set.score || '—')}</span>
+              <span class="set-result ${outcome}">${outcome === 'unknown' ? 'RESULT UNKNOWN' : outcome.toUpperCase()}</span>
+            </div>`;
+          }).join('') : '<p class="set-empty muted">No set details were recorded for this event.</p>';
+
+          expandedSetsHtml = `<div class="best-finish-sets-expanded set-details">
+            <div class="set-head"><span>PHASE</span><span>OPPONENT</span><span>SCORE</span><span>RESULT</span></div>
+            ${setRows}
+          </div>`;
+        }
+
+        return `<div class="best-finish-item">
+          <div class="opponent-set-row best-finish-row${isExpanded ? ' active' : ''}" tabindex="0" role="button" aria-expanded="${isExpanded}" data-finish-key="${esc(finishKey)}">
+            <span class="opponent-set-context">
+              <b><a class="event-link opponent-link" href="${esc(eventUrl)}">${esc(eventTitle)}</a></b>
+              <small>${fmt(result.date)}${result.entrants ? ` · ${result.entrants} entrants` : ''}</small>
+            </span>
+            <span class="opponent-set-score ${result.place <= 3 ? `top3 p${result.place}` : ''}">${ord(result.place)}</span>
+          </div>
+          ${expandedSetsHtml}
+        </div>`;
+      }).join('');
+
+      return `<div class="panel glass opponent-history" id="best-placement-history"><div class="opponent-history-heading"><h2>Best finishes</h2><button class="quiet-button close-best-placement-history" type="button">Close</button></div>${itemsHtml || '<p class="muted">No tournaments recorded for this placement.</p>'}</div>`;
     })()
     : '';
 
@@ -423,12 +494,36 @@ function render() {
   });
   $('#main').querySelector('.best-placement-tile-button')?.addEventListener('click', () => {
     selectedBestPlacement = selectedBestPlacement === sel.id ? null : sel.id;
+    selectedBestFinishKey = null;
     render();
     if (selectedBestPlacement) $('#best-placement-history')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   });
   $('#main').querySelector('.close-best-placement-history')?.addEventListener('click', () => {
     selectedBestPlacement = null;
+    selectedBestFinishKey = null;
     render();
+  });
+  $('#main').querySelectorAll('.best-finish-row').forEach(row => {
+    row.addEventListener('click', e => {
+      if (e.target.closest('.event-link')) return;
+      const key = row.dataset.finishKey;
+      selectedBestFinishKey = selectedBestFinishKey === key ? null : key;
+      render();
+    });
+    row.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        if (e.target.closest('.event-link')) return;
+        e.preventDefault();
+        const key = row.dataset.finishKey;
+        selectedBestFinishKey = selectedBestFinishKey === key ? null : key;
+        render();
+      }
+    });
+  });
+  $('#main').querySelectorAll('.best-finish-row .event-link').forEach(link => {
+    link.addEventListener('click', e => {
+      e.stopPropagation();
+    });
   });
   $('#main').querySelectorAll('.result-toggle').forEach(button => {
     button.addEventListener('click', () => {
