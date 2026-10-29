@@ -227,8 +227,105 @@ def test_quality_wins_system(mock_db):
     res_qw = engine.calculate("ultimate", system="quality_wins")
     assert res_qw["system"] == "quality_wins"
     p101 = next(p for p in res_qw["rankings"] if p["playerId"] == "101")
+    p102 = next(p for p in res_qw["rankings"] if p["playerId"] == "102")
     assert p101["wins"] == 2
     assert p101["totalQualityWins"] > 0
+    assert p101["score"] == p101["avgQualityWin"]
+    assert p101["isProvisional"] is True
+    # Player 102 defeated higher-rated Player 101, earning higher average win quality
+    assert p102["score"] > p101["score"]
+    assert p102["rank"] == 1
+    assert p101["rank"] == 2
+
+def test_quality_wins_average_formula_and_ranking_order(mock_db):
+    conn, engine = mock_db
+    res_qw = engine.calculate("ultimate", system="quality_wins")
+    rankings = res_qw["rankings"]
+    ranked_players = [p for p in rankings if not p["isUnranked"]]
+
+    # Verify ranking order is strictly descending by score (Average Quality per Win)
+    for i in range(len(ranked_players) - 1):
+        assert ranked_players[i]["score"] >= ranked_players[i + 1]["score"]
+        assert ranked_players[i]["rank"] == i + 1
+
+    # Verify formula correctness: score == round(totalQualityWins / wins, 3)
+    for p in ranked_players:
+        expected_avg = round(p["totalQualityWins"] / p["wins"], 3)
+        assert p["score"] == expected_avg
+        assert p["avgQualityWin"] == expected_avg
+
+def test_quality_wins_zero_wins_and_provisional():
+    """Test dedicated scenarios for small samples, zero wins, and ranking order."""
+    conn = sqlite3.connect(":memory:")
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    cursor.executescript("""
+        CREATE TABLE videogames (id INTEGER PRIMARY KEY, slug TEXT UNIQUE, name TEXT);
+        CREATE TABLE tournaments (slug TEXT PRIMARY KEY, name TEXT, start_at INTEGER);
+        CREATE TABLE events (id TEXT PRIMARY KEY, videogame_slug TEXT, tournament_slug TEXT, name TEXT, source_url TEXT, is_temporary INTEGER DEFAULT 0, num_entrants INTEGER);
+        CREATE TABLE entrants (id TEXT PRIMARY KEY, event_id TEXT);
+        CREATE TABLE phases (id TEXT PRIMARY KEY, phase_order INTEGER, name TEXT);
+        CREATE TABLE phase_groups (id TEXT PRIMARY KEY, phase_id TEXT);
+        CREATE TABLE sets (id TEXT PRIMARY KEY, event_id TEXT, winner_entrant_id TEXT, display_score TEXT, started_at INTEGER, start_at INTEGER, completed_at INTEGER, phase_group_id TEXT, round INTEGER);
+        CREATE TABLE set_entrants (set_id TEXT, entrant_id TEXT, score_display TEXT, score_label TEXT, score TEXT);
+        CREATE TABLE entrant_participants (entrant_id TEXT, participant_id TEXT);
+        CREATE TABLE participants (id TEXT PRIMARY KEY, player_id TEXT, gamer_tag TEXT);
+        CREATE TABLE event_standings (event_id TEXT, entrant_id TEXT, placement INTEGER);
+    """)
+
+    cursor.execute("INSERT INTO videogames VALUES (1, 'ultimate', 'Super Smash Bros. Ultimate')")
+    cursor.execute("INSERT INTO tournaments VALUES ('t1', 'Tournament 1', 1700000000)")
+    cursor.execute("INSERT INTO events VALUES ('e1', 'ultimate', 't1', 'Singles', 'https://start.gg/tournament/t1/event/singles', 0, 4)")
+
+    # P1 (1 big win), P2 (5 easy wins, but lower average quality), P3 (0 wins, 2 losses)
+    players = [(1, 'ProvisionalPlayer'), (2, 'VeteranPlayer'), (3, 'ZeroWinPlayer'), (4, 'Opponent')]
+    for pid, tag in players:
+        cursor.execute("INSERT INTO participants VALUES (?, ?, ?)", (f"part_{pid}", str(pid), tag))
+        cursor.execute("INSERT INTO entrants VALUES (?, ?)", (f"ent_{pid}_e1", 'e1'))
+        cursor.execute("INSERT INTO entrant_participants VALUES (?, ?)", (f"ent_{pid}_e1", f"part_{pid}"))
+
+    # P1 beats P4 (Win 1)
+    cursor.execute("INSERT INTO sets VALUES ('s1', 'e1', 'ent_1_e1', '2-0', 1700000100, 1700000100, 1700000100, NULL, 1)")
+    cursor.execute("INSERT INTO set_entrants VALUES ('s1', 'ent_1_e1', '2', '2', '2')")
+    cursor.execute("INSERT INTO set_entrants VALUES ('s1', 'ent_4_e1', '0', '0', '0')")
+
+    # P2 beats P4 in 3 sets
+    for set_num in range(2, 5):
+        s_id = f"s{set_num}"
+        cursor.execute("INSERT INTO sets VALUES (?, 'e1', 'ent_2_e1', '2-0', ?, ?, ?, NULL, ?)", (s_id, 1700000100 + set_num*100, 1700000100 + set_num*100, 1700000100 + set_num*100, set_num))
+        cursor.execute("INSERT INTO set_entrants VALUES (?, 'ent_2_e1', '2', '2', '2')", (s_id,))
+        cursor.execute("INSERT INTO set_entrants VALUES (?, 'ent_4_e1', '0', '0', '0')", (s_id,))
+
+    # P3 loses to P4 twice (0 wins)
+    for set_num in range(5, 7):
+        s_id = f"s{set_num}"
+        cursor.execute("INSERT INTO sets VALUES (?, 'e1', 'ent_4_e1', '2-0', ?, ?, ?, NULL, ?)", (s_id, 1700000100 + set_num*100, 1700000100 + set_num*100, 1700000100 + set_num*100, set_num))
+        cursor.execute("INSERT INTO set_entrants VALUES (?, 'ent_4_e1', '2', '2', '2')", (s_id,))
+        cursor.execute("INSERT INTO set_entrants VALUES (?, 'ent_3_e1', '0', '0', '0')", (s_id,))
+
+    conn.commit()
+    engine = RankingEngine(connection=conn)
+
+    res = engine.calculate("ultimate", system="quality_wins")
+    p1 = next(p for p in res["rankings"] if p["playerId"] == "1")
+    p2 = next(p for p in res["rankings"] if p["playerId"] == "2")
+    p3 = next(p for p in res["rankings"] if p["playerId"] == "3")
+
+    # P1 has 1 win (< 3), so isProvisional is True
+    assert p1["isProvisional"] is True
+    assert p1["wins"] == 1
+
+    # P2 has 3 wins (>= 3), so isProvisional is False
+    assert p2["isProvisional"] is False
+    assert p2["wins"] == 3
+
+    # P3 has 0 wins, so isUnranked is True, rank is None
+    assert p3["isUnranked"] is True
+    assert p3["rank"] is None
+    assert p3["score"] == 0.0
+
+    conn.close()
 
 def test_loss_quality_consistency_system(mock_db):
     conn, engine = mock_db

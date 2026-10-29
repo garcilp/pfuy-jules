@@ -910,9 +910,10 @@ class RankingEngine:
     # -------------------------------------------------------------------------
 
     def _calculate_quality_wins(self, sets, mode, start_date, end_date, target_player_id, game_slug, raw_target_player_id=None):
-        """Quality Wins: Sum of (1 - expected_score) across wins using pre-match Glicko ratings."""
+        """Quality Wins: Average quality per eligible win using pre-match Glicko-2 ratings."""
         pre_match_ratings, _ = self._compute_pre_match_glicko_ratings(sets, mode=mode, start_date=start_date)
         calc = self.glicko_calc
+        provisional_threshold = 3
 
         player_qw = {}
         diagnostic_history = {}
@@ -933,13 +934,14 @@ class RankingEngine:
             credit = 1.0 - e_win
 
             if w_id not in player_qw:
-                player_qw[w_id] = {"totalQuality": 0.0, "wins": 0, "losses": 0, "credits": []}
+                player_qw[w_id] = {"totalQuality": 0.0, "wins": 0, "losses": 0, "credits": [], "winOpponentRatingsSum": 0.0}
             player_qw[w_id]["totalQuality"] += credit
             player_qw[w_id]["wins"] += 1
             player_qw[w_id]["credits"].append(credit)
+            player_qw[w_id]["winOpponentRatingsSum"] += l_pre["r"]
 
             if l_id not in player_qw:
-                player_qw[l_id] = {"totalQuality": 0.0, "wins": 0, "losses": 0, "credits": []}
+                player_qw[l_id] = {"totalQuality": 0.0, "wins": 0, "losses": 0, "credits": [], "winOpponentRatingsSum": 0.0}
             player_qw[l_id]["losses"] += 1
 
             if target_player_id is None or w_id == target_player_id:
@@ -953,10 +955,13 @@ class RankingEngine:
                     "round": s["roundText"],
                     "opponentId": l_id,
                     "opponentTag": self.latest_tags.get(l_id, f"Player {l_id}"),
+                    "playerPreRating": round(w_pre["r"], 1),
                     "opponentPreRating": round(l_pre["r"], 1),
                     "expectedScore": round(e_win, 3),
                     "credit": round(credit, 3),
                     "outcome": "win",
+                    "isEligibleWin": True,
+                    "exclusionReason": None,
                 }
                 diagnostic_history.setdefault(w_id, []).append(trace)
 
@@ -972,10 +977,13 @@ class RankingEngine:
                     "round": s["roundText"],
                     "opponentId": w_id,
                     "opponentTag": self.latest_tags.get(w_id, f"Player {w_id}"),
+                    "playerPreRating": round(l_pre["r"], 1),
                     "opponentPreRating": round(w_pre["r"], 1),
                     "expectedScore": round(e_loss, 3),
                     "credit": 0.0,
                     "outcome": "loss",
+                    "isEligibleWin": False,
+                    "exclusionReason": "Loss (only wins contribute to Quality Wins average)",
                 }
                 diagnostic_history.setdefault(l_id, []).append(trace_l)
 
@@ -986,22 +994,41 @@ class RankingEngine:
             matches = wins + losses
             total = data["totalQuality"]
             avg_credit = total / wins if wins > 0 else 0.0
+            avg_opp_rating = data["winOpponentRatingsSum"] / wins if wins > 0 else 0.0
+            is_provisional = (0 < wins < provisional_threshold)
+            is_unranked = (wins == 0)
 
             rankings.append({
                 "playerId": pid,
                 "playerTag": self.latest_tags.get(pid, f"Player {pid}"),
-                "score": round(total, 2),
-                "totalQualityWins": round(total, 2),
+                "score": round(avg_credit, 3),
                 "avgQualityWin": round(avg_credit, 3),
+                "totalQualityWins": round(total, 3),
+                "avgOpponentWinRating": round(avg_opp_rating, 1),
                 "wins": wins,
                 "losses": losses,
                 "matches": matches,
                 "winRate": round(100.0 * wins / max(1, matches), 1),
+                "isProvisional": is_provisional,
+                "isUnranked": is_unranked,
             })
 
-        rankings.sort(key=lambda x: (x["score"], x["wins"]), reverse=True)
-        for idx, item in enumerate(rankings, 1):
+        # Separate ranked (wins > 0) and unranked (wins == 0) players
+        ranked_players = [p for p in rankings if not p["isUnranked"]]
+        unranked_players = [p for p in rankings if p["isUnranked"]]
+
+        ranked_players.sort(
+            key=lambda x: (x["score"], x["totalQualityWins"], x["wins"], x["matches"]),
+            reverse=True,
+        )
+        for idx, item in enumerate(ranked_players, 1):
             item["rank"] = idx
+
+        unranked_players.sort(key=lambda x: x["matches"], reverse=True)
+        for item in unranked_players:
+            item["rank"] = None
+
+        rankings = ranked_players + unranked_players
 
         result = {
             "gameSlug": game_slug,
@@ -1009,16 +1036,17 @@ class RankingEngine:
             "mode": mode,
             "startDate": start_date,
             "endDate": end_date,
-            "totalPlayers": len(rankings),
+            "totalPlayers": len(ranked_players),
             "rankings": rankings,
             "algorithm": {
                 "version": ALGORITHM_VERSION,
                 "name": "Quality Wins",
-                "description": "Rewards victories based on opponent strength and pre-match expected score. Earns higher credit for defeating stronger opponents.",
-                "limitations": "Cumulative metric rewarding victory volume against strong opponents. Does not penalize losses.",
+                "description": "Ranks players by the average quality of their eligible wins (1 - Expected Score). Higher scores indicate more impressive wins relative to pre-match expectations.",
+                "limitations": "Evaluates average win quality rather than total victory volume or overall win rate.",
                 "parameters": {
-                    "formula": "Sum of (1 - E_win) across eligible wins",
+                    "formula": "Average Quality per Win = Sum of (1 - Expected Score) / Number of Eligible Wins",
                     "expectedScoreFormula": "Glicko-2 E(mu_winner, mu_loser, phi_loser) using pre-match ratings",
+                    "provisionalThreshold": f"Wins < {provisional_threshold} marked as provisional",
                 },
             },
         }
@@ -1027,13 +1055,21 @@ class RankingEngine:
             p_rank = next((item for item in rankings if item["playerId"] == target_player_id), None)
             hist = diagnostic_history.get(target_player_id, [])
 
-            alg_params = {"expectedScoreFormula": "Glicko-2 E(mu_1, mu_2, phi_2)"}
+            alg_params = {
+                "formula": "Average Quality per Win = Sum of (1 - Expected Score) / Number of Eligible Wins",
+                "expectedScoreFormula": "Glicko-2 E(mu_1, mu_2, phi_2)",
+                "provisionalThreshold": f"Wins < {provisional_threshold} marked as provisional",
+            }
             breakdown_dict = {
-                "totalQualityWins": p_rank["totalQualityWins"] if p_rank else 0.0,
+                "finalAverageQuality": p_rank["score"] if p_rank else 0.0,
                 "avgQualityWin": p_rank["avgQualityWin"] if p_rank else 0.0,
-                "wins": p_rank["wins"] if p_rank else 0,
+                "totalQualityWins": p_rank["totalQualityWins"] if p_rank else 0.0,
+                "eligibleWins": p_rank["wins"] if p_rank else 0,
                 "losses": p_rank["losses"] if p_rank else 0,
                 "matches": p_rank["matches"] if p_rank else 0,
+                "avgOpponentWinRating": p_rank["avgOpponentWinRating"] if p_rank else 0.0,
+                "isProvisional": p_rank["isProvisional"] if p_rank else False,
+                "isUnranked": p_rank["isUnranked"] if p_rank else True,
             }
 
             result["diagnostic"] = {
@@ -1071,7 +1107,7 @@ class RankingEngine:
                     "mode": mode,
                     "startDate": start_date,
                     "endDate": end_date,
-                    "formula": "Quality Wins Score = Sum(1.0 - ExpectedWinProbability)",
+                    "formula": "Average Quality per Win = Sum of (1.0 - Expected Win Probability) / Number of Eligible Wins",
                     "parameters": alg_params,
                     "breakdown": breakdown_dict,
                 },
