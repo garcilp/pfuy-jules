@@ -16,9 +16,10 @@ let currentData = null;
 let comparisonData = {};
 let sortCol = 'rank';
 let sortAsc = true;
-let currentPage = 1;
-const pageSize = 25;
+let visibleCount = 25;
+const batchSize = 25;
 let currentRequestId = 0;
+let scrollObserver = null;
 
 // URL State Sync
 function getStateFromURL() {
@@ -101,7 +102,7 @@ async function init() {
   endDateInput.addEventListener('input', onFilterChange);
 
   playerSearch.addEventListener('input', () => {
-    currentPage = 1;
+    visibleCount = batchSize;
     const state = getCurrentFilterState();
     updateURLState(state);
     render();
@@ -111,7 +112,7 @@ async function init() {
     btn.addEventListener('click', () => {
       $$('.ranking-tab').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      currentPage = 1;
+      visibleCount = batchSize;
       onFilterChange();
     });
   });
@@ -167,6 +168,7 @@ function getCurrentFilterState() {
 }
 
 async function onFilterChange() {
+  visibleCount = batchSize;
   const state = getCurrentFilterState();
   updateURLState(state);
   await loadData();
@@ -340,12 +342,37 @@ window.switchToSystem = function(sysKey) {
   $$('.ranking-tab').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.system === sysKey);
   });
-  currentPage = 1;
+  visibleCount = batchSize;
   onFilterChange();
 };
 
+function cleanupObserver() {
+  if (scrollObserver) {
+    scrollObserver.disconnect();
+    scrollObserver = null;
+  }
+}
+
+function setupInfiniteScroll(totalCount) {
+  cleanupObserver();
+
+  const sentinel = $('#scroll-sentinel');
+  if (!sentinel || visibleCount >= totalCount) return;
+
+  scrollObserver = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting) {
+      visibleCount += batchSize;
+      render();
+    }
+  }, { rootMargin: '200px' });
+
+  scrollObserver.observe(sentinel);
+}
+
 // Individual System View
 function renderIndividualSystem(systemKey) {
+  cleanupObserver();
+
   if (!currentData || !currentData.rankings) {
     rankingsContent.innerHTML = '<div class="panel glass empty-state"><h2>No ranking results</h2><p class="muted">No matches found for this game and date range.</p></div>';
     return;
@@ -365,11 +392,7 @@ function renderIndividualSystem(systemKey) {
   });
 
   const totalFiltered = list.length;
-  const totalPages = Math.ceil(totalFiltered / pageSize) || 1;
-  if (currentPage > totalPages) currentPage = totalPages;
-
-  const startIndex = (currentPage - 1) * pageSize;
-  const paginated = list.slice(startIndex, startIndex + pageSize);
+  const visibleList = list.slice(0, visibleCount);
 
   const sysInfo = currentData.algorithm || {};
 
@@ -397,7 +420,7 @@ function renderIndividualSystem(systemKey) {
           <span>MATCHES / EVENTS</span>
           <span>ACTIONS</span>
         </div>
-        ${paginated.length ? paginated.map(p => `
+        ${visibleList.length ? visibleList.map(p => `
           <div class="tr ranking-row">
             <span class="rank-col font-bold ${p.rank <= 3 ? 'p' + p.rank : ''}">#${p.rank}</span>
             <div class="player-col">
@@ -417,17 +440,16 @@ function renderIndividualSystem(systemKey) {
         `).join('') : '<div class="empty-state"><p class="muted">No players match the search filter.</p></div>'}
       </div>
 
-      ${totalPages > 1 ? `
-        <div class="pagination-controls">
-          <button class="quiet-button" ${currentPage === 1 ? 'disabled' : ''} onclick="changePage(${currentPage - 1})">← Previous</button>
-          <span class="mono muted">Page ${currentPage} of ${totalPages}</span>
-          <button class="quiet-button" ${currentPage === totalPages ? 'disabled' : ''} onclick="changePage(${currentPage + 1})">Next →</button>
+      ${totalFiltered > 0 ? `
+        <div id="scroll-sentinel" class="infinite-scroll-sentinel mono muted">
+          ${visibleCount < totalFiltered ? `Showing ${visibleList.length} of ${totalFiltered} players (scroll down to load more…)` : `Showing all ${totalFiltered} players`}
         </div>
       ` : ''}
     </div>
   `;
 
   rankingsContent.innerHTML = html;
+  setupInfiniteScroll(totalFiltered);
 }
 
 function getSystemDescription(systemKey) {
@@ -470,16 +492,14 @@ window.changeSort = function(col) {
     sortCol = col;
     sortAsc = (col === 'playerTag' || col === 'rank');
   }
+  visibleCount = batchSize;
   render();
-};
-
-window.changePage = function(page) {
-  currentPage = page;
-  renderIndividualSystem(getActiveSystem());
 };
 
 // Comparison View
 function renderComparison() {
+  cleanupObserver();
+
   if (!comparisonData || !Object.keys(comparisonData).length) {
     rankingsContent.innerHTML = '<div class="panel glass empty-state"><h2>No comparison data</h2></div>';
     return;
@@ -510,6 +530,9 @@ function renderComparison() {
     return rA - rB;
   });
 
+  const totalFiltered = list.length;
+  const visibleList = list.slice(0, visibleCount);
+
   let html = `
     <div class="panel glass system-banner">
       <h2>System Comparison View</h2>
@@ -526,7 +549,7 @@ function renderComparison() {
           <span>LOSS QUALITY</span>
           <span>ACTIONS</span>
         </div>
-        ${list.length ? list.map(p => `
+        ${visibleList.length ? visibleList.map(p => `
           <div class="tr ranking-row comparison-row">
             <div class="player-col">
               <a href="index.html?player=${encodeURIComponent(p.playerId)}" class="player-card-link">
@@ -543,10 +566,17 @@ function renderComparison() {
           </div>
         `).join('') : '<div class="empty-state"><p class="muted">No players match the filter.</p></div>'}
       </div>
+
+      ${totalFiltered > 0 ? `
+        <div id="scroll-sentinel" class="infinite-scroll-sentinel mono muted">
+          ${visibleCount < totalFiltered ? `Showing ${visibleList.length} of ${totalFiltered} players (scroll down to load more…)` : `Showing all ${totalFiltered} players`}
+        </div>
+      ` : ''}
     </div>
   `;
 
   rankingsContent.innerHTML = html;
+  setupInfiniteScroll(totalFiltered);
 }
 
 // Diagnostic Modal
