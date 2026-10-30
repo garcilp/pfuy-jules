@@ -352,7 +352,9 @@ function render() {
           const rows = sets.map(set => {
             const dateFmt = fmtMonthYear(set.date);
             const metaParts = [dateFmt, set.game, set.round].filter(Boolean).map(esc).join(' · ');
-            return `<div class="opponent-set-row"><span class="opponent-set-context"><b>${esc((set.event || '').split(' · ')[0])}</b><small>${metaParts}</small></span><span class="opponent-set-score">${esc(set.score || '—')}</span><span class="set-result ${['win', 'loss'].includes(set.outcome) ? set.outcome : 'unknown'}">${set.outcome === 'win' ? 'WIN' : set.outcome === 'loss' ? 'LOSS' : 'UNKNOWN'}</span></div>`;
+            const tSlug = getTournamentSlug({ eventKey: set.eventKey, event: set.event });
+            const eventUrl = `event.html?tournament=${encodeURIComponent(tSlug)}`;
+            return `<div class="opponent-set-row"><span class="opponent-set-context"><b><a class="event-link opponent-link" href="${esc(eventUrl)}">${esc((set.event || '').split(' · ')[0])}</a></b><small>${metaParts}</small></span><span class="opponent-set-score">${esc(set.score || '—')}</span><span class="set-result ${['win', 'loss'].includes(set.outcome) ? set.outcome : 'unknown'}">${set.outcome === 'win' ? 'WIN' : set.outcome === 'loss' ? 'LOSS' : 'UNKNOWN'}</span></div>`;
           }).join('');
           expandedSetsHtml = `<div class="opponent-sets-expanded">${rows || '<p class="muted" style="padding:10px 4px;">No set details were recorded against this opponent.</p>'}</div>`;
         }
@@ -570,10 +572,13 @@ function setupInteractiveChart() {
       const baseX = parseFloat(point.dataset.baseX);
       const relX = baseX - 40;
       const xTrans = Math.round((40 + relX * chartZoom - chartPanX) * 100) / 100;
-      const circle = point.querySelector('circle');
-      if (circle) {
+      const circles = point.querySelectorAll('circle');
+      circles.forEach(circle => {
         circle.setAttribute('cx', xTrans);
-        const cy = circle.getAttribute('cy');
+      });
+      const dot = point.querySelector('circle.dot');
+      if (dot) {
+        const cy = dot.getAttribute('cy');
         pointCoords.push(`${xTrans},${cy}`);
       }
     });
@@ -782,9 +787,13 @@ function chart(g) {
   const polylinePoints = pts.map(p => `${p.x},${p.y}`).join(' ');
   const pointsHtml = pts.map(p => {
     const tourneyName = (p.result.event || '').split(' · ')[0];
-    return `<g class="chart-point" tabindex="0" data-base-x="${p.x}" data-tourney="${esc(tourneyName)}" data-date="${esc(p.result.date)}" data-place="${esc(p.result.place)}">
-      <circle cx="${p.x}" cy="${p.y}" r="5" />
-    </g>`;
+    const tSlug = getTournamentSlug(p.result);
+    const eventUrl = `event.html?tournament=${encodeURIComponent(tSlug)}`;
+    const placeCls = p.result.place <= 3 ? ` p${p.result.place}` : '';
+    return `<a class="chart-point${placeCls}" href="${esc(eventUrl)}" aria-label="${esc(tourneyName)}: ${ord(p.result.place)} place (${fmt(p.result.date)})" data-base-x="${p.x}" data-tourney="${esc(tourneyName)}" data-date="${esc(p.result.date)}" data-place="${esc(p.result.place)}">
+      <circle class="hit-area" cx="${p.x}" cy="${p.y}" r="14" fill="transparent" pointer-events="all" />
+      <circle class="dot" cx="${p.x}" cy="${p.y}" r="5" />
+    </a>`;
   }).join('');
 
   return `<div class="chart-container">
