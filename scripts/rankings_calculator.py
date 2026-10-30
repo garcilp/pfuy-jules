@@ -1339,26 +1339,35 @@ class RankingEngine:
         return result
 
     # -------------------------------------------------------------------------
-    # System 4: Loss Quality (Consistency Ranking)
+    # System 4: Consistency Ranking (Candidate C)
     # -------------------------------------------------------------------------
 
     def _calculate_loss_quality(self, sets, mode, start_date, end_date, target_player_id, game_slug, raw_target_player_id=None):
-        """Consistency (Loss Quality / Upset Resistance):
-        Evaluates player competitive consistency relative to pre-match Glicko-2 expectations.
+        """Consistency (Candidate C with Opponent-Sensitive Loss Protection):
+        Evaluates player competitive consistency relative to pre-match expectations and opponent quality.
 
-        For each match:
-        - Actual outcome S in {1.0, 0.0} (1.0 for win, 0.0 for loss).
-        - Pre-match Glicko-2 win probability E in (0.0, 1.0).
-        - Match performance contribution d = S - E:
-          * Victory credit = + (1.0 - E) (rewards upset wins against stronger opponents)
-          * Loss penalty = - E (minimal penalty -E ~ -0.1 for expected losses against elite rivals;
-            heavy penalty -E ~ -0.9 for unexpected losses against weaker opponents)
-        - Net Performance Points = Sum(S - E).
-        - Consistency Score = 50.0 + 100.0 * NetPoints / (Matches + 20.0), dampening small sample sizes
-          with Bayesian prior m = 20.0 toward neutral baseline 50.0.
+        Approved Candidate C Formula:
+        For each match i:
+        - Win Credit = 1.0 + gamma * max(0.0, (r_opp,i - 1500.0) / 400.0)
+        - Loss Penalty = E_win,i * Protection_i
+          where Protection_i = max(beta_min, 1.0 - beta * max(0.0, (r_opp,i - 1400.0) / 400.0))
+        - Net Points = Sum(Win Credits) - Sum(Loss Penalties)
+        - Raw Consistency Score = 50.0 + 50.0 * NetPoints / (Matches + m_C)
+        - Clamped Score = max(0.0, min(100.0, Raw Score))
+
+        Default Approved Parameters:
+        - gamma = 0.30 (Win Quality Multiplier)
+        - beta = 0.75 (Loss Protection Rate)
+        - beta_min = 0.20 (Loss Protection Floor)
+        - m_C = 15.0 (Sample Dampener)
         """
         pre_match_ratings, _ = self._compute_pre_match_glicko_ratings(sets, mode=mode, start_date=start_date)
         calc = self.glicko_calc
+
+        gamma = 0.30
+        beta = 0.75
+        beta_min = 0.20
+        dampener_m = 15.0
 
         player_data = {}
         diagnostic_history = {}
@@ -1378,8 +1387,14 @@ class RankingEngine:
             e_win = calc.expected_score_original(w_pre["r"], w_pre["rd"], l_pre["r"], l_pre["rd"])
             e_loss = calc.expected_score_original(l_pre["r"], l_pre["rd"], w_pre["r"], w_pre["rd"])
 
-            win_contrib = 1.0 - e_win
-            loss_contrib = 0.0 - e_loss
+            # Candidate C Match Calculations:
+            win_credit = 1.0 + gamma * max(0.0, (l_pre["r"] - 1500.0) / 400.0)
+
+            protection_l = max(beta_min, 1.0 - beta * max(0.0, (w_pre["r"] - 1400.0) / 400.0))
+            loss_penalty = e_loss * protection_l
+
+            win_contrib = win_credit
+            loss_contrib = -loss_penalty
 
             if w_id not in player_data:
                 player_data[w_id] = {"wins": 0, "losses": 0, "matches": 0, "totalPoints": 0.0, "winCredits": 0.0, "lossPenalties": 0.0, "events": set()}
@@ -1394,7 +1409,7 @@ class RankingEngine:
             player_data[l_id]["losses"] += 1
             player_data[l_id]["matches"] += 1
             player_data[l_id]["totalPoints"] += loss_contrib
-            player_data[l_id]["lossPenalties"] += abs(loss_contrib)
+            player_data[l_id]["lossPenalties"] += loss_penalty
             player_data[l_id]["events"].add(s["eventId"])
 
             if target_player_id is None or w_id == target_player_id:
@@ -1410,7 +1425,7 @@ class RankingEngine:
                     "opponentTag": self.latest_tags.get(l_id, f"Player {l_id}"),
                     "opponentPreRating": round(l_pre["r"], 1),
                     "expectedScore": round(e_win, 3),
-                    "credit": round(win_contrib, 3),
+                    "credit": round(win_credit, 3),
                     "contribution": round(win_contrib, 3),
                     "outcome": "win",
                 }
@@ -1429,13 +1444,13 @@ class RankingEngine:
                     "opponentTag": self.latest_tags.get(w_id, f"Player {w_id}"),
                     "opponentPreRating": round(w_pre["r"], 1),
                     "expectedScore": round(e_loss, 3),
-                    "penalty": round(e_loss, 3),
+                    "protection": round(protection_l, 3),
+                    "penalty": round(loss_penalty, 3),
                     "contribution": round(loss_contrib, 3),
                     "outcome": "loss",
                 }
                 diagnostic_history.setdefault(l_id, []).append(trace_l)
 
-        dampener_m = 20.0
         rankings = []
         for pid, data in player_data.items():
             matches = data["matches"]
@@ -1443,12 +1458,15 @@ class RankingEngine:
                 continue
 
             tot_pts = data["totalPoints"]
-            consistency_score = round(50.0 + (100.0 * tot_pts / (matches + dampener_m)), 1)
+            raw_consistency = 50.0 + (50.0 * tot_pts / (matches + dampener_m))
+            clamped_score = max(0.0, min(100.0, raw_consistency))
+            consistency_score = round(clamped_score, 1)
 
             rankings.append({
                 "playerId": pid,
                 "playerTag": self.latest_tags.get(pid, f"Player {pid}"),
                 "score": consistency_score,
+                "rawScore": round(raw_consistency, 4),
                 "totalPoints": round(tot_pts, 3),
                 "winCredits": round(data["winCredits"], 3),
                 "lossPenalties": round(data["lossPenalties"], 3),
@@ -1459,7 +1477,7 @@ class RankingEngine:
                 "events": len(data["events"]),
             })
 
-        rankings.sort(key=lambda x: (x["score"], x["matches"]), reverse=True)
+        rankings.sort(key=lambda x: (x["score"], x["rawScore"], x["wins"], x["matches"]), reverse=True)
         for idx, item in enumerate(rankings, 1):
             item["rank"] = idx
 
@@ -1473,13 +1491,18 @@ class RankingEngine:
             "rankings": rankings,
             "algorithm": {
                 "version": ALGORITHM_VERSION,
-                "name": "Performance vs. Expectation",
-                "description": "Measures competitive performance relative to pre-match expectations. Score contribution equals actual minus expected result (S - E) with Bayesian sample-size dampening.",
-                "limitations": "Measures performance relative to pre-match expectations rather than absolute skill rating.",
+                "name": "Consistency",
+                "description": "Evaluates competitive consistency relative to pre-match expectations and opponent quality. Rewards victories against strong rivals with bonus credit and applies opponent-sensitive loss protection when losing to elite peers.",
+                "limitations": "Evaluates opponent-adjusted win performance relative to pre-match Glicko-2 ratings and sample size.",
                 "parameters": {
-                    "matchContribution": "Actual - Expected (S - E)",
-                    "sampleDampener": f"m = {dampener_m}",
-                    "scoreFormula": f"50.0 + 100.0 * NetPoints / (Matches + {dampener_m})",
+                    "gamma": gamma,
+                    "beta": beta,
+                    "betaMin": beta_min,
+                    "sampleDampener": dampener_m,
+                    "winCreditFormula": "1.0 + gamma * max(0.0, (r_opp - 1500.0) / 400.0)",
+                    "lossProtectionFormula": "max(beta_min, 1.0 - beta * max(0.0, (r_opp - 1400.0) / 400.0))",
+                    "lossPenaltyFormula": "E_win * Protection",
+                    "scoreFormula": f"max(0.0, min(100.0, 50.0 + 50.0 * NetPoints / (Matches + {dampener_m})))",
                 },
             },
         }
@@ -1489,13 +1512,20 @@ class RankingEngine:
             hist = diagnostic_history.get(target_player_id, [])
 
             alg_params = {
+                "gamma": gamma,
+                "beta": beta,
+                "betaMin": beta_min,
                 "sampleDampener": dampener_m,
-                "matchContribution": "Actual - Expected (S - E)",
+                "winCreditFormula": "1.0 + gamma * max(0.0, (r_opp - 1500.0) / 400.0)",
+                "lossProtectionFormula": "max(beta_min, 1.0 - beta * max(0.0, (r_opp - 1400.0) / 400.0))",
+                "lossPenaltyFormula": "E_win * Protection",
+                "scoreFormula": f"max(0.0, min(100.0, 50.0 + 50.0 * NetPoints / (Matches + {dampener_m})))",
             }
             breakdown_dict = {
                 "winCreditsTotal": p_rank["winCredits"] if p_rank else 0.0,
                 "lossPenaltiesTotal": p_rank["lossPenalties"] if p_rank else 0.0,
                 "totalPoints": p_rank["totalPoints"] if p_rank else 0.0,
+                "rawConsistencyScore": p_rank["rawScore"] if p_rank else 0.0,
                 "matches": p_rank["matches"] if p_rank else 0,
                 "wins": p_rank["wins"] if p_rank else 0,
                 "losses": p_rank["losses"] if p_rank else 0,
@@ -1536,7 +1566,7 @@ class RankingEngine:
                     "mode": mode,
                     "startDate": start_date,
                     "endDate": end_date,
-                    "formula": f"Consistency Score = 50.0 + (100.0 * NetPoints / (Matches + {dampener_m}))",
+                    "formula": f"Consistency Score = max(0.0, min(100.0, 50.0 + (50.0 * NetPoints / (Matches + {dampener_m}))))",
                     "parameters": alg_params,
                     "breakdown": breakdown_dict,
                 },
