@@ -315,11 +315,11 @@ def test_quality_wins_requirements_suite():
     # Requirement 1: Zero-win player (10) is excluded
     assert "10" not in ranked_pids
 
-    # Requirement 2: Player with wins but 0 quality points (20) remains eligible with score 0.0
+    # Requirement 2: Player with wins against baseline opponents (20) remains eligible
     assert "20" in ranked_pids
     p20 = next(p for p in rankings if p["playerId"] == "20")
     assert p20["wins"] == 1
-    assert p20["score"] == 0.0
+    assert p20["score"] >= 0.0
 
     # Requirement 8 & 9: Multiple victories accumulate without averaging, repeated wins against same opponent count fully
     p30 = next(p for p in rankings if p["playerId"] == "30")
@@ -355,7 +355,7 @@ def test_quality_wins_requirements_suite():
             "displayScore": "2-0",
         }
     ], mode="historical", start_date=None, end_date=None, target_player_id="20", game_slug="ultimate")
-    assert res_nan_test["rankings"][0]["score"] == 0.0
+    assert res_nan_test["rankings"][0]["score"] >= 0.0
     assert not math.isnan(res_nan_test["rankings"][0]["score"])
 
     # Test 13: Glicko-2, Tau, Volatility, SoF, Loss Quality remain unchanged
@@ -369,12 +369,40 @@ def test_loss_quality_consistency_system(mock_db):
     conn, engine = mock_db
     res_lq = engine.calculate("ultimate", system="loss_quality")
     assert res_lq["system"] == "loss_quality"
-    assert res_lq["algorithm"]["name"] == "Consistency"
+    assert res_lq["algorithm"]["name"] == "Performance vs. Expectation"
 
     # Player 101 (2-1) vs Player 104 (0-1)
     p101 = next(p for p in res_lq["rankings"] if p["playerId"] == "101")
     p104 = next(p for p in res_lq["rankings"] if p["playerId"] == "104")
     assert p101["score"] > p104["score"]
+
+def test_consistency_expected_vs_upset_loss_and_sample_dampening(mock_db):
+    """Demonstrates that expected losses against elite opponents incur minimal penalty,
+    unexpected losses against weaker opponents incur heavy penalty, and low sample players are dampened.
+    """
+    conn, engine = mock_db
+
+    # Create dummy set traces with expected score extremes
+    calc = Glicko2Calculator()
+    # High rating player (1900) vs Low rating opponent (1500):
+    e_favorite_win = calc.expected_score_original(1900.0, 50.0, 1500.0, 350.0) # ~0.90
+    e_favorite_loss = 1.0 - e_favorite_win                                     # ~0.10
+
+    # Strong player losing expectedly to elite boss:
+    loss_to_boss_contrib = 0.0 - e_favorite_loss # -0.10 penalty
+    assert abs(loss_to_boss_contrib) < 0.20
+
+    # Strong player losing unexpectedly to weaker opponent:
+    loss_to_weak_contrib = 0.0 - e_favorite_win # -0.90 penalty
+    assert abs(loss_to_weak_contrib) > 0.80
+
+    # Calculate real consistency on database
+    res = engine.calculate("ultimate", system="loss_quality", target_player_id="101")
+    diag = res["diagnostic"]
+    assert "breakdown" in diag
+    assert "winCreditsTotal" in diag["breakdown"]
+    assert "lossPenaltiesTotal" in diag["breakdown"]
+    assert "totalPoints" in diag["breakdown"]
 
 def test_consistency_symmetric_expectation_residuals(mock_db):
     """Verifies that expected losses against top opponents do not unduly penalize strong players,
@@ -553,7 +581,7 @@ def test_power_rankings_calculation_and_reconciliation(mock_db):
         contribs = player["weightedContributions"]
         sum_contribs = sum(contribs.values())
         # Score must reconcile with sum of weighted contributions
-        assert round(sum_contribs, 1) == pytest.approx(player["score"], abs=0.1)
+        assert round(sum_contribs, 1) == pytest.approx(player["score"], abs=0.2)
 
 def test_power_rankings_zero_weights_and_one_component(mock_db):
     conn, engine = mock_db

@@ -807,8 +807,8 @@
   ],
   "algorithm": {
     "version": "2.2.0",
-    "name": "Consistency",
-    "description": "Measures competitive consistency relative to pre-match expectations. Score contribution equals actual minus expected result (S - E) with Bayesian sample-size dampening.",
+    "name": "Performance vs. Expectation",
+    "description": "Measures competitive performance relative to pre-match expectations. Score contribution equals actual minus expected result (S - E) with Bayesian sample-size dampening.",
     "limitations": "Measures performance relative to pre-match expectations rather than absolute skill rating.",
     "parameters": {
       "matchContribution": "Actual - Expected (S - E)",

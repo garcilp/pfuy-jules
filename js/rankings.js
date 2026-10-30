@@ -87,7 +87,7 @@ const SYSTEM_NAMES = {
   glicko2: 'Glicko-2',
   sof: 'Strength of Field',
   quality_wins: 'Quality Wins',
-  loss_quality: 'Loss Quality',
+  loss_quality: 'Performance vs. Expectation',
   custom: 'Custom Formula'
 };
 
@@ -370,7 +370,7 @@ const PR_COMPONENTS = {
   glicko2: { name: 'Glicko-2', color: '#38BDF8' },
   quality_wins: { name: 'Quality Wins', color: '#F5C542' },
   sof: { name: 'Strength of Field', color: '#34D399' },
-  loss_quality: { name: 'Consistency', color: '#A78BFA' }
+  loss_quality: { name: 'Performance vs. Expectation', color: '#A78BFA' }
 };
 
 const DEFAULT_PR_WEIGHTS = {
@@ -1055,9 +1055,9 @@ function getSystemDescription(systemKey) {
     case 'sof':
       return 'Strength of Field evaluates tournament performance against pre-event field strengths and entrant scaling.';
     case 'quality_wins':
-      return 'Ranks players by cumulative quality points earned from victories, based on opponent pre-match effective ratings (Rating - 0.5 * RD). Victories against higher-rated opponents award disproportionately higher points.';
+      return 'Quality Wins ranks players by average victory quality adjusted for sample confidence, rewarding wins against strong opponents without volume inflation.';
     case 'loss_quality':
-      return 'Loss Quality measures competitive consistency relative to pre-match expectations with Bayesian sample dampening.';
+      return 'Performance vs. Expectation measures competitive performance relative to pre-match Glicko-2 expectations (S - E) with Bayesian sample dampening.';
     default:
       return '';
   }
@@ -1144,7 +1144,7 @@ function renderComparison() {
           <span>GLICKO-2</span>
           <span>STRENGTH OF FIELD</span>
           <span>QUALITY WINS</span>
-          <span>LOSS QUALITY</span>
+          <span>PERFORMANCE VS. EXPECTATION</span>
           <span>ACTIONS</span>
         </div>
         ${visibleList.length ? visibleList.map(p => `
