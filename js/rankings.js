@@ -76,7 +76,6 @@ const modalCloseBtn = $('#modal-close-btn');
 const modalPlayerInfo = $('#modal-player-info');
 const modalBody = $('#modal-body');
 const breadcrumbNav = $('#ranking-breadcrumbs');
-const systemTabsNav = $('#system-tabs');
 
 let activeSection = 'systems';
 let activeSubsection = 'overview';
@@ -91,18 +90,35 @@ const SYSTEM_NAMES = {
   custom: 'Custom Formula'
 };
 
+function renderSystemTabsNav() {
+  if (activeSection !== 'systems') return '';
+  return `
+    <nav id="system-tabs" class="ranking-subsection-tabs" aria-label="Ranking Systems Subsections">
+      <button class="ranking-tab ${activeSubsection === 'overview' ? 'active' : ''}" data-system="overview">Overview</button>
+      <button class="ranking-tab ${activeSubsection === 'glicko2' ? 'active' : ''}" data-system="glicko2">Glicko-2</button>
+      <button class="ranking-tab ${activeSubsection === 'sof' ? 'active' : ''}" data-system="sof">Strength of Field</button>
+      <button class="ranking-tab ${activeSubsection === 'quality_wins' ? 'active' : ''}" data-system="quality_wins">Quality Wins</button>
+      <button class="ranking-tab ${activeSubsection === 'loss_quality' ? 'active' : ''}" data-system="loss_quality">Consistency</button>
+    </nav>
+  `;
+}
+
+function bindSystemTabsEvents() {
+  $$('#system-tabs .ranking-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const sys = btn.dataset.system;
+      window.navigateToSection('systems', sys);
+    });
+  });
+}
+
 function updateBreadcrumbsAndNav() {
   // Update section tabs highlight
   $$('.ranking-section-tab').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.section === activeSection);
   });
 
-  // Toggle subsection tabs visibility
-  if (systemTabsNav) {
-    systemTabsNav.style.display = activeSection === 'systems' ? 'flex' : 'none';
-  }
-
-  // Update active subsection tab highlight
+  // Update active subsection tab highlight (if present in DOM)
   $$('.ranking-tab').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.system === activeSubsection);
   });
@@ -194,12 +210,6 @@ async function init() {
     });
   });
 
-  $$('.ranking-tab').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const sys = btn.dataset.system;
-      window.navigateToSection('systems', sys);
-    });
-  });
 
   $$('.preset-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -252,7 +262,10 @@ function getCurrentFilterState() {
   };
 }
 
-async function onFilterChange() {
+async function onFilterChange(event) {
+  if (event && event.target === gameFilter) {
+    selectedInspectorPlayerId = null;
+  }
   visibleCount = batchSize;
   const state = getCurrentFilterState();
   updateURLState(state);
@@ -878,10 +891,6 @@ function renderCustomPowerRankings() {
           • <b>Weighted Contribution (pts):</b> <code>(Normalized Score × Weight) / 100</code>. How much that component contributes to the player's final custom score.
         </p>
       </details>
-
-      <div class="pr-player-inspector">
-        ${inspectorHtml}
-      </div>
     </div>
 
     <div class="panel glass ranking-table-panel">
@@ -927,6 +936,7 @@ function renderCustomPowerRankings() {
   `;
 
   rankingsContent.innerHTML = html;
+  bindSystemTabsEvents();
   setupInfiniteScroll(totalFiltered);
 }
 
@@ -994,16 +1004,11 @@ function renderIndividualSystem(systemKey) {
 
   let html = `
     <div class="panel glass system-banner">
-      <div class="system-banner-head">
-        <h2>${esc(sysInfo.name || systemKey)} Rankings</h2>
-        <span class="badge mono">Version ${esc(sysInfo.version || '2.2.0')}</span>
-      </div>
+      <h2>${esc(sysInfo.name || systemKey)} Rankings</h2>
       <p class="muted">${esc(sysInfo.description || getSystemDescription(systemKey))}</p>
-      ${sysInfo.limitations ? `<p class="muted mono"><b>Note:</b> ${esc(sysInfo.limitations)}</p>` : ''}
-      <div class="params-row mono">
-        ${formatAlgorithmParams(sysInfo.parameters)}
-      </div>
     </div>
+
+    ${renderSystemTabsNav()}
 
     <div class="panel glass ranking-table-panel">
       <div class="table">
@@ -1045,6 +1050,7 @@ function renderIndividualSystem(systemKey) {
   `;
 
   rankingsContent.innerHTML = html;
+  bindSystemTabsEvents();
   setupInfiniteScroll(totalFiltered);
 }
 
@@ -1137,6 +1143,8 @@ function renderComparison() {
       <p class="muted">Side-by-side player ranks and scores across all 4 distinct systems. Each metric measures a different competitive dimension and raw values are presented on their native scales.</p>
     </div>
 
+    ${renderSystemTabsNav()}
+
     <div class="panel glass ranking-table-panel">
       <div class="table">
         <div class="tr head comparison-head">
@@ -1174,6 +1182,7 @@ function renderComparison() {
   `;
 
   rankingsContent.innerHTML = html;
+  bindSystemTabsEvents();
   setupInfiniteScroll(totalFiltered);
 }
 
