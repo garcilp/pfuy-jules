@@ -369,7 +369,7 @@ def test_loss_quality_consistency_system(mock_db):
     conn, engine = mock_db
     res_lq = engine.calculate("ultimate", system="loss_quality")
     assert res_lq["system"] == "loss_quality"
-    assert res_lq["algorithm"]["name"] == "Performance vs. Expectation"
+    assert res_lq["algorithm"]["name"] == "Consistency"
 
     # Player 101 (2-1) vs Player 104 (0-1)
     p101 = next(p for p in res_lq["rankings"] if p["playerId"] == "101")
@@ -377,24 +377,32 @@ def test_loss_quality_consistency_system(mock_db):
     assert p101["score"] > p104["score"]
 
 def test_consistency_expected_vs_upset_loss_and_sample_dampening(mock_db):
-    """Demonstrates that expected losses against elite opponents incur minimal penalty,
-    unexpected losses against weaker opponents incur heavy penalty, and low sample players are dampened.
+    """Demonstrates Candidate C win credit and opponent-sensitive loss protection properties:
+    wins against strong opponents earn bonus credit, expected losses against elite rivals incur protected minimal penalties,
+    and unexpected losses against weaker opponents incur heavy penalties.
     """
     conn, engine = mock_db
 
-    # Create dummy set traces with expected score extremes
     calc = Glicko2Calculator()
-    # High rating player (1900) vs Low rating opponent (1500):
-    e_favorite_win = calc.expected_score_original(1900.0, 50.0, 1500.0, 350.0) # ~0.90
-    e_favorite_loss = 1.0 - e_favorite_win                                     # ~0.10
+    gamma, beta, beta_min = 0.30, 0.75, 0.20
 
-    # Strong player losing expectedly to elite boss:
-    loss_to_boss_contrib = 0.0 - e_favorite_loss # -0.10 penalty
-    assert abs(loss_to_boss_contrib) < 0.20
+    # Player 1700 losing to Elite Boss (1850) vs losing to Weak Opponent (1300)
+    e_win_vs_boss = calc.expected_score_original(1700.0, 50.0, 1850.0, 50.0) # ~0.30
+    prot_boss = max(beta_min, 1.0 - beta * max(0.0, (1850.0 - 1400.0) / 400.0)) # 0.20
+    penalty_boss = e_win_vs_boss * prot_boss # ~0.06
 
-    # Strong player losing unexpectedly to weaker opponent:
-    loss_to_weak_contrib = 0.0 - e_favorite_win # -0.90 penalty
-    assert abs(loss_to_weak_contrib) > 0.80
+    e_win_vs_weak = calc.expected_score_original(1700.0, 50.0, 1300.0, 50.0) # ~0.91
+    prot_weak = max(beta_min, 1.0 - beta * max(0.0, (1300.0 - 1400.0) / 400.0)) # 1.00
+    penalty_weak = e_win_vs_weak * prot_weak # ~0.91
+
+    # Protected loss penalty to boss is substantially smaller than upset loss penalty to weak opponent
+    assert penalty_boss < 0.15
+    assert penalty_weak > 0.80
+
+    # Win credit against strong opponent (1850) vs weak opponent (1300)
+    credit_vs_boss = 1.0 + gamma * max(0.0, (1850.0 - 1500.0) / 400.0) # 1.2625
+    credit_vs_weak = 1.0 + gamma * max(0.0, (1300.0 - 1500.0) / 400.0) # 1.0000
+    assert credit_vs_boss > credit_vs_weak
 
     # Calculate real consistency on database
     res = engine.calculate("ultimate", system="loss_quality", target_player_id="101")
@@ -403,6 +411,22 @@ def test_consistency_expected_vs_upset_loss_and_sample_dampening(mock_db):
     assert "winCreditsTotal" in diag["breakdown"]
     assert "lossPenaltiesTotal" in diag["breakdown"]
     assert "totalPoints" in diag["breakdown"]
+
+def test_candidate_c_consistency_marroll_regression():
+    """Regression test for Marroll (ID 795083) in Rivals of Aether under Candidate C Consistency:
+    Confirms Marroll's score is 79.1 (raw: 79.1237), ranking #3 with 28.234 win credits and 1.440 loss penalties.
+    """
+    engine = RankingEngine()
+    res = engine.calculate("rivals-of-aether", system="loss_quality")
+
+    mint_p = next(p for p in res["rankings"] if p["playerId"] == "2441157")
+    marroll_p = next(p for p in res["rankings"] if p["playerId"] == "795083")
+    franco_p = next(p for p in res["rankings"] if p["playerId"] == "1154899")
+
+    assert marroll_p["score"] == 79.1
+    assert marroll_p["rawScore"] == pytest.approx(79.1237, abs=0.001)
+    assert marroll_p["rank"] == 3
+    assert mint_p["score"] > franco_p["score"] > marroll_p["score"]
 
 def test_consistency_symmetric_expectation_residuals(mock_db):
     """Verifies that expected losses against top opponents do not unduly penalize strong players,
