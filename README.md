@@ -60,7 +60,7 @@ The existing snapshots identify tournament slugs from their source URLs but do n
 - `assets/logo.jpg` — logo (also used as favicon)
 - `assets/renders/<game-slug>/portraits/` — character portraits used on game cards
 - `assets/renders/<game-slug>/stocks/` — small stock icons used in character usage lists
-- `assets/renders/<game-slug>/full/` — full character artwork used in the player’s top-character box; filenames use the character slug, such as `captain-falcon.png`
+- `assets/renders/<game-slug>/full/` — full character artwork used in the player’s top-character box; filenames use the character slug, such as `captain-falcon.webp`
 - `assets/players/` — player photos named with the start.gg player ID, such as `557903.png`
 
 ## Build a player profile from SQLite

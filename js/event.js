@@ -67,7 +67,8 @@ function renderBracketCard(sub, tournament) {
         let stockIconHtml = '<span class="stock-icon stock-placeholder"></span>';
         if (st.character && st.character.stockIcon) {
           const charInitial = esc((st.character.name || '?')[0]);
-          stockIconHtml = `<span class="stock-icon"><span>${charInitial}</span><img src="${esc(st.character.stockIcon)}" alt="${esc(st.character.name)}" title="${esc(st.character.name)}" onload="if(this.previousElementSibling)this.previousElementSibling.remove()" onerror="this.remove()"></span>`;
+          const stockIconSrc = esc(st.character.stockIcon.replace(/\.png$/, '.webp'));
+          stockIconHtml = `<span class="stock-icon"><span>${charInitial}</span><img src="${stockIconSrc}" alt="${esc(st.character.name)}" title="${esc(st.character.name)}" onload="if(this.previousElementSibling)this.previousElementSibling.remove()" onerror="this.remove()"></span>`;
         }
 
         return `

@@ -265,7 +265,7 @@ function render() {
   const mainCharSlug = mainCharacter ? slug(mainCharacter.name) : 'other';
   const mainCharName = mainCharacter ? mainCharacter.name : 'other';
   const characterFeatureTile = sel
-    ? `<div class="tile glass character-feature-tile"><img src="assets/renders/${esc(sel.slug)}/full/${mainCharSlug}.png" alt="${esc(mainCharName)}" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='assets/renders/${esc(sel.slug)}/full/other.png'}else{this.remove()}"></div>`
+    ? `<div class="tile glass character-feature-tile"><img src="assets/renders/${esc(sel.slug)}/full/${mainCharSlug}.webp" alt="${esc(mainCharName)}" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='assets/renders/${esc(sel.slug)}/full/other.webp'}else{this.remove()}"></div>`
     : '';
   const tiles = stats.map(([a, b, c]) => {
     const tileClass = `tile glass${a === 'MOST-PLAYED OPPONENT' ? ' tile-opponent' : a === 'BEST PLACING' ? ' tile-best-placement' : a === 'ACTIVE FOR' ? ' tile-active-for' : a === 'CLOSEST UPSET' ? ' tile-upset-fallback' : ''}`;
@@ -287,14 +287,14 @@ function render() {
         const bestLabel = eventWins
           ? `Won ${eventWins} event${eventWins === 1 ? '' : 's'}`
           : `Best: ${ord(g.bestPlace)}`;
-          return `<a class="card glass" href="#${encodeURIComponent(g.id)}"><span class="ini">${esc(character[0])}</span><img class="bg" src="assets/renders/${esc(g.slug)}/portraits/${slug(character)}.png" alt="" onload="this.previousElementSibling.remove()" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='assets/renders/${esc(g.slug)}/portraits/other.png'}else{this.remove()}">
+          return `<a class="card glass" href="#${encodeURIComponent(g.id)}"><span class="ini">${esc(character[0])}</span><img class="bg" src="assets/renders/${esc(g.slug)}/portraits/${slug(character)}.webp" alt="" onload="this.previousElementSibling.remove()" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='assets/renders/${esc(g.slug)}/portraits/other.webp'}else{this.remove()}">
         <b>${esc(g.name)}</b><span class="muted">${g.events} event${g.events === 1 ? '' : 's'}</span>
         <span class="rec">${g.wins}–${g.losses}</span><span class="muted">${bestLabel}</span></a>`;
       }).join('') + `</div>`;
   } else {
     middle = `<div class="row2">
       <div class="panel glass"><h2>Character usage</h2>${(sel.characters || []).map(c =>
-        `<div class="usage"><div class="usage-row"><span class="stock-icon"><span>${esc(c.name[0])}</span><img src="assets/renders/${esc(sel.slug)}/stocks/${slug(c.name)}.webp" alt="" onload="this.previousElementSibling.remove()" onerror="if(!this.dataset.fallback){this.dataset.fallback='png';this.src=this.src.replace('.webp','.png')}else{this.parentElement.remove()}"></span><span>${esc(c.name)}</span><span class="mono usage-percent">${Number(c.usage).toFixed(1)}%</span></div><div class="bar"><i style="width:${Number(c.usage) || 0}%"></i></div></div>`).join('') || '<p class="muted">No character selections recorded.</p>'}</div>
+        `<div class="usage"><div class="usage-row"><span class="stock-icon"><span>${esc(c.name[0])}</span><img src="assets/renders/${esc(sel.slug)}/stocks/${slug(c.name)}.webp" alt="" onload="this.previousElementSibling.remove()" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='assets/renders/${esc(sel.slug)}/stocks/other.webp'}else{this.parentElement.remove()}"></span><span>${esc(c.name)}</span><span class="mono usage-percent">${Number(c.usage).toFixed(1)}%</span></div><div class="bar"><i style="width:${Number(c.usage) || 0}%"></i></div></div>`).join('') || '<p class="muted">No character selections recorded.</p>'}</div>
       <div class="panel glass"><h2>Notable wins</h2>${notableWins.map(x => {
         const tournamentName = ((x.event || x.detail?.split(' · ').slice(1).join(' · ') || '').split(' · ')[0]);
         let dateStr = x.date;
