@@ -34,9 +34,9 @@ async function initHome() {
     renderStats();
     renderUpcomingEvents();
     await renderRecentResults();
-    renderOnThisDay();
+    renderOnThisWeek();
     await renderTopPlayers();
-    renderRivalry();
+    await renderRivalry();
     renderNewcomerSteps();
     renderHubs();
     setupSearch();
@@ -156,24 +156,27 @@ function renderUpcomingEvents() {
   }).join('');
 }
 
-// 3. Recent results
+// 3. Recent results (showing distinct game events)
 async function renderRecentResults() {
   const container = $('#results');
   if (!container) return;
 
   const todayIso = new Date().toISOString().split('T')[0];
 
-  // Group completed tournaments
+  // Group completed events by (tournament, game) so tournaments with multiple games show multiple rows
   const grouped = new Map();
   eventsIndex.forEach(event => {
-    const key = event.tournamentSlug || (event.tournament || '').toLowerCase();
+    const tourneyKey = event.tournamentSlug || (event.tournament || '').toLowerCase();
+    const gameKey = (event.gameSlug || event.game || 'default').toLowerCase();
+    const compositeKey = `${tourneyKey}::${gameKey}`;
+
     const takenPlace = event.hasTakenPlace !== undefined
       ? event.hasTakenPlace
       : (event.date ? event.date <= todayIso : true);
 
     if (takenPlace && !event.isTemporary) {
-      if (!grouped.has(key)) {
-        grouped.set(key, {
+      if (!grouped.has(compositeKey)) {
+        grouped.set(compositeKey, {
           tournament: event.tournament,
           tournamentSlug: event.tournamentSlug,
           date: event.date,
@@ -182,7 +185,7 @@ async function renderRecentResults() {
           entrants: event.entrants || 0
         });
       } else {
-        const item = grouped.get(key);
+        const item = grouped.get(compositeKey);
         if (event.entrants && event.entrants > item.entrants) {
           item.entrants = event.entrants;
         }
@@ -192,14 +195,16 @@ async function renderRecentResults() {
 
   const completed = [...grouped.values()]
     .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
-    .slice(0, 5);
+    .slice(0, 6);
 
   if (!completed.length) {
     container.innerHTML = '<p class="empty-notice">No recent results found.</p>';
     return;
   }
 
-  // Fetch winners for top 5 completed events
+  // Cache event details to prevent fetching the same tournament JSON multiple times
+  const eventDetailsCache = new Map();
+
   const resultsWithWinners = await Promise.all(completed.map(async tourney => {
     let winner = '—';
     let winnerId = null;
@@ -207,17 +212,30 @@ async function renderRecentResults() {
 
     if (tourney.tournamentSlug) {
       try {
-        const res = await fetch(`data/events/${encodeURIComponent(tourney.tournamentSlug)}.json`);
-        if (res.ok) {
-          const detail = await res.json();
-          if (detail.totalEntrants) entrantsCount = detail.totalEntrants;
-          // Find 1st place standing from subEvents
-          for (const sub of detail.subEvents || []) {
+        if (!eventDetailsCache.has(tourney.tournamentSlug)) {
+          const res = await fetch(`data/events/${encodeURIComponent(tourney.tournamentSlug)}.json`);
+          if (res.ok) {
+            eventDetailsCache.set(tourney.tournamentSlug, await res.json());
+          } else {
+            eventDetailsCache.set(tourney.tournamentSlug, null);
+          }
+        }
+
+        const detail = eventDetailsCache.get(tourney.tournamentSlug);
+        if (detail) {
+          // Find the matching subEvent for this game
+          const sub = (detail.subEvents || []).find(s => {
+            const g = (s.game || '').toLowerCase();
+            const target = (tourney.game || '').toLowerCase();
+            return g.includes(target) || target.includes(g);
+          }) || (detail.subEvents || [])[0];
+
+          if (sub) {
+            if (sub.entrants) entrantsCount = sub.entrants;
             const first = (sub.standings || []).find(s => Number(s.placement) === 1);
             if (first) {
               winner = first.tag || '—';
               winnerId = first.playerId;
-              break;
             }
           }
         }
@@ -262,48 +280,65 @@ async function renderRecentResults() {
   `;
 }
 
-// 4. On this day
-function renderOnThisDay() {
+// 4. On this week
+function renderOnThisWeek() {
   const container = $('#history');
   const todayLabel = $('#today');
   if (!container) return;
 
   const now = new Date();
   if (todayLabel) {
-    todayLabel.textContent = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - 3);
+    const endOfWeek = new Date(now);
+    endOfWeek.setDate(now.getDate() + 3);
+    todayLabel.textContent = `${startOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${endOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
   }
 
-  const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
-  const currentDay = String(now.getDate()).padStart(2, '0');
   const currentYear = now.getFullYear();
-  const matchSuffix = `-${currentMonth}-${currentDay}`;
 
+  // Match events that occurred in the calendar week (+/- 3 days) in past years
   const matchingEvents = eventsIndex.filter(e => {
     if (!e.date || e.isTemporary) return false;
-    if (e.date.endsWith(matchSuffix)) {
-      const year = parseInt(e.date.split('-')[0], 10);
-      return year < currentYear;
-    }
-    return false;
+    const parts = e.date.split('-');
+    if (parts.length < 3) return false;
+    const year = parseInt(parts[0], 10);
+    if (year >= currentYear) return false;
+
+    const eventDate = new Date(parts[0], parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+    // Compare day difference relative to current year anniversary
+    const anniversary = new Date(currentYear, parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+    const diffTime = Math.abs(anniversary - now);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays <= 3;
   });
 
   if (!matchingEvents.length) {
-    container.innerHTML = '<p class="empty-notice">No tournaments were played on this date in past years.</p>';
+    container.innerHTML = '<p class="empty-notice">No tournaments were played during this week in past years.</p>';
     return;
   }
 
-  // Deduplicate and sort by years ago
-  const items = matchingEvents.map(e => {
-    const year = parseInt(e.date.split('-')[0], 10);
-    return {
-      yearsAgo: currentYear - year,
-      year,
-      event: e.tournament,
-      slug: e.tournamentSlug,
-      game: e.game,
-      entrants: e.entrants
-    };
-  }).sort((a, b) => a.yearsAgo - b.yearsAgo);
+  // Deduplicate tournaments if multiple sub-entries
+  const seenTournaments = new Set();
+  const items = [];
+  matchingEvents.forEach(e => {
+    const key = e.tournamentSlug || e.tournament;
+    if (!seenTournaments.has(key)) {
+      seenTournaments.add(key);
+      const year = parseInt(e.date.split('-')[0], 10);
+      items.push({
+        yearsAgo: currentYear - year,
+        year,
+        date: e.date,
+        event: e.tournament,
+        slug: e.tournamentSlug,
+        game: e.game,
+        entrants: e.entrants
+      });
+    }
+  });
+
+  items.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
 
   container.innerHTML = items.map(h => {
     const tourneyUrl = h.slug ? `event.html?tournament=${encodeURIComponent(h.slug)}` : 'events.html';
@@ -497,9 +532,9 @@ function renderHubs() {
       <span class="big">${h.players}</span>
       <span class="muted">players · ${h.events} events indexed</span>
       <div class="hub-links">
-        <a class="hub-btn" href="players.html">View Players</a>
-        <a class="hub-btn" href="events.html">View Tournaments</a>
-        <a class="hub-btn" href="rankings.html">View Rankings</a>
+        <a class="hub-btn" href="players.html">Players</a>
+        <a class="hub-btn" href="events.html">Events</a>
+        <a class="hub-btn" href="rankings.html">Rankings</a>
       </div>
     </div>
   `).join('');
