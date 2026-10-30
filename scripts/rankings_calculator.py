@@ -1314,12 +1314,15 @@ class RankingEngine:
     # -------------------------------------------------------------------------
 
     def _calculate_loss_quality(self, sets, mode, start_date, end_date, target_player_id, game_slug, alpha=2.0, raw_target_player_id=None):
-        """Loss Quality (Consistency): Measures competitive consistency relative to expectations.
+        """Consistency (formerly Loss Quality): Measures competitive consistency relative to pre-match expectations.
 
-        Winning gains credit (1 - expected_win_prob).
-        Losing incurs penalty (expected_win_prob ^ alpha).
-        Performance Points = Sum(Win Credit) - Sum(Loss Penalty).
-        Consistency Score = 50.0 + (100.0 * Performance Points / (Matches + 10.0)).
+        For each match:
+        - Actual score S = 1 for win, 0 for loss.
+        - Expected score E = pre-match Glicko-2 win probability.
+        - Match residual d = S - E.
+          (Surprise win: + (1 - E); Expected loss: - E; Upset loss: - E).
+        - Net Performance Points = Sum(S - E).
+        - Consistency Score = 50.0 + 100.0 * Net Performance Points / (Matches + 20.0).
         """
         pre_match_ratings, _ = self._compute_pre_match_glicko_ratings(sets, mode=mode, start_date=start_date)
         calc = self.glicko_calc
@@ -1342,23 +1345,23 @@ class RankingEngine:
             e_win = calc.expected_score_original(w_pre["r"], w_pre["rd"], l_pre["r"], l_pre["rd"])
             e_loss = calc.expected_score_original(l_pre["r"], l_pre["rd"], w_pre["r"], w_pre["rd"])
 
-            win_credit = 1.0 - e_win
-            loss_penalty = (e_loss ** alpha)
+            win_contrib = 1.0 - e_win
+            loss_contrib = 0.0 - e_loss
 
             if w_id not in player_data:
                 player_data[w_id] = {"wins": 0, "losses": 0, "matches": 0, "totalPoints": 0.0, "winCredits": 0.0, "lossPenalties": 0.0, "events": set()}
             player_data[w_id]["wins"] += 1
             player_data[w_id]["matches"] += 1
-            player_data[w_id]["totalPoints"] += win_credit
-            player_data[w_id]["winCredits"] += win_credit
+            player_data[w_id]["totalPoints"] += win_contrib
+            player_data[w_id]["winCredits"] += win_contrib
             player_data[w_id]["events"].add(s["eventId"])
 
             if l_id not in player_data:
                 player_data[l_id] = {"wins": 0, "losses": 0, "matches": 0, "totalPoints": 0.0, "winCredits": 0.0, "lossPenalties": 0.0, "events": set()}
             player_data[l_id]["losses"] += 1
             player_data[l_id]["matches"] += 1
-            player_data[l_id]["totalPoints"] -= loss_penalty
-            player_data[l_id]["lossPenalties"] += loss_penalty
+            player_data[l_id]["totalPoints"] += loss_contrib
+            player_data[l_id]["lossPenalties"] += abs(loss_contrib)
             player_data[l_id]["events"].add(s["eventId"])
 
             if target_player_id is None or w_id == target_player_id:
@@ -1374,7 +1377,8 @@ class RankingEngine:
                     "opponentTag": self.latest_tags.get(l_id, f"Player {l_id}"),
                     "opponentPreRating": round(l_pre["r"], 1),
                     "expectedScore": round(e_win, 3),
-                    "credit": round(win_credit, 3),
+                    "credit": round(win_contrib, 3),
+                    "contribution": round(win_contrib, 3),
                     "outcome": "win",
                 }
                 diagnostic_history.setdefault(w_id, []).append(trace_w)
@@ -1392,11 +1396,13 @@ class RankingEngine:
                     "opponentTag": self.latest_tags.get(w_id, f"Player {w_id}"),
                     "opponentPreRating": round(w_pre["r"], 1),
                     "expectedScore": round(e_loss, 3),
-                    "penalty": round(loss_penalty, 3),
+                    "penalty": round(e_loss, 3),
+                    "contribution": round(loss_contrib, 3),
                     "outcome": "loss",
                 }
                 diagnostic_history.setdefault(l_id, []).append(trace_l)
 
+        dampener_m = 20.0
         rankings = []
         for pid, data in player_data.items():
             matches = data["matches"]
@@ -1404,7 +1410,7 @@ class RankingEngine:
                 continue
 
             tot_pts = data["totalPoints"]
-            consistency_score = round(50.0 + (100.0 * tot_pts / (matches + 10.0)), 1)
+            consistency_score = round(50.0 + (100.0 * tot_pts / (matches + dampener_m)), 1)
 
             rankings.append({
                 "playerId": pid,
@@ -1434,14 +1440,13 @@ class RankingEngine:
             "rankings": rankings,
             "algorithm": {
                 "version": ALGORITHM_VERSION,
-                "name": "Loss Quality",
-                "description": "Measures competitive consistency relative to pre-match expectations. Wins gain credit, expected losses carry small penalties, and unexpected upset losses carry higher penalties.",
-                "limitations": "Measures consistency relative to pre-match expectations rather than absolute skill.",
+                "name": "Consistency",
+                "description": "Measures competitive consistency relative to pre-match expectations. Score contribution equals actual minus expected result (S - E) with Bayesian sample-size dampening.",
+                "limitations": "Measures performance relative to pre-match expectations rather than absolute skill rating.",
                 "parameters": {
-                    "alpha": alpha,
-                    "winCredit": "1 - expected_score",
-                    "lossPenalty": f"expected_score ^ {alpha}",
-                    "scoreFormula": "50.0 + (100.0 * PerformancePoints / (Matches + 10.0))",
+                    "matchContribution": "Actual - Expected (S - E)",
+                    "sampleDampener": f"m = {dampener_m}",
+                    "scoreFormula": f"50.0 + 100.0 * NetPoints / (Matches + {dampener_m})",
                 },
             },
         }
@@ -1451,9 +1456,8 @@ class RankingEngine:
             hist = diagnostic_history.get(target_player_id, [])
 
             alg_params = {
-                "alpha": alpha,
-                "winCredit": "1 - expected_win_prob",
-                "lossPenalty": f"expected_win_prob ^ {alpha}",
+                "sampleDampener": dampener_m,
+                "matchContribution": "Actual - Expected (S - E)",
             }
             breakdown_dict = {
                 "winCreditsTotal": p_rank["winCredits"] if p_rank else 0.0,
@@ -1499,7 +1503,7 @@ class RankingEngine:
                     "mode": mode,
                     "startDate": start_date,
                     "endDate": end_date,
-                    "formula": "Consistency Score = 50.0 + (100.0 * TotalPoints / (Matches + 10.0))",
+                    "formula": f"Consistency Score = 50.0 + (100.0 * NetPoints / (Matches + {dampener_m}))",
                     "parameters": alg_params,
                     "breakdown": breakdown_dict,
                 },

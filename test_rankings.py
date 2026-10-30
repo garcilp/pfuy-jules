@@ -369,11 +369,73 @@ def test_loss_quality_consistency_system(mock_db):
     conn, engine = mock_db
     res_lq = engine.calculate("ultimate", system="loss_quality")
     assert res_lq["system"] == "loss_quality"
+    assert res_lq["algorithm"]["name"] == "Consistency"
 
     # Player 101 (2-1) vs Player 104 (0-1)
     p101 = next(p for p in res_lq["rankings"] if p["playerId"] == "101")
     p104 = next(p for p in res_lq["rankings"] if p["playerId"] == "104")
     assert p101["score"] > p104["score"]
+
+def test_consistency_symmetric_expectation_residuals(mock_db):
+    """Verifies that expected losses against top opponents do not unduly penalize strong players,
+    while unexpected losses against weaker opponents incur penalties.
+    """
+    conn = sqlite3.connect(":memory:")
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    cursor.executescript("""
+        CREATE TABLE videogames (id INTEGER PRIMARY KEY, slug TEXT UNIQUE, name TEXT);
+        CREATE TABLE tournaments (slug TEXT PRIMARY KEY, name TEXT, start_at INTEGER);
+        CREATE TABLE events (id TEXT PRIMARY KEY, videogame_slug TEXT, tournament_slug TEXT, name TEXT, source_url TEXT, is_temporary INTEGER DEFAULT 0, num_entrants INTEGER);
+        CREATE TABLE entrants (id TEXT PRIMARY KEY, event_id TEXT);
+        CREATE TABLE phases (id TEXT PRIMARY KEY, phase_order INTEGER, name TEXT);
+        CREATE TABLE phase_groups (id TEXT PRIMARY KEY, phase_id TEXT);
+        CREATE TABLE sets (id TEXT PRIMARY KEY, event_id TEXT, winner_entrant_id TEXT, display_score TEXT, started_at INTEGER, start_at INTEGER, completed_at INTEGER, phase_group_id TEXT, round INTEGER);
+        CREATE TABLE set_entrants (set_id TEXT, entrant_id TEXT, score_display TEXT, score_label TEXT, score TEXT);
+        CREATE TABLE entrant_participants (entrant_id TEXT, participant_id TEXT);
+        CREATE TABLE participants (id TEXT PRIMARY KEY, player_id TEXT, gamer_tag TEXT);
+        CREATE TABLE event_standings (event_id TEXT, entrant_id TEXT, placement INTEGER);
+    """)
+
+    cursor.execute("INSERT INTO videogames VALUES (1, 'ultimate', 'Super Smash Bros. Ultimate')")
+    cursor.execute("INSERT INTO tournaments VALUES ('t1', 'Tournament 1', 1700000000)")
+    cursor.execute("INSERT INTO events VALUES ('e1', 'ultimate', 't1', 'Singles', 'https://start.gg/tournament/t1/event/singles', 0, 8)")
+
+    # P1: Elite Boss (high rating)
+    # P2: Strong Player (loses only to P1)
+    # P3: Weak Player
+    # P4: Upset-prone Player (loses to P3)
+    for pid, tag in [(1, 'Boss'), (2, 'StrongPlayer'), (3, 'WeakPlayer'), (4, 'UpsetProne')]:
+        cursor.execute("INSERT INTO participants VALUES (?, ?, ?)", (f"part_{pid}", str(pid), tag))
+        cursor.execute("INSERT INTO entrants VALUES (?, ?)", (f"ent_{pid}_e1", 'e1'))
+        cursor.execute("INSERT INTO entrant_participants VALUES (?, ?)", (f"ent_{pid}_e1", f"part_{pid}"))
+
+    # Set 1: StrongPlayer beats WeakPlayer
+    cursor.execute("INSERT INTO sets VALUES ('s1', 'e1', 'ent_2_e1', '2-0', 1700000100, 1700000100, 1700000100, NULL, 1)")
+    cursor.execute("INSERT INTO set_entrants VALUES ('s1', 'ent_2_e1', '2', '2', '2')")
+    cursor.execute("INSERT INTO set_entrants VALUES ('s1', 'ent_3_e1', '0', '0', '0')")
+
+    # Set 2: Boss beats StrongPlayer
+    cursor.execute("INSERT INTO sets VALUES ('s2', 'e1', 'ent_1_e1', '2-0', 1700000200, 1700000200, 1700000200, NULL, 2)")
+    cursor.execute("INSERT INTO set_entrants VALUES ('s2', 'ent_1_e1', '2', '2', '2')")
+    cursor.execute("INSERT INTO set_entrants VALUES ('s2', 'ent_2_e1', '0', '0', '0')")
+
+    # Set 3: WeakPlayer beats UpsetProne
+    cursor.execute("INSERT INTO sets VALUES ('s3', 'e1', 'ent_3_e1', '2-0', 1700000300, 1700000300, 1700000300, NULL, 3)")
+    cursor.execute("INSERT INTO set_entrants VALUES ('s3', 'ent_3_e1', '2', '2', '2')")
+    cursor.execute("INSERT INTO set_entrants VALUES ('s3', 'ent_4_e1', '0', '0', '0')")
+
+    conn.commit()
+    engine = RankingEngine(connection=conn)
+    res = engine.calculate("ultimate", system="loss_quality")
+
+    p_strong = next(p for p in res["rankings"] if p["playerId"] == "2")
+    p_upset = next(p for p in res["rankings"] if p["playerId"] == "4")
+
+    # StrongPlayer (1-1 against Boss and WeakPlayer) should have higher consistency score than UpsetProne (0-1 against WeakPlayer)
+    assert p_strong["score"] > p_upset["score"]
+    conn.close()
 
 def test_merges_and_canonical_id():
     merges = {"2002": "1001", "3003": "2002"}

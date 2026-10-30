@@ -25,9 +25,21 @@ let scrollObserver = null;
 // URL State Sync
 function getStateFromURL() {
   const params = new URLSearchParams(window.location.search);
+  let section = params.get('section') || '';
+  let system = params.get('system') || 'overview';
+
+  // Backward compatibility: system=custom maps to power_rankings section
+  if (system === 'custom' || system === 'power_rankings') {
+    section = 'power_rankings';
+    system = 'custom';
+  } else if (!section) {
+    section = 'systems';
+  }
+
   return {
+    section,
     game: params.get('game') || 'ultimate',
-    system: params.get('system') || 'overview',
+    system,
     mode: params.get('mode') || 'historical',
     start: params.get('start') || '',
     end: params.get('end') || '',
@@ -38,6 +50,7 @@ function getStateFromURL() {
 
 function updateURLState(state) {
   const params = new URLSearchParams();
+  if (state.section && state.section !== 'systems') params.set('section', state.section);
   if (state.game && state.game !== 'ultimate') params.set('game', state.game);
   if (state.system && state.system !== 'overview') params.set('system', state.system);
   if (state.mode && state.mode !== 'historical') params.set('mode', state.mode);
@@ -62,10 +75,78 @@ const diagnosticModal = $('#diagnostic-modal');
 const modalCloseBtn = $('#modal-close-btn');
 const modalPlayerInfo = $('#modal-player-info');
 const modalBody = $('#modal-body');
+const breadcrumbNav = $('#ranking-breadcrumbs');
+const systemTabsNav = $('#system-tabs');
+
+let activeSection = 'systems';
+let activeSubsection = 'overview';
+
+// Helper to get descriptive names for system tabs
+const SYSTEM_NAMES = {
+  overview: 'Overview',
+  glicko2: 'Glicko-2',
+  sof: 'Strength of Field',
+  quality_wins: 'Quality Wins',
+  loss_quality: 'Loss Quality',
+  custom: 'Custom Formula'
+};
+
+function updateBreadcrumbsAndNav() {
+  // Update section tabs highlight
+  $$('.ranking-section-tab').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.section === activeSection);
+  });
+
+  // Toggle subsection tabs visibility
+  if (systemTabsNav) {
+    systemTabsNav.style.display = activeSection === 'systems' ? 'flex' : 'none';
+  }
+
+  // Update active subsection tab highlight
+  $$('.ranking-tab').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.system === activeSubsection);
+  });
+
+  // Render breadcrumbs
+  if (breadcrumbNav) {
+    if (activeSection === 'power_rankings') {
+      breadcrumbNav.innerHTML = `
+        <a href="rankings.html?section=systems&system=overview" onclick="event.preventDefault(); window.navigateToSection('systems', 'overview');">Rankings</a>
+        <span class="sep">/</span>
+        <span class="current">Power Rankings</span>
+      `;
+    } else {
+      const subName = SYSTEM_NAMES[activeSubsection] || activeSubsection;
+      breadcrumbNav.innerHTML = `
+        <a href="rankings.html?section=systems&system=overview" onclick="event.preventDefault(); window.navigateToSection('systems', 'overview');">Rankings</a>
+        <span class="sep">/</span>
+        <a href="rankings.html?section=systems&system=overview" onclick="event.preventDefault(); window.navigateToSection('systems', 'overview');">Ranking Systems</a>
+        <span class="sep">/</span>
+        <span class="current">${esc(subName)}</span>
+      `;
+    }
+  }
+}
+
+window.navigateToSection = function(section, subsection = null) {
+  activeSection = section;
+  if (section === 'power_rankings') {
+    activeSubsection = 'custom';
+  } else {
+    activeSubsection = subsection || (activeSubsection === 'custom' ? 'overview' : activeSubsection);
+  }
+  updateBreadcrumbsAndNav();
+  visibleCount = batchSize;
+  const state = getCurrentFilterState();
+  updateURLState(state);
+  loadData();
+};
 
 // Initialize
 async function init() {
   const state = getStateFromURL();
+  activeSection = state.section;
+  activeSubsection = state.system;
 
   // Load available games
   try {
@@ -89,10 +170,7 @@ async function init() {
   endDateInput.value = state.end;
   playerSearch.value = state.search;
 
-  // Set active system tab
-  $$('.ranking-tab').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.system === state.system);
-  });
+  updateBreadcrumbsAndNav();
 
   // Add event listeners
   gameFilter.addEventListener('change', onFilterChange);
@@ -109,12 +187,17 @@ async function init() {
     render();
   });
 
+  $$('.ranking-section-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const sec = btn.dataset.section;
+      window.navigateToSection(sec);
+    });
+  });
+
   $$('.ranking-tab').forEach(btn => {
     btn.addEventListener('click', () => {
-      $$('.ranking-tab').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      visibleCount = batchSize;
-      onFilterChange();
+      const sys = btn.dataset.system;
+      window.navigateToSection('systems', sys);
     });
   });
 
@@ -153,12 +236,13 @@ async function init() {
 }
 
 function getActiveSystem() {
-  const activeBtn = $('.ranking-tab.active');
-  return activeBtn ? activeBtn.dataset.system : 'overview';
+  if (activeSection === 'power_rankings') return 'custom';
+  return activeSubsection || 'overview';
 }
 
 function getCurrentFilterState() {
   return {
+    section: activeSection,
     game: gameFilter.value,
     system: getActiveSystem(),
     mode: modeFilter.value,
