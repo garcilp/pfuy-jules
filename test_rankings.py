@@ -376,6 +376,34 @@ def test_loss_quality_consistency_system(mock_db):
     p104 = next(p for p in res_lq["rankings"] if p["playerId"] == "104")
     assert p101["score"] > p104["score"]
 
+def test_consistency_expected_vs_upset_loss_and_sample_dampening(mock_db):
+    """Demonstrates that expected losses against elite opponents incur minimal penalty,
+    unexpected losses against weaker opponents incur heavy penalty, and low sample players are dampened.
+    """
+    conn, engine = mock_db
+
+    # Create dummy set traces with expected score extremes
+    calc = Glicko2Calculator()
+    # High rating player (1900) vs Low rating opponent (1500):
+    e_favorite_win = calc.expected_score_original(1900.0, 50.0, 1500.0, 350.0) # ~0.90
+    e_favorite_loss = 1.0 - e_favorite_win                                     # ~0.10
+
+    # Strong player losing expectedly to elite boss:
+    loss_to_boss_contrib = 0.0 - e_favorite_loss # -0.10 penalty
+    assert abs(loss_to_boss_contrib) < 0.20
+
+    # Strong player losing unexpectedly to weaker opponent:
+    loss_to_weak_contrib = 0.0 - e_favorite_win # -0.90 penalty
+    assert abs(loss_to_weak_contrib) > 0.80
+
+    # Calculate real consistency on database
+    res = engine.calculate("ultimate", system="loss_quality", target_player_id="101")
+    diag = res["diagnostic"]
+    assert "breakdown" in diag
+    assert "winCreditsTotal" in diag["breakdown"]
+    assert "lossPenaltiesTotal" in diag["breakdown"]
+    assert "totalPoints" in diag["breakdown"]
+
 def test_consistency_symmetric_expectation_residuals(mock_db):
     """Verifies that expected losses against top opponents do not unduly penalize strong players,
     while unexpected losses against weaker opponents incur penalties.

@@ -427,7 +427,7 @@ class RankingEngine:
         elif system == "quality_wins":
             return self._calculate_quality_wins(valid_sets, mode, start_date, end_date, target_player_id, game_slug, raw_target_player_id=raw_target_player_id)
         elif system == "loss_quality":
-            return self._calculate_loss_quality(valid_sets, mode, start_date, end_date, target_player_id, game_slug, alpha=alpha, raw_target_player_id=raw_target_player_id)
+            return self._calculate_loss_quality(valid_sets, mode, start_date, end_date, target_player_id, game_slug, raw_target_player_id=raw_target_player_id)
         elif system in ("custom", "power_rankings"):
             return self._calculate_custom(valid_sets, mode, start_date, end_date, target_player_id, game_slug, weights=weights, raw_target_player_id=raw_target_player_id)
         else:
@@ -1313,16 +1313,20 @@ class RankingEngine:
     # System 4: Loss Quality (Consistency Ranking)
     # -------------------------------------------------------------------------
 
-    def _calculate_loss_quality(self, sets, mode, start_date, end_date, target_player_id, game_slug, alpha=2.0, raw_target_player_id=None):
-        """Consistency (formerly Loss Quality): Measures competitive consistency relative to pre-match expectations.
+    def _calculate_loss_quality(self, sets, mode, start_date, end_date, target_player_id, game_slug, raw_target_player_id=None):
+        """Consistency (Loss Quality / Upset Resistance):
+        Evaluates player competitive consistency relative to pre-match Glicko-2 expectations.
 
         For each match:
-        - Actual score S = 1 for win, 0 for loss.
-        - Expected score E = pre-match Glicko-2 win probability.
-        - Match residual d = S - E.
-          (Surprise win: + (1 - E); Expected loss: - E; Upset loss: - E).
+        - Actual outcome S in {1.0, 0.0} (1.0 for win, 0.0 for loss).
+        - Pre-match Glicko-2 win probability E in (0.0, 1.0).
+        - Match performance contribution d = S - E:
+          * Victory credit = + (1.0 - E) (rewards upset wins against stronger opponents)
+          * Loss penalty = - E (minimal penalty -E ~ -0.1 for expected losses against elite rivals;
+            heavy penalty -E ~ -0.9 for unexpected losses against weaker opponents)
         - Net Performance Points = Sum(S - E).
-        - Consistency Score = 50.0 + 100.0 * Net Performance Points / (Matches + 20.0).
+        - Consistency Score = 50.0 + 100.0 * NetPoints / (Matches + 20.0), dampening small sample sizes
+          with Bayesian prior m = 20.0 toward neutral baseline 50.0.
         """
         pre_match_ratings, _ = self._compute_pre_match_glicko_ratings(sets, mode=mode, start_date=start_date)
         calc = self.glicko_calc
