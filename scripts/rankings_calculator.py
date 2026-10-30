@@ -1086,10 +1086,19 @@ class RankingEngine:
     # -------------------------------------------------------------------------
 
     def _calculate_quality_wins(self, sets, mode, start_date, end_date, target_player_id, game_slug, raw_target_player_id=None):
-        """Quality Wins: Cumulative quadratic quality points based on pre-match Glicko-2 ratings."""
+        """Quality Wins: Normalized average victory quality adjusted for sample confidence.
+
+        Formula:
+        q_i = max(0, (r_eff,opp - 1400) / 100) ^ 1.8
+        r_eff,opp = r_opp - 0.25 * max(0, RD_opp - 50)
+        Average Quality = Sum(q_i) / eligible_wins
+        Adjusted QoW Score = Average Quality * (eligible_wins / (eligible_wins + 5.0)) * 20.0
+        """
         pre_match_ratings, _ = self._compute_pre_match_glicko_ratings(sets, mode=mode, start_date=start_date)
         calc = self.glicko_calc
         provisional_threshold = 3
+        confidence_m = 5.0
+        scale_factor = 20.0
 
         player_qw = {}
         diagnostic_history = {}
@@ -1123,9 +1132,9 @@ class RankingEngine:
             w_pre = safe_snapshot(pre_match_ratings.get((s["setId"], w_id)))
             l_pre = safe_snapshot(pre_match_ratings.get((s["setId"], l_id)))
 
-            # Effective rating of loser: opponentRating - 0.5 * opponentRD
-            eff_rating_l = l_pre["r"] - 0.5 * l_pre["rd"]
-            q_points_w = math.pow(max(0.0, (eff_rating_l - 1500.0) / 100.0), 2)
+            # Effective rating of loser: opponentRating - 0.25 * max(0, opponentRD - 50)
+            eff_rating_l = l_pre["r"] - 0.25 * max(0.0, l_pre["rd"] - 50.0)
+            q_points_w = math.pow(max(0.0, (eff_rating_l - 1400.0) / 100.0), 1.8)
 
             if w_id not in player_qw:
                 player_qw[w_id] = {"totalQuality": 0.0, "wins": 0, "losses": 0, "points": [], "winOpponentRatingsSum": 0.0, "events": set()}
@@ -1163,7 +1172,7 @@ class RankingEngine:
                 diagnostic_history.setdefault(w_id, []).append(trace)
 
             if target_player_id is None or l_id == target_player_id:
-                eff_rating_w = w_pre["r"] - 0.5 * w_pre["rd"]
+                eff_rating_w = w_pre["r"] - 0.25 * max(0.0, w_pre["rd"] - 50.0)
                 trace_l = {
                     "setId": s["setId"],
                     "event": f"{s['tournamentName']} · {s['eventName']}",
@@ -1193,15 +1202,22 @@ class RankingEngine:
             if wins == 0:
                 continue
 
-            tot_q = data["totalQuality"]
-            avg_opp_rating = data["winOpponentRatingsSum"] / wins if wins > 0 else 0.0
+            unadjusted_tot_q = data["totalQuality"]
+            avg_quality = unadjusted_tot_q / wins
+            confidence_factor = wins / (wins + confidence_m)
+            adjusted_score = avg_quality * confidence_factor * scale_factor
+
+            avg_opp_rating = data["winOpponentRatingsSum"] / wins
             is_provisional = (wins < provisional_threshold)
 
             rankings.append({
                 "playerId": pid,
                 "playerTag": self.latest_tags.get(pid, f"Player {pid}"),
-                "score": round(tot_q, 4),
-                "totalQualityWins": round(tot_q, 4),
+                "score": round(adjusted_score, 1),
+                "rawScore": round(adjusted_score, 4),
+                "avgOpponentQuality": round(avg_quality, 4),
+                "confidenceFactor": round(confidence_factor, 4),
+                "totalQualityWins": round(unadjusted_tot_q, 4),
                 "avgOpponentWinRating": round(avg_opp_rating, 1),
                 "wins": wins,
                 "losses": losses,
@@ -1229,14 +1245,17 @@ class RankingEngine:
             "algorithm": {
                 "version": ALGORITHM_VERSION,
                 "name": "Quality Wins",
-                "description": "Ranks players by cumulative quality points earned from victories against opponents, using pre-match effective ratings (Rating - 0.5 * RD).",
-                "limitations": "Evaluates victory quality above baseline 1500 using pre-match Glicko-2 ratings.",
+                "description": "Ranks players by average victory quality adjusted for sample confidence. Rewards beating strong opponents without volume inflation.",
+                "limitations": "Evaluates defeated opponent quality density relative to a 1400 effective rating baseline.",
                 "parameters": {
-                    "formula": "Cumulative QoW = Sum of max(0, (Opponent Effective Rating - 1500) / 100) ^ 2",
-                    "effectiveRatingFormula": "Opponent Rating - 0.5 * Opponent RD (using pre-match snapshots)",
-                    "baseline": 1500,
-                    "uncertaintyPenaltyCoefficient": 0.5,
-                    "scale": 100,
+                    "victoryQualityFormula": "q_i = max(0, (r_eff,opp - 1400) / 100) ^ 1.8",
+                    "effectiveRatingFormula": "r_opp - 0.25 * max(0, RD_opp - 50)",
+                    "averageQualityFormula": "Sum(q_i) / eligible_wins",
+                    "confidenceFactorFormula": "eligible_wins / (eligible_wins + 5.0)",
+                    "scoreFormula": "Average Quality * Confidence Factor * 20.0",
+                    "baseline": 1400,
+                    "confidenceParam": confidence_m,
+                    "scale": scale_factor,
                 },
             },
         }
@@ -1249,15 +1268,25 @@ class RankingEngine:
             losses = p_data["losses"]
             matches = wins + losses
 
+            unadj_q = p_data["totalQuality"]
+            avg_q = unadj_q / wins if wins > 0 else 0.0
+            conf_f = wins / (wins + confidence_m) if wins > 0 else 0.0
+            adj_sc = avg_q * conf_f * scale_factor if wins > 0 else 0.0
+
             alg_params = {
-                "formula": "Cumulative QoW = Sum of max(0, (Opponent Effective Rating - 1500) / 100) ^ 2",
-                "effectiveRatingFormula": "Opponent Effective Rating = Opponent Rating - 0.5 * Opponent RD",
-                "baseline": 1500,
-                "uncertaintyPenaltyCoefficient": 0.5,
-                "scale": 100,
+                "victoryQualityFormula": "q_i = max(0, (r_eff,opp - 1400) / 100) ^ 1.8",
+                "effectiveRatingFormula": "r_opp - 0.25 * max(0, RD_opp - 50)",
+                "confidenceFactorFormula": "eligible_wins / (eligible_wins + 5.0)",
+                "scoreFormula": "Average Quality * Confidence Factor * 20.0",
+                "baseline": 1400,
+                "confidenceParam": confidence_m,
+                "scale": scale_factor,
             }
             breakdown_dict = {
-                "totalQualityWins": round(p_data["totalQuality"], 4),
+                "unadjustedTotalQuality": round(unadj_q, 4),
+                "avgOpponentQuality": round(avg_q, 4),
+                "confidenceFactor": round(conf_f, 4),
+                "adjustedQualityWins": round(adj_sc, 4),
                 "eligibleWins": wins,
                 "losses": losses,
                 "matches": matches,
@@ -1301,7 +1330,7 @@ class RankingEngine:
                     "mode": mode,
                     "startDate": start_date,
                     "endDate": end_date,
-                    "formula": "Cumulative Quality Wins = Sum of max(0, (Opponent Effective Rating - 1500) / 100) ^ 2",
+                    "formula": "Score = Average Quality * (eligible_wins / (eligible_wins + 5.0)) * 20.0",
                     "parameters": alg_params,
                     "breakdown": breakdown_dict,
                 },
@@ -1444,8 +1473,8 @@ class RankingEngine:
             "rankings": rankings,
             "algorithm": {
                 "version": ALGORITHM_VERSION,
-                "name": "Consistency",
-                "description": "Measures competitive consistency relative to pre-match expectations. Score contribution equals actual minus expected result (S - E) with Bayesian sample-size dampening.",
+                "name": "Performance vs. Expectation",
+                "description": "Measures competitive performance relative to pre-match expectations. Score contribution equals actual minus expected result (S - E) with Bayesian sample-size dampening.",
                 "limitations": "Measures performance relative to pre-match expectations rather than absolute skill rating.",
                 "parameters": {
                     "matchContribution": "Actual - Expected (S - E)",
