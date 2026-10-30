@@ -35,7 +35,24 @@
         <div id="player-game-options" class="visibility-options"></div>
         <div class="form-actions"><button id="save-game-exclusions" class="quiet-button" type="button">Save game visibility</button><p id="game-exclusion-message" class="form-message mono" role="status"></p></div>
       </fieldset>
-      <label>Complete profile data<textarea id="profile-json" class="profile-json" spellcheck="false" required></textarea></label>
+      <div class="editor-tabs" role="tablist" aria-label="Editor mode">
+        <button id="tab-visual" class="ranking-tab active" type="button" role="tab" aria-selected="true">Profile details</button>
+        <button id="tab-raw" class="ranking-tab" type="button" role="tab" aria-selected="false">Raw JSON</button>
+      </div>
+      <div id="panel-visual">
+        <div class="form-grid">
+          <label>Display tag<input id="player-tag" type="text" maxlength="80" placeholder="e.g. Mitsu" required></label>
+          <label>Sponsor / prefix<input id="player-sponsor" type="text" maxlength="100" placeholder="e.g. NSG"></label>
+          <label>City<input id="player-city" type="text" maxlength="120" placeholder="e.g. Montevideo"></label>
+          <label>Country<input id="player-country" type="text" maxlength="120" placeholder="e.g. Uruguay"></label>
+          <label>Location text (fallback)<input id="player-location" type="text" maxlength="120" placeholder="e.g. Montevideo, Uruguay"></label>
+          <label>start.gg profile link<input id="player-startgg" type="url" placeholder="https://start.gg/user/..."></label>
+        </div>
+        <label style="margin-top:14px;">Known aliases (comma-separated)<input id="player-aliases" type="text" placeholder="e.g. Tag1, Tag2"></label>
+      </div>
+      <div id="panel-raw" hidden>
+        <label>Complete profile data<textarea id="profile-json" class="profile-json" spellcheck="false"></textarea></label>
+      </div>
       <div class="photo-row"><label class="upload-control">Replace picture<input id="profile-photo-file" type="file" accept="image/png,image/jpeg,image/webp"></label><span id="photo-name" class="mono muted">PNG, JPEG or WebP · up to 5 MB</span><img id="photo-preview" class="photo-preview" alt="Selected player picture preview" hidden></div>
       <div class="form-actions"><button class="action-button" type="submit">Save changes</button><p id="save-message" class="form-message mono" role="status"></p></div>
     </form>

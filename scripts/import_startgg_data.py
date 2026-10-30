@@ -171,6 +171,10 @@ CREATE INDEX IF NOT EXISTS idx_sets_phase_round ON sets(phase_group_id, round);
 CREATE INDEX IF NOT EXISTS idx_sets_started_at ON sets(event_id, started_at);
 CREATE INDEX IF NOT EXISTS idx_participants_player ON participants(player_id);
 CREATE INDEX IF NOT EXISTS idx_selections_entrant ON set_game_selections(entrant_id);
+CREATE INDEX IF NOT EXISTS idx_set_entrants_entrant ON set_entrants(entrant_id);
+CREATE INDEX IF NOT EXISTS idx_entrant_participants_part ON entrant_participants(participant_id);
+CREATE INDEX IF NOT EXISTS idx_set_games_set ON set_games(set_id);
+CREATE INDEX IF NOT EXISTS idx_event_standings_entrant ON event_standings(entrant_id);
 """
 
 

@@ -143,7 +143,30 @@ def profile_entries(public_only=False):
             )
             if not has_visible_data:
                 continue
-        entry = {"playerId": player_id, "tag": player["tag"], "slug": path.stem}
+        games_list = games if (public_only and player_id) else profile.get("games", [])
+        games_summary = [
+            {
+                "id": g.get("id"),
+                "slug": g.get("slug") or g.get("id"),
+                "name": g.get("name"),
+                "events": int(g.get("events") or 0),
+            }
+            for g in games_list
+        ]
+        total_events = sum(g["events"] for g in games_summary)
+        entry = {
+            "playerId": player_id,
+            "tag": player.get("tag") or path.stem,
+            "slug": path.stem,
+            "sponsor": player.get("sponsor"),
+            "city": player.get("city"),
+            "country": player.get("country"),
+            "location": player.get("location"),
+            "aliases": player.get("aliases") or [],
+            "photo": player.get("photo"),
+            "games": games_summary,
+            "events": total_events,
+        }
         if not player_id:
             entries_by_id[f"file:{path.stem}"] = entry
         elif player_id not in entries_by_id or path.stem.endswith(f"-{player_id}"):

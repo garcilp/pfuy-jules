@@ -908,7 +908,30 @@ def write_profile(connection, player_id, display_tag, profile_slug):
           f"{sum(game['events'] for game in profile['games'])} event entries")
     if not profile["games"]:
         return None
-    return {"playerId": str(player_id), "tag": profile["player"]["tag"], "slug": profile_slug}
+    player = profile["player"]
+    games_summary = [
+        {
+            "id": g.get("id"),
+            "slug": g.get("slug") or g.get("id"),
+            "name": g.get("name"),
+            "events": int(g.get("events") or 0),
+        }
+        for g in profile.get("games", [])
+    ]
+    total_events = sum(g["events"] for g in games_summary)
+    return {
+        "playerId": str(player_id),
+        "tag": player.get("tag") or display_tag,
+        "slug": profile_slug,
+        "sponsor": player.get("sponsor"),
+        "city": player.get("city"),
+        "country": player.get("country"),
+        "location": player.get("location"),
+        "aliases": player.get("aliases") or [],
+        "photo": player.get("photo"),
+        "games": games_summary,
+        "events": total_events,
+    }
 
 
 def character_stock_icon(game_slug, character_name):

@@ -3,7 +3,68 @@ const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;
 let currentSlug = '';
 let currentPlayerId = '';
 let currentProfileSnapshot = '';
+let currentProfileObject = null;
+let activeEditorMode = 'visual';
 let selectedPhoto = null;
+
+function syncVisualFromObject(profile) {
+  const p = profile?.player || {};
+  if ($('#player-tag')) $('#player-tag').value = p.tag || '';
+  if ($('#player-sponsor')) $('#player-sponsor').value = p.sponsor || '';
+  if ($('#player-city')) $('#player-city').value = p.city || '';
+  if ($('#player-country')) $('#player-country').value = p.country || '';
+  if ($('#player-location')) $('#player-location').value = p.location || '';
+  if ($('#player-startgg')) $('#player-startgg').value = p.startgg || '';
+  if ($('#player-aliases')) $('#player-aliases').value = Array.isArray(p.aliases) ? p.aliases.join(', ') : '';
+}
+
+function syncObjectFromVisual() {
+  if (!currentProfileObject) return;
+  if (!currentProfileObject.player) currentProfileObject.player = {};
+  const p = currentProfileObject.player;
+  if ($('#player-tag')) p.tag = $('#player-tag').value.trim();
+  if ($('#player-sponsor')) p.sponsor = $('#player-sponsor').value.trim() || null;
+  if ($('#player-city')) p.city = $('#player-city').value.trim() || '';
+  if ($('#player-country')) p.country = $('#player-country').value.trim() || '';
+  if ($('#player-location')) p.location = $('#player-location').value.trim() || '';
+  if ($('#player-startgg')) p.startgg = $('#player-startgg').value.trim() || '';
+  if ($('#player-aliases')) {
+    const raw = $('#player-aliases').value.trim();
+    p.aliases = raw ? raw.split(',').map(s => s.trim()).filter(Boolean) : [];
+  }
+}
+
+function setEditorMode(mode) {
+  activeEditorMode = mode;
+  const isVisual = mode === 'visual';
+  const tabVisual = $('#tab-visual');
+  const tabRaw = $('#tab-raw');
+  const panelVisual = $('#panel-visual');
+  const panelRaw = $('#panel-raw');
+  if (tabVisual) {
+    tabVisual.classList.toggle('active', isVisual);
+    tabVisual.setAttribute('aria-selected', isVisual);
+  }
+  if (tabRaw) {
+    tabRaw.classList.toggle('active', !isVisual);
+    tabRaw.setAttribute('aria-selected', !isVisual);
+  }
+  if (panelVisual) panelVisual.hidden = !isVisual;
+  if (panelRaw) panelRaw.hidden = isVisual;
+
+  if (isVisual) {
+    try {
+      currentProfileObject = JSON.parse($('#profile-json').value);
+      syncVisualFromObject(currentProfileObject);
+    } catch {
+      alert('The raw JSON contains syntax errors. Fix them before switching to the structured form.');
+      setEditorMode('raw');
+    }
+  } else {
+    syncObjectFromVisual();
+    $('#profile-json').value = JSON.stringify(currentProfileObject, null, 2);
+  }
+}
 
 async function api(path, options = {}) {
   const response = await fetch(path, {
@@ -19,7 +80,10 @@ async function api(path, options = {}) {
 function showEditor(authed) {
   $('#admin-login').hidden = authed;
   $('#admin-editor').hidden = !authed;
-  if (authed) loadProfiles();
+  if (authed) {
+    setEditorMode('visual');
+    loadProfiles();
+  }
 }
 
 async function loadProfiles(selected = '') {
@@ -102,7 +166,9 @@ async function loadProfile(slug) {
   $('#profile-photo-file').value = '';
   $('#photo-preview').hidden = true;
   const { profile } = await api(`/api/admin/profile?slug=${encodeURIComponent(slug)}`);
+  currentProfileObject = profile;
   currentPlayerId = String(profile.player?.startggPlayerId || '');
+  syncVisualFromObject(profile);
   $('#profile-json').value = JSON.stringify(profile, null, 2);
   currentProfileSnapshot = $('#profile-json').value;
   await loadPlayerGameOptions(currentPlayerId);
@@ -238,14 +304,25 @@ $('#profile-photo-file').addEventListener('change', event => {
   preview.hidden = false;
 });
 
+$('#tab-visual')?.addEventListener('click', () => setEditorMode('visual'));
+$('#tab-raw')?.addEventListener('click', () => setEditorMode('raw'));
+
 $('#profile-form').addEventListener('submit', async event => {
   event.preventDefault();
   const message = $('#save-message');
   message.textContent = 'Saving…';
   try {
     let profile;
-    try { profile = JSON.parse($('#profile-json').value); }
-    catch { throw new Error('Profile data must be valid JSON.'); }
+    if (activeEditorMode === 'visual') {
+      syncObjectFromVisual();
+      profile = currentProfileObject;
+      $('#profile-json').value = JSON.stringify(profile, null, 2);
+    } else {
+      try { profile = JSON.parse($('#profile-json').value); }
+      catch { throw new Error('Profile data must be valid JSON.'); }
+      currentProfileObject = profile;
+      syncVisualFromObject(profile);
+    }
     if (!profile || typeof profile !== 'object' || !profile.player || !Array.isArray(profile.games)) {
       throw new Error('Profile JSON must contain a player object and a games array.');
     }
@@ -261,7 +338,9 @@ $('#profile-form').addEventListener('submit', async event => {
       });
       const photo = await api('/api/admin/photo', { method: 'POST', body: JSON.stringify({ playerId: currentPlayerId, filename: selectedPhoto.name, data: dataUrl }) });
       profile.player.photo = photo.path;
+      currentProfileObject = profile;
       $('#profile-json').value = JSON.stringify(profile, null, 2);
+      syncVisualFromObject(profile);
     }
     await api('/api/admin/profile', { method: 'PUT', body: JSON.stringify({ slug: currentSlug, profile }) });
     message.textContent = 'Saved. The player page now reflects the complete profile data.';

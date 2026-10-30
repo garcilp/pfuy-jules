@@ -14,8 +14,8 @@ class TestFetchEventsSkip(unittest.TestCase):
         self.assertEqual(get_processed_event_ids(non_existent), set())
 
     def test_get_processed_event_ids_with_db(self):
-        with tempfile.NamedTemporaryFile(suffix=".sqlite3") as tmp_file:
-            db_path = Path(tmp_file.name)
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            db_path = Path(tmp_dir) / "test_import.sqlite3"
             conn = sqlite3.connect(db_path)
             conn.execute("CREATE TABLE import_markers (event_id TEXT PRIMARY KEY)")
             conn.execute("INSERT INTO import_markers VALUES ('12345')")

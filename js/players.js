@@ -13,12 +13,16 @@ async function loadPlayers() {
     const response = await fetch('data/profiles/index.json', { cache: 'no-store' });
     if (!response.ok) throw new Error('No generated player directory is available yet.');
     const entries = await response.json();
-    players = await Promise.all(entries.map(async entry => {
-      const profileResponse = await fetch(`data/profiles/${encodeURIComponent(entry.slug)}.json`);
-      if (!profileResponse.ok) return null;
-      return { ...entry, profile: await profileResponse.json() };
-    }));
-    players = players.filter(Boolean);
+    if (entries.length && (entries[0].games || entries[0].events !== undefined)) {
+      players = entries;
+    } else {
+      players = await Promise.all(entries.map(async entry => {
+        const profileResponse = await fetch(`data/profiles/${encodeURIComponent(entry.slug)}.json`);
+        if (!profileResponse.ok) return null;
+        return { ...entry, profile: await profileResponse.json() };
+      }));
+      players = players.filter(Boolean);
+    }
     populateGameFilter();
     render();
   } catch (error) {
@@ -32,10 +36,13 @@ playerView.value = 'condensed';
 
 function populateGameFilter() {
   const games = new Map();
-  players.forEach(entry => (entry.profile.games || []).forEach(game => {
-    const id = game.slug || game.id;
-    if (id && game.name) games.set(id, game.name);
-  }));
+  players.forEach(entry => {
+    const gameList = entry.games || entry.profile?.games || [];
+    gameList.forEach(game => {
+      const id = game.slug || game.id;
+      if (id && game.name) games.set(id, game.name);
+    });
+  });
   gameFilter.innerHTML = '<option value="">All games</option>' +
     [...games].sort((a, b) => nameCollator.compare(a[1], b[1]))
       .map(([id, name]) => `<option value="${esc(id)}">${esc(name)}</option>`).join('');
@@ -47,23 +54,23 @@ function render() {
   const query = search.value.trim().toLocaleLowerCase();
   const selectedGame = gameFilter.value;
   const shown = players.filter(entry => {
-    const p = entry.profile.player;
-    const games = entry.profile.games || [];
+    const p = entry.profile?.player || entry;
+    const games = entry.games || entry.profile?.games || [];
     const location = p.city || p.country
       ? [p.city, p.country || 'Uruguay'].filter(Boolean).join(', ')
-      : p.location;
+      : (p.location || '');
     const includesGame = !selectedGame || games.some(game => (game.slug || game.id) === selectedGame);
     const matchesSearch = [entry.tag, p.tag, p.sponsor, p.city, p.country, location, ...(p.aliases || []), ...games.map(g => g.name)].join(' ').toLocaleLowerCase().includes(query);
     return includesGame && matchesSearch;
-  }).sort((a, b) => nameCollator.compare(a.profile.player.tag || a.tag, b.profile.player.tag || b.tag) || nameCollator.compare(a.slug, b.slug));
+  }).sort((a, b) => nameCollator.compare(a.profile?.player?.tag || a.tag, b.profile?.player?.tag || b.tag) || nameCollator.compare(a.slug, b.slug));
   status.textContent = `${shown.length} player${shown.length === 1 ? '' : 's'}`;
   list.innerHTML = shown.length ? shown.map(entry => {
-    const p = entry.profile.player;
-    const games = entry.profile.games || [];
+    const p = entry.profile?.player || entry;
+    const games = entry.games || entry.profile?.games || [];
     const location = p.city || p.country
       ? [p.city, p.country || 'Uruguay'].filter(Boolean).join(', ')
-      : p.location;
-    const events = games.reduce((total, game) => total + (Number(game.events) || 0), 0);
+      : (p.location || '');
+    const events = entry.events !== undefined ? entry.events : games.reduce((total, game) => total + (Number(game.events) || 0), 0);
     const eventLabel = events === 1 ? 'EVENT' : 'EVENTS';
     const picture = p.photo || `assets/players/${entry.playerId}.png`;
     return `<a class="player-card glass" href="index.html?player=${encodeURIComponent(entry.playerId)}">
