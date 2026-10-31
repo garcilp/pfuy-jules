@@ -364,11 +364,11 @@ async function renderHistoricalRankings() {
           <div class="main">
             <div class="line"><span class="name">${esc(r.name)}</span><span class="status ${r.status === 'current' ? 'current' : ''}">${r.status === 'current' ? 'CURRENT' : 'FINAL'}</span></div>
             <div class="line meta"><span class="glass pill chip">${esc(r.gameName)}</span><span>${period(r.start, r.end)}</span></div>
-          </div>
-          <div class="side-info">
-            <div><span class="mono p1" style="font-weight:700">#1</span> ${esc(r.top)}</div>
-            <span class="mono muted" style="font-size:12px">${r.players} players</span>
-            <span class="go">Read ranking →</span>
+            <div class="line side-info">
+              <div><span class="mono p1" style="font-weight:700">#1</span> ${esc(r.top)}</div>
+              <span class="mono muted" style="font-size:12px">${r.players} players</span>
+              <span class="go">View Ranking →</span>
+            </div>
           </div>
         </a></div>`;
     }).join('');
