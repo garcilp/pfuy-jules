@@ -593,6 +593,10 @@ function setupSearch() {
   let resultsBox = document.createElement('div');
   resultsBox.className = 'search-results';
   resultsBox.hidden = true;
+  // Ensure wheel events inside the dropdown scroll the results box, preventing page scroll chaining
+  resultsBox.addEventListener('wheel', e => {
+    e.stopPropagation();
+  }, { passive: false });
   searchForm.appendChild(resultsBox);
 
   function handleSearch() {
