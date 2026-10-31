@@ -10,7 +10,6 @@
 
 .home .hero {
   position: relative;
-  overflow: hidden;
   padding: 40px;
   border-radius: 32px;
   display: flex;
@@ -26,6 +25,8 @@
   width: 55%;
   pointer-events: none;
   overflow: hidden;
+  border-top-right-radius: 32px;
+  border-bottom-right-radius: 32px;
   z-index: 0;
   /* Prominent fade on the left side into the dark navy background */
   mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.4) 25%, rgba(0, 0, 0, 0.95) 70%, black 100%);
