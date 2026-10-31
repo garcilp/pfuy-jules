@@ -128,10 +128,10 @@
 .rk .card {
   flex: 1 1 480px;
   min-width: 0;
-  padding: 22px 24px;
+  padding: 20px 24px;
   border-radius: 24px;
   display: flex;
-  gap: 16px;
+  gap: 20px;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
@@ -142,6 +142,31 @@
 .rk .card:hover {
   border-color: rgba(255, 255, 255, .38);
   background: rgba(255, 255, 255, .12);
+}
+.card .card-left {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.card .hub-icon-wrapper {
+  width: 52px;
+  height: 52px;
+  min-width: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+.card .hub-icon {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  display: block;
 }
 .card .main {
   display: flex;

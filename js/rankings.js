@@ -343,9 +343,14 @@ async function renderHistoricalRankings() {
       lastYear = year;
       return `<div class="rk"><div class="yr mono">${label}</div>
         <a class="card glass" href="ranking.html?id=${encodeURIComponent(r.id)}">
-          <div class="main">
-            <div class="line"><span class="name">${esc(r.name)}</span><span class="status ${r.status === 'current' ? 'current' : ''}">${r.status === 'current' ? 'CURRENT' : 'FINAL'}</span></div>
-            <div class="line meta"><span class="glass pill chip">${esc(selectedGame.name)}</span><span>${period(r.start, r.end)}</span></div>
+          <div class="card-left">
+            <div class="hub-icon-wrapper glass">
+              <img class="hub-icon" src="assets/hubs/${esc(selectedGame.slug)}.webp" alt="" onerror="this.style.display='none';">
+            </div>
+            <div class="main">
+              <div class="line"><span class="name">${esc(r.name)}</span><span class="status ${r.status === 'current' ? 'current' : ''}">${r.status === 'current' ? 'CURRENT' : 'FINAL'}</span></div>
+              <div class="line meta"><span class="glass pill chip">${esc(selectedGame.name)}</span><span>${period(r.start, r.end)}</span></div>
+            </div>
           </div>
           <div class="side-info">
             <div><span class="mono p1" style="font-weight:700">#1</span> ${esc(r.top)}</div>
@@ -357,7 +362,7 @@ async function renderHistoricalRankings() {
   }
 
   const gameSwitches = games.map(g =>
-    `<a class="${g.id === selectedGame.id ? 'on' : ''}" href="#${esc(g.id)}" onclick="setTimeout(() => { if (activeSection === 'historical') renderHistoricalRankings(); }, 10);">${esc(g.name)}</a>`
+    `<a class="${g.id === selectedGame.id ? 'on' : ''}" href="#${esc(g.id)}">${esc(g.name)}</a>`
   ).join('');
 
   rankingsContent.innerHTML = `
