@@ -88,12 +88,14 @@ function showEditor(authed) {
 
 async function loadProfiles(selected = '') {
   try {
-    const [{ profiles }, { merges }, { eventGroups }, { exclusions }, { events }] = await Promise.all([
-      api('/api/admin/profiles'), api('/api/admin/merges'), api('/api/admin/event-groups'), api('/api/admin/exclusions'), api('/api/admin/events').catch(() => ({ events: [] }))
+    const [{ profiles }, { merges }, { eventGroups }, { exclusions }, { events }, { socials }] = await Promise.all([
+      api('/api/admin/profiles'), api('/api/admin/merges'), api('/api/admin/event-groups'), api('/api/admin/exclusions'), api('/api/admin/events').catch(() => ({ events: [] })),
+      api('/api/admin/community-socials').catch(() => ({ socials: {} }))
     ]);
     renderEventGroups(eventGroups);
     renderExcludedEvents(exclusions.events || []);
     renderEventSelects(events || []);
+    renderCommunitySocials(socials || {});
     const select = $('#profile-select');
     select.innerHTML = profiles.map(p => `<option value="${esc(p.slug)}">${esc(p.tag)} · ${esc(p.playerId || 'local profile')}</option>`).join('');
     const source = $('#merge-source');
@@ -347,6 +349,79 @@ $('#profile-form').addEventListener('submit', async event => {
     selectedPhoto = null;
     await loadProfiles(currentSlug);
   } catch (error) { message.textContent = error.message; }
+});
+
+const COMMUNITY_GAMES = [
+  { slug: 'ultimate', name: 'Super Smash Bros. Ultimate' },
+  { slug: 'melee', name: 'Super Smash Bros. Melee' },
+  { slug: 'project-plus', name: 'Project+' },
+  { slug: 'rivals-2', name: 'Rivals 2' },
+  { slug: 'rivals-of-aether', name: 'Rivals of Aether' }
+];
+
+function renderCommunitySocials(socials = {}) {
+  const container = $('#community-socials-fields');
+  if (!container) return;
+
+  container.innerHTML = COMMUNITY_GAMES.map(g => {
+    const gSocial = socials[g.slug] || {};
+    const wa = gSocial.whatsapp || { enabled: false, url: '' };
+    const dc = gSocial.discord || { enabled: false, url: '' };
+    const tw = gSocial.twitter || { enabled: false, url: '' };
+
+    return `
+      <div style="margin-bottom:20px;padding:16px;background:rgba(255,255,255,0.04);border-radius:12px;border:1px solid var(--line);">
+        <h4 style="margin:0 0 12px 0;">${esc(g.name)}</h4>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <label style="width:120px;margin:0;"><input type="checkbox" id="soc-${g.slug}-wa-toggle" ${wa.enabled ? 'checked' : ''}> WhatsApp</label>
+            <input type="url" id="soc-${g.slug}-wa-url" placeholder="https://chat.whatsapp.com/..." value="${esc(wa.url || '')}" style="flex:1;">
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <label style="width:120px;margin:0;"><input type="checkbox" id="soc-${g.slug}-dc-toggle" ${dc.enabled ? 'checked' : ''}> Discord</label>
+            <input type="url" id="soc-${g.slug}-dc-url" placeholder="https://discord.gg/..." value="${esc(dc.url || '')}" style="flex:1;">
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <label style="width:120px;margin:0;"><input type="checkbox" id="soc-${g.slug}-tw-toggle" ${tw.enabled ? 'checked' : ''}> Twitter / X</label>
+            <input type="url" id="soc-${g.slug}-tw-url" placeholder="https://twitter.com/..." value="${esc(tw.url || '')}" style="flex:1;">
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+$('#community-socials-form')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const message = $('#socials-message');
+  message.textContent = 'Saving…';
+  try {
+    const socials = {};
+    COMMUNITY_GAMES.forEach(g => {
+      socials[g.slug] = {
+        whatsapp: {
+          enabled: $(`#soc-${g.slug}-wa-toggle`).checked,
+          url: $(`#soc-${g.slug}-wa-url`).value.trim()
+        },
+        discord: {
+          enabled: $(`#soc-${g.slug}-dc-toggle`).checked,
+          url: $(`#soc-${g.slug}-dc-url`).value.trim()
+        },
+        twitter: {
+          enabled: $(`#soc-${g.slug}-tw-toggle`).checked,
+          url: $(`#soc-${g.slug}-tw-url`).value.trim()
+        }
+      };
+    });
+
+    await api('/api/admin/community-socials', {
+      method: 'POST',
+      body: JSON.stringify({ socials })
+    });
+    message.textContent = 'Saved community social links.';
+  } catch (err) {
+    message.textContent = err.message || 'Error saving socials.';
+  }
 });
 
 $('#signout').addEventListener('click', async () => {

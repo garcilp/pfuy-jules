@@ -7,23 +7,97 @@
 <link rel="icon" href="assets/logo.jpg">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/home.css">
+<script>
+  // Seamless backward-compatibility: forward existing player profile URLs to player.html
+  if (new URLSearchParams(window.location.search).has('player')) {
+    window.location.replace('player.html' + window.location.search + window.location.hash);
+  }
+</script>
 </head>
 <body>
 <header class="topbar glass pill">
-  <a class="brand" href="#overview"><img src="assets/logo.jpg" alt="">Platfighters<span class="tld">.uy</span></a>
+  <a class="brand" href="index.html"><img src="assets/logo.jpg" alt="">Platfighters<span class="tld">.uy</span></a>
   <span class="spacer"></span>
-  <nav><a href="players.html">Players</a><a href="events.html">Events</a><a href="rankings.html">Rankings</a></nav>
-  <span class="badge" id="site-badge">SAMPLE DATA</span>
+  <nav>
+    <a href="players.html">Players</a>
+    <a href="events.html">Events</a>
+    <a href="rankings.html">Rankings</a>
+  </nav>
+  <span class="badge">URUGUAY SCENE</span>
 </header>
-<div class="page">
-  <aside class="side glass">
-    <div id="profile" class="profile"></div>
-    <nav id="tabs" class="tabs"></nav>
-    <p class="note mono muted">Game tabs are generated from the games found in this player’s start.gg entries.</p>
-  </aside>
-  <main id="main" class="content"></main>
-</div>
+
+<main class="home">
+  <section class="hero glass">
+    <div class="hero-bg-art" aria-hidden="true">
+      <img src="assets/main-box-image.webp" alt="" onerror="this.style.display='none'">
+    </div>
+    <div class="hero-content">
+      <div class="eyebrow">The Uruguayan platfighter scene</div>
+      <h1 class="display">Every platfighter community, one scene.</h1>
+      <p class="lead">Results, rankings and events from every game and community in Uruguay, built from start.gg history.</p>
+    </div>
+    <form id="search-form" class="search glass pill" role="search" onsubmit="return false">
+      <input id="global-search" type="text" placeholder="Search players or tournaments…" aria-label="Search players or tournaments" autocomplete="off">
+      <button class="btn" type="submit">Search</button>
+    </form>
+  </section>
+
+  <section id="events" class="panel glass lg">
+    <div class="head">
+      <h2>Upcoming events</h2>
+      <a class="link" href="events.html">View all events →</a>
+    </div>
+    <div id="events-grid" class="events"></div>
+  </section>
+
+  <div id="stats" class="tiles"></div>
+
+  <div class="cols">
+    <div class="col main-col">
+      <section class="panel glass">
+        <div class="head">
+          <h2>Recent results</h2>
+          <a class="link" href="events.html">All tournaments →</a>
+        </div>
+        <div id="results" class="table"></div>
+      </section>
+
+      <section class="panel glass">
+        <h2>On this week</h2>
+        <p class="muted sm">Tournaments played this week (<span id="today"></span>) in past years</p>
+        <div id="history"></div>
+      </section>
+    </div>
+
+    <div class="col side-col">
+      <section id="rankings" class="panel glass">
+        <div class="head">
+          <h2>Top players</h2>
+          <a class="link" href="rankings.html">All rankings →</a>
+        </div>
+        <p class="muted sm">Current #1 on each community's ranking</p>
+        <div id="top-players"></div>
+      </section>
+
+      <section id="rivalry" class="panel glass"></section>
+    </div>
+  </div>
+
+  <section class="panel glass lg">
+    <h2>New to the scene?</h2>
+    <p class="muted sm">Four steps from curious to competing.</p>
+    <div id="steps" class="steps"></div>
+  </section>
+
+  <section id="hubs">
+    <h2 class="sec" style="margin-bottom:4px">Community hubs</h2>
+    <p class="muted sm">One scene, many communities. Discover where each game lives.</p>
+    <div id="hub-list" class="cards"></div>
+  </section>
+</main>
+
 <footer class="foot mono muted">Source: start.gg API · Served from local cache · Last synced <span id="synced">[TIMESTAMP]</span></footer>
-<script src="js/app.js"></script>
+<script src="js/home.js"></script>
 </body>
 </html>
