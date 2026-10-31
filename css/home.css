@@ -9,11 +9,44 @@
 }
 
 .home .hero {
+  position: relative;
+  overflow: hidden;
   padding: 40px;
   border-radius: 32px;
   display: flex;
   flex-direction: column;
+  gap: 24px;
+}
+
+.home .hero-bg-art {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 55%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+  /* Prominent fade on the left side into the dark navy background */
+  mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.4) 25%, rgba(0, 0, 0, 0.95) 70%, black 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.4) 25%, rgba(0, 0, 0, 0.95) 70%, black 100%);
+}
+
+.home .hero-bg-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: right center;
+  opacity: 0.85;
+}
+
+.home .hero-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
   gap: 20px;
+  max-width: 720px;
 }
 
 .home .eyebrow {
@@ -40,15 +73,17 @@
 }
 
 .home .search {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   gap: 8px;
-  max-width: 640px;
   width: 100%;
+  max-width: 100%;
   min-height: 60px;
   padding: 6px 6px 6px 20px;
   border-radius: 999px;
-  position: relative;
+  box-sizing: border-box;
 }
 
 .home .search input {
@@ -470,10 +505,29 @@
   font-size: 20px;
 }
 
+.home .hub-stat-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 8px;
+}
+
 .home .hub .big {
   font-size: 28px;
   font-weight: 700;
-  margin-top: 8px;
+  line-height: 1;
+}
+
+.home .hub .players-label {
+  font-size: 14px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.home .hub .events-sub {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 2px;
 }
 
 .home .social {

@@ -513,24 +513,36 @@ function renderHubs() {
   const container = $('#hub-list');
   if (!container) return;
 
-  // Calculate real player count and event count for each game
+  // Calculate real player count, event count, and latest tournament date for each game
   const hubs = activeCommunities.map(c => {
     const playersInGame = playerDirectory.filter(p => (p.games || []).some(g => (g.slug || g.id) === c.slug)).length;
-    const eventsInGame = eventsIndex.filter(e => (e.gameSlug || '').toLowerCase() === c.slug).length;
+    const gameEvents = eventsIndex.filter(e => (e.gameSlug || '').toLowerCase() === c.slug);
+
+    // Find most recent completed tournament date
+    const completedEvents = gameEvents.filter(e => !e.isTemporary && e.hasTakenPlace !== false);
+    completedEvents.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+    const latestDate = completedEvents.length > 0 ? (completedEvents[0].date || '') : '';
 
     return {
       ...c,
       players: playersInGame,
-      events: eventsInGame
+      events: gameEvents.length,
+      latestDate
     };
   });
+
+  // Order community hubs based on the most recent tournament hosted (descending)
+  hubs.sort((a, b) => b.latestDate.localeCompare(a.latestDate) || b.events - a.events);
 
   container.innerHTML = hubs.map(h => `
     <div class="hub glass">
       <span class="abbr">${esc(h.abbr)}</span>
       <b>${esc(h.name)}</b>
-      <span class="big">${h.players}</span>
-      <span class="muted">players · ${h.events} events indexed</span>
+      <div class="hub-stat-row">
+        <span class="big">${h.players}</span>
+        <span class="players-label">players</span>
+      </div>
+      <div class="events-sub">${h.events} events indexed</div>
       <div class="hub-links">
         <a class="hub-btn" href="players.html">Players</a>
         <a class="hub-btn" href="events.html">Events</a>
