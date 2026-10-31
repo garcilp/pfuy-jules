@@ -32,8 +32,16 @@ function getStateFromURL() {
   if (system === 'custom' || system === 'power_rankings') {
     section = 'power_rankings';
     system = 'custom';
+  } else if (section === 'historical' || system === 'historical') {
+    section = 'historical';
+    system = 'historical';
   } else if (!section) {
-    section = 'systems';
+    if (window.location.hash && !params.get('system')) {
+      section = 'historical';
+      system = 'historical';
+    } else {
+      section = 'systems';
+    }
   }
 
   return {
@@ -51,6 +59,12 @@ function getStateFromURL() {
 function updateURLState(state) {
   const params = new URLSearchParams();
   if (state.section && state.section !== 'systems') params.set('section', state.section);
+  if (state.section === 'historical') {
+    const hash = window.location.hash || '';
+    const newSearch = params.toString() ? `?${params.toString()}` : window.location.pathname;
+    window.history.replaceState({}, '', newSearch + hash);
+    return;
+  }
   if (state.game && state.game !== 'ultimate') params.set('game', state.game);
   if (state.system && state.system !== 'overview') params.set('system', state.system);
   if (state.mode && state.mode !== 'historical') params.set('mode', state.mode);
@@ -131,6 +145,12 @@ function updateBreadcrumbsAndNav() {
         <span class="sep">/</span>
         <span class="current">Power Rankings</span>
       `;
+    } else if (activeSection === 'historical') {
+      breadcrumbNav.innerHTML = `
+        <a href="rankings.html?section=systems&system=overview" onclick="event.preventDefault(); window.navigateToSection('systems', 'overview');">Rankings</a>
+        <span class="sep">/</span>
+        <span class="current">Historical Rankings</span>
+      `;
     } else {
       const subName = SYSTEM_NAMES[activeSubsection] || activeSubsection;
       breadcrumbNav.innerHTML = `
@@ -148,8 +168,10 @@ window.navigateToSection = function(section, subsection = null) {
   activeSection = section;
   if (section === 'power_rankings') {
     activeSubsection = 'custom';
+  } else if (section === 'historical') {
+    activeSubsection = 'historical';
   } else {
-    activeSubsection = subsection || (activeSubsection === 'custom' ? 'overview' : activeSubsection);
+    activeSubsection = subsection || (activeSubsection === 'custom' || activeSubsection === 'historical' ? 'overview' : activeSubsection);
   }
   updateBreadcrumbsAndNav();
   visibleCount = batchSize;
@@ -238,6 +260,12 @@ async function init() {
     modalCloseBtn.addEventListener('click', () => diagnosticModal.close());
   }
 
+  window.addEventListener('hashchange', () => {
+    if (activeSection === 'historical') {
+      renderHistoricalRankings();
+    }
+  });
+
   await loadData();
 
   if (state.player) {
@@ -247,6 +275,7 @@ async function init() {
 
 function getActiveSystem() {
   if (activeSection === 'power_rankings') return 'custom';
+  if (activeSection === 'historical') return 'historical';
   return activeSubsection || 'overview';
 }
 
@@ -272,7 +301,105 @@ async function onFilterChange(event) {
   await loadData();
 }
 
+let historicalRankingsData = null;
+
+async function renderHistoricalRankings() {
+  if (!historicalRankingsData) {
+    try {
+      const res = await fetch('data/rankings.json');
+      if (res.ok) {
+        historicalRankingsData = await res.json();
+      }
+    } catch (e) {
+      rankingsContent.innerHTML = '<div class="empty glass">Could not load historical rankings data.</div>';
+      return;
+    }
+  }
+
+  if (!historicalRankingsData || !historicalRankingsData.games) {
+    rankingsContent.innerHTML = '<div class="empty glass">No historical rankings available.</div>';
+    return;
+  }
+
+  const games = historicalRankingsData.games;
+  const rawHash = location.hash.replace(/^#/, '');
+  const selectedGame = games.find(g => g.id === rawHash || g.slug === rawHash) || games[0];
+
+  const md = d => new Date(d + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const period = (s, e) => s.slice(0, 4) === e.slice(0, 4)
+    ? `${md(s)} – ${md(e)}, ${e.slice(0, 4)}`
+    : `${md(s)}, ${s.slice(0, 4)} – ${md(e)}, ${e.slice(0, 4)}`;
+
+  const items = [...(historicalRankingsData.rankings[selectedGame.id] || [])].sort((a, b) => b.end.localeCompare(a.end));
+
+  let listHtml = '';
+  if (!items.length) {
+    listHtml = '<div class="empty glass">No rankings published for this game yet.</div>';
+  } else {
+    let lastYear = '';
+    listHtml = items.map(r => {
+      const year = r.end.slice(0, 4);
+      const label = year === lastYear ? '' : year;
+      lastYear = year;
+      return `<div class="rk"><div class="yr mono">${label}</div>
+        <a class="card glass" href="ranking.html?id=${encodeURIComponent(r.id)}">
+          <div class="main">
+            <div class="line"><span class="name">${esc(r.name)}</span><span class="status ${r.status === 'current' ? 'current' : ''}">${r.status === 'current' ? 'CURRENT' : 'FINAL'}</span></div>
+            <div class="line meta"><span class="glass pill chip">${esc(selectedGame.name)}</span><span>${period(r.start, r.end)}</span></div>
+          </div>
+          <div class="side-info">
+            <div><span class="mono p1" style="font-weight:700">#1</span> ${esc(r.top)}</div>
+            <span class="mono muted" style="font-size:12px">${r.players} players</span>
+            <span class="go">Read ranking →</span>
+          </div>
+        </a></div>`;
+    }).join('');
+  }
+
+  const gameSwitches = games.map(g =>
+    `<a class="${g.id === selectedGame.id ? 'on' : ''}" href="#${esc(g.id)}" onclick="setTimeout(() => { if (activeSection === 'historical') renderHistoricalRankings(); }, 10);">${esc(g.name)}</a>`
+  ).join('');
+
+  rankingsContent.innerHTML = `
+    <section class="head-panel glass">
+      <div class="historical-head-actions">
+        <div>
+          <div class="eyebrow mono">HISTORICAL POWER RANKINGS</div>
+          <h2 class="display" style="font-size:36px; margin: 8px 0;">${esc(selectedGame.name)} power rankings</h2>
+          <p class="muted lead">Rankings are published by each game’s community. Newest first.</p>
+        </div>
+        <a href="ranking-creator.html" class="create-ranking-btn">
+          <span style="font-size: 18px; line-height: 1;">+</span>
+          <span>Create</span>
+        </a>
+      </div>
+      <nav id="switch" class="switch glass pill" aria-label="Game Switcher">
+        ${gameSwitches}
+      </nav>
+    </section>
+    <div id="list" class="list-col">
+      ${listHtml}
+    </div>
+  `;
+}
+
 async function loadData() {
+  if (activeSection === 'historical') {
+    if (activeFetchController) {
+      activeFetchController.abort();
+    }
+    cleanupObserver();
+    const controlsPanel = $('.ranking-controls-panel');
+    if (controlsPanel) controlsPanel.style.display = 'none';
+    if (rankingStatus) rankingStatus.style.display = 'none';
+    renderHistoricalRankings();
+    return;
+  }
+
+  const controlsPanel = $('.ranking-controls-panel');
+  if (controlsPanel) controlsPanel.style.display = '';
+  if (rankingStatus) rankingStatus.style.display = '';
+
   if (activeFetchController) {
     activeFetchController.abort();
   }
