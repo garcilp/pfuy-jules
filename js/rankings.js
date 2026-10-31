@@ -323,18 +323,35 @@ async function renderHistoricalRankings() {
 
   const games = historicalRankingsData.games;
   const rawHash = location.hash.replace(/^#/, '');
-  const selectedGame = games.find(g => g.id === rawHash || g.slug === rawHash) || games[0];
+  const isAll = !rawHash || rawHash === 'all';
+  const selectedGame = isAll ? null : (games.find(g => g.id === rawHash || g.slug === rawHash) || null);
 
   const md = d => new Date(d + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   const period = (s, e) => s.slice(0, 4) === e.slice(0, 4)
     ? `${md(s)} – ${md(e)}, ${e.slice(0, 4)}`
     : `${md(s)}, ${s.slice(0, 4)} – ${md(e)}, ${e.slice(0, 4)}`;
 
-  const items = [...(historicalRankingsData.rankings[selectedGame.id] || [])].sort((a, b) => b.end.localeCompare(a.end));
+  let items = [];
+  if (isAll || !selectedGame) {
+    games.forEach(g => {
+      const gRankings = historicalRankingsData.rankings[g.id] || [];
+      gRankings.forEach(r => {
+        items.push({ ...r, gameName: g.name, gameSlug: g.slug });
+      });
+    });
+  } else {
+    items = (historicalRankingsData.rankings[selectedGame.id] || []).map(r => ({
+      ...r,
+      gameName: selectedGame.name,
+      gameSlug: selectedGame.slug
+    }));
+  }
+
+  items.sort((a, b) => b.end.localeCompare(a.end));
 
   let listHtml = '';
   if (!items.length) {
-    listHtml = '<div class="empty glass">No rankings published for this game yet.</div>';
+    listHtml = '<div class="empty glass">No rankings published for this selection yet.</div>';
   } else {
     let lastYear = '';
     listHtml = items.map(r => {
@@ -344,12 +361,10 @@ async function renderHistoricalRankings() {
       return `<div class="rk"><div class="yr mono">${label}</div>
         <a class="card glass" href="ranking.html?id=${encodeURIComponent(r.id)}">
           <div class="card-left">
-            <div class="hub-icon-wrapper glass">
-              <img class="hub-icon" src="assets/hubs/${esc(selectedGame.slug)}.webp" alt="" onerror="this.style.display='none';">
-            </div>
+            <img class="hub-icon" src="assets/hubs/${esc(r.gameSlug)}.webp" alt="" onerror="this.style.display='none';">
             <div class="main">
               <div class="line"><span class="name">${esc(r.name)}</span><span class="status ${r.status === 'current' ? 'current' : ''}">${r.status === 'current' ? 'CURRENT' : 'FINAL'}</span></div>
-              <div class="line meta"><span class="glass pill chip">${esc(selectedGame.name)}</span><span>${period(r.start, r.end)}</span></div>
+              <div class="line meta"><span class="glass pill chip">${esc(r.gameName)}</span><span>${period(r.start, r.end)}</span></div>
             </div>
           </div>
           <div class="side-info">
@@ -361,16 +376,22 @@ async function renderHistoricalRankings() {
     }).join('');
   }
 
-  const gameSwitches = games.map(g =>
-    `<a class="${g.id === selectedGame.id ? 'on' : ''}" href="#${esc(g.id)}">${esc(g.name)}</a>`
-  ).join('');
+  const allActive = isAll || !selectedGame;
+  const gameSwitches = [
+    `<a class="${allActive ? 'on' : ''}" href="#all">All games</a>`,
+    ...games.map(g =>
+      `<a class="${!allActive && selectedGame && selectedGame.id === g.id ? 'on' : ''}" href="#${esc(g.id)}">${esc(g.name)}</a>`
+    )
+  ].join('');
+
+  const displayTitle = (isAll || !selectedGame) ? 'All games power rankings' : `${esc(selectedGame.name)} power rankings`;
 
   rankingsContent.innerHTML = `
     <section class="head-panel glass">
       <div class="historical-head-actions">
         <div>
           <div class="eyebrow mono">HISTORICAL POWER RANKINGS</div>
-          <h2 class="display" style="font-size:36px; margin: 8px 0;">${esc(selectedGame.name)} power rankings</h2>
+          <h2 class="display" style="font-size:36px; margin: 8px 0;">${displayTitle}</h2>
           <p class="muted lead">Rankings are published by each game’s community. Newest first.</p>
         </div>
         <a href="ranking-creator.html" class="create-ranking-btn">

@@ -128,7 +128,7 @@
 .rk .card {
   flex: 1 1 480px;
   min-width: 0;
-  padding: 20px 24px;
+  padding: 18px 24px;
   border-radius: 24px;
   display: flex;
   gap: 20px;
@@ -146,25 +146,14 @@
 .card .card-left {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 12px;
   min-width: 0;
   flex: 1 1 auto;
 }
-.card .hub-icon-wrapper {
-  width: 52px;
-  height: 52px;
-  min-width: 52px;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  overflow: hidden;
-}
 .card .hub-icon {
-  width: 40px;
-  height: 40px;
+  width: 64px;
+  height: 64px;
+  min-width: 64px;
   object-fit: contain;
   display: block;
 }
