@@ -131,9 +131,8 @@
   padding: 18px 24px;
   border-radius: 24px;
   display: flex;
-  gap: 20px;
+  gap: 12px;
   align-items: center;
-  justify-content: space-between;
   flex-wrap: wrap;
   color: var(--text);
   text-decoration: none;
@@ -143,25 +142,20 @@
   border-color: rgba(255, 255, 255, .38);
   background: rgba(255, 255, 255, .12);
 }
-.card .card-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 0;
-  flex: 1 1 auto;
-}
 .card .hub-icon {
   width: 64px;
   height: 64px;
   min-width: 64px;
   object-fit: contain;
   display: block;
+  flex-shrink: 0;
 }
 .card .main {
   display: flex;
   flex-direction: column;
   gap: 10px;
   min-width: 0;
+  flex: 1 1 auto;
 }
 .card .name {
   font-size: 20px;
@@ -178,6 +172,7 @@
   align-items: center;
   gap: 24px;
   flex-wrap: wrap;
+  margin-left: auto;
 }
 .status {
   font: 11px 'JetBrains Mono', monospace;

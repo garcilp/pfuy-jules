@@ -360,12 +360,10 @@ async function renderHistoricalRankings() {
       lastYear = year;
       return `<div class="rk"><div class="yr mono">${label}</div>
         <a class="card glass" href="ranking.html?id=${encodeURIComponent(r.id)}">
-          <div class="card-left">
-            <img class="hub-icon" src="assets/hubs/${esc(r.gameSlug)}.webp" alt="" onerror="this.style.display='none';">
-            <div class="main">
-              <div class="line"><span class="name">${esc(r.name)}</span><span class="status ${r.status === 'current' ? 'current' : ''}">${r.status === 'current' ? 'CURRENT' : 'FINAL'}</span></div>
-              <div class="line meta"><span class="glass pill chip">${esc(r.gameName)}</span><span>${period(r.start, r.end)}</span></div>
-            </div>
+          <img class="hub-icon" src="assets/hubs/${esc(r.gameSlug)}.webp" alt="" onerror="this.style.display='none';">
+          <div class="main">
+            <div class="line"><span class="name">${esc(r.name)}</span><span class="status ${r.status === 'current' ? 'current' : ''}">${r.status === 'current' ? 'CURRENT' : 'FINAL'}</span></div>
+            <div class="line meta"><span class="glass pill chip">${esc(r.gameName)}</span><span>${period(r.start, r.end)}</span></div>
           </div>
           <div class="side-info">
             <div><span class="mono p1" style="font-weight:700">#1</span> ${esc(r.top)}</div>
