@@ -341,6 +341,50 @@ def startgg_metadata():
         return {}
 
 
+def count_events_per_identity(connection, player_ids, exclusions=None, event_links=None, amateur_cfg=None):
+    if exclusions is None:
+        exclusions = visibility_exclusions()
+    if event_links is None:
+        event_links = event_group_overrides()
+    if amateur_cfg is None:
+        amateur_cfg = amateur_brackets_config()
+    counts_by_game = {}
+    for pid in player_ids:
+        rows = connection.execute(
+            "SELECT DISTINCT e.id AS event_id, e.name AS event_name, e.num_entrants, e.source_url, "
+            "e.videogame_slug, v.name AS videogame_name, t.slug AS tournament_slug, "
+            "t.name AS tournament_name, t.start_at AS tournament_start, e.is_temporary "
+            "FROM participants p "
+            "JOIN entrant_participants ep ON ep.participant_id=p.id "
+            "JOIN entrants en ON en.id=ep.entrant_id "
+            "JOIN events e ON e.id=en.event_id "
+            "JOIN videogames v ON v.slug=e.videogame_slug "
+            "JOIN tournaments t ON t.slug=e.tournament_slug "
+            "WHERE p.player_id=? ORDER BY e.videogame_slug, e.id",
+            (pid,),
+        ).fetchall()
+        rows = [r for r in rows if not r["is_temporary"] and normalize_event_key(r["source_url"]) not in exclusions["events"]]
+        by_game = {}
+        for row in rows:
+            event_id = text_id(row["event_id"])
+            game_slug = row["videogame_slug"]
+            own_entrants = [text_id(r[0]) for r in connection.execute(
+                "SELECT DISTINCT en.id FROM entrants en "
+                "JOIN entrant_participants ep ON ep.participant_id=p.id "
+                "JOIN participants p ON p.id=ep.participant_id "
+                "WHERE en.event_id=? AND p.player_id=?",
+                [event_id, pid],
+            )]
+            if not own_entrants:
+                continue
+            g = by_game.setdefault(game_slug, [])
+            g.append({"eventKey": normalize_event_key(row["source_url"]) or f"event:{event_id}", "event": row["event_name"]})
+        for game_slug, results in by_game.items():
+            combined = combine_linked_events(results, event_links, {}, amateur_cfg)
+            counts_by_game[game_slug] = counts_by_game.get(game_slug, 0) + len(combined)
+    return counts_by_game
+
+
 def profile_for_player(connection, player_id, display_tag, profile_slug):
     merges = identity_merges()
     latest_player_tags = current_player_tags(connection, merges)
@@ -524,14 +568,23 @@ def profile_for_player(connection, player_id, display_tag, profile_slug):
                 opponent_ids,
             ).fetchall() if opponent_ids else []
             names_by_entrant = {}
+            opponent_canonical_ids = set()
             for tag_row in opponent_tag_rows:
                 player_key = canonical_id(text_id(tag_row["player_id"]), merges) if tag_row["player_id"] is not None else None
+                if player_key:
+                    opponent_canonical_ids.add(player_key)
                 current_tag = latest_player_tags.get(player_key) if player_key else None
                 names_by_entrant.setdefault(text_id(tag_row["entrant_id"]), []).append(current_tag or tag_row["gamer_tag"])
             opponent_display = ", ".join(dict.fromkeys(
                 tag for entrant_id in opponent_ids
                 for tag in (names_by_entrant.get(entrant_id) or [opponent_names[entrant_id]])
             )) or "Unknown"
+            is_opponent_excluded = bool(
+                game_slug and any(
+                    game_slug in exclusions.get("playerGames", {}).get(opp_id, [])
+                    for opp_id in opponent_canonical_ids
+                )
+            )
             opponent_score = next((opponent_scores[key] for key in opponent_ids if opponent_scores.get(key)), None)
             outcome = "win" if own_won else ("loss" if winner_id is not None else "unknown")
             score = f"{preferred_own_score}–{opponent_score}" if preferred_own_score is not None and opponent_score is not None else (set_row["display_score"] or "")
@@ -558,6 +611,7 @@ def profile_for_player(connection, player_id, display_tag, profile_slug):
                 "opponent": opponent_display,
                 "score": score,
                 "outcome": outcome,
+                "opponentExcluded": is_opponent_excluded,
                 "ownSeed": own_seed,
                 "opponentSeed": opponent_seed,
                 "isUpset": is_upset,
@@ -887,6 +941,14 @@ def profile_for_player(connection, player_id, display_tag, profile_slug):
     profile["games"] = [game for game in profile["games"]
                         if game.get("id") not in player_excluded_games
                         and game.get("slug") not in player_excluded_games]
+
+    if len(player_ids) > 1:
+        additive_counts = count_events_per_identity(connection, player_ids, exclusions, event_links, amateur_cfg)
+        for game in profile["games"]:
+            g_slug = game.get("slug") or game.get("id")
+            if g_slug in additive_counts:
+                game["events"] = additive_counts[g_slug]
+
     visible_dates = [result["date"] for game in profile["games"]
                      for result in game.get("results", []) if result.get("date")]
     profile["player"]["activeSince"] = min(visible_dates) if visible_dates else None
