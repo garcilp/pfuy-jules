@@ -202,9 +202,25 @@ $('#merge-form').addEventListener('submit', async event => {
   const sourceName = $('#merge-source').selectedOptions[0].textContent;
   const targetName = $('#merge-target').selectedOptions[0].textContent;
   if (!confirm(`Merge ${sourceName} into ${targetName}? The retained profile ID will be ${targetId}.`)) return;
-  message.textContent = 'Merging and rebuilding profiles…';
+  message.textContent = 'Checking for overlaps and merging…';
   try {
-    await api('/api/admin/merge', { method: 'POST', body: JSON.stringify({ sourceId, targetId }) });
+    let res = await api('/api/admin/merge', { method: 'POST', body: JSON.stringify({ sourceId, targetId }) });
+    if (res && res.warning && res.overlaps && res.overlaps.length > 0) {
+      const overlapDetails = res.overlaps.map(o => {
+        const dateStr = o.startAt ? new Date(o.startAt * 1000).toLocaleDateString() : 'Unknown date';
+        const game = o.gameSlug || 'Unknown game';
+        return `• ${o.tournamentName || 'Tournament'} - ${o.eventName || 'Event'} (${game}, ${dateStr})`;
+      }).join('\n');
+      const confirmed = confirm(
+        `Warning: These profiles share tournament participation in ${res.overlaps.length} event(s):\n\n${overlapDetails}\n\nDo you want to proceed with merging them?`
+      );
+      if (!confirmed) {
+        message.textContent = 'Merge cancelled.';
+        return;
+      }
+      message.textContent = 'Merging and rebuilding profiles…';
+      res = await api('/api/admin/merge', { method: 'POST', body: JSON.stringify({ sourceId, targetId, confirmed: true }) });
+    }
     message.textContent = `Merged ${sourceName} into ${targetName}.`;
     await loadProfiles();
   } catch (error) { message.textContent = error.message; }

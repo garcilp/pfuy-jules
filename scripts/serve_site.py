@@ -43,6 +43,58 @@ def identity_merges():
         return {}
 
 
+def get_player_overlapping_events(player_a_id: str, player_b_id: str):
+    """
+    Finds shared tournament event participation between two players.
+    Returns a list of dicts with eventId, eventName, tournamentName, startAt, and gameSlug.
+    """
+    db_path = ROOT / "startgg-data" / "platfighters.sqlite3"
+    if not db_path.exists():
+        return []
+    try:
+        con = sqlite3.connect(str(db_path))
+        con.row_factory = sqlite3.Row
+        cur = con.cursor()
+        query = """
+            SELECT DISTINCT
+                e.id AS event_id,
+                e.name AS event_name,
+                t.name AS tournament_name,
+                t.start_at AS start_at,
+                e.videogame_slug AS game_slug,
+                p.player_id AS player_id
+            FROM entrants ent
+            JOIN events e ON ent.event_id = e.id
+            JOIN tournaments t ON e.tournament_slug = t.slug
+            JOIN entrant_participants ep ON ep.entrant_id = ent.id
+            JOIN participants p ON ep.participant_id = p.id
+            WHERE p.player_id IN (?, ?)
+        """
+        cur.execute(query, (str(player_a_id), str(player_b_id)))
+        rows = cur.fetchall()
+        con.close()
+
+        from collections import defaultdict
+        events_by_id = defaultdict(list)
+        event_info = {}
+        for row in rows:
+            eid = str(row["event_id"])
+            events_by_id[eid].append(str(row["player_id"]))
+            if eid not in event_info:
+                event_info[eid] = {
+                    "eventId": eid,
+                    "eventName": row["event_name"] or "",
+                    "tournamentName": row["tournament_name"] or "",
+                    "startAt": row["start_at"],
+                    "gameSlug": row["game_slug"] or "",
+                }
+
+        overlaps = [event_info[eid] for eid, pids in events_by_id.items() if len(set(pids)) > 1]
+        return overlaps
+    except Exception:
+        return []
+
+
 def canonical_id(player_id, merges):
     current, seen = str(player_id), set()
     while current in merges and current not in seen:
@@ -501,6 +553,16 @@ class Handler(SimpleHTTPRequestHandler):
             if canonical_id(target, {**merges, source: target}) == source:
                 self.send_json(400, {"error": "That merge would create an identity loop."})
                 return
+            confirmed = body.get("confirmed", False)
+            if not confirmed:
+                overlaps = get_player_overlapping_events(source, target)
+                if overlaps:
+                    self.send_json(200, {
+                        "warning": True,
+                        "overlaps": overlaps,
+                        "message": f"Source and target share {len(overlaps)} tournament event(s)."
+                    })
+                    return
             merges[source] = target
             atomic_json(PROFILE_DIR / "merges.json", merges)
             builder = ROOT / "scripts" / "build_player_profile.py"
