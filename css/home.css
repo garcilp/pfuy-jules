@@ -78,8 +78,8 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  max-width: 640px;
   width: 100%;
-  max-width: 100%;
   min-height: 60px;
   padding: 6px 6px 6px 20px;
   border-radius: 999px;
@@ -499,6 +499,24 @@
   line-height: 1;
   color: rgba(255, 255, 255, 0.08);
   pointer-events: none;
+  z-index: 0;
+}
+
+.home .hub .hub-art {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  opacity: 0.25;
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity 150ms ease;
+}
+
+.home .hub:hover .hub-art {
+  opacity: 0.45;
 }
 
 .home .hub b {
@@ -560,23 +578,31 @@
   margin-top: 12px;
 }
 
-.home .hub-btn {
+.home .hub-social-btn {
   display: inline-flex;
   align-items: center;
-  min-height: 38px;
-  padding: 0 14px;
-  font-size: 13px;
-  border-radius: 999px;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: var(--text);
   text-decoration: none;
-  transition: background 150ms ease;
+  transition: background 150ms ease, transform 150ms ease, border-color 150ms ease;
 }
 
-.home .hub-btn:hover {
-  background: rgba(255, 255, 255, 0.18);
-  color: var(--text);
+.home .hub-social-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.home .hub-social-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: var(--sky);
+  transform: translateY(-2px);
+  color: #fff;
 }
 
 .home .empty-notice {

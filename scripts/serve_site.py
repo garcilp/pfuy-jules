@@ -21,6 +21,7 @@ ROOT = Path(__file__).resolve().parent.parent
 PROFILE_DIR = ROOT / "data" / "profiles"
 EVENT_GROUPS_PATH = PROFILE_DIR / "event_groups.json"
 EXCLUSIONS_PATH = PROFILE_DIR / "exclusions.json"
+COMMUNITY_SOCIALS_PATH = ROOT / "data" / "community_socials.json"
 DATABASE = ROOT / "startgg-data" / "platfighters.sqlite3"
 PLAYER_ASSETS = ROOT / "assets" / "players"
 SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9-]{0,100}$")
@@ -84,6 +85,18 @@ def visibility_exclusions():
         }
     except (OSError, json.JSONDecodeError, AttributeError, TypeError):
         return {"events": [], "playerGames": {}}
+
+
+def community_socials():
+    try:
+        if COMMUNITY_SOCIALS_PATH.exists():
+            with COMMUNITY_SOCIALS_PATH.open(encoding="utf-8") as stream:
+                data = json.load(stream)
+                if isinstance(data, dict):
+                    return data
+    except (OSError, json.JSONDecodeError):
+        pass
+    return {}
 
 
 def rebuild_profiles():
@@ -259,6 +272,10 @@ class Handler(SimpleHTTPRequestHandler):
             if not self.require_admin():
                 return
             self.send_json(200, {"merges": identity_merges()})
+        elif parsed.path == "/api/admin/community-socials":
+            if not self.require_admin():
+                return
+            self.send_json(200, {"socials": community_socials()})
         elif parsed.path == "/api/admin/event-groups":
             if not self.require_admin():
                 return
@@ -460,6 +477,15 @@ class Handler(SimpleHTTPRequestHandler):
             path = PLAYER_ASSETS / f"{player_id}{MIME_EXTENSIONS[mime]}"
             path.write_bytes(photo)
             self.send_json(200, {"path": f"assets/players/{path.name}"})
+        elif parsed.path == "/api/admin/community-socials":
+            if not self.require_admin():
+                return
+            socials = body.get("socials")
+            if not isinstance(socials, dict):
+                self.send_json(400, {"error": "Invalid socials configuration."})
+                return
+            atomic_json(COMMUNITY_SOCIALS_PATH, socials)
+            self.send_json(200, {"socials": socials})
         elif parsed.path == "/api/admin/merge":
             if not self.require_admin():
                 return
