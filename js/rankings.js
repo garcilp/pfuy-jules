@@ -317,6 +317,41 @@ async function onFilterChange(event) {
 }
 
 let historicalRankingsData = null;
+const historicalArticlesCache = {};
+
+async function fetchHistoricalArticle(id) {
+  if (historicalArticlesCache[id]) return historicalArticlesCache[id];
+  try {
+    const res = await fetch(`data/rankings/${encodeURIComponent(id)}.json`);
+    if (res.ok) {
+      const data = await res.json();
+      historicalArticlesCache[id] = data;
+      return data;
+    }
+  } catch (err) {
+    // Article might not exist yet as individual JSON, fall back gracefully
+  }
+  return null;
+}
+
+function getRankingTop3(r, article) {
+  if (article && Array.isArray(article.players) && article.players.length > 0) {
+    return article.players.slice(0, 3).map((p, idx) => ({
+      placement: p.placement || idx + 1,
+      tag: p.tag || p.player || `Player${idx + 1}`
+    }));
+  }
+  if (Array.isArray(r.top3) && r.top3.length > 0) {
+    return r.top3.slice(0, 3).map((tag, idx) => ({
+      placement: idx + 1,
+      tag: tag
+    }));
+  }
+  if (r.top) {
+    return [{ placement: 1, tag: r.top }];
+  }
+  return [];
+}
 
 async function renderHistoricalRankings() {
   if (!historicalRankingsData) {
@@ -368,21 +403,48 @@ async function renderHistoricalRankings() {
   if (!items.length) {
     listHtml = '<div class="empty glass">No rankings published for this selection yet.</div>';
   } else {
+    // Fetch article details in parallel if available to show top 3 players
+    const articles = await Promise.all(items.map(r => fetchHistoricalArticle(r.id)));
+
     let lastYear = '';
-    listHtml = items.map(r => {
+    listHtml = items.map((r, index) => {
       const year = r.end.slice(0, 4);
       const label = year === lastYear ? '' : year;
       lastYear = year;
+      const article = articles[index];
+      const top3 = getRankingTop3(r, article);
+
+      let top3Html = '';
+      if (top3.length > 0) {
+        top3Html = top3.map(p => `<span class="top-player-item"><b class="mono p${p.placement}">#${p.placement}</b> ${esc(p.tag)}</span>`).join('<span class="dot-sep">·</span>');
+      }
+
       return `<div class="rk"><div class="yr mono">${label}</div>
         <a class="card glass" href="ranking.html?id=${encodeURIComponent(r.id)}">
-          <img class="hub-icon" src="assets/hubs/${esc(r.gameSlug)}.webp" alt="" onerror="this.style.display='none';">
+          <div class="hub-icon-col">
+            <img class="hub-icon" src="assets/hubs/${esc(r.gameSlug)}.webp" alt="" onerror="this.onerror=null; this.src='assets/players/${esc(r.gameSlug)}.png'; this.style.display=this.src.includes('undefined')?'none':'block';">
+          </div>
           <div class="main">
-            <div class="line"><span class="name">${esc(r.name)}</span><span class="status ${r.status === 'current' ? 'current' : ''}">${r.status === 'current' ? 'CURRENT' : 'FINAL'}</span></div>
-            <div class="line meta"><span class="glass pill chip">${esc(r.gameName)}</span><span>${period(r.start, r.end)}</span></div>
-            <div class="line side-info">
-              <div><span class="mono p1" style="font-weight:700">#1</span> ${esc(r.top)}</div>
-              <span class="mono muted" style="font-size:12px">${r.players} players</span>
-              <span class="go">View Ranking →</span>
+            <!-- Row 1: Ranking Identity -->
+            <div class="row-identity">
+              <span class="name">${esc(r.name)}</span>
+              <span class="status ${r.status === 'current' ? 'current' : ''}">${r.status === 'current' ? 'CURRENT' : 'FINAL'}</span>
+            </div>
+
+            <!-- Row 2: Ranking Details -->
+            <div class="row-details">
+              <span class="glass pill chip">${esc(r.gameName)}</span>
+              <span class="period mono">${period(r.start, r.end)}</span>
+            </div>
+
+            <!-- Row 3: Ranking Summary & Action -->
+            <div class="row-summary">
+              <div class="top-three mono">
+                ${top3Html}
+              </div>
+              <span class="dot-sep">·</span>
+              <span class="players-count mono muted">${r.players} players</span>
+              <span class="view-link mono">View Ranking →</span>
             </div>
           </div>
         </a></div>`;
@@ -1056,7 +1118,6 @@ function renderCustomPowerRankings() {
           <h2 style="margin:4px 0 0; font-size:26px;">Linked Weights &amp; Formula Budget</h2>
         </div>
         <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-          <button class="btn glass pill mono" style="font-size:13px; font-weight:700; color:var(--sky); border-color:var(--sky); cursor:pointer;" onclick="createPRFromCurrentRankings()">${(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es') ? 'Crear PR' : 'Create PR'}</button>
           <button class="quiet-button mono" style="font-size:12px; padding:6px 12px; border:1px solid rgba(255,255,255,0.2); border-radius:6px; cursor:pointer;" onclick="resetToDefaultPRWeights()">${(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es') ? 'Restablecer Valores (55/20/15/10)' : 'Reset to Defaults (55/20/15/10)'}</button>
           <div class="pr-total-badge mono" id="pr-total-badge">
             ${(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es') ? 'PESO TOTAL:' : 'TOTAL WEIGHT:'} <b>100%</b>
@@ -1096,64 +1157,42 @@ function renderCustomPowerRankings() {
     </div>
 
     <div class="panel glass ranking-table-panel">
-      <div class="pr-cards-list">
-        ${visibleList.length ? visibleList.map(p => {
-          const currentGameSlug = gameFilter.value || 'ultimate';
-          const isSelected = (inspectedPlayer && inspectedPlayer.playerId === p.playerId);
-          const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
-          return `
-            <div class="pr-card-row ranking-row ${isSelected ? 'selected' : ''}" onclick="onPRSelectPlayer('${esc(p.playerId)}')">
-              <div class="pr-row-left">
-                <img class="pr-row-icon" src="assets/hubs/${esc(currentGameSlug)}.webp" alt="" onerror="this.src='assets/players/${esc(p.playerId)}.png'; this.onerror=function(){this.style.display='none';};">
-              </div>
-              <div class="pr-row-right">
-                <!-- Row 1: Rank, Avatar & Tag, Score Badge, Actions -->
-                <div class="pr-row-line line1">
-                  <span class="pr-row-rank mono ${p.rank && p.rank <= 3 ? 'p' + p.rank : ''}">#${p.rank}</span>
-                  <div class="pr-row-player">
-                    <span class="player-avatar mini"><img src="assets/players/${esc(p.playerId)}.png" alt="" onerror="this.remove()"></span>
-                    <a href="index.html?player=${encodeURIComponent(p.playerId)}" class="pr-row-tag" onclick="event.stopPropagation();">${esc(p.playerTag)}</a>
-                  </div>
-                  <div class="pr-row-score-badge mono">
-                    <span>${isEs ? 'PUNTAJE:' : 'SCORE:'}</span> <b>${p.score}</b>
-                  </div>
-                  <div class="pr-row-actions" onclick="event.stopPropagation();">
-                    <button class="quiet-button diagnostic-btn" onclick="openDiagnosticModal('${esc(p.playerId)}')">${isEs ? 'Diagnóstico' : 'Diagnostic'}</button>
-                  </div>
-                </div>
+      <div class="pr-table-toolbar">
+        <button class="pr-create-pill-btn mono" onclick="createPRFromCurrentRankings()">
+          ${(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es') ? 'CREAR PR' : 'CREATE PR'}
+        </button>
+      </div>
+      <div class="table">
+        <div class="tr head ranking-row" style="grid-template-columns: 60px minmax(180px,1.8fr) 110px repeat(4, minmax(90px, 1fr)) 110px;">
+          <span class="sortable" onclick="changeSort('rank')">${(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es') ? 'PUESTO' : 'RANK'} ${sortCol === 'rank' ? (sortAsc ? '▲' : '▼') : ''}</span>
+          <span class="sortable" onclick="changeSort('playerTag')">${(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es') ? 'JUGADOR' : 'PLAYER'} ${sortCol === 'playerTag' ? (sortAsc ? '▲' : '▼') : ''}</span>
+          <span class="sortable" onclick="changeSort('score')">${(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es') ? 'PUNTAJE' : 'SCORE'} ${sortCol === 'score' ? (sortAsc ? '▲' : '▼') : ''}</span>
+          <span>GLICKO-2</span>
+          <span>${(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es') ? 'VICTORIAS CALIDAD' : 'QUALITY WINS'}</span>
+          <span>SOF</span>
+          <span>${(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es') ? 'CONSISTENCIA' : 'CONSISTENCY'}</span>
+          <span>${(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es') ? 'ACCIONES' : 'ACTIONS'}</span>
+        </div>
 
-                <!-- Row 2: 4 Breakdown Contributions -->
-                <div class="pr-row-line pr-row-breakdown mono">
-                  <span class="pr-breakdown-item" style="color:${PR_COMPONENTS.glicko2.color};">
-                    <span class="pr-breakdown-swatch" style="background:${PR_COMPONENTS.glicko2.color};"></span>
-                    <b>Glicko-2:</b> +${Math.round((p.weightedContributions.glicko2||0)*10)/10} <small class="muted">(${Math.round((p.normalizedScores.glicko2||0)*10)/10})</small>
-                  </span>
-                  <span class="pr-breakdown-item" style="color:${PR_COMPONENTS.quality_wins.color};">
-                    <span class="pr-breakdown-swatch" style="background:${PR_COMPONENTS.quality_wins.color};"></span>
-                    <b>${isEs ? 'Victorias de Calidad:' : 'Quality Wins:'}</b> +${Math.round((p.weightedContributions.quality_wins||0)*10)/10} <small class="muted">(${Math.round((p.normalizedScores.quality_wins||0)*10)/10})</small>
-                  </span>
-                  <span class="pr-breakdown-item" style="color:${PR_COMPONENTS.sof.color};">
-                    <span class="pr-breakdown-swatch" style="background:${PR_COMPONENTS.sof.color};"></span>
-                    <b>${isEs ? 'Fuerza de Campo:' : 'SOF:'}</b> +${Math.round((p.weightedContributions.sof||0)*10)/10} <small class="muted">(${Math.round((p.normalizedScores.sof||0)*10)/10})</small>
-                  </span>
-                  <span class="pr-breakdown-item" style="color:${PR_COMPONENTS.loss_quality.color};">
-                    <span class="pr-breakdown-swatch" style="background:${PR_COMPONENTS.loss_quality.color};"></span>
-                    <b>${isEs ? 'Consistencia:' : 'Consistency:'}</b> +${Math.round((p.weightedContributions.loss_quality||0)*10)/10} <small class="muted">(${Math.round((p.normalizedScores.loss_quality||0)*10)/10})</small>
-                  </span>
-                </div>
-
-                <!-- Row 3: Meta (Matches, Events, and Supporting stats) -->
-                <div class="pr-row-line pr-row-meta mono">
-                  <span>${p.matches || 0} ${isEs ? 'partidas' : 'matches'}</span>
-                  <span>·</span>
-                  <span>${p.events || 0} ${isEs ? 'torneos' : 'events'}</span>
-                  <span>·</span>
-                  <span class="muted">${isEs ? 'Contribución total ponderada:' : 'Total weighted contribution:'} <b>${p.score} pts</b></span>
-                </div>
-              </div>
+        ${visibleList.length ? visibleList.map(p => `
+          <div class="tr ranking-row" style="grid-template-columns: 60px minmax(180px,1.8fr) 110px repeat(4, minmax(90px, 1fr)) 110px; cursor:pointer;" onclick="onPRSelectPlayer('${esc(p.playerId)}')">
+            <span class="rank-col font-bold ${p.rank && p.rank <= 3 ? 'p' + p.rank : ''}">#${p.rank}</span>
+            <div class="player-col">
+              <a href="index.html?player=${encodeURIComponent(p.playerId)}" class="player-card-link" onclick="event.stopPropagation();">
+                <span class="player-avatar mini"><img src="assets/players/${esc(p.playerId)}.png" alt="" onerror="this.remove()"></span>
+                <b>${esc(p.playerTag)}</b>
+              </a>
             </div>
-          `;
-        }).join('') : `<div class="empty-state"><p class="muted">${(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es') ? 'Ningún jugador coincide con el filtro.' : 'No players match the search filter.'}</p></div>`}
+            <span class="score-col mono font-bold">${p.score}</span>
+            <span class="mono" style="color:${PR_COMPONENTS.glicko2.color};">${Math.round((p.weightedContributions.glicko2||0)*10)/10} <small class="muted">(${Math.round((p.normalizedScores.glicko2||0)*10)/10})</small></span>
+            <span class="mono" style="color:${PR_COMPONENTS.quality_wins.color};">${Math.round((p.weightedContributions.quality_wins||0)*10)/10} <small class="muted">(${Math.round((p.normalizedScores.quality_wins||0)*10)/10})</small></span>
+            <span class="mono" style="color:${PR_COMPONENTS.sof.color};">${Math.round((p.weightedContributions.sof||0)*10)/10} <small class="muted">(${Math.round((p.normalizedScores.sof||0)*10)/10})</small></span>
+            <span class="mono" style="color:${PR_COMPONENTS.loss_quality.color};">${Math.round((p.weightedContributions.loss_quality||0)*10)/10} <small class="muted">(${Math.round((p.normalizedScores.loss_quality||0)*10)/10})</small></span>
+            <div class="actions-col" onclick="event.stopPropagation();">
+              <button class="quiet-button diagnostic-btn" onclick="openDiagnosticModal('${esc(p.playerId)}')">${(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es') ? 'Diagnóstico' : 'Diagnostic'}</button>
+            </div>
+          </div>
+        `).join('') : `<div class="empty-state"><p class="muted">${(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es') ? 'Ningún jugador coincide con el filtro.' : 'No players match the search filter.'}</p></div>`}
       </div>
 
       ${totalFiltered > 0 ? `
