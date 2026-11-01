@@ -12,18 +12,20 @@
 <header class="topbar glass pill">
   <a class="brand" href="index.html"><img src="assets/logo.jpg" alt="">Platfighters<span class="tld">.uy</span></a>
   <span class="spacer"></span>
-  <nav><a href="players.html">Players</a><a href="events.html">Events</a><a href="rankings.html">Rankings</a></nav>
-  <span class="badge" id="site-badge">SAMPLE DATA</span>
+  <nav><a href="players.html" data-i18n="nav.players">Players</a><a href="events.html" data-i18n="nav.events">Events</a><a href="rankings.html" data-i18n="nav.rankings">Rankings</a></nav>
+  <div class="lang glass pill"><button type="button" class="lang-btn on" data-lang="en">EN</button><button type="button" class="lang-btn" data-lang="es">ES</button></div>
+  <span class="badge" id="site-badge" data-i18n="badge.sample">SAMPLE DATA</span>
 </header>
 <div class="page">
   <aside class="side glass">
     <div id="profile" class="profile"></div>
     <nav id="tabs" class="tabs"></nav>
-    <p class="note mono muted">Game tabs are generated from the games found in this player’s start.gg entries.</p>
+    <p class="note mono muted" data-i18n="player.note">Game tabs are generated from the games found in this player’s start.gg entries.</p>
   </aside>
   <main id="main" class="content"></main>
 </div>
-<footer class="foot mono muted">Source: start.gg API · Served from local cache · Last synced <span id="synced">[TIMESTAMP]</span></footer>
+<footer class="foot mono muted"><span data-i18n="footer.source">Source: start.gg API · Served from local cache · Last synced</span> <span id="synced">[TIMESTAMP]</span></footer>
+<script src="js/i18n.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

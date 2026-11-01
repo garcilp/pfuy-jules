@@ -12,26 +12,27 @@
 <header class="topbar glass pill">
   <a class="brand" href="index.html"><img src="assets/logo.jpg" alt="">Platfighters<span class="tld">.uy</span></a>
   <span class="spacer"></span>
-  <nav><a href="players.html">Players</a><a href="events.html">Events</a><a href="rankings.html">Rankings</a></nav>
-  <span class="badge">ADMIN</span>
+  <nav><a href="players.html" data-i18n="nav.players">Players</a><a href="events.html" data-i18n="nav.events">Events</a><a href="rankings.html" data-i18n="nav.rankings">Rankings</a></nav>
+  <div class="lang glass pill"><button type="button" class="lang-btn on" data-lang="en">EN</button><button type="button" class="lang-btn" data-lang="es">ES</button></div>
+  <span class="badge" data-i18n="badge.admin">ADMIN</span>
 </header>
 <main class="admin-page page-single">
-  <section class="admin-heading"><div class="eyebrow mono">PLAYER MANAGEMENT</div><h1>Player data</h1><p class="muted">Update the profile details shown on Platfighters.uy.</p></section>
+  <section class="admin-heading"><div class="eyebrow mono" data-i18n="admin.eyebrow">PLAYER MANAGEMENT</div><h1 data-i18n="admin.title">Player data</h1><p class="muted" data-i18n="admin.desc">Update the profile details shown on Platfighters.uy.</p></section>
   <section id="admin-login" class="panel glass admin-panel">
-    <h2>Administrator sign in</h2><p class="muted admin-copy">Sign in to edit player profile information.</p>
+    <h2 data-i18n="admin.login.title">Administrator sign in</h2><p class="muted admin-copy" data-i18n="admin.login.desc">Sign in to edit player profile information.</p>
     <form id="login-form" class="admin-form">
-      <label>Admin password<input id="admin-password" type="password" autocomplete="current-password" required></label>
-      <button class="action-button" type="submit">Sign in</button>
+      <label><span data-i18n="admin.login.password">Admin password</span><input id="admin-password" type="password" autocomplete="current-password" required></label>
+      <button class="action-button" type="submit" data-i18n="admin.login.submit">Sign in</button>
       <p id="login-message" class="form-message mono" role="status"></p>
     </form>
   </section>
   <section id="admin-editor" class="panel glass admin-panel" hidden>
-    <div class="editor-heading"><div><h2>Edit player</h2><p class="muted admin-copy">Edit every profile field, game summary, character, matchup, and result in the full JSON document. The start.gg player ID stays fixed.</p></div><button id="signout" class="quiet-button" type="button">Sign out</button></div>
+    <div class="editor-heading"><div><h2 data-i18n="admin.editor.title">Edit player</h2><p class="muted admin-copy" data-i18n="admin.editor.desc">Edit every profile field, game summary, character, matchup, and result in the full JSON document. The start.gg player ID stays fixed.</p></div><button id="signout" class="quiet-button" type="button" data-i18n="admin.editor.signout">Sign out</button></div>
     <form id="profile-form" class="admin-form">
-      <label>Player profile<select id="profile-select" required></select></label>
+      <label><span data-i18n="admin.editor.profile">Player profile</span><select id="profile-select" required></select></label>
       <fieldset id="player-game-exclusions" class="visibility-fieldset">
-        <legend>Game visibility</legend>
-        <p class="muted admin-copy">Check games to hide this player’s activity from those games across the site.</p>
+        <legend data-i18n="admin.editor.gameVis">Game visibility</legend>
+        <p class="muted admin-copy" data-i18n="admin.editor.gameVisDesc">Check games to hide this player’s activity from those games across the site.</p>
         <div id="player-game-options" class="visibility-options"></div>
         <div class="form-actions"><button id="save-game-exclusions" class="quiet-button" type="button">Save game visibility</button><p id="game-exclusion-message" class="form-message mono" role="status"></p></div>
       </fieldset>
@@ -97,6 +98,7 @@
   </section>
 </main>
 <footer class="foot mono muted">Platfighters.uy · Local administrator session</footer>
+<script src="js/i18n.js"></script>
 <script src="js/admin.js"></script>
 </body>
 </html>

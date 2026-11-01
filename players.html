@@ -12,24 +12,26 @@
 <header class="topbar glass pill">
   <a class="brand" href="index.html"><img src="assets/logo.jpg" alt="">Platfighters<span class="tld">.uy</span></a>
   <span class="spacer"></span>
-  <nav><a class="nav-active" aria-current="page">Players</a><a href="events.html">Events</a><a href="rankings.html">Rankings</a></nav>
-  <span class="badge">PLAYER DIRECTORY</span>
+  <nav><a class="nav-active" aria-current="page" data-i18n="nav.players">Players</a><a href="events.html" data-i18n="nav.events">Events</a><a href="rankings.html" data-i18n="nav.rankings">Rankings</a></nav>
+  <div class="lang glass pill"><button type="button" class="lang-btn on" data-lang="en">EN</button><button type="button" class="lang-btn" data-lang="es">ES</button></div>
+  <span class="badge" data-i18n="badge.players">PLAYER DIRECTORY</span>
 </header>
 <main class="directory page-single">
   <section class="directory-head">
-    <div><div class="eyebrow mono">START.GG PLAYER DATA</div><h1>Players</h1><p class="muted">Browse competitors across the games we follow.</p></div>
+    <div><div class="eyebrow mono" data-i18n="players.eyebrow">START.GG PLAYER DATA</div><h1 data-i18n="players.title">Players</h1><p class="muted" data-i18n="players.desc">Browse competitors across the games we follow.</p></div>
     <div class="directory-controls">
-      <label class="search glass"><span aria-hidden="true">⌕</span><input id="player-search" type="search" placeholder="Search players or tags" autocomplete="off" aria-label="Search players"></label>
+      <label class="search glass"><span aria-hidden="true">⌕</span><input id="player-search" type="search" placeholder="Search players or tags" data-i18n-placeholder="players.search.placeholder" autocomplete="off" aria-label="Search players"></label>
       <div class="directory-filter-row">
-        <label class="game-filter-wrap"><span class="sr-only">Filter by game</span><select id="game-filter" class="game-filter glass" aria-label="Filter players by game"><option value="">All games</option></select></label>
-        <label class="game-filter-wrap"><span class="sr-only">Player list display</span><select id="player-view" class="game-filter glass" aria-label="Player list display"><option value="condensed" selected>Condensed list</option><option value="cards">Cards</option></select></label>
+        <label class="game-filter-wrap"><span class="sr-only">Filter by game</span><select id="game-filter" class="game-filter glass" aria-label="Filter players by game"><option value="" data-i18n="players.filter.allGames">All games</option></select></label>
+        <label class="game-filter-wrap"><span class="sr-only">Player list display</span><select id="player-view" class="game-filter glass" aria-label="Player list display"><option value="condensed" selected data-i18n="players.view.condensed">Condensed list</option><option value="cards" data-i18n="players.view.cards">Cards</option></select></label>
       </div>
     </div>
   </section>
-  <p id="directory-status" class="directory-status mono muted" aria-live="polite">Loading player profiles…</p>
+  <p id="directory-status" class="directory-status mono muted" aria-live="polite" data-i18n="players.loading">Loading player profiles…</p>
   <section id="player-list" class="player-list" aria-label="Player list"></section>
 </main>
-<footer class="foot mono muted">Platfighters.uy · Player directory</footer>
+<footer class="foot mono muted" data-i18n="footer.players">Platfighters.uy · Player directory</footer>
+<script src="js/i18n.js"></script>
 <script src="js/players.js"></script>
 </body>
 </html>

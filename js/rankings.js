@@ -4,14 +4,14 @@ const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;
 
 // Default games fallback if API is unavailable
 const DEFAULT_GAMES = [
-  { slug: 'ultimate', name: 'Ultimate' },
-  { slug: 'rivals-of-aether', name: 'Rivals of Aether' },
   { slug: 'melee', name: 'Melee' },
+  { slug: 'project-plus', name: 'Project+' },
   { slug: 'rivals-2', name: 'Rivals 2' },
-  { slug: 'project-plus', name: 'Project+' }
+  { slug: 'rivals-of-aether', name: 'Rivals of Aether' },
+  { slug: 'ultimate', name: 'Ultimate' }
 ];
 
-let availableGames = [...DEFAULT_GAMES];
+let availableGames = [...DEFAULT_GAMES].sort((a, b) => a.name.localeCompare(b.name));
 let currentData = null;
 let comparisonData = {};
 let sortCol = 'rank';
@@ -95,24 +95,28 @@ let activeSection = 'systems';
 let activeSubsection = 'overview';
 
 // Helper to get descriptive names for system tabs
-const SYSTEM_NAMES = {
-  overview: 'Overview',
-  glicko2: 'Glicko-2',
-  sof: 'Strength of Field',
-  quality_wins: 'Quality Wins',
-  loss_quality: 'Consistency',
-  custom: 'Custom Formula'
-};
+function getSystemNames() {
+  const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
+  return {
+    overview: isEs ? 'Resumen' : 'Overview',
+    glicko2: 'Glicko-2',
+    sof: isEs ? 'Fuerza de Campo' : 'Strength of Field',
+    quality_wins: isEs ? 'Victorias de Calidad' : 'Quality Wins',
+    loss_quality: isEs ? 'Consistencia' : 'Consistency',
+    custom: isEs ? 'Fórmula Personalizada' : 'Custom Formula'
+  };
+}
 
 function renderSystemTabsNav() {
   if (activeSection !== 'systems') return '';
+  const names = getSystemNames();
   return `
     <nav id="system-tabs" class="ranking-subsection-tabs" aria-label="Ranking Systems Subsections">
-      <button class="ranking-tab ${activeSubsection === 'overview' ? 'active' : ''}" data-system="overview">Overview</button>
-      <button class="ranking-tab ${activeSubsection === 'glicko2' ? 'active' : ''}" data-system="glicko2">Glicko-2</button>
-      <button class="ranking-tab ${activeSubsection === 'sof' ? 'active' : ''}" data-system="sof">Strength of Field</button>
-      <button class="ranking-tab ${activeSubsection === 'quality_wins' ? 'active' : ''}" data-system="quality_wins">Quality Wins</button>
-      <button class="ranking-tab ${activeSubsection === 'loss_quality' ? 'active' : ''}" data-system="loss_quality">Consistency</button>
+      <button class="ranking-tab ${activeSubsection === 'overview' ? 'active' : ''}" data-system="overview">${names.overview}</button>
+      <button class="ranking-tab ${activeSubsection === 'glicko2' ? 'active' : ''}" data-system="glicko2">${names.glicko2}</button>
+      <button class="ranking-tab ${activeSubsection === 'sof' ? 'active' : ''}" data-system="sof">${names.sof}</button>
+      <button class="ranking-tab ${activeSubsection === 'quality_wins' ? 'active' : ''}" data-system="quality_wins">${names.quality_wins}</button>
+      <button class="ranking-tab ${activeSubsection === 'loss_quality' ? 'active' : ''}" data-system="loss_quality">${names.loss_quality}</button>
     </nav>
   `;
 }
@@ -152,7 +156,8 @@ function updateBreadcrumbsAndNav() {
         <span class="current">Historical Rankings</span>
       `;
     } else {
-      const subName = SYSTEM_NAMES[activeSubsection] || activeSubsection;
+      const names = getSystemNames();
+      const subName = names[activeSubsection] || activeSubsection;
       breadcrumbNav.innerHTML = `
         <a href="rankings.html?section=systems&system=overview" onclick="event.preventDefault(); window.navigateToSection('systems', 'overview');">Rankings</a>
         <span class="sep">/</span>
@@ -162,6 +167,13 @@ function updateBreadcrumbsAndNav() {
       `;
     }
   }
+}
+
+if (window.i18n && window.i18n.onChange) {
+  window.i18n.onChange(() => {
+    updateBreadcrumbsAndNav();
+    render();
+  });
 }
 
 window.navigateToSection = function(section, subsection = null) {
@@ -196,6 +208,9 @@ async function init() {
   } catch (err) {
     // Fallback to DEFAULT_GAMES
   }
+
+  // Sort available games alphabetically
+  availableGames.sort((a, b) => a.name.localeCompare(b.name));
 
   // Populate game filter
   gameFilter.innerHTML = availableGames.map(g =>
@@ -374,27 +389,30 @@ async function renderHistoricalRankings() {
     }).join('');
   }
 
+  const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
   const allActive = isAll || !selectedGame;
   const gameSwitches = [
-    `<a class="${allActive ? 'on' : ''}" href="#all">All games</a>`,
+    `<a class="${allActive ? 'on' : ''}" href="#all">${isEs ? 'Todos los juegos' : 'All games'}</a>`,
     ...games.map(g =>
       `<a class="${!allActive && selectedGame && selectedGame.id === g.id ? 'on' : ''}" href="#${esc(g.id)}">${esc(g.name)}</a>`
     )
   ].join('');
 
-  const displayTitle = (isAll || !selectedGame) ? 'All games power rankings' : `${esc(selectedGame.name)} power rankings`;
+  const displayTitle = (isAll || !selectedGame)
+    ? (isEs ? 'Power rankings de todos los juegos' : 'All games power rankings')
+    : (isEs ? `Power rankings de ${esc(selectedGame.name)}` : `${esc(selectedGame.name)} power rankings`);
 
   rankingsContent.innerHTML = `
     <section class="head-panel glass">
       <div class="historical-head-actions">
         <div>
-          <div class="eyebrow mono">HISTORICAL POWER RANKINGS</div>
+          <div class="eyebrow mono">${isEs ? 'POWER RANKINGS HISTÓRICOS' : 'HISTORICAL POWER RANKINGS'}</div>
           <h2 class="display" style="font-size:36px; margin: 8px 0;">${displayTitle}</h2>
-          <p class="muted lead">Rankings are published by each game’s community. Newest first.</p>
+          <p class="muted lead">${isEs ? 'Los rankings son publicados por la comunidad de cada juego. Más recientes primero.' : 'Rankings are published by each game’s community. Newest first.'}</p>
         </div>
         <a href="ranking-creator.html" class="create-ranking-btn">
           <span style="font-size: 18px; line-height: 1;">+</span>
-          <span>Create</span>
+          <span>${isEs ? 'Crear' : 'Create'}</span>
         </a>
       </div>
       <nav id="switch" class="switch glass pill" aria-label="Game Switcher">
@@ -864,6 +882,38 @@ window.resetToDefaultPRWeights = function() {
   renderCustomPowerRankings();
 };
 
+window.createPRFromCurrentRankings = function() {
+  const { players: leaderboard } = computePRLeaderboard();
+  const currentGameSlug = gameFilter.value || 'ultimate';
+  const gameObj = availableGames.find(g => g.slug === currentGameSlug) || { slug: currentGameSlug, name: currentGameSlug };
+
+  // Capture snapshot without modifying any existing rankings data
+  const snapshot = {
+    game: {
+      id: gameObj.id || gameObj.slug,
+      name: gameObj.name,
+      slug: gameObj.slug
+    },
+    capturedAt: new Date().toISOString(),
+    players: leaderboard.map((p, idx) => ({
+      placement: idx + 1,
+      tag: p.playerTag,
+      points: Math.round(p.score),
+      photo: `assets/players/${p.playerId}.png`,
+      playerId: p.playerId
+    }))
+  };
+
+  try {
+    sessionStorage.setItem('platfighters_pr_snapshot', JSON.stringify(snapshot));
+  } catch (e) {
+    console.error('Could not save PR snapshot to sessionStorage:', e);
+  }
+
+  // Navigate to ranking creator in PR creation mode
+  window.location.href = 'ranking-creator.html?source=pr';
+};
+
 function renderCustomPowerRankings() {
   cleanupObserver();
 
@@ -1005,10 +1055,11 @@ function renderCustomPowerRankings() {
           <div class="eyebrow mono">CUSTOM POWER RANKINGS CREATOR</div>
           <h2 style="margin:4px 0 0; font-size:26px;">Linked Weights &amp; Formula Budget</h2>
         </div>
-        <div style="display:flex; align-items:center; gap:12px;">
-          <button class="quiet-button mono" style="font-size:12px; padding:6px 12px; border:1px solid rgba(255,255,255,0.2); border-radius:6px; cursor:pointer;" onclick="resetToDefaultPRWeights()">Reset to Defaults (55/20/15/10)</button>
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+          <button class="btn glass pill mono" style="font-size:13px; font-weight:700; color:var(--sky); border-color:var(--sky); cursor:pointer;" onclick="createPRFromCurrentRankings()">${(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es') ? 'Crear PR' : 'Create PR'}</button>
+          <button class="quiet-button mono" style="font-size:12px; padding:6px 12px; border:1px solid rgba(255,255,255,0.2); border-radius:6px; cursor:pointer;" onclick="resetToDefaultPRWeights()">${(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es') ? 'Restablecer Valores (55/20/15/10)' : 'Reset to Defaults (55/20/15/10)'}</button>
           <div class="pr-total-badge mono" id="pr-total-badge">
-            TOTAL WEIGHT: <b>100%</b>
+            ${(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es') ? 'PESO TOTAL:' : 'TOTAL WEIGHT:'} <b>100%</b>
           </div>
         </div>
       </div>
@@ -1045,42 +1096,69 @@ function renderCustomPowerRankings() {
     </div>
 
     <div class="panel glass ranking-table-panel">
-      <div class="table">
-        <div class="tr head ranking-row" style="grid-template-columns: 60px minmax(180px,1.8fr) 110px repeat(4, minmax(90px, 1fr)) 110px;">
-          <span class="sortable" onclick="changeSort('rank')">RANK ${sortCol === 'rank' ? (sortAsc ? '▲' : '▼') : ''}</span>
-          <span class="sortable" onclick="changeSort('playerTag')">PLAYER ${sortCol === 'playerTag' ? (sortAsc ? '▲' : '▼') : ''}</span>
-          <span class="sortable" onclick="changeSort('score')">SCORE ${sortCol === 'score' ? (sortAsc ? '▲' : '▼') : ''}</span>
-          <span>GLICKO-2</span>
-          <span>QUALITY WINS</span>
-          <span>SOF</span>
-          <span>CONSISTENCY</span>
-          <span>ACTIONS</span>
-        </div>
+      <div class="pr-cards-list">
+        ${visibleList.length ? visibleList.map(p => {
+          const currentGameSlug = gameFilter.value || 'ultimate';
+          const isSelected = (inspectedPlayer && inspectedPlayer.playerId === p.playerId);
+          const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
+          return `
+            <div class="pr-card-row ranking-row ${isSelected ? 'selected' : ''}" onclick="onPRSelectPlayer('${esc(p.playerId)}')">
+              <div class="pr-row-left">
+                <img class="pr-row-icon" src="assets/hubs/${esc(currentGameSlug)}.webp" alt="" onerror="this.src='assets/players/${esc(p.playerId)}.png'; this.onerror=function(){this.style.display='none';};">
+              </div>
+              <div class="pr-row-right">
+                <!-- Row 1: Rank, Avatar & Tag, Score Badge, Actions -->
+                <div class="pr-row-line line1">
+                  <span class="pr-row-rank mono ${p.rank && p.rank <= 3 ? 'p' + p.rank : ''}">#${p.rank}</span>
+                  <div class="pr-row-player">
+                    <span class="player-avatar mini"><img src="assets/players/${esc(p.playerId)}.png" alt="" onerror="this.remove()"></span>
+                    <a href="index.html?player=${encodeURIComponent(p.playerId)}" class="pr-row-tag" onclick="event.stopPropagation();">${esc(p.playerTag)}</a>
+                  </div>
+                  <div class="pr-row-score-badge mono">
+                    <span>${isEs ? 'PUNTAJE:' : 'SCORE:'}</span> <b>${p.score}</b>
+                  </div>
+                  <div class="pr-row-actions" onclick="event.stopPropagation();">
+                    <button class="quiet-button diagnostic-btn" onclick="openDiagnosticModal('${esc(p.playerId)}')">${isEs ? 'Diagnóstico' : 'Diagnostic'}</button>
+                  </div>
+                </div>
 
-        ${visibleList.length ? visibleList.map(p => `
-          <div class="tr ranking-row" style="grid-template-columns: 60px minmax(180px,1.8fr) 110px repeat(4, minmax(90px, 1fr)) 110px; cursor:pointer;" onclick="onPRSelectPlayer('${esc(p.playerId)}')">
-            <span class="rank-col font-bold ${p.rank && p.rank <= 3 ? 'p' + p.rank : ''}">#${p.rank}</span>
-            <div class="player-col">
-              <a href="index.html?player=${encodeURIComponent(p.playerId)}" class="player-card-link" onclick="event.stopPropagation();">
-                <span class="player-avatar mini"><img src="assets/players/${esc(p.playerId)}.png" alt="" onerror="this.remove()"></span>
-                <b>${esc(p.playerTag)}</b>
-              </a>
+                <!-- Row 2: 4 Breakdown Contributions -->
+                <div class="pr-row-line pr-row-breakdown mono">
+                  <span class="pr-breakdown-item" style="color:${PR_COMPONENTS.glicko2.color};">
+                    <span class="pr-breakdown-swatch" style="background:${PR_COMPONENTS.glicko2.color};"></span>
+                    <b>Glicko-2:</b> +${Math.round((p.weightedContributions.glicko2||0)*10)/10} <small class="muted">(${Math.round((p.normalizedScores.glicko2||0)*10)/10})</small>
+                  </span>
+                  <span class="pr-breakdown-item" style="color:${PR_COMPONENTS.quality_wins.color};">
+                    <span class="pr-breakdown-swatch" style="background:${PR_COMPONENTS.quality_wins.color};"></span>
+                    <b>${isEs ? 'Victorias de Calidad:' : 'Quality Wins:'}</b> +${Math.round((p.weightedContributions.quality_wins||0)*10)/10} <small class="muted">(${Math.round((p.normalizedScores.quality_wins||0)*10)/10})</small>
+                  </span>
+                  <span class="pr-breakdown-item" style="color:${PR_COMPONENTS.sof.color};">
+                    <span class="pr-breakdown-swatch" style="background:${PR_COMPONENTS.sof.color};"></span>
+                    <b>${isEs ? 'Fuerza de Campo:' : 'SOF:'}</b> +${Math.round((p.weightedContributions.sof||0)*10)/10} <small class="muted">(${Math.round((p.normalizedScores.sof||0)*10)/10})</small>
+                  </span>
+                  <span class="pr-breakdown-item" style="color:${PR_COMPONENTS.loss_quality.color};">
+                    <span class="pr-breakdown-swatch" style="background:${PR_COMPONENTS.loss_quality.color};"></span>
+                    <b>${isEs ? 'Consistencia:' : 'Consistency:'}</b> +${Math.round((p.weightedContributions.loss_quality||0)*10)/10} <small class="muted">(${Math.round((p.normalizedScores.loss_quality||0)*10)/10})</small>
+                  </span>
+                </div>
+
+                <!-- Row 3: Meta (Matches, Events, and Supporting stats) -->
+                <div class="pr-row-line pr-row-meta mono">
+                  <span>${p.matches || 0} ${isEs ? 'partidas' : 'matches'}</span>
+                  <span>·</span>
+                  <span>${p.events || 0} ${isEs ? 'torneos' : 'events'}</span>
+                  <span>·</span>
+                  <span class="muted">${isEs ? 'Contribución total ponderada:' : 'Total weighted contribution:'} <b>${p.score} pts</b></span>
+                </div>
+              </div>
             </div>
-            <span class="score-col mono font-bold">${p.score}</span>
-            <span class="mono" style="color:${PR_COMPONENTS.glicko2.color};">${Math.round((p.weightedContributions.glicko2||0)*10)/10} <small class="muted">(${Math.round((p.normalizedScores.glicko2||0)*10)/10})</small></span>
-            <span class="mono" style="color:${PR_COMPONENTS.quality_wins.color};">${Math.round((p.weightedContributions.quality_wins||0)*10)/10} <small class="muted">(${Math.round((p.normalizedScores.quality_wins||0)*10)/10})</small></span>
-            <span class="mono" style="color:${PR_COMPONENTS.sof.color};">${Math.round((p.weightedContributions.sof||0)*10)/10} <small class="muted">(${Math.round((p.normalizedScores.sof||0)*10)/10})</small></span>
-            <span class="mono" style="color:${PR_COMPONENTS.loss_quality.color};">${Math.round((p.weightedContributions.loss_quality||0)*10)/10} <small class="muted">(${Math.round((p.normalizedScores.loss_quality||0)*10)/10})</small></span>
-            <div class="actions-col" onclick="event.stopPropagation();">
-              <button class="quiet-button diagnostic-btn" onclick="openDiagnosticModal('${esc(p.playerId)}')">Diagnostic</button>
-            </div>
-          </div>
-        `).join('') : '<div class="empty-state"><p class="muted">No players match the search filter.</p></div>'}
+          `;
+        }).join('') : `<div class="empty-state"><p class="muted">${(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es') ? 'Ningún jugador coincide con el filtro.' : 'No players match the search filter.'}</p></div>`}
       </div>
 
       ${totalFiltered > 0 ? `
         <div id="scroll-sentinel" class="infinite-scroll-sentinel mono muted">
-          ${visibleCount < totalFiltered ? `Showing ${visibleList.length} of ${totalFiltered} players (scroll down to load more…)` : `Showing all ${totalFiltered} players`}
+          ${visibleCount < totalFiltered ? ((window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es') ? `Mostrando ${visibleList.length} de ${totalFiltered} jugadores (desplaza hacia abajo para cargar más…)` : `Showing ${visibleList.length} of ${totalFiltered} players (scroll down to load more…)`) : ((window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es') ? `Mostrando los ${totalFiltered} jugadores` : `Showing all ${totalFiltered} players`)}
         </div>
       ` : ''}
     </div>

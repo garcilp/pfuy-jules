@@ -65,11 +65,12 @@ function renderStats() {
   // Crossover players: players participating in 2 or more games
   const crossoverCount = playerDirectory.filter(p => (p.games || []).length >= 2).length;
 
+  const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
   const stats = [
-    { label: 'PLAYERS', value: totalPlayers.toLocaleString(), sub: `across ${activeCommunities.length} communities` },
-    { label: 'TOURNAMENTS', value: totalTournaments.toLocaleString(), sub: 'indexed from start.gg' },
-    { label: 'GAMES', value: activeCommunities.length.toString(), sub: 'platform fighters active' },
-    { label: 'CROSSOVER PLAYERS', value: crossoverCount.toLocaleString(), sub: 'compete in 2+ games' }
+    { label: isEs ? 'JUGADORES' : 'PLAYERS', value: totalPlayers.toLocaleString(), sub: isEs ? `en ${activeCommunities.length} comunidades` : `across ${activeCommunities.length} communities` },
+    { label: isEs ? 'TORNEOS' : 'TOURNAMENTS', value: totalTournaments.toLocaleString(), sub: isEs ? 'registrados en start.gg' : 'indexed from start.gg' },
+    { label: isEs ? 'JUEGOS' : 'GAMES', value: activeCommunities.length.toString(), sub: isEs ? 'platform fighters activos' : 'platform fighters active' },
+    { label: isEs ? 'JUGADORES CROSSOVER' : 'CROSSOVER PLAYERS', value: crossoverCount.toLocaleString(), sub: isEs ? 'compiten en 2+ juegos' : 'compete in 2+ games' }
   ];
 
   statsContainer.innerHTML = stats.map(s => `
@@ -252,12 +253,13 @@ async function renderRecentResults() {
     };
   }));
 
+  const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
   container.innerHTML = `
     <div class="tr c4 head">
-      <span>EVENT</span>
-      <span>GAME</span>
-      <span>WINNER</span>
-      <span>ENTRANTS</span>
+      <span>${isEs ? 'TORNEO' : 'EVENT'}</span>
+      <span>${isEs ? 'JUEGO' : 'GAME'}</span>
+      <span>${isEs ? 'GANADOR' : 'WINNER'}</span>
+      <span>${isEs ? 'PARTICIPANTES' : 'ENTRANTS'}</span>
     </div>
     ${resultsWithWinners.map(r => {
       const tourneyUrl = r.tournamentSlug ? `event.html?tournament=${encodeURIComponent(r.tournamentSlug)}` : 'events.html';
@@ -471,7 +473,33 @@ function renderNewcomerSteps() {
   const container = $('#steps');
   if (!container) return;
 
-  const steps = [
+  const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
+  const steps = isEs ? [
+    {
+      title: 'Elige un juego',
+      body: 'Cada platform fighter tiene una comunidad activa en Uruguay. Elige tu juego principal o explora varios títulos.',
+      link: 'Explorar comunidades',
+      href: '#hubs'
+    },
+    {
+      title: 'Únete a la escena',
+      body: 'Conéctate con jugadores locales, asiste a encuentros semanales y súmate a sesiones de práctica en Uruguay.',
+      link: 'Encontrar comunidades',
+      href: '#hubs'
+    },
+    {
+      title: 'Inscríbete en un torneo',
+      body: 'Pon a prueba tu nivel en semanales locales, regionales o torneos online registrados directamente en start.gg.',
+      link: 'Ver próximos eventos',
+      href: 'events.html'
+    },
+    {
+      title: 'Sigue tu carrera',
+      body: 'Tus resultados, historial de sets, registros frente a frente y rankings se construyen automáticamente en Platfighters.',
+      link: 'Explorar jugadores',
+      href: 'players.html'
+    }
+  ] : [
     {
       title: 'Pick a game',
       body: 'Every platform fighter has an active community in Uruguay. Choose your main game or explore multiple titles.',
@@ -682,6 +710,18 @@ function setupSearch() {
     if (searchInput.value.trim().length >= 2) {
       resultsBox.hidden = false;
     }
+  });
+}
+
+if (window.i18n && window.i18n.onChange) {
+  window.i18n.onChange(() => {
+    renderStats();
+    renderUpcomingEvents();
+    renderRecentResults();
+    renderOnThisWeek();
+    renderTopPlayers();
+    renderNewcomerSteps();
+    renderHubs();
   });
 }
 
