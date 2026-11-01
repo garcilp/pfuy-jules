@@ -43,9 +43,11 @@ function populateGameFilter() {
       if (id && game.name) games.set(id, game.name);
     });
   });
-  gameFilter.innerHTML = '<option value="">All games</option>' +
+  const currentVal = gameFilter.value;
+  const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
+  gameFilter.innerHTML = `<option value="">${isEs ? 'Todos los juegos' : 'All games'}</option>` +
     [...games].sort((a, b) => nameCollator.compare(a[1], b[1]))
-      .map(([id, name]) => `<option value="${esc(id)}">${esc(name)}</option>`).join('');
+      .map(([id, name]) => `<option value="${esc(id)}"${id === currentVal ? ' selected' : ''}>${esc(name)}</option>`).join('');
 }
 
 function render() {
@@ -53,6 +55,7 @@ function render() {
   list.classList.toggle('condensed', condensed);
   const query = search.value.trim().toLocaleLowerCase();
   const selectedGame = gameFilter.value;
+  const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
   const shown = players.filter(entry => {
     const p = entry.profile?.player || entry;
     const games = entry.games || entry.profile?.games || [];
@@ -63,7 +66,9 @@ function render() {
     const matchesSearch = [entry.tag, p.tag, p.sponsor, p.city, p.country, location, ...(p.aliases || []), ...games.map(g => g.name)].join(' ').toLocaleLowerCase().includes(query);
     return includesGame && matchesSearch;
   }).sort((a, b) => nameCollator.compare(a.profile?.player?.tag || a.tag, b.profile?.player?.tag || b.tag) || nameCollator.compare(a.slug, b.slug));
-  status.textContent = `${shown.length} player${shown.length === 1 ? '' : 's'}`;
+  status.textContent = isEs
+    ? `${shown.length} jugador${shown.length === 1 ? '' : 'es'}`
+    : `${shown.length} player${shown.length === 1 ? '' : 's'}`;
   list.innerHTML = shown.length ? shown.map(entry => {
     const p = entry.profile?.player || entry;
     const games = entry.games || entry.profile?.games || [];
@@ -71,14 +76,18 @@ function render() {
       ? [p.city, p.country || 'Uruguay'].filter(Boolean).join(', ')
       : (p.location || '');
     const events = entry.events !== undefined ? entry.events : games.reduce((total, game) => total + (Number(game.events) || 0), 0);
-    const eventLabel = events === 1 ? 'EVENT' : 'EVENTS';
+    const eventLabel = isEs
+      ? (events === 1 ? 'TORNEO' : 'TORNEOS')
+      : (events === 1 ? 'EVENT' : 'EVENTS');
     const picture = p.photo || `assets/players/${entry.playerId}.png`;
     return `<a class="player-card glass" href="index.html?player=${encodeURIComponent(entry.playerId)}">
       <span class="player-avatar"><img src="${esc(picture)}" alt="" loading="lazy"></span>
-      <span class="player-card-copy">${p.sponsor ? `<span class="mono muted player-sponsor">${esc(p.sponsor)}</span>` : ''}<b>${esc(p.tag || entry.tag)}</b><span class="muted">${esc(location || games.map(g => g.name).join(' · ') || 'Player')}</span></span>
+      <span class="player-card-copy">${p.sponsor ? `<span class="mono muted player-sponsor">${esc(p.sponsor)}</span>` : ''}<b>${esc(p.tag || entry.tag)}</b><span class="muted">${esc(location || games.map(g => g.name).join(' · ') || (isEs ? 'Jugador' : 'Player'))}</span></span>
       <span class="player-card-meta"><b>${events}</b><span class="mono muted">${eventLabel}</span></span>
     </a>`;
-  }).join('') : '<div class="panel glass empty-state"><h2>No matches</h2><p class="muted">Try another player name, tag, sponsor or game.</p></div>';
+  }).join('') : (isEs
+    ? '<div class="panel glass empty-state"><h2>Sin resultados</h2><p class="muted">Prueba con otro nombre, tag, sponsor o juego.</p></div>'
+    : '<div class="panel glass empty-state"><h2>No matches</h2><p class="muted">Try another player name, tag, sponsor or game.</p></div>');
   list.querySelectorAll('.player-avatar img').forEach(image => image.addEventListener('error', () => {
     const avatar = image.parentElement;
     image.remove();
@@ -89,4 +98,12 @@ function render() {
 search.addEventListener('input', render);
 gameFilter.addEventListener('change', render);
 playerView.addEventListener('change', render);
+
+if (window.i18n && window.i18n.onChange) {
+  window.i18n.onChange(() => {
+    populateGameFilter();
+    render();
+  });
+}
+
 loadPlayers();
