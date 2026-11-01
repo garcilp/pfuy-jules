@@ -130,9 +130,10 @@
   min-width: 0;
   padding: 18px 24px;
   border-radius: 24px;
-  display: flex;
+  display: grid;
+  grid-template-columns: 68px minmax(0, 1fr);
   gap: 24px;
-  align-items: stretch;
+  align-items: center;
   color: var(--text);
   text-decoration: none;
   transition: border-color 150ms ease, background 150ms ease;
@@ -144,7 +145,7 @@
 
 /* Dedicated community icon column spanning full height of 3 rows */
 .rk .hub-icon-col {
-  flex: 0 0 68px;
+  width: 68px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -224,6 +225,9 @@
   align-items: baseline;
   gap: 4px;
 }
+.rk .top-player-item b {
+  font-size: inherit;
+}
 .rk .dot-sep {
   color: rgba(255, 255, 255, 0.35);
   font-weight: 400;
@@ -257,11 +261,12 @@
 
 @media (max-width: 768px) {
   .rk .card {
+    grid-template-columns: 52px minmax(0, 1fr);
     gap: 16px;
     padding: 16px;
   }
   .rk .hub-icon-col {
-    flex: 0 0 52px;
+    width: 52px;
   }
   .rk .hub-icon {
     width: 52px;
