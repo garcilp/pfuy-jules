@@ -14,12 +14,12 @@
   <a class="brand" href="index.html"><img src="assets/logo.jpg" alt="">Platfighters<span class="tld">.uy</span></a>
   <span class="spacer"></span>
   <nav>
-    <a href="players.html">Players</a>
-    <a href="events.html">Events</a>
-    <a class="nav-active" aria-current="page" href="rankings.html">Rankings</a>
+    <a href="players.html" data-i18n="nav.players">Players</a>
+    <a href="events.html" data-i18n="nav.events">Events</a>
+    <a class="nav-active" aria-current="page" href="rankings.html" data-i18n="nav.rankings">Rankings</a>
   </nav>
-  <div class="lang glass pill"><button type="button" class="on">EN</button><button type="button">ES</button></div>
-  <span class="badge">SAMPLE DATA</span>
+  <div class="lang glass pill"><button type="button" class="lang-btn on" data-lang="en">EN</button><button type="button" class="lang-btn" data-lang="es">ES</button></div>
+  <span class="badge" data-i18n="badge.sample">SAMPLE DATA</span>
 </header>
 
 <main class="page">
@@ -45,7 +45,8 @@
   </div>
 </main>
 
-<footer class="foot mono muted">Platfighters.uy · Community Rankings</footer>
+<footer class="foot mono muted" data-i18n="footer.creator">Platfighters.uy · Community Rankings</footer>
+<script src="js/i18n.js"></script>
 <script src="js/common.js"></script>
 <script src="js/creator.js"></script>
 </body>

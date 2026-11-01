@@ -61,9 +61,11 @@ async function loadEvents() {
 
 function populateGameFilter() {
   const games = new Map(events.flatMap(event => event.games).map(game => [game.slug, game.name]).filter(([slug, name]) => slug && name));
-  gameFilter.innerHTML = '<option value="">All games</option>' +
+  const currentVal = gameFilter.value;
+  const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
+  gameFilter.innerHTML = `<option value="">${isEs ? 'Todos los juegos' : 'All games'}</option>` +
     [...games].sort((a, b) => collator.compare(a[1], b[1]))
-      .map(([slug, name]) => `<option value="${esc(slug)}">${esc(name)}</option>`).join('');
+      .map(([slug, name]) => `<option value="${esc(slug)}"${slug === currentVal ? ' selected' : ''}>${esc(name)}</option>`).join('');
 }
 
 function renderCard(event) {
@@ -112,7 +114,10 @@ function render() {
   past.sort((a, b) => (b.date || '').localeCompare(a.date || '') || collator.compare(a.tournament, b.tournament));
 
   const totalShown = upcoming.length + past.length;
-  status.textContent = `${totalShown} tournament${totalShown === 1 ? '' : 's'}`;
+  const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
+  status.textContent = isEs
+    ? `${totalShown} torneo${totalShown === 1 ? '' : 's'}`
+    : `${totalShown} tournament${totalShown === 1 ? '' : 's'}`;
 
   if (upcomingSection && upcomingList) {
     if (upcoming.length) {
@@ -129,7 +134,9 @@ function render() {
   } else if (upcoming.length) {
     list.innerHTML = '';
   } else {
-    list.innerHTML = '<div class="panel glass empty-state"><h2>No matches</h2><p class="muted">Try another tournament name or game.</p></div>';
+    list.innerHTML = isEs
+      ? '<div class="panel glass empty-state"><h2>Sin resultados</h2><p class="muted">Prueba con otro nombre de torneo o juego.</p></div>'
+      : '<div class="panel glass empty-state"><h2>No matches</h2><p class="muted">Try another tournament name or game.</p></div>';
   }
 }
 
@@ -137,4 +144,12 @@ search.addEventListener('input', render);
 gameFilter.addEventListener('change', render);
 eventView.addEventListener('change', render);
 eventView.value = 'condensed';
+
+if (window.i18n && window.i18n.onChange) {
+  window.i18n.onChange(() => {
+    populateGameFilter();
+    render();
+  });
+}
+
 loadEvents();

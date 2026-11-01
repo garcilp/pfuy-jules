@@ -29,22 +29,26 @@ async function loadEvent() {
 function renderEvent(event) {
   document.title = `${event.tournament} · Platfighters.uy`;
 
+  const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
   const gamesStr = event.games.map(g => g.name).join(' · ');
   const avatarHtml = `<span class="event-header-avatar" aria-hidden="true">${esc((event.tournament || '?').slice(0, 1))}${event.image ? `<img src="${esc(event.image)}" alt="" loading="lazy">` : ''}</span>`;
+  const entrantsLabel = isEs
+    ? `${event.totalEntrants} participante${event.totalEntrants === 1 ? '' : 's'}`
+    : `${event.totalEntrants} entrant${event.totalEntrants === 1 ? '' : 's'}`;
 
   const headerBarHtml = `
     <section class="panel glass event-header-panel">
       <div class="event-header-top">
         ${avatarHtml}
         <div class="event-header-info">
-          <div class="eyebrow mono">${esc(gamesStr || 'PLATFORM FIGHTER')}</div>
+          <div class="eyebrow mono">${esc(gamesStr || (isEs ? 'PLATFORM FIGHTER' : 'PLATFORM FIGHTER'))}</div>
           <h1>${esc(event.tournament)}</h1>
           <div class="event-header-meta mono muted">
             <span>📅 ${fmt(event.date)}</span>
-            <span>👥 ${event.totalEntrants} entrant${event.totalEntrants === 1 ? '' : 's'}</span>
+            <span>👥 ${entrantsLabel}</span>
           </div>
         </div>
-        ${event.startggUrl ? `<a class="action-button open-startgg-btn" href="${esc(event.startggUrl)}" target="_blank" rel="noopener noreferrer">Open on start.gg ↗</a>` : ''}
+        ${event.startggUrl ? `<a class="action-button open-startgg-btn" href="${esc(event.startggUrl)}" target="_blank" rel="noopener noreferrer">${isEs ? 'Abrir en start.gg ↗' : 'Open on start.gg ↗'}</a>` : ''}
       </div>
     </section>
   `;
@@ -81,17 +85,28 @@ function renderBracketCard(sub, tournament) {
       }).join('')
     : '<p class="muted p-12">No standings recorded.</p>';
 
+  const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
+  const entrantsLabel = isEs
+    ? `${sub.entrants} participante${sub.entrants === 1 ? '' : 's'}`
+    : `${sub.entrants} entrant${sub.entrants === 1 ? '' : 's'}`;
+
   return `
     <section class="panel glass bracket-card ${sub.isAmateur ? 'amateur-bracket' : 'main-bracket'}">
       <div class="bracket-card-head">
         <h2>${esc(sub.title)}</h2>
-        <p class="mono muted">${esc(sub.game)} · ${sub.entrants} entrant${sub.entrants === 1 ? '' : 's'}</p>
+        <p class="mono muted">${esc(sub.game)} · ${entrantsLabel}</p>
       </div>
       <div class="standings-list">
         ${standingsHtml}
       </div>
     </section>
   `;
+}
+
+if (window.i18n && window.i18n.onChange) {
+  window.i18n.onChange(() => {
+    loadEvent();
+  });
 }
 
 loadEvent();

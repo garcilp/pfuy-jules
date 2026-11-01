@@ -18,6 +18,8 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
 ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 PROFILE_DIR = ROOT / "data" / "profiles"
 EVENT_GROUPS_PATH = PROFILE_DIR / "event_groups.json"
 EXCLUSIONS_PATH = PROFILE_DIR / "exclusions.json"

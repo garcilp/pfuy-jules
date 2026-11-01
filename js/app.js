@@ -155,8 +155,10 @@ function render() {
      ${player.startgg ? `<a class="profile-startgg" href="${esc(player.startgg)}" target="_blank" rel="noopener">View on start.gg</a>` : ''}`;
   fitPlayerName();
 
-  $('#tabs').innerHTML = [{ id: 'overview', label: 'Overview', count: '' },
-    ...mostRecentlyPlayedFirst.map(g => ({ id: g.id, label: g.name, count: `${g.events} event${g.events === 1 ? '' : 's'}` }))]
+  const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
+  const overviewLabel = isEs ? 'Resumen' : 'Overview';
+  $('#tabs').innerHTML = [{ id: 'overview', label: overviewLabel, count: '' },
+    ...mostRecentlyPlayedFirst.map(g => ({ id: g.id, label: g.name, count: isEs ? `${g.events} torneo${g.events === 1 ? '' : 's'}` : `${g.events} event${g.events === 1 ? '' : 's'}` }))]
     .map(t => `<a class="tab${t.id === id ? ' on' : ''}" href="#${encodeURIComponent(t.id)}"><span class="lbl">${esc(t.label)}</span><span class="c">${esc(t.count)}</span></a>`).join('');
 
   const sum = f => G.reduce((a, g) => a + (Number(f(g)) || 0), 0);
@@ -537,6 +539,12 @@ function render() {
   });
 
   setupInteractiveChart();
+}
+
+if (window.i18n && window.i18n.onChange) {
+  window.i18n.onChange(() => {
+    if (data) render();
+  });
 }
 
 let chartZoom = 1;

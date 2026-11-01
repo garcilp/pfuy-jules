@@ -18,6 +18,10 @@ h1,h2,p{margin:0}.mono{font-family:'JetBrains Mono',monospace}.muted{color:var(-
 .spacer{flex:1}.topbar nav a{padding:12px 10px;color:var(--text)}
 .topbar nav a:hover,.topbar nav a:focus-visible{color:var(--sky)}
 .badge{font:12px 'JetBrains Mono',monospace;border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:6px 12px}
+.lang{display:inline-flex;align-items:center;padding:3px;gap:2px}
+.lang .lang-btn{min-height:28px;padding:0 10px;border:0;border-radius:999px;background:transparent;color:var(--muted);font:700 12px 'JetBrains Mono',monospace;cursor:pointer;transition:all 150ms ease}
+.lang .lang-btn:hover{color:var(--text)}
+.lang .lang-btn.on{background:rgba(255,255,255,.2);color:var(--text);box-shadow:inset 0 1px 0 rgba(255,255,255,.4)}
 
 /* Layout */
 .page{max-width:1240px;margin:0 auto;padding:0 24px 24px;display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start}
@@ -333,6 +337,36 @@ a.event-card:hover{color:var(--text);background:rgba(255,255,255,.14);border-col
 .ranking-table-panel{padding:16px 20px}
 .ranking-row{grid-template-columns:60px minmax(180px,1.8fr) 110px 90px 140px 110px;padding:12px 6px}
 .comparison-head,.comparison-row{grid-template-columns:minmax(180px,1.8fr) repeat(4,minmax(110px,1fr)) 100px}
+
+/* Reworked Power Rankings row layout (3-row card with full-height left icon) */
+.pr-card-row{display:flex;align-items:stretch;gap:20px;padding:16px 20px;border-radius:20px;margin-bottom:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);transition:all 150ms ease;cursor:pointer}
+.pr-card-row:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.25);transform:translateY(-1px)}
+.pr-card-row.selected{border-color:var(--sky);box-shadow:0 0 0 1px var(--sky),inset 0 1px 0 rgba(255,255,255,.3)}
+.pr-row-left{flex:0 0 84px;display:flex;align-items:center;justify-content:center}
+.pr-row-icon{width:84px;height:84px;border-radius:18px;object-fit:contain;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1)}
+.pr-row-right{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:8px;text-align:left}
+.pr-row-line{display:flex;align-items:center;flex-wrap:wrap;gap:12px 16px;text-align:left}
+.pr-row-line.line1{gap:12px 20px}
+.pr-row-rank{font-size:22px;font-weight:700;line-height:1}
+.pr-row-player{display:inline-flex;align-items:center;gap:10px}
+.pr-row-player .player-avatar.mini{width:32px;height:32px;border-radius:10px}
+.pr-row-tag{font-size:18px;font-weight:700;color:var(--text)}
+.pr-row-tag:hover{color:var(--sky);text-decoration:underline}
+.pr-row-score-badge{display:inline-flex;align-items:baseline;gap:6px;padding:4px 12px;border-radius:999px;background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.3);color:var(--sky);font-size:14px}
+.pr-row-score-badge b{font-size:16px}
+.pr-row-actions{margin-left:auto}
+.pr-row-breakdown{font-size:13px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.pr-breakdown-item{display:inline-flex;align-items:center;gap:6px}
+.pr-breakdown-swatch{width:8px;height:8px;border-radius:50%}
+.pr-row-meta{font-size:12px;color:var(--muted);gap:16px}
+
+@media(max-width:700px){
+  .pr-card-row{flex-direction:column;align-items:flex-start;gap:14px;padding:14px}
+  .pr-row-left{flex:0 0 auto;width:100%;justify-content:flex-start}
+  .pr-row-icon{width:56px;height:56px}
+  .pr-row-actions{margin-left:0;width:100%}
+  .pr-row-actions button{width:100%}
+}
 .rank-col{font-size:18px}.font-bold{font-weight:700}.font-normal{font-weight:400}
 .player-col{display:flex;align-items:center;gap:10px;min-width:0}
 .player-card-link{display:inline-flex;align-items:center;gap:10px;min-width:0;color:var(--text)}

@@ -20,11 +20,11 @@
   <a class="brand" href="index.html"><img src="assets/logo.jpg" alt="">Platfighters<span class="tld">.uy</span></a>
   <span class="spacer"></span>
   <nav>
-    <a href="players.html">Players</a>
-    <a href="events.html">Events</a>
-    <a href="rankings.html">Rankings</a>
+    <a href="players.html" data-i18n="nav.players">Players</a>
+    <a href="events.html" data-i18n="nav.events">Events</a>
+    <a href="rankings.html" data-i18n="nav.rankings">Rankings</a>
   </nav>
-  <span class="badge">URUGUAY SCENE</span>
+  <div class="lang glass pill"><button type="button" class="lang-btn on" data-lang="en">EN</button><button type="button" class="lang-btn" data-lang="es">ES</button></div>
 </header>
 
 <main class="home">
@@ -33,20 +33,20 @@
       <img src="assets/main-box-image.webp" alt="" onerror="this.style.display='none'">
     </div>
     <div class="hero-content">
-      <div class="eyebrow">The Uruguayan platfighter scene</div>
-      <h1 class="display">Every platfighter community, one scene.</h1>
-      <p class="lead">Results, rankings and events from every game and community in Uruguay, built from start.gg history.</p>
+      <div class="eyebrow" data-i18n="home.hero.eyebrow">The Uruguayan platfighter scene</div>
+      <h1 class="display" data-i18n="home.hero.title">Every platfighter community, one scene.</h1>
+      <p class="lead" data-i18n="home.hero.lead">Results, rankings and events from every game and community in Uruguay, built from start.gg history.</p>
     </div>
     <form id="search-form" class="search glass pill" role="search" onsubmit="return false">
-      <input id="global-search" type="text" placeholder="Search players or tournaments…" aria-label="Search players or tournaments" autocomplete="off">
-      <button class="btn" type="submit">Search</button>
+      <input id="global-search" type="text" placeholder="Search players or tournaments…" data-i18n-placeholder="home.search.placeholder" aria-label="Search players or tournaments" autocomplete="off">
+      <button class="btn" type="submit" data-i18n="home.search.button">Search</button>
     </form>
   </section>
 
   <section id="events" class="panel glass lg">
     <div class="head">
-      <h2>Upcoming events</h2>
-      <a class="link" href="events.html">View all events →</a>
+      <h2 data-i18n="home.upcoming.title">Upcoming events</h2>
+      <a class="link" href="events.html" data-i18n="home.upcoming.viewAll">View all events →</a>
     </div>
     <div id="events-grid" class="events"></div>
   </section>
@@ -57,15 +57,15 @@
     <div class="col main-col">
       <section class="panel glass">
         <div class="head">
-          <h2>Recent results</h2>
-          <a class="link" href="events.html">All tournaments →</a>
+          <h2 data-i18n="home.results.title">Recent results</h2>
+          <a class="link" href="events.html" data-i18n="home.results.viewAll">All tournaments →</a>
         </div>
         <div id="results" class="table"></div>
       </section>
 
       <section class="panel glass">
-        <h2>On this week</h2>
-        <p class="muted sm">Tournaments played this week (<span id="today"></span>) in past years</p>
+        <h2 data-i18n="home.history.title">On this week</h2>
+        <p class="muted sm" id="history-sub-text">Tournaments played this week (<span id="today"></span>) in past years</p>
         <div id="history"></div>
       </section>
     </div>
@@ -73,10 +73,10 @@
     <div class="col side-col">
       <section id="rankings" class="panel glass">
         <div class="head">
-          <h2>Top players</h2>
-          <a class="link" href="rankings.html">All rankings →</a>
+          <h2 data-i18n="home.rankings.title">Top players</h2>
+          <a class="link" href="rankings.html" data-i18n="home.rankings.viewAll">All rankings →</a>
         </div>
-        <p class="muted sm">Current #1 on each community's ranking</p>
+        <p class="muted sm" data-i18n="home.rankings.sub">Current #1 on each community's ranking</p>
         <div id="top-players"></div>
       </section>
 
@@ -85,19 +85,20 @@
   </div>
 
   <section class="panel glass lg">
-    <h2>New to the scene?</h2>
-    <p class="muted sm">Four steps from curious to competing.</p>
+    <h2 data-i18n="home.steps.title">New to the scene?</h2>
+    <p class="muted sm" data-i18n="home.steps.sub">Four steps from curious to competing.</p>
     <div id="steps" class="steps"></div>
   </section>
 
   <section id="hubs">
-    <h2 class="sec" style="margin-bottom:4px">Community hubs</h2>
-    <p class="muted sm">One scene, many communities. Discover where each game lives.</p>
+    <h2 class="sec" style="margin-bottom:4px" data-i18n="home.hubs.title">Community hubs</h2>
+    <p class="muted sm" data-i18n="home.hubs.sub">One scene, many communities. Discover where each game lives.</p>
     <div id="hub-list" class="cards"></div>
   </section>
 </main>
 
-<footer class="foot mono muted">Source: start.gg API · Served from local cache · Last synced <span id="synced">[TIMESTAMP]</span></footer>
+<footer class="foot mono muted"><span data-i18n="footer.source">Source: start.gg API · Served from local cache · Last synced</span> <span id="synced">[TIMESTAMP]</span></footer>
+<script src="js/i18n.js"></script>
 <script src="js/home.js"></script>
 </body>
 </html>

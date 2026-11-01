@@ -14,11 +14,12 @@
   <a class="brand" href="index.html"><img src="assets/logo.jpg" alt="">Platfighters<span class="tld">.uy</span></a>
   <span class="spacer"></span>
   <nav>
-    <a href="players.html">Players</a>
-    <a href="events.html">Events</a>
-    <a class="nav-active" aria-current="page">Rankings</a>
+    <a href="players.html" data-i18n="nav.players">Players</a>
+    <a href="events.html" data-i18n="nav.events">Events</a>
+    <a class="nav-active" aria-current="page" data-i18n="nav.rankings">Rankings</a>
   </nav>
-  <span class="badge">RANKINGS ENGINE</span>
+  <div class="lang glass pill"><button type="button" class="lang-btn on" data-lang="en">EN</button><button type="button" class="lang-btn" data-lang="es">ES</button></div>
+  <span class="badge" data-i18n="badge.rankings">RANKINGS ENGINE</span>
 </header>
 
 <main class="directory page-single">
@@ -33,54 +34,54 @@
 
   <!-- Top-Level Navigation Tabs -->
   <nav id="section-tabs" class="ranking-section-tabs" aria-label="Ranking Destinations">
-    <button class="ranking-section-tab active" data-section="systems">Ranking Systems</button>
-    <button class="ranking-section-tab" data-section="power_rankings">Power Rankings</button>
-    <button class="ranking-section-tab" data-section="historical">Historical Rankings</button>
+    <button class="ranking-section-tab active" data-section="systems" data-i18n="rankings.tab.systems">Ranking Systems</button>
+    <button class="ranking-section-tab" data-section="power_rankings" data-i18n="rankings.tab.powerRankings">Power Rankings</button>
+    <button class="ranking-section-tab" data-section="historical" data-i18n="rankings.tab.historical">Historical Rankings</button>
   </nav>
 
   <!-- Filter & Controls Drawer -->
   <section class="panel glass ranking-controls-panel">
     <div class="ranking-controls-grid">
       <label class="ranking-control-group">
-        <span class="control-label mono">GAME</span>
+        <span class="control-label mono" data-i18n="rankings.filter.game">GAME</span>
         <select id="game-filter" class="game-filter glass" aria-label="Select Game"></select>
       </label>
 
       <label class="ranking-control-group">
-        <span class="control-label mono">CALCULATION MODE</span>
+        <span class="control-label mono" data-i18n="rankings.filter.mode">CALCULATION MODE</span>
         <select id="mode-filter" class="game-filter glass" aria-label="Calculation Mode">
-          <option value="historical" selected>Historical rating (as of end date)</option>
+          <option value="historical" selected data-i18n="rankings.filter.modeHistorical">Historical (All time)</option>
           <option value="period_only">Period-only (neutral start in period)</option>
           <option value="period_performance">Period performance (start from pre-period rating)</option>
         </select>
       </label>
 
       <label class="ranking-control-group">
-        <span class="control-label mono">START DATE</span>
+        <span class="control-label mono" data-i18n="rankings.filter.start">START DATE</span>
         <input id="start-date-input" type="date" class="date-input glass" aria-label="Start Date">
       </label>
 
       <label class="ranking-control-group">
-        <span class="control-label mono">END DATE</span>
+        <span class="control-label mono" data-i18n="rankings.filter.end">END DATE</span>
         <input id="end-date-input" type="date" class="date-input glass" aria-label="End Date">
       </label>
 
     </div>
 
     <label class="ranking-control-group search-group">
-      <span class="control-label mono">SEARCH PLAYER</span>
+      <span class="control-label mono" data-i18n="players.title">SEARCH PLAYER</span>
       <div class="search glass">
         <span aria-hidden="true">⌕</span>
-        <input id="player-search" type="search" placeholder="Search tag or player" autocomplete="off" aria-label="Search players">
+        <input id="player-search" type="search" placeholder="Search tag or player" data-i18n-placeholder="rankings.filter.search" autocomplete="off" aria-label="Search players">
       </div>
     </label>
 
     <div class="ranking-presets-row">
       <span class="mono muted">Presets:</span>
-      <button class="preset-btn quiet-button" data-preset="all">All time</button>
-      <button class="preset-btn quiet-button" data-preset="2025">2025</button>
-      <button class="preset-btn quiet-button" data-preset="2024">2024</button>
-      <button class="preset-btn quiet-button" data-preset="6m">Last 6 months</button>
+      <button class="preset-btn quiet-button" data-preset="all" data-i18n="rankings.preset.all">All time</button>
+      <button class="preset-btn quiet-button" data-preset="2025" data-i18n="rankings.preset.2025">2025</button>
+      <button class="preset-btn quiet-button" data-preset="2024" data-i18n="rankings.preset.2024">2024</button>
+      <button class="preset-btn quiet-button" data-preset="6m" data-i18n="rankings.preset.6m">Last 6 months</button>
     </div>
   </section>
 
@@ -99,7 +100,8 @@
   <div id="modal-body" class="modal-body"></div>
 </dialog>
 
-<footer class="foot mono muted">Platfighters.uy · Rankings Engine</footer>
+<footer class="foot mono muted" data-i18n="badge.rankings">Platfighters.uy · Rankings Engine</footer>
+<script src="js/i18n.js"></script>
 <script src="js/rankings.js"></script>
 </body>
 </html>

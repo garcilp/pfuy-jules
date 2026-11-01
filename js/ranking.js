@@ -17,10 +17,11 @@ const pts = p => `${Number(p.points || 0).toLocaleString('en-US')} pts`;
 function render(r) {
   document.title = `${r.title} · Platfighters.uy`;
   const players = [...r.players].sort((a, b) => a.placement - b.placement);
+  const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
   const mains = p => p.mains && p.mains.length ? `<div class="stocks">${p.mains.map(m => stock(r.game, m)).join('')}</div>` : '';
   const real = p => p.realName ? `<div class="muted" style="font-size:15px">${esc(p.realName)}</div>` : '';
-  const win = w => `<div>${esc(w.opponent)} <span class="muted">· ${w.times > 1 ? w.times + ' times' : esc(w.tournament)}</span></div>`;
-  const res = x => `<div>${ord(x.placement)} · ${esc(x.event)} · ${x.entrants} entrants</div>`;
+  const win = w => `<div>${esc(w.opponent)} <span class="muted">· ${w.times > 1 ? (isEs ? w.times + ' veces' : w.times + ' times') : esc(w.tournament)}</span></div>`;
+  const res = x => `<div>${ord(x.placement)} · ${esc(x.event)} · ${x.entrants} ${isEs ? 'participantes' : 'entrants'}</div>`;
   const list = (label, items, fn) => items && items.length ? `<div class="list"><h3>${label}</h3>${items.map(fn).join('')}</div>` : '';
 
   const full = p => `<article class="entry full glass" id="p-${p.placement}">
@@ -28,7 +29,7 @@ function render(r) {
       <div class="ident"><span class="rank ${pcls(p.placement)}">${p.placement}</span><h2>${esc(p.tag)}</h2></div>
       ${real(p)}<div class="pts mono">${pts(p)}</div>${mains(p)}</div></div>
     ${p.text ? `<p class="text">${esc(p.text)}</p>` : ''}
-    ${p.notableWins || p.notableResults ? `<div class="lists">${list('NOTABLE WINS', p.notableWins, win)}${list('NOTABLE RESULTS', p.notableResults, res)}</div>` : ''}</article>`;
+    ${p.notableWins || p.notableResults ? `<div class="lists">${list(isEs ? 'VICTORIAS DESTACADAS' : 'NOTABLE WINS', p.notableWins, win)}${list(isEs ? 'RESULTADOS DESTACADOS' : 'NOTABLE RESULTS', p.notableResults, res)}</div>` : ''}</article>`;
 
   const medium = p => `<article class="entry med glass" id="p-${p.placement}">
     <span class="rank-md ${pcls(p.placement)}">${p.placement}</span>${photo(p, 'md')}
@@ -46,12 +47,20 @@ function render(r) {
   });
   flush();
 
-  $('#side').innerHTML = `<div class="top"><div class="eyebrow mono">POWER RANKINGS</div><b>${esc(r.title)}</b><span class="muted">${esc(r.game.name)} · ${players.length} players ranked</span></div>` +
+  $('#side').innerHTML = `<div class="top"><div class="eyebrow mono">POWER RANKINGS</div><b>${esc(r.title)}</b><span class="muted">${esc(r.game.name)} · ${players.length} ${isEs ? 'jugadores rankeados' : 'players ranked'}</span></div>` +
     players.map(p => `<a class="jump" href="#p-${p.placement}"><span class="n ${pcls(p.placement)}">${p.placement}</span>${esc(p.tag)}</a>`).join('');
 
   $('#col').innerHTML = `<section class="head-panel glass">
       <div class="eyebrow mono"><a href="rankings.html?section=historical#${esc(r.game.id)}">Rankings</a> › ${esc(r.game.name)} › ${esc(r.title)}</div>
       <h1 class="display">${esc(r.title)}</h1>
-      <div class="meta"><span class="glass pill chip">${esc(r.game.name)}</span><span>${period(r.period.start, r.period.end)}</span>${r.publishedBy ? `<span>·</span><span>Published by ${esc(r.publishedBy)}</span>` : ''}</div>
+      <div class="meta"><span class="glass pill chip">${esc(r.game.name)}</span><span>${period(r.period.start, r.period.end)}</span>${r.publishedBy ? `<span>·</span><span>${isEs ? 'Publicado por ' + esc(r.publishedBy) : 'Published by ' + esc(r.publishedBy)}</span>` : ''}</div>
       ${r.intro ? `<p class="intro">${esc(r.intro)}</p>` : ''}</section>` + html;
+}
+
+if (window.i18n && window.i18n.onChange) {
+  window.i18n.onChange(() => {
+    if (typeof id === 'string' && id) {
+      fetch(`data/rankings/${id}.json`).then(r => r.ok ? r.json() : null).then(data => { if (data) render(data); });
+    }
+  });
 }

@@ -1,9 +1,42 @@
 // Platfighters.uy — ranking creator (front-end prototype). Plain JS, no build step.
 // State lives in `draft`, which has the same shape as data/rankings/<id>.json in the rankings pages.
 let draft, games, sel = 0, dragFrom = null, dirty = false, savedAt = '';
+let prSnapshot = null;
+
+// Check for PR snapshot from sessionStorage
+try {
+  const isPrSource = new URLSearchParams(window.location.search).get('source') === 'pr';
+  const savedSnap = sessionStorage.getItem('platfighters_pr_snapshot');
+  if (isPrSource && savedSnap) {
+    prSnapshot = JSON.parse(savedSnap);
+  }
+} catch (e) {
+  console.warn('Could not read PR snapshot:', e);
+}
 
 Promise.all([fetch('data/games.json').then(r => r.json()), fetch('data/draft.json').then(r => r.json())])
-  .then(([g, d]) => { games = g; draft = d; renderDetails(); renderAll(); });
+  .then(([g, d]) => {
+    games = g.sort((a, b) => a.name.localeCompare(b.name));
+    if (prSnapshot) {
+      // Initialize a completely blank article as required
+      const matchingGame = games.find(gm => gm.slug === prSnapshot.game.slug || gm.id === prSnapshot.game.id) || games[0];
+      draft = {
+        id: '',
+        title: '',
+        game: { id: matchingGame.id, name: matchingGame.name, slug: matchingGame.slug },
+        period: { start: '', end: '' },
+        status: 'draft',
+        publishedBy: '',
+        intro: '',
+        players: []
+      };
+      dirty = false;
+    } else {
+      draft = d;
+    }
+    renderDetails();
+    renderAll();
+  });
 
 document.addEventListener('input', onInput);
 document.addEventListener('click', onClick);
@@ -27,33 +60,101 @@ const has = a => a && a.length;
 // The layout a player gets on the ranking page depends on how much data they have.
 const kind = p => ((p.text && p.text.trim()) || has(p.notableWins) || has(p.notableResults)) ? 'FULL'
   : (has(p.mains) || (p.realName && p.realName.trim())) ? 'MEDIUM' : 'MINIMUM';
-const WHY = { FULL: 'Shown as a full entry because it has a year text or notable wins or results.',
-  MEDIUM: 'Shown as a medium entry because it has mains or a real name.',
-  MINIMUM: 'Shown as a minimum row: placement, picture, tag and points only.' };
-const lab = (t, req) => `<div class="lab"><span>${t}</span><span>${req ? 'REQUIRED' : 'OPTIONAL'}</span></div>`;
+const getWhy = () => {
+  const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
+  return isEs ? {
+    FULL: 'Se muestra como entrada completa porque tiene texto del año o victorias/resultados destacados.',
+    MEDIUM: 'Se muestra como entrada mediana porque tiene mains o nombre real.',
+    MINIMUM: 'Se muestra como fila mínima: solo puesto, imagen, tag y puntos.'
+  } : {
+    FULL: 'Shown as a full entry because it has a year text or notable wins or results.',
+    MEDIUM: 'Shown as a medium entry because it has mains or a real name.',
+    MINIMUM: 'Shown as a minimum row: placement, picture, tag and points only.'
+  };
+};
+const lab = (t, req) => {
+  const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
+  return `<div class="lab"><span>${t}</span><span>${req ? (isEs ? 'REQUERIDO' : 'REQUIRED') : (isEs ? 'OPCIONAL' : 'OPTIONAL')}</span></div>`;
+};
 const lab2 = t => `<div class="lab"><span>${t}</span></div>`;
 const stock = name => `<span class="stock"><i>${esc(name[0])}</i><img src="assets/stock-icons/${esc(draft.game.slug)}/${slug(name)}.png" alt="" onerror="this.remove()"></span>`;
 const rowId = () => draft.id || `${draft.game.id}-${slug(draft.title || 'ranking')}`;
 
 // ---- rendering ----
 function renderAll() { renderSide(); renderEditor(); renderSub(); }
-function refresh() { renderSide(); renderSub(); const p = draft.players[sel], k = kind(p); $('#kindPill').textContent = k + ' ENTRY'; $('#why').textContent = WHY[k]; }
+function refresh() {
+  renderSide();
+  renderSub();
+  if (draft.players && draft.players[sel]) {
+    const p = draft.players[sel], k = kind(p);
+    const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
+    $('#kindPill').textContent = isEs ? (k === 'FULL' ? 'ENTRADA COMPLETA' : k === 'MEDIUM' ? 'ENTRADA MEDIANA' : 'ENTRADA MÍNIMA') : k + ' ENTRY';
+    $('#why').textContent = getWhy()[k];
+  }
+}
 
 function renderSub() {
+  const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
   $('#crumbGame').textContent = draft.game.name;
-  $('#sub').textContent = `${draft.game.name} community · ${dirty ? 'Unsaved changes' : savedAt ? 'Saved at ' + savedAt : 'No changes yet'}`;
+  const statusStr = dirty
+    ? (isEs ? 'Cambios sin guardar' : 'Unsaved changes')
+    : savedAt
+      ? (isEs ? 'Guardado a las ' + savedAt : 'Saved at ' + savedAt)
+      : (isEs ? 'Sin cambios aún' : 'No changes yet');
+  $('#sub').textContent = `${isEs ? 'Comunidad de ' + draft.game.name : draft.game.name + ' community'} · ${statusStr}`;
   $('#preview').href = `ranking.html?id=${encodeURIComponent(rowId())}`;
 }
 
+function populateFromSnapshot(count) {
+  if (!prSnapshot || !prSnapshot.players || !prSnapshot.players.length) return;
+  const countNum = parseInt(count, 10);
+  const playersToTake = prSnapshot.players.slice(0, countNum);
+
+  // Populate or replace generated ranking entries, preserving ordering and fields
+  draft.players = playersToTake.map((p, idx) => ({
+    placement: idx + 1,
+    tag: p.tag || '',
+    points: p.points !== null && p.points !== undefined ? p.points : null,
+    photo: p.photo || '',
+    playerId: p.playerId || ''
+  }));
+
+  sel = 0;
+  dirty = true;
+  renderAll();
+}
+
 function renderDetails() {
-  $('#details').innerHTML = `<div><h2>Ranking details</h2><div class="sub">Shown in the archive and at the top of the article.</div></div>
-    <div class="frow"><div class="fld" style="flex:2 1 320px">${lab('NAME', 1)}<input class="inp" data-bind="title" value="${esc(draft.title)}"></div>
-      <div class="fld" style="flex:1 1 200px">${lab('GAME', 1)}<select class="inp" data-bind="game">${games.map(g => `<option value="${g.id}"${g.id === draft.game.id ? ' selected' : ''}>${esc(g.name)}</option>`).join('')}</select></div></div>
-    <div class="frow"><div class="fld" style="flex:1 1 160px">${lab('PERIOD START', 1)}<input type="date" class="inp" data-bind="start" value="${draft.period.start}"></div>
-      <div class="fld" style="flex:1 1 160px">${lab('PERIOD END', 1)}<input type="date" class="inp" data-bind="end" value="${draft.period.end}"></div>
-      <div class="fld">${lab('STATUS', 1)}<div class="seg glass pill" id="status">${['current', 'final'].map(s => `<button type="button" class="${draft.status === s ? 'on' : ''}" data-act="status" data-v="${s}">${s[0].toUpperCase() + s.slice(1)}</button>`).join('')}</div></div></div>
-    <div class="fld">${lab('PUBLISHED BY', 0)}<input class="inp" data-bind="publishedBy" value="${esc(draft.publishedBy || '')}"></div>
-    <div class="fld">${lab('INTRO', 0)}<textarea class="inp" data-bind="intro">${esc(draft.intro || '')}</textarea><div class="cnt" id="introCount">${(draft.intro || '').length} characters</div></div>`;
+  const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
+
+  let snapshotControlsHtml = '';
+  if (prSnapshot && prSnapshot.players && prSnapshot.players.length) {
+    snapshotControlsHtml = `
+      <div class="pr-snapshot-box glass" style="padding:14px 18px; border-radius:18px; margin-bottom:16px; border:1px solid rgba(56,189,248,.3); background:rgba(56,189,248,.08);">
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+          <div>
+            <span class="eyebrow mono" style="color:var(--sky); font-weight:700;">${isEs ? 'POBLACIÓN RÁPIDA DESDE POWER RANKINGS' : 'QUICK POPULATE FROM POWER RANKINGS'}</span>
+            <div style="font-size:13px; color:var(--muted); margin-top:2px;">${isEs ? `Snapshot capturado con ${prSnapshot.players.length} jugadores en orden calculado.` : `Captured snapshot with ${prSnapshot.players.length} ranked players in calculated order.`}</div>
+          </div>
+          <div class="seg glass pill" style="display:inline-flex; gap:6px;">
+            <button type="button" class="btn glass pill" data-act="pop-snapshot" data-n="10" style="padding:4px 12px; font-size:13px; cursor:pointer;">${isEs ? 'Agregar 10' : 'Add 10'}</button>
+            <button type="button" class="btn glass pill" data-act="pop-snapshot" data-n="20" style="padding:4px 12px; font-size:13px; cursor:pointer;">${isEs ? 'Agregar 20' : 'Add 20'}</button>
+            <button type="button" class="btn glass pill" data-act="pop-snapshot" data-n="50" style="padding:4px 12px; font-size:13px; cursor:pointer;">${isEs ? 'Agregar 50' : 'Add 50'}</button>
+            <button type="button" class="btn glass pill" data-act="pop-snapshot" data-n="100" style="padding:4px 12px; font-size:13px; cursor:pointer;">${isEs ? 'Agregar 100' : 'Add 100'}</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  $('#details').innerHTML = `${snapshotControlsHtml}<div><h2>${isEs ? 'Detalles del ranking' : 'Ranking details'}</h2><div class="sub">${isEs ? 'Se muestra en el archivo y al inicio del artículo.' : 'Shown in the archive and at the top of the article.'}</div></div>
+    <div class="frow"><div class="fld" style="flex:2 1 320px">${lab(isEs ? 'NOMBRE' : 'NAME', 1)}<input class="inp" data-bind="title" value="${esc(draft.title)}"></div>
+      <div class="fld" style="flex:1 1 200px">${lab(isEs ? 'JUEGO' : 'GAME', 1)}<select class="inp" data-bind="game">${games.map(g => `<option value="${g.id}"${g.id === draft.game.id ? ' selected' : ''}>${esc(g.name)}</option>`).join('')}</select></div></div>
+    <div class="frow"><div class="fld" style="flex:1 1 160px">${lab(isEs ? 'INICIO DEL PERIODO' : 'PERIOD START', 1)}<input type="date" class="inp" data-bind="start" value="${draft.period.start}"></div>
+      <div class="fld" style="flex:1 1 160px">${lab(isEs ? 'FIN DEL PERIODO' : 'PERIOD END', 1)}<input type="date" class="inp" data-bind="end" value="${draft.period.end}"></div>
+      <div class="fld">${lab(isEs ? 'ESTADO' : 'STATUS', 1)}<div class="seg glass pill" id="status">${['current', 'final'].map(s => `<button type="button" class="${draft.status === s ? 'on' : ''}" data-act="status" data-v="${s}">${s === 'current' ? (isEs ? 'Actual' : 'Current') : (isEs ? 'Final' : 'Final')}</button>`).join('')}</div></div></div>
+    <div class="fld">${lab(isEs ? 'PUBLICADO POR' : 'PUBLISHED BY', 0)}<input class="inp" data-bind="publishedBy" value="${esc(draft.publishedBy || '')}"></div>
+    <div class="fld">${lab(isEs ? 'INTRODUCCIÓN' : 'INTRO', 0)}<textarea class="inp" data-bind="intro">${esc(draft.intro || '')}</textarea><div class="cnt" id="introCount">${(draft.intro || '').length} ${isEs ? 'caracteres' : 'characters'}</div></div>`;
 }
 
 function renderSide() {
@@ -70,7 +171,17 @@ function renderSide() {
 }
 
 function renderEditor() {
-  const p = draft.players[sel], n = sel + 1, k = kind(p);
+  if (!draft.players || !draft.players.length) {
+    const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
+    $('#editor').innerHTML = `<div class="panel glass empty-state" style="padding:36px; text-align:center;">
+      <h3>${isEs ? 'No hay jugadores en este ranking' : 'No players in this ranking'}</h3>
+      <p class="muted" style="margin:12px 0 20px;">${isEs ? 'Usa las opciones de población rápida arriba o agrega jugadores manualmente.' : 'Use the quick populate options above or add players manually.'}</p>
+      <button type="button" class="btn glass pill" data-act="add-player">${isEs ? '+ Agregar jugador' : '+ Add player'}</button>
+    </div>`;
+    return;
+  }
+  const p = draft.players[sel] || draft.players[0];
+  const n = sel + 1, k = kind(p);
   const pic = p._preview ? `<img src="${p._preview}" alt="">` : p.photo ? `<img src="${esc(p.photo)}" alt="" onerror="this.remove()">` : '';
   const sec = (key, title, body) => { const on = p[key] !== undefined;
     return `<div class="sec glass"><div class="sh"><b>${title}</b><small>OPTIONAL</small><span class="sp"></span><button type="button" class="tog${on ? ' on' : ''}" role="switch" aria-checked="${on}" aria-label="${title}" data-act="toggle" data-k="${key}"></button></div>${on ? body : ''}</div>`; };
@@ -87,7 +198,7 @@ function renderEditor() {
 
   $('#editor').innerHTML = `<div class="ed-head"><div class="l"><span class="big ${pcls(n)}">${n}</span><span class="nm">${esc(p.tag || 'New player')}</span></div>
       <div class="l" style="align-items:center"><span class="kind" id="kindPill">${k} ENTRY</span><button type="button" class="add" data-act="remove-player">Remove player</button></div></div>
-    <div class="why" id="why">${WHY[k]}</div>
+    <div class="why" id="why">${getWhy()[k]}</div>
     <div class="req"><div class="dzw"><div class="dz"><i>${esc((p.tag || '?')[0])}</i>${pic}</div>
         <button type="button" class="btn glass pill" data-act="pick-photo">Replace picture</button><input type="file" id="photoFile" accept="image/png,image/jpeg" hidden><div class="note0" style="text-align:center">JPG or PNG</div></div>
       <div class="reqf"><div class="fld" style="flex:0 0 120px">${lab('PLACEMENT', 1)}<input class="inp ro ${pcls(n)}" value="${n}" readonly aria-readonly="true"></div>
@@ -130,6 +241,7 @@ function onClick(e) {
     case 'sel': sel = i; renderAll(); return;
     case 'pick-photo': $('#photoFile').click(); return;
     case 'save': save(); return;
+    case 'pop-snapshot': populateFromSnapshot(b.dataset.n); return;
     case 'add-player': draft.players.push({ tag: '', points: null }); sel = draft.players.length - 1; renderAll(); break;
     case 'remove-player': if (draft.players.length > 1) { draft.players.splice(sel, 1); sel = Math.max(0, sel - 1); renderAll(); } break;
     case 'sort': { const cur = p; draft.players.sort((x, y) => (y.points || 0) - (x.points || 0)); sel = draft.players.indexOf(cur); renderAll(); break; }
@@ -179,4 +291,13 @@ function save() {
   a.download = out.id + '.json'; a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   dirty = false; savedAt = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); renderSub();
+}
+
+if (window.i18n && window.i18n.onChange) {
+  window.i18n.onChange(() => {
+    if (draft) {
+      renderDetails();
+      renderAll();
+    }
+  });
 }

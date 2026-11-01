@@ -12,13 +12,15 @@
 <header class="topbar glass pill">
   <a class="brand" href="index.html"><img src="assets/logo.jpg" alt="">Platfighters<span class="tld">.uy</span></a>
   <span class="spacer"></span>
-  <nav><a href="players.html">Players</a><a class="nav-active" aria-current="page">Events</a><a href="rankings.html">Rankings</a></nav>
-  <span class="badge">EVENT PAGE</span>
+  <nav><a href="players.html" data-i18n="nav.players">Players</a><a class="nav-active" aria-current="page" data-i18n="nav.events">Events</a><a href="rankings.html" data-i18n="nav.rankings">Rankings</a></nav>
+  <div class="lang glass pill"><button type="button" class="lang-btn on" data-lang="en">EN</button><button type="button" class="lang-btn" data-lang="es">ES</button></div>
+  <span class="badge" data-i18n="badge.eventPage">EVENT PAGE</span>
 </header>
 <main id="main" class="directory page-single">
-  <p id="directory-status" class="directory-status mono muted" aria-live="polite">Loading event details…</p>
+  <p id="directory-status" class="directory-status mono muted" aria-live="polite" data-i18n="event.loading">Loading event details…</p>
 </main>
-<footer class="foot mono muted">Platfighters.uy · Event details</footer>
+<footer class="foot mono muted" data-i18n="footer.events">Platfighters.uy · Event details</footer>
+<script src="js/i18n.js"></script>
 <script src="js/event.js"></script>
 </body>
 </html>

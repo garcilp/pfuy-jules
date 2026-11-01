@@ -12,28 +12,30 @@
 <header class="topbar glass pill">
   <a class="brand" href="index.html"><img src="assets/logo.jpg" alt="">Platfighters<span class="tld">.uy</span></a>
   <span class="spacer"></span>
-  <nav><a href="players.html">Players</a><a class="nav-active" aria-current="page">Events</a><a href="rankings.html">Rankings</a></nav>
-  <span class="badge">EVENT DIRECTORY</span>
+  <nav><a href="players.html" data-i18n="nav.players">Players</a><a class="nav-active" aria-current="page" data-i18n="nav.events">Events</a><a href="rankings.html" data-i18n="nav.rankings">Rankings</a></nav>
+  <div class="lang glass pill"><button type="button" class="lang-btn on" data-lang="en">EN</button><button type="button" class="lang-btn" data-lang="es">ES</button></div>
+  <span class="badge" data-i18n="badge.events">EVENT DIRECTORY</span>
 </header>
 <main class="directory page-single">
   <section class="directory-head">
-    <div><div class="eyebrow mono">START.GG TOURNAMENT DATA</div><h1>Events</h1><p class="muted">Browse tournaments across the games we follow.</p></div>
+    <div><div class="eyebrow mono" data-i18n="events.eyebrow">START.GG TOURNAMENT DATA</div><h1 data-i18n="events.title">Events</h1><p class="muted" data-i18n="events.desc">Browse tournaments across the games we follow.</p></div>
     <div class="directory-controls">
-      <label class="search glass"><span aria-hidden="true">⌕</span><input id="event-search" type="search" placeholder="Search tournaments or events" autocomplete="off" aria-label="Search events"></label>
+      <label class="search glass"><span aria-hidden="true">⌕</span><input id="event-search" type="search" placeholder="Search tournaments or events" data-i18n-placeholder="events.search.placeholder" autocomplete="off" aria-label="Search events"></label>
       <div class="directory-filter-row">
-        <label class="game-filter-wrap"><span class="sr-only">Filter by game</span><select id="game-filter" class="game-filter glass" aria-label="Filter events by game"><option value="">All games</option></select></label>
-        <label class="game-filter-wrap"><span class="sr-only">Event list display</span><select id="event-view" class="game-filter glass" aria-label="Event list display"><option value="condensed" selected>Condensed list</option><option value="cards">Cards</option></select></label>
+        <label class="game-filter-wrap"><span class="sr-only">Filter by game</span><select id="game-filter" class="game-filter glass" aria-label="Filter events by game"><option value="" data-i18n="events.filter.allGames">All games</option></select></label>
+        <label class="game-filter-wrap"><span class="sr-only">Event list display</span><select id="event-view" class="game-filter glass" aria-label="Event list display"><option value="condensed" selected data-i18n="players.view.condensed">Condensed list</option><option value="cards" data-i18n="players.view.cards">Cards</option></select></label>
       </div>
     </div>
   </section>
-  <p id="directory-status" class="directory-status mono muted" aria-live="polite">Loading events…</p>
+  <p id="directory-status" class="directory-status mono muted" aria-live="polite" data-i18n="events.loading">Loading events…</p>
   <section id="upcoming-events-section" class="panel glass upcoming-panel" style="display:none;">
-    <h2>Upcoming events</h2>
+    <h2 data-i18n="home.upcoming.title">Upcoming events</h2>
     <div id="upcoming-event-list" class="event-list" aria-label="Upcoming events list"></div>
   </section>
   <section id="event-list" class="event-list" aria-label="Event list"></section>
 </main>
-<footer class="foot mono muted">Platfighters.uy · Event directory</footer>
+<footer class="foot mono muted" data-i18n="footer.events">Platfighters.uy · Event directory</footer>
+<script src="js/i18n.js"></script>
 <script src="js/events.js"></script>
 </body>
 </html>
