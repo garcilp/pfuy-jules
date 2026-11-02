@@ -6,6 +6,8 @@ let currentProfileSnapshot = '';
 let currentProfileObject = null;
 let activeEditorMode = 'visual';
 let selectedPhoto = null;
+let csrfToken = '';
+let officialRankingsList = [];
 
 function syncVisualFromObject(profile) {
   const p = profile?.player || {};
@@ -67,12 +69,23 @@ function setEditorMode(mode) {
 }
 
 async function api(path, options = {}) {
+  const headers = {
+    'Content-Type': 'application/json',
+    'X-Admin-Request': '1',
+    ...(options.headers || {})
+  };
+  if (csrfToken) {
+    headers['X-CSRF-Token'] = csrfToken;
+  }
   const response = await fetch(path, {
     credentials: 'same-origin',
     ...options,
-    headers: { 'Content-Type': 'application/json', 'X-Admin-Request': '1', ...(options.headers || {}) }
+    headers
   });
   const payload = await response.json().catch(() => ({}));
+  if (payload.csrfToken) {
+    csrfToken = payload.csrfToken;
+  }
   if (!response.ok) throw new Error(payload.error || `Request failed (${response.status})`);
   return payload;
 }
@@ -83,19 +96,79 @@ function showEditor(authed) {
   if (authed) {
     setEditorMode('visual');
     loadProfiles();
+    loadRankings();
   }
+}
+
+async function loadRankings() {
+  const tableBody = $('#rankings-table-body');
+  if (!tableBody) return;
+  const gameFilter = $('#ranking-game-filter')?.value || 'all';
+  const searchQuery = $('#ranking-search')?.value.trim() || '';
+  const showArchived = $('#ranking-show-archived')?.checked ? '1' : '0';
+
+  try {
+    const params = new URLSearchParams();
+    if (gameFilter !== 'all') params.set('game', gameFilter);
+    if (searchQuery) params.set('search', searchQuery);
+    params.set('includeArchived', showArchived);
+
+    const { rankings } = await api(`/api/admin/rankings?${params.toString()}`);
+    officialRankingsList = rankings || [];
+    renderRankingsTable(officialRankingsList);
+  } catch (err) {
+    tableBody.innerHTML = `<tr><td colspan="6" style="padding:20px; text-align:center; color:#f87171;">Error loading rankings: ${esc(err.message)}</td></tr>`;
+  }
+}
+
+function renderRankingsTable(rankings) {
+  const tableBody = $('#rankings-table-body');
+  if (!tableBody) return;
+  if (!rankings.length) {
+    tableBody.innerHTML = '<tr><td colspan="6" style="padding:20px; text-align:center;" class="muted">No official rankings match the current filters.</td></tr>';
+    return;
+  }
+
+  tableBody.innerHTML = rankings.map(r => {
+    const isArchived = r.isArchived;
+    const statusLabel = (r.status === 'yearly') ? 'Yearly' : 'Seasonal';
+    const periodStr = (r.periodStart && r.periodEnd) ? `${r.periodStart} → ${r.periodEnd}` : '—';
+    const archiveBadge = isArchived ? '<span style="font-size:11px; padding:2px 6px; border-radius:4px; background:rgba(239,68,68,0.2); color:#fca5a5; margin-left:6px;">ARCHIVED</span>' : '';
+
+    return `
+      <tr style="border-bottom:1px solid var(--line); opacity: ${isArchived ? '0.6' : '1'};">
+        <td style="padding:10px 14px; font-weight:600;">
+          ${esc(r.title)}
+          ${archiveBadge}
+        </td>
+        <td style="padding:10px 14px;">${esc(r.gameSlug || r.gameId)}</td>
+        <td style="padding:10px 14px;"><span class="tagpill" style="font-size:11px;">${statusLabel}</span></td>
+        <td style="padding:10px 14px; font-size:13px;" class="muted">${esc(periodStr)}</td>
+        <td style="padding:10px 14px; text-align:center; font-family:var(--font-mono, monospace);">${r.playerCount}</td>
+        <td style="padding:10px 14px; text-align:right; white-space:nowrap;">
+          <a href="ranking-creator.html?id=${encodeURIComponent(r.id)}&mode=admin" class="btn glass pill" style="padding:4px 10px; font-size:12px; text-decoration:none; margin-right:6px;">Edit</a>
+          ${isArchived
+            ? `<button type="button" class="btn glass pill" data-unarchive-ranking="${esc(r.id)}" style="padding:4px 10px; font-size:12px; color:#38bdf8;">Unarchive</button>`
+            : `<button type="button" class="btn glass pill" data-archive-ranking="${esc(r.id)}" style="padding:4px 10px; font-size:12px; color:#f87171;">Archive</button>`
+          }
+        </td>
+      </tr>
+    `;
+  }).join('');
 }
 
 async function loadProfiles(selected = '') {
   try {
-    const [{ profiles }, { merges }, { eventGroups }, { exclusions }, { events }, { socials }] = await Promise.all([
+    const [{ profiles }, { merges }, { eventGroups }, { exclusions }, { events }, { socials }, { games }] = await Promise.all([
       api('/api/admin/profiles'), api('/api/admin/merges'), api('/api/admin/event-groups'), api('/api/admin/exclusions'), api('/api/admin/events').catch(() => ({ events: [] })),
-      api('/api/admin/community-socials').catch(() => ({ socials: {} }))
+      api('/api/admin/community-socials').catch(() => ({ socials: {} })),
+      api('/api/games').catch(() => ({ games: [] }))
     ]);
     renderEventGroups(eventGroups);
     renderExcludedEvents(exclusions.events || []);
     renderEventSelects(events || []);
     renderCommunitySocials(socials || {});
+    renderGameFilter(games || []);
     const select = $('#profile-select');
     select.innerHTML = profiles.map(p => `<option value="${esc(p.slug)}">${esc(p.tag)} · ${esc(p.playerId || 'local profile')}</option>`).join('');
     const source = $('#merge-source');
@@ -112,6 +185,15 @@ async function loadProfiles(selected = '') {
     select.value = selected || profiles[0].slug;
     await loadProfile(select.value);
   } catch (error) { $('#save-message').textContent = error.message; }
+}
+
+function renderGameFilter(games = []) {
+  const gameFilter = $('#ranking-game-filter');
+  if (!gameFilter) return;
+  const currentVal = gameFilter.value;
+  gameFilter.innerHTML = '<option value="all">All games</option>' +
+    games.map(g => `<option value="${esc(g.slug)}">${esc(g.name)}</option>`).join('');
+  if (currentVal) gameFilter.value = currentVal;
 }
 
 function renderEventSelects(events = []) {
@@ -183,11 +265,53 @@ $('#login-form').addEventListener('submit', async event => {
   const message = $('#login-message');
   message.textContent = 'Signing in…';
   try {
-    await api('/api/admin/login', { method: 'POST', body: JSON.stringify({ password: $('#admin-password').value }) });
+    const res = await api('/api/admin/login', { method: 'POST', body: JSON.stringify({ password: $('#admin-password').value }) });
+    if (res.csrfToken) csrfToken = res.csrfToken;
     $('#admin-password').value = '';
     message.textContent = '';
     showEditor(true);
   } catch (error) { message.textContent = error.message; }
+});
+
+$('#ranking-game-filter')?.addEventListener('change', () => loadRankings());
+$('#ranking-search')?.addEventListener('input', () => loadRankings());
+$('#ranking-show-archived')?.addEventListener('change', () => loadRankings());
+
+$('#rankings-table-body')?.addEventListener('click', async event => {
+  const archiveBtn = event.target.closest('[data-archive-ranking]');
+  const unarchiveBtn = event.target.closest('[data-unarchive-ranking]');
+  const message = $('#ranking-admin-message');
+
+  if (archiveBtn) {
+    const rid = archiveBtn.dataset.archiveRanking;
+    if (!confirm(`Are you sure you want to archive official ranking "${rid}"? It will be hidden from the public website.`)) return;
+    if (message) message.textContent = 'Archiving ranking…';
+    try {
+      await api(`/api/admin/rankings/${encodeURIComponent(rid)}`, { method: 'DELETE' });
+      if (message) message.textContent = `Ranking "${rid}" archived successfully.`;
+      loadRankings();
+    } catch (err) {
+      if (message) message.textContent = `Failed to archive: ${err.message}`;
+    }
+    return;
+  }
+
+  if (unarchiveBtn) {
+    const rid = unarchiveBtn.dataset.unarchiveRanking;
+    if (!confirm(`Unarchive official ranking "${rid}" and restore it to the public website?`)) return;
+    if (message) message.textContent = 'Restoring ranking…';
+    try {
+      await api(`/api/admin/rankings/${encodeURIComponent(rid)}`, {
+        method: 'PUT',
+        body: JSON.stringify({ action: 'unarchive' })
+      });
+      if (message) message.textContent = `Ranking "${rid}" restored successfully.`;
+      loadRankings();
+    } catch (err) {
+      if (message) message.textContent = `Failed to restore: ${err.message}`;
+    }
+    return;
+  }
 });
 
 $('#merge-form').addEventListener('submit', async event => {
@@ -444,4 +568,7 @@ $('#signout').addEventListener('click', async () => {
   try { await api('/api/admin/logout', { method: 'POST', body: '{}' }); } finally { showEditor(false); }
 });
 
-api('/api/admin/session').then(({ authenticated }) => showEditor(authenticated)).catch(() => showEditor(false));
+api('/api/admin/session').then(res => {
+  if (res.csrfToken) csrfToken = res.csrfToken;
+  showEditor(res.authenticated);
+}).catch(() => showEditor(false));

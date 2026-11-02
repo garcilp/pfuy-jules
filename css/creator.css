@@ -5,7 +5,11 @@
 .p1{color:var(--gold)}.p2{color:var(--silver)}.p3{color:var(--bronze)}.pn{color:var(--sky)}
 
 .tagpill{font:11px 'JetBrains Mono',monospace;color:var(--muted);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:3px 10px}
-.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.actions{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.action-group-preview{display:inline-flex;}
+.action-group-io{display:inline-flex;gap:8px;}
+.action-group-share{display:inline-flex;gap:8px;}
+.action-group-admin{display:inline-flex;margin-left:auto;}
 
 /* Buttons */
 .creator-page .btn{min-height:48px;padding:0 22px;display:inline-flex;align-items:center;justify-content:center;color:var(--text);font:500 15px 'Space Grotesk',sans-serif;cursor:pointer;border-radius:999px;text-decoration:none;transition:all 150ms ease}

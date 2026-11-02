@@ -1,8 +1,8 @@
-"""Local Platfighters.uy web server with password-protected profile editing."""
+"""Local Platfighters.uy web server with password-protected profile editing and ranking management."""
 
 import base64
-import hmac
 import getpass
+import hmac
 import json
 import os
 import re
@@ -12,14 +12,27 @@ import subprocess
 import sys
 import time
 from base64 import binascii
+from collections import defaultdict
 from http.cookies import SimpleCookie
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
+try:
+    import bcrypt
+except ImportError:
+    bcrypt = None
+
 ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
+
+from scripts.rankings_manager import (
+    init_db as init_rankings_db,
+    seed_existing_rankings,
+    sync_static_rankings,
+)
+
 PROFILE_DIR = ROOT / "data" / "profiles"
 EVENT_GROUPS_PATH = PROFILE_DIR / "event_groups.json"
 EXCLUSIONS_PATH = PROFILE_DIR / "exclusions.json"
@@ -30,9 +43,58 @@ SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9-]{0,100}$")
 MAX_BODY = 7 * 1024 * 1024
 MAX_PHOTO = 5 * 1024 * 1024
 SESSION_SECONDS = 8 * 60 * 60
+
+# Authentication state
 PASSWORD = os.environ.get("PLATFIGHTERS_ADMIN_PASSWORD", "")
+PASSWORD_BCRYPT = None
+
+# In-memory sessions: token -> { "expires": float, "csrf_token": str }
 SESSIONS = {}
+
+# Rate limiting for login attempts: client_ip -> list of timestamps
+LOGIN_ATTEMPTS = defaultdict(list)
+RATE_LIMIT_MAX_ATTEMPTS = 5
+RATE_LIMIT_WINDOW = 300  # 5 minutes
+
 MIME_EXTENSIONS = {"image/png": ".png", "image/jpeg": ".jpg", "image/webp": ".webp"}
+
+
+def hash_password(plain_password: str) -> bytes:
+    if bcrypt:
+        return bcrypt.hashpw(plain_password.encode("utf-8"), bcrypt.gensalt(12))
+    return plain_password.encode("utf-8")
+
+
+def verify_password(plain_password: str) -> bool:
+    global PASSWORD_BCRYPT, PASSWORD
+    if bcrypt and PASSWORD_BCRYPT:
+        try:
+            return bcrypt.checkpw(plain_password.encode("utf-8"), PASSWORD_BCRYPT)
+        except Exception:
+            return False
+    return hmac.compare_digest(plain_password, PASSWORD)
+
+
+def init_auth():
+    global PASSWORD, PASSWORD_BCRYPT
+    if PASSWORD:
+        if bcrypt:
+            PASSWORD_BCRYPT = hash_password(PASSWORD)
+
+
+init_auth()
+
+
+def check_rate_limit(client_ip: str) -> bool:
+    """Returns True if allowed, False if rate-limited."""
+    now = time.time()
+    attempts = [t for t in LOGIN_ATTEMPTS[client_ip] if now - t < RATE_LIMIT_WINDOW]
+    LOGIN_ATTEMPTS[client_ip] = attempts
+    return len(attempts) < RATE_LIMIT_MAX_ATTEMPTS
+
+
+def record_login_attempt(client_ip: str):
+    LOGIN_ATTEMPTS[client_ip].append(time.time())
 
 
 def identity_merges():
@@ -46,10 +108,6 @@ def identity_merges():
 
 
 def get_player_overlapping_events(player_a_id: str, player_b_id: str):
-    """
-    Finds shared tournament event participation between two players.
-    Returns a list of dicts with eventId, eventName, tournamentName, startAt, and gameSlug.
-    """
     db_path = ROOT / "startgg-data" / "platfighters.sqlite3"
     if not db_path.exists():
         return []
@@ -76,7 +134,6 @@ def get_player_overlapping_events(player_a_id: str, player_b_id: str):
         rows = cur.fetchall()
         con.close()
 
-        from collections import defaultdict
         events_by_id = defaultdict(list)
         event_info = {}
         for row in rows:
@@ -283,15 +340,20 @@ class Handler(SimpleHTTPRequestHandler):
         morsel = cookie.get("platfighters_admin")
         return morsel.value if morsel else None
 
-    def is_admin(self):
+    def get_session(self):
         token = self.session_token()
-        expires = SESSIONS.get(token) if token else None
-        if not expires:
-            return False
-        if expires < time.time():
+        if not token:
+            return None
+        session = SESSIONS.get(token)
+        if not session:
+            return None
+        if session["expires"] < time.time():
             SESSIONS.pop(token, None)
-            return False
-        return True
+            return None
+        return session
+
+    def is_admin(self):
+        return self.get_session() is not None
 
     def require_admin(self):
         if not self.is_admin():
@@ -302,10 +364,31 @@ class Handler(SimpleHTTPRequestHandler):
     def has_admin_header(self):
         return self.headers.get("X-Admin-Request") == "1"
 
+    def verify_csrf(self):
+        """Verifies CSRF token on state-changing requests."""
+        csrf_hdr = self.headers.get("X-CSRF-Token")
+        session = self.get_session()
+        if not session or not csrf_hdr or not hmac.compare_digest(csrf_hdr, session.get("csrf_token", "")):
+            return False
+        return True
+
+    def client_ip(self):
+        forwarded = self.headers.get("X-Forwarded-For")
+        if forwarded:
+            return forwarded.split(",")[0].strip()
+        return self.client_address[0] if self.client_address else "127.0.0.1"
+
     def do_GET(self):
         parsed = urlsplit(self.path)
         if parsed.path == "/api/admin/session":
-            self.send_json(200, {"authenticated": self.is_admin()})
+            session = self.get_session()
+            if session:
+                self.send_json(200, {
+                    "authenticated": True,
+                    "csrfToken": session["csrf_token"]
+                })
+            else:
+                self.send_json(200, {"authenticated": False})
         elif parsed.path == "/api/admin/profiles":
             if not self.require_admin():
                 return
@@ -363,6 +446,101 @@ class Handler(SimpleHTTPRequestHandler):
             if not self.require_admin():
                 return
             self.send_json(200, {"exclusions": visibility_exclusions()})
+        elif parsed.path == "/api/admin/rankings":
+            if not self.require_admin():
+                return
+            qs = parse_qs(parsed.query)
+            game_filter = qs.get("game", [None])[0]
+            search_query = qs.get("search", [None])[0]
+            include_archived = qs.get("includeArchived", ["0"])[0] in {"1", "true", "yes"}
+
+            try:
+                init_rankings_db()
+                with sqlite3.connect(DATABASE) as connection:
+                    connection.row_factory = sqlite3.Row
+                    sql = "SELECT * FROM official_rankings"
+                    clauses = []
+                    params = []
+
+                    if not include_archived:
+                        clauses.append("is_archived = 0")
+                    if game_filter and game_filter != "all":
+                        clauses.append("(game_slug = ? OR game_id = ?)")
+                        params.extend([game_filter, game_filter])
+                    if search_query and search_query.strip():
+                        clauses.append("title LIKE ?")
+                        params.append(f"%{search_query.strip()}%")
+
+                    if clauses:
+                        sql += " WHERE " + " AND ".join(clauses)
+                    sql += " ORDER BY period_end DESC, created_at DESC"
+
+                    rows = connection.execute(sql, params).fetchall()
+
+                    rankings_list = []
+                    for r in rows:
+                        try:
+                            players = json.loads(r["players_json"])
+                        except Exception:
+                            players = []
+                        rankings_list.append({
+                            "id": r["id"],
+                            "title": r["title"],
+                            "gameSlug": r["game_slug"],
+                            "gameId": r["game_id"],
+                            "periodStart": r["period_start"],
+                            "periodEnd": r["period_end"],
+                            "status": r["status"],
+                            "publishedBy": r["published_by"] or "",
+                            "intro": r["intro"] or "",
+                            "playerCount": len(players),
+                            "createdAt": r["created_at"],
+                            "updatedAt": r["updated_at"],
+                            "isArchived": bool(r["is_archived"]),
+                        })
+                    self.send_json(200, {"rankings": rankings_list})
+            except Exception as e:
+                self.send_json(500, {"error": f"Could not load rankings: {e}"})
+        elif parsed.path.startswith("/api/admin/rankings/"):
+            if not self.require_admin():
+                return
+            rid = parsed.path.split("/api/admin/rankings/")[1].strip()
+            if not safe_slug(rid):
+                self.send_json(400, {"error": "Invalid ranking ID."})
+                return
+            try:
+                init_rankings_db()
+                with sqlite3.connect(DATABASE) as connection:
+                    connection.row_factory = sqlite3.Row
+                    row = connection.execute("SELECT * FROM official_rankings WHERE id = ?", (rid,)).fetchone()
+                    if not row:
+                        self.send_json(404, {"error": "Ranking not found."})
+                        return
+                    try:
+                        players = json.loads(row["players_json"])
+                    except Exception:
+                        players = []
+
+                    data = {
+                        "id": row["id"],
+                        "title": row["title"],
+                        "game": {
+                            "id": row["game_id"],
+                            "slug": row["game_slug"],
+                        },
+                        "period": {
+                            "start": row["period_start"],
+                            "end": row["period_end"],
+                        },
+                        "status": row["status"],
+                        "publishedBy": row["published_by"] or "",
+                        "intro": row["intro"] or "",
+                        "players": players,
+                        "isArchived": bool(row["is_archived"]),
+                    }
+                    self.send_json(200, {"ranking": data})
+            except Exception as e:
+                self.send_json(500, {"error": f"Error loading ranking: {e}"})
         elif parsed.path == "/api/games":
             try:
                 with sqlite3.connect(DATABASE) as connection:
@@ -474,6 +652,9 @@ class Handler(SimpleHTTPRequestHandler):
         if not self.has_admin_header():
             self.send_json(403, {"error": "Request rejected."})
             return
+
+        client_ip = self.client_ip()
+
         try:
             body = self.read_json()
         except OverflowError as error:
@@ -487,24 +668,167 @@ class Handler(SimpleHTTPRequestHandler):
             return
 
         if parsed.path == "/api/admin/login":
+            if not check_rate_limit(client_ip):
+                self.send_json(429, {"error": "Too many failed sign-in attempts. Please wait 5 minutes before trying again."})
+                return
+
             password = body.get("password")
-            if not PASSWORD:
+            if not PASSWORD and not PASSWORD_BCRYPT:
                 self.send_json(503, {"error": "Admin access is not configured on this server."})
                 return
-            if not isinstance(password, str) or not hmac.compare_digest(password, PASSWORD):
+            if not isinstance(password, str) or not verify_password(password):
+                record_login_attempt(client_ip)
                 self.send_json(401, {"error": "That password was not accepted."})
                 return
+
+            # Regenerate session token
             token = secrets.token_urlsafe(32)
-            SESSIONS[token] = time.time() + SESSION_SECONDS
-            self.send_json(200, {"authenticated": True}, {"Set-Cookie": f"platfighters_admin={token}; HttpOnly; SameSite=Strict; Path=/; Max-Age={SESSION_SECONDS}"})
-        elif parsed.path == "/api/admin/logout":
+            csrf_token = secrets.token_urlsafe(32)
+            SESSIONS[token] = {
+                "expires": time.time() + SESSION_SECONDS,
+                "csrf_token": csrf_token,
+            }
+            self.send_json(
+                200,
+                {"authenticated": True, "csrfToken": csrf_token},
+                {"Set-Cookie": f"platfighters_admin={token}; HttpOnly; SameSite=Strict; Path=/; Max-Age={SESSION_SECONDS}"}
+            )
+            return
+
+        # State-changing operations require authentication & CSRF verification
+        if not self.require_admin():
+            return
+
+        if not self.verify_csrf():
+            self.send_json(403, {"error": "Invalid or missing CSRF token."})
+            return
+
+        if parsed.path == "/api/admin/logout":
             token = self.session_token()
             if token:
                 SESSIONS.pop(token, None)
             self.send_json(200, {"authenticated": False}, {"Set-Cookie": "platfighters_admin=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0"})
-        elif parsed.path == "/api/admin/photo":
-            if not self.require_admin():
+        elif parsed.path == "/api/admin/rankings":
+            ranking_data = body.get("ranking")
+            if not isinstance(ranking_data, dict):
+                self.send_json(400, {"error": "Invalid ranking payload."})
                 return
+
+            rid = str(ranking_data.get("id") or "").strip()
+            title = str(ranking_data.get("title") or "").strip()
+            game = ranking_data.get("game") or {}
+            game_slug = str(game.get("slug") or "").strip()
+            game_id = str(game.get("id") or "").strip()
+            period = ranking_data.get("period") or {}
+            start = str(period.get("start") or "").strip()
+            end = str(period.get("end") or "").strip()
+            status = str(ranking_data.get("status") or "yearly").strip()
+            published_by = str(ranking_data.get("publishedBy") or "").strip()
+            intro = str(ranking_data.get("intro") or "").strip()
+            players = ranking_data.get("players")
+
+            if not safe_slug(rid) or not title or not game_slug or not start or not end or not isinstance(players, list):
+                self.send_json(400, {"error": "Missing required ranking fields (id, title, game, period, players)."})
+                return
+
+            if status not in {"yearly", "seasonal"}:
+                self.send_json(400, {"error": "Classification must be 'yearly' or 'seasonal'."})
+                return
+
+            sanitized_players = []
+            seen_player_ids = set()
+            for p in players:
+                if not isinstance(p, dict) or not p.get("tag"):
+                    self.send_json(400, {"error": "Each player must have a valid tag."})
+                    return
+                pid = str(p.get("playerId") or "").strip()
+                if pid:
+                    if pid in seen_player_ids:
+                        self.send_json(400, {"error": f"Duplicate player ID '{pid}' in ranking."})
+                        return
+                    seen_player_ids.add(pid)
+                sanitized_player = {
+                    "placement": int(p.get("placement") or (len(sanitized_players) + 1)),
+                    "tag": str(p["tag"]).strip()[:80],
+                }
+                if pid:
+                    sanitized_player["playerId"] = pid
+                if p.get("points") is not None and str(p.get("points")).strip() != "":
+                    try:
+                        sanitized_player["points"] = float(p["points"])
+                    except (ValueError, TypeError):
+                        pass
+                if p.get("photo"):
+                    sanitized_player["photo"] = str(p["photo"]).strip()[:240]
+                if p.get("realName"):
+                    sanitized_player["realName"] = str(p["realName"]).strip()[:100]
+                if isinstance(p.get("mains"), list):
+                    sanitized_player["mains"] = [str(m).strip()[:50] for m in p["mains"] if str(m).strip()]
+                if p.get("text"):
+                    sanitized_player["text"] = str(p["text"]).strip()[:2000]
+                if isinstance(p.get("notableWins"), list):
+                    sanitized_player["notableWins"] = []
+                    for w in p["notableWins"]:
+                        if isinstance(w, dict) and w.get("opponent"):
+                            win_obj = {"opponent": str(w["opponent"]).strip()[:80]}
+                            if "times" in w and w["times"] is not None:
+                                try:
+                                    win_obj["times"] = int(w["times"])
+                                except (ValueError, TypeError):
+                                    win_obj["times"] = 1
+                            elif "tournament" in w:
+                                win_obj["tournament"] = str(w.get("tournament") or "").strip()[:100]
+                            sanitized_player["notableWins"].append(win_obj)
+                if isinstance(p.get("notableResults"), list):
+                    sanitized_player["notableResults"] = []
+                    for r in p["notableResults"]:
+                        if isinstance(r, dict) and r.get("event"):
+                            res_obj = {
+                                "placement": r.get("placement"),
+                                "event": str(r["event"]).strip()[:120],
+                                "entrants": r.get("entrants")
+                            }
+                            sanitized_player["notableResults"].append(res_obj)
+
+                sanitized_players.append(sanitized_player)
+
+            now = int(time.time())
+            try:
+                init_rankings_db()
+                with sqlite3.connect(DATABASE) as connection:
+                    existing = connection.execute("SELECT created_at FROM official_rankings WHERE id = ?", (rid,)).fetchone()
+                    created_at = existing[0] if existing else now
+
+                    connection.execute(
+                        """
+                        INSERT OR REPLACE INTO official_rankings (
+                            id, title, game_slug, game_id, period_start, period_end,
+                            status, published_by, intro, players_json,
+                            created_at, updated_at, is_archived
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
+                        """,
+                        (
+                            rid,
+                            title[:150],
+                            game_slug[:50],
+                            game_id[:50],
+                            start[:20],
+                            end[:20],
+                            status,
+                            published_by[:100],
+                            intro[:2000],
+                            json.dumps(sanitized_players, ensure_ascii=False),
+                            created_at,
+                            now,
+                        )
+                    )
+                    connection.commit()
+
+                sync_static_rankings()
+                self.send_json(200, {"success": True, "id": rid})
+            except Exception as e:
+                self.send_json(500, {"error": f"Failed to publish ranking: {e}"})
+        elif parsed.path == "/api/admin/photo":
             player_id, data_url = str(body.get("playerId", "")), body.get("data", "")
             if not player_id.isdigit() or not isinstance(data_url, str) or "," not in data_url:
                 self.send_json(400, {"error": "Invalid picture upload."})
@@ -532,8 +856,6 @@ class Handler(SimpleHTTPRequestHandler):
             path.write_bytes(photo)
             self.send_json(200, {"path": f"assets/players/{path.name}"})
         elif parsed.path == "/api/admin/community-socials":
-            if not self.require_admin():
-                return
             socials = body.get("socials")
             if not isinstance(socials, dict):
                 self.send_json(400, {"error": "Invalid socials configuration."})
@@ -541,8 +863,6 @@ class Handler(SimpleHTTPRequestHandler):
             atomic_json(COMMUNITY_SOCIALS_PATH, socials)
             self.send_json(200, {"socials": socials})
         elif parsed.path == "/api/admin/merge":
-            if not self.require_admin():
-                return
             source, target = str(body.get("sourceId", "")), str(body.get("targetId", ""))
             profiles = {entry["playerId"] for entry in profile_entries() if entry["playerId"]}
             merges = identity_merges()
@@ -578,8 +898,6 @@ class Handler(SimpleHTTPRequestHandler):
             refresh_index()
             self.send_json(200, {"merged": source, "into": target, "profiles": profile_entries()})
         elif parsed.path == "/api/admin/event-group":
-            if not self.require_admin():
-                return
             groups = event_groups()
             child_key = normalize_event_key(body.get("child"))
             if not child_key:
@@ -611,8 +929,6 @@ class Handler(SimpleHTTPRequestHandler):
             refresh_index()
             self.send_json(200, {"eventGroups": groups})
         elif parsed.path == "/api/admin/exclusions":
-            if not self.require_admin():
-                return
             config = visibility_exclusions()
             previous = json.loads(json.dumps(config))
             kind = body.get("kind")
@@ -669,14 +985,16 @@ class Handler(SimpleHTTPRequestHandler):
             self.send_json(404, {"error": "Not found."})
 
     def do_PUT(self):
-        if urlsplit(self.path).path != "/api/admin/profile":
-            self.send_json(404, {"error": "Not found."})
-            return
+        parsed = urlsplit(self.path)
         if not self.has_admin_header():
             self.send_json(403, {"error": "Request rejected."})
             return
         if not self.require_admin():
             return
+        if not self.verify_csrf():
+            self.send_json(403, {"error": "Invalid or missing CSRF token."})
+            return
+
         try:
             body = self.read_json()
         except OverflowError as error:
@@ -686,88 +1004,265 @@ class Handler(SimpleHTTPRequestHandler):
             self.send_json(400, {"error": str(error)})
             return
         if not isinstance(body, dict):
-            self.send_json(400, {"error": "Invalid profile update."})
+            self.send_json(400, {"error": "Invalid request."})
             return
-        slug, profile = body.get("slug", ""), body.get("profile")
-        if not safe_slug(slug) or not isinstance(profile, dict):
-            self.send_json(400, {"error": "Invalid profile update."})
-            return
-        path = PROFILE_DIR / f"{slug}.json"
-        try:
-            with path.open(encoding="utf-8") as stream:
-                original = json.load(stream)
-        except FileNotFoundError:
-            self.send_json(404, {"error": "Profile not found."})
-            return
-        except json.JSONDecodeError:
-            self.send_json(500, {"error": "The saved profile is not valid JSON."})
-            return
-        player = profile.get("player")
-        games = profile.get("games")
-        if not isinstance(player, dict) or not isinstance(games, list):
-            self.send_json(400, {"error": "Profile JSON must contain a player object and a games array."})
-            return
-        if not isinstance(player.get("tag"), str) or not player["tag"].strip() or len(player["tag"]) > 80:
-            self.send_json(400, {"error": "Display name must be a non-empty string up to 80 characters."})
-            return
-        for key, limit in (("sponsor", 100), ("location", 120), ("startgg", 500), ("photo", 240)):
-            value = player.get(key, "")
-            if not isinstance(value, str) or len(value) > limit:
-                self.send_json(400, {"error": f"Invalid {key} value."})
+
+        if parsed.path == "/api/admin/profile":
+            slug, profile = body.get("slug", ""), body.get("profile")
+            if not safe_slug(slug) or not isinstance(profile, dict):
+                self.send_json(400, {"error": "Invalid profile update."})
                 return
-            player[key] = value.strip()
-        if player["startgg"]:
-            link = urlsplit(player["startgg"])
-            if link.scheme != "https" or link.netloc not in {"start.gg", "www.start.gg"}:
-                self.send_json(400, {"error": "Use an HTTPS start.gg profile link."})
-                return
-        photo_path = player["photo"]
-        if photo_path and (not photo_path.startswith("assets/players/") or ".." in Path(photo_path).parts or "\\" in photo_path):
-            self.send_json(400, {"error": "Player pictures must be stored under assets/players/."})
-            return
-        for game in games:
-            if not isinstance(game, dict) or not isinstance(game.get("id"), str) or not game["id"].strip():
-                self.send_json(400, {"error": "Every game entry must be an object with a non-empty id."})
-                return
-        player_id = str(original.get("player", {}).get("startggPlayerId") or "")
-        if str(player.get("startggPlayerId") or "") != player_id:
-            self.send_json(400, {"error": "The start.gg player ID is fixed and cannot be changed."})
-            return
-        overrides_path = PROFILE_DIR / "overrides.json"
-        overrides = None
-        if player_id:
+            path = PROFILE_DIR / f"{slug}.json"
             try:
-                with overrides_path.open(encoding="utf-8") as stream:
-                    overrides = json.load(stream)
+                with path.open(encoding="utf-8") as stream:
+                    original = json.load(stream)
             except FileNotFoundError:
-                overrides = {}
-            except json.JSONDecodeError:
-                self.send_json(500, {"error": "The profile overrides file is invalid."})
+                self.send_json(404, {"error": "Profile not found."})
                 return
-            overrides[player_id] = {"profile": profile}
-        atomic_json(path, profile)
-        if player_id:
-            atomic_json(overrides_path, overrides)
-        refresh_index()
-        self.send_json(200, {"saved": True})
+            except json.JSONDecodeError:
+                self.send_json(500, {"error": "The saved profile is not valid JSON."})
+                return
+            player = profile.get("player")
+            games = profile.get("games")
+            if not isinstance(player, dict) or not isinstance(games, list):
+                self.send_json(400, {"error": "Profile JSON must contain a player object and a games array."})
+                return
+            if not isinstance(player.get("tag"), str) or not player["tag"].strip() or len(player["tag"]) > 80:
+                self.send_json(400, {"error": "Display name must be a non-empty string up to 80 characters."})
+                return
+            for key, limit in (("sponsor", 100), ("location", 120), ("startgg", 500), ("photo", 240)):
+                value = player.get(key, "")
+                if not isinstance(value, str) or len(value) > limit:
+                    self.send_json(400, {"error": f"Invalid {key} value."})
+                    return
+                player[key] = value.strip()
+            if player["startgg"]:
+                link = urlsplit(player["startgg"])
+                if link.scheme != "https" or link.netloc not in {"start.gg", "www.start.gg"}:
+                    self.send_json(400, {"error": "Use an HTTPS start.gg profile link."})
+                    return
+            photo_path = player["photo"]
+            if photo_path and (not photo_path.startswith("assets/players/") or ".." in Path(photo_path).parts or "\\" in photo_path):
+                self.send_json(400, {"error": "Player pictures must be stored under assets/players/."})
+                return
+            for game in games:
+                if not isinstance(game, dict) or not isinstance(game.get("id"), str) or not game["id"].strip():
+                    self.send_json(400, {"error": "Every game entry must be an object with a non-empty id."})
+                    return
+            player_id = str(original.get("player", {}).get("startggPlayerId") or "")
+            if str(player.get("startggPlayerId") or "") != player_id:
+                self.send_json(400, {"error": "The start.gg player ID is fixed and cannot be changed."})
+                return
+            overrides_path = PROFILE_DIR / "overrides.json"
+            overrides = None
+            if player_id:
+                try:
+                    with overrides_path.open(encoding="utf-8") as stream:
+                        overrides = json.load(stream)
+                except FileNotFoundError:
+                    overrides = {}
+                except json.JSONDecodeError:
+                    self.send_json(500, {"error": "The profile overrides file is invalid."})
+                    return
+                overrides[player_id] = {"profile": profile}
+            atomic_json(path, profile)
+            if player_id:
+                atomic_json(overrides_path, overrides)
+            refresh_index()
+            self.send_json(200, {"saved": True})
+        elif parsed.path.startswith("/api/admin/rankings/"):
+            rid = parsed.path.split("/api/admin/rankings/")[1].strip()
+            if not safe_slug(rid):
+                self.send_json(400, {"error": "Invalid ranking ID."})
+                return
+            action = body.get("action")
+            if action == "unarchive":
+                try:
+                    with sqlite3.connect(DATABASE) as connection:
+                        connection.execute("UPDATE official_rankings SET is_archived = 0, updated_at = ? WHERE id = ?", (int(time.time()), rid))
+                        connection.commit()
+                    sync_static_rankings()
+                    self.send_json(200, {"success": True, "unarchived": rid})
+                    return
+                except Exception as e:
+                    self.send_json(500, {"error": f"Failed to unarchive ranking: {e}"})
+                    return
+
+            ranking_data = body.get("ranking")
+            if not isinstance(ranking_data, dict):
+                self.send_json(400, {"error": "Invalid ranking payload."})
+                return
+
+            title = str(ranking_data.get("title") or "").strip()
+            game = ranking_data.get("game") or {}
+            game_slug = str(game.get("slug") or "").strip()
+            game_id = str(game.get("id") or "").strip()
+            period = ranking_data.get("period") or {}
+            start = str(period.get("start") or "").strip()
+            end = str(period.get("end") or "").strip()
+            status = str(ranking_data.get("status") or "yearly").strip()
+            published_by = str(ranking_data.get("publishedBy") or "").strip()
+            intro = str(ranking_data.get("intro") or "").strip()
+            players = ranking_data.get("players")
+
+            if not title or not game_slug or not start or not end or not isinstance(players, list):
+                self.send_json(400, {"error": "Missing required ranking fields."})
+                return
+
+            sanitized_players = []
+            seen_player_ids = set()
+            for p in players:
+                if not isinstance(p, dict) or not p.get("tag"):
+                    self.send_json(400, {"error": "Each player must have a valid tag."})
+                    return
+                pid = str(p.get("playerId") or "").strip()
+                if pid:
+                    if pid in seen_player_ids:
+                        self.send_json(400, {"error": f"Duplicate player ID '{pid}'."})
+                        return
+                    seen_player_ids.add(pid)
+                sanitized_player = {
+                    "placement": int(p.get("placement") or (len(sanitized_players) + 1)),
+                    "tag": str(p["tag"]).strip()[:80],
+                }
+                if pid:
+                    sanitized_player["playerId"] = pid
+                if p.get("points") is not None and str(p.get("points")).strip() != "":
+                    try:
+                        sanitized_player["points"] = float(p["points"])
+                    except (ValueError, TypeError):
+                        pass
+                if p.get("photo"):
+                    sanitized_player["photo"] = str(p["photo"]).strip()[:240]
+                if p.get("realName"):
+                    sanitized_player["realName"] = str(p["realName"]).strip()[:100]
+                if isinstance(p.get("mains"), list):
+                    sanitized_player["mains"] = [str(m).strip()[:50] for m in p["mains"] if str(m).strip()]
+                if p.get("text"):
+                    sanitized_player["text"] = str(p["text"]).strip()[:2000]
+                if isinstance(p.get("notableWins"), list):
+                    sanitized_player["notableWins"] = []
+                    for w in p["notableWins"]:
+                        if isinstance(w, dict) and w.get("opponent"):
+                            win_obj = {"opponent": str(w["opponent"]).strip()[:80]}
+                            if "times" in w and w["times"] is not None:
+                                try:
+                                    win_obj["times"] = int(w["times"])
+                                except (ValueError, TypeError):
+                                    win_obj["times"] = 1
+                            elif "tournament" in w:
+                                win_obj["tournament"] = str(w.get("tournament") or "").strip()[:100]
+                            sanitized_player["notableWins"].append(win_obj)
+                if isinstance(p.get("notableResults"), list):
+                    sanitized_player["notableResults"] = []
+                    for r in p["notableResults"]:
+                        if isinstance(r, dict) and r.get("event"):
+                            res_obj = {
+                                "placement": r.get("placement"),
+                                "event": str(r["event"]).strip()[:120],
+                                "entrants": r.get("entrants")
+                            }
+                            sanitized_player["notableResults"].append(res_obj)
+
+                sanitized_players.append(sanitized_player)
+
+            now = int(time.time())
+            try:
+                init_rankings_db()
+                with sqlite3.connect(DATABASE) as connection:
+                    cur = connection.cursor()
+                    cur.execute(
+                        """
+                        UPDATE official_rankings SET
+                            title = ?, game_slug = ?, game_id = ?, period_start = ?, period_end = ?,
+                            status = ?, published_by = ?, intro = ?, players_json = ?, updated_at = ?
+                        WHERE id = ?
+                        """,
+                        (
+                            title[:150],
+                            game_slug[:50],
+                            game_id[:50],
+                            start[:20],
+                            end[:20],
+                            status,
+                            published_by[:100],
+                            intro[:2000],
+                            json.dumps(sanitized_players, ensure_ascii=False),
+                            now,
+                            rid,
+                        )
+                    )
+                    if cur.rowcount == 0:
+                        self.send_json(404, {"error": "Ranking not found to update."})
+                        return
+                    connection.commit()
+
+                sync_static_rankings()
+                self.send_json(200, {"success": True, "id": rid})
+            except Exception as e:
+                self.send_json(500, {"error": f"Failed to update ranking: {e}"})
+        else:
+            self.send_json(404, {"error": "Not found."})
 
     def do_DELETE(self):
-        self.send_json(405, {"error": "Method not allowed."})
+        parsed = urlsplit(self.path)
+        if not self.has_admin_header():
+            self.send_json(403, {"error": "Request rejected."})
+            return
+        if not self.require_admin():
+            return
+        if not self.verify_csrf():
+            self.send_json(403, {"error": "Invalid or missing CSRF token."})
+            return
+
+        if parsed.path.startswith("/api/admin/rankings/"):
+            rid = parsed.path.split("/api/admin/rankings/")[1].strip()
+            if not safe_slug(rid):
+                self.send_json(400, {"error": "Invalid ranking ID."})
+                return
+
+            qs = parse_qs(parsed.query)
+            permanent = qs.get("permanent", ["0"])[0] in {"1", "true", "yes"}
+
+            try:
+                init_rankings_db()
+                with sqlite3.connect(DATABASE) as connection:
+                    if permanent:
+                        connection.execute("DELETE FROM official_rankings WHERE id = ?", (rid,))
+                    else:
+                        connection.execute("UPDATE official_rankings SET is_archived = 1, updated_at = ? WHERE id = ?", (int(time.time()), rid))
+                    connection.commit()
+
+                sync_static_rankings()
+                self.send_json(200, {"success": True, "archived": not permanent, "deleted": permanent, "id": rid})
+            except Exception as e:
+                self.send_json(500, {"error": f"Failed to delete/archive ranking: {e}"})
+        else:
+            self.send_json(405, {"error": "Method not allowed."})
 
 
 def main():
-    global PASSWORD
+    global PASSWORD, PASSWORD_BCRYPT
     if not PASSWORD:
         password = getpass.getpass("Choose an administrator password for this session: ")
         confirmation = getpass.getpass("Confirm administrator password: ")
         if not password or not hmac.compare_digest(password, confirmation):
             raise SystemExit("A matching, non-empty administrator password is required.")
         PASSWORD = password
+    init_auth()
+
+    try:
+        init_rankings_db()
+        seed_existing_rankings()
+        sync_static_rankings()
+    except Exception as e:
+        print(f"Warning: Could not sync rankings on startup: {e}")
+
     host = "127.0.0.1"
     port = int(os.environ.get("PLATFIGHTERS_PORT", "8000"))
     server = ThreadingHTTPServer((host, port), Handler)
     print(f"Platfighters.uy is serving at http://{host}:{port}")
-    print("Profile editing is protected by a password and is available only on this computer.")
+    print("Profile and ranking management is protected by a password and is available only on this computer.")
     try:
         server.serve_forever()
     except KeyboardInterrupt:
