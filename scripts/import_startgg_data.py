@@ -9,6 +9,8 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 RAW_ROOT = PROJECT_ROOT / "startgg-data" / "raw"
 DATABASE = PROJECT_ROOT / "startgg-data" / "platfighters.sqlite3"
 MANIFEST = PROJECT_ROOT / "events.json"
@@ -552,7 +554,7 @@ def load_game_names():
     return {game["slug"]: game["name"] for game in config.get("games", [])}
 
 
-def main():
+def run_import(no_export=False, force_export=False):
     DATABASE.parent.mkdir(parents=True, exist_ok=True)
     game_names = load_game_names()
     event_configs = load_event_configs()
@@ -617,11 +619,37 @@ def main():
             print(f"ERROR importing event {event_id} ({relative_path}): {error}", file=sys.stderr)
             failed += 1
 
-    connection.close()
     print(f"\nDatabase: {DATABASE}")
     print(f"Imported: {imported}; unchanged: {skipped}; failed: {failed}")
     if failed:
+        connection.close()
         raise SystemExit(1)
+
+    # Automatically synchronize website static event catalogs when new events are imported or force_export is requested
+    should_export = (imported > 0 or force_export) and not no_export
+    if should_export:
+        print("\nUpdating website static event catalogs (events-index.json & event details)...")
+        try:
+            from scripts.build_player_profile import write_event_index
+            write_event_index(connection)
+            print("Successfully updated website static event catalogs.")
+        except Exception as export_error:
+            connection.close()
+            print(f"ERROR: Import succeeded but failed to update website static event catalogs: {export_error}", file=sys.stderr)
+            raise SystemExit(1)
+
+    connection.close()
+
+
+def main():
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--no-export", action="store_true",
+                        help="skip automatic regeneration of website static event catalogs")
+    parser.add_argument("--export", action="store_true",
+                        help="force regeneration of website static event catalogs even if no new events were imported")
+    args = parser.parse_args()
+    run_import(no_export=args.no_export, force_export=args.export)
 
 
 if __name__ == "__main__":
