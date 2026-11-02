@@ -26,6 +26,12 @@ function decodeCommunityPayload(base64Str) {
     if (!parsed || typeof parsed !== 'object' || !Array.isArray(parsed.players)) {
       throw new Error('Invalid community ranking structure.');
     }
+    if (parsed.createdBy !== undefined && parsed.createdBy !== null) {
+      parsed.createdBy = String(parsed.createdBy).slice(0, 80).trim();
+    }
+    // Prevent unauthenticated elevation from shareable community links
+    delete parsed.isOfficial;
+    delete parsed.publishedBy;
     return parsed;
   } catch (err) {
     throw new Error('Malformed or corrupted shareable link.');
@@ -119,13 +125,21 @@ function render(r) {
   });
   flush();
 
-  const eyebrowTitle = isCommunity
-    ? (isEs ? 'RANKING COMUNITARIO' : 'COMMUNITY RANKING')
-    : 'POWER RANKINGS';
+  const customRankingLabel = isEs ? 'Ranking Personalizado' : 'Custom Ranking';
+  const creatorStr = (r.createdBy && typeof r.createdBy === 'string') ? r.createdBy.trim() : '';
 
-  const badgeHtml = isCommunity
-    ? `<span class="tagpill" style="color:var(--gold); border-color:rgba(234,179,8,.4); background:rgba(234,179,8,.1); font-weight:700;">Community Ranking – Unofficial</span>`
-    : '';
+  let badgeHtml = '';
+  if (isCommunity) {
+    if (creatorStr) {
+      badgeHtml = `<span class="tagpill" style="color:var(--gold); border-color:rgba(234,179,8,.4); background:rgba(234,179,8,.1); font-weight:700;"><span class="custom-ranking-main">${esc(customRankingLabel)}</span> <span class="custom-ranking-by" style="font-weight:400; opacity:0.9;">· ${isEs ? 'Creado por ' + esc(creatorStr) : 'Created by ' + esc(creatorStr)}</span></span>`;
+    } else {
+      badgeHtml = `<span class="tagpill" style="color:var(--gold); border-color:rgba(234,179,8,.4); background:rgba(234,179,8,.1); font-weight:700;"><span class="custom-ranking-main">${esc(customRankingLabel)}</span></span>`;
+    }
+  }
+
+  const eyebrowTitle = isCommunity
+    ? (isEs ? 'RANKING PERSONALIZADO' : 'CUSTOM RANKING')
+    : 'POWER RANKINGS';
 
   $('#side').innerHTML = `<div class="top"><div class="eyebrow mono">${eyebrowTitle}</div><b>${esc(r.title)}</b><span class="muted">${esc(r.game ? r.game.name : '')} · ${players.length} ${isEs ? 'jugadores' : 'players'}</span></div>` +
     players.map(p => `<a class="jump" href="#p-${p.placement}"><span class="n ${pcls(p.placement)}">${p.placement}</span>${esc(p.tag)}</a>`).join('');
@@ -136,13 +150,17 @@ function render(r) {
 
   const periodText = (r.period && r.period.start && r.period.end) ? period(r.period.start, r.period.end) : '';
 
+  const metaCreatorHtml = (isCommunity && creatorStr)
+    ? `<span>·</span><span class="ranking-created-by">${isEs ? 'Creado por ' + esc(creatorStr) : 'Created by ' + esc(creatorStr)}</span>`
+    : '';
+
   $('#col').innerHTML = `<section class="head-panel glass">
       <div class="eyebrow mono">${breadcrumb}</div>
       <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-top:8px;">
         <h1 class="display" style="margin:0;">${esc(r.title)}</h1>
         ${badgeHtml}
       </div>
-      <div class="meta" style="margin-top:12px;"><span class="glass pill chip">${esc(r.game ? r.game.name : '')}</span>${periodText ? `<span>${periodText}</span>` : ''}${r.publishedBy ? `<span>·</span><span>${isEs ? 'Publicado por ' + esc(r.publishedBy) : 'Published by ' + esc(r.publishedBy)}</span>` : ''}</div>
+      <div class="meta" style="margin-top:12px;"><span class="glass pill chip">${esc(r.game ? r.game.name : '')}</span>${periodText ? `<span>${periodText}</span>` : ''}${r.publishedBy ? `<span>·</span><span>${isEs ? 'Publicado por ' + esc(r.publishedBy) : 'Published by ' + esc(r.publishedBy)}</span>` : ''}${metaCreatorHtml}</div>
       ${r.intro ? `<p class="intro">${esc(r.intro)}</p>` : ''}</section>` + html;
 }
 
