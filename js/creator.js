@@ -69,6 +69,7 @@ Promise.all(loadPromises)
 
     if (existingRanking) {
       draft = existingRanking;
+      draft.createdBy = draft.createdBy || '';
       if (draft.status === 'current') draft.status = 'yearly';
       else if (draft.status === 'final') draft.status = 'seasonal';
       dirty = false;
@@ -81,6 +82,7 @@ Promise.all(loadPromises)
         period: { start: '', end: '' },
         status: 'yearly',
         publishedBy: '',
+        createdBy: '',
         intro: '',
         players: []
       };
@@ -94,6 +96,7 @@ Promise.all(loadPromises)
         period: { start: '', end: '' },
         status: 'yearly',
         publishedBy: '',
+        createdBy: '',
         intro: '',
         players: []
       };
@@ -476,7 +479,8 @@ function renderDetails() {
     <div class="frow"><div class="fld" style="flex:1 1 160px">${lab(isEs ? 'INICIO DEL PERIODO' : 'PERIOD START', 1)}<input type="date" class="inp" data-bind="start" value="${draft.period.start}"></div>
       <div class="fld" style="flex:1 1 160px">${lab(isEs ? 'FIN DEL PERIODO' : 'PERIOD END', 1)}<input type="date" class="inp" data-bind="end" value="${draft.period.end}"></div>
       <div class="fld">${lab(isEs ? 'CLASIFICACIÓN' : 'CLASSIFICATION', 1)}<div class="seg glass pill" id="status">${['yearly', 'seasonal'].map(s => `<button type="button" class="${draft.status === s ? 'on' : ''}" data-act="status" data-v="${s}">${s === 'yearly' ? (isEs ? 'Anual' : 'Yearly') : (isEs ? 'De temporada' : 'Seasonal')}</button>`).join('')}</div></div></div>
-    <div class="fld">${lab(isEs ? 'PUBLICADO POR' : 'PUBLISHED BY', 0)}<input class="inp" data-bind="publishedBy" value="${esc(draft.publishedBy || '')}"></div>
+    ${(isAdmin && requestedMode === 'admin') ? `<div class="fld">${lab(isEs ? 'PUBLICADO POR' : 'PUBLISHED BY', 0)}<input class="inp" data-bind="publishedBy" value="${esc(draft.publishedBy || '')}"></div>` : ''}
+    <div class="fld">${lab(isEs ? 'CREADO POR' : 'CREATED BY', 0)}<input class="inp" data-bind="createdBy" maxlength="80" value="${esc(draft.createdBy || '')}" placeholder="${isEs ? 'Alias o nombre para mostrar' : 'Display name, alias, or handle'}"></div>
     <div class="fld">${lab(isEs ? 'INTRODUCCIÓN' : 'INTRO', 0)}<textarea class="inp" data-bind="intro" placeholder="Introductory notes...">${esc(draft.intro || '')}</textarea><div class="cnt" id="introCount">${(draft.intro || '').length} ${isEs ? 'caracteres' : 'characters'}</div></div>`;
 }
 
@@ -655,6 +659,7 @@ function constructRankingJson() {
     status: draft.status || 'yearly'
   };
   if (draft.publishedBy && draft.publishedBy.trim()) out.publishedBy = draft.publishedBy.trim();
+  if (draft.createdBy && draft.createdBy.trim()) out.createdBy = draft.createdBy.trim().slice(0, 80);
   if (draft.intro && draft.intro.trim()) out.intro = draft.intro.trim();
 
   out.players = (draft.players || []).map((p, i) => {
@@ -734,7 +739,8 @@ function validateAndSanitizeImport(data) {
     game: { id: 'r2', name: 'Rivals 2', slug: 'rivals-2' },
     period: { start: '', end: '' },
     status: (data.status === 'seasonal' || data.status === 'final') ? 'seasonal' : 'yearly',
-    publishedBy: typeof data.publishedBy === 'string' ? data.publishedBy.slice(0, 100) : '',
+    publishedBy: (isAdmin && requestedMode === 'admin' && typeof data.publishedBy === 'string') ? data.publishedBy.slice(0, 100).trim() : '',
+    createdBy: typeof data.createdBy === 'string' ? data.createdBy.slice(0, 80).trim() : '',
     intro: typeof data.intro === 'string' ? data.intro.slice(0, 2000) : '',
     players: []
   };
@@ -894,15 +900,21 @@ function doExportImage() {
   ctx.fill();
   ctx.restore();
 
+  const creatorName = (rankingData.createdBy && typeof rankingData.createdBy === 'string') ? rankingData.createdBy.trim() : '';
+
   ctx.fillStyle = '#38BDF8';
   ctx.font = '700 16px "Space Grotesk", sans-serif';
-  ctx.fillText('PLATFIGHTERS.UY · COMMUNITY POWER RANKING', padding, 70);
+  const headerAttribution = creatorName
+    ? `PLATFIGHTERS.UY · CUSTOM RANKING · CREATED BY ${creatorName.toUpperCase()}`
+    : 'PLATFIGHTERS.UY · CUSTOM RANKING';
+  ctx.fillText(headerAttribution, padding, 70);
 
   ctx.fillStyle = '#FFFFFF';
   ctx.font = '700 36px "Space Grotesk", sans-serif';
   ctx.fillText(rankingData.title, padding, 120);
 
-  const metaText = `${rankingData.game.name} · ${rankingData.status.toUpperCase()} · ${rankingData.period.start || ''} → ${rankingData.period.end || ''}`;
+  const metaCreator = creatorName ? ` · Created by ${creatorName}` : '';
+  const metaText = `${rankingData.game.name} · ${rankingData.status.toUpperCase()} · ${rankingData.period.start || ''} → ${rankingData.period.end || ''}${metaCreator}`;
   ctx.fillStyle = '#94A3B8';
   ctx.font = '500 16px "Space Grotesk", sans-serif';
   ctx.fillText(metaText, padding, 155);
@@ -957,7 +969,10 @@ function doExportImage() {
 
   ctx.fillStyle = '#64748B';
   ctx.font = '500 14px monospace';
-  ctx.fillText('Generated on Platfighters.uy · Community Ranking (Unofficial)', padding, height - 20);
+  const footerAttribution = creatorName
+    ? `Generated on Platfighters.uy · Custom Ranking · Created by ${creatorName}`
+    : 'Generated on Platfighters.uy · Custom Ranking';
+  ctx.fillText(footerAttribution, padding, height - 20);
 
   const a = document.createElement('a');
   a.download = `${slug(rankingData.title || 'power-ranking')}.png`;
