@@ -38,6 +38,8 @@ Promise.all(loadPromises)
 
     if (existingRanking) {
       draft = existingRanking;
+      if (draft.status === 'current') draft.status = 'yearly';
+      else if (draft.status === 'final') draft.status = 'seasonal';
       dirty = false;
     } else if (prSnapshot) {
       const matchingGame = games.find(gm => gm.slug === prSnapshot.game.slug || gm.id === prSnapshot.game.id) || games[0];
@@ -476,7 +478,7 @@ function renderDetails() {
       <div class="fld" style="flex:1 1 200px">${lab(isEs ? 'JUEGO' : 'GAME', 1)}<select class="inp" data-bind="game">${games.map(g => `<option value="${g.id}"${g.id === draft.game.id ? ' selected' : ''}>${esc(g.name)}</option>`).join('')}</select></div></div>
     <div class="frow"><div class="fld" style="flex:1 1 160px">${lab(isEs ? 'INICIO DEL PERIODO' : 'PERIOD START', 1)}<input type="date" class="inp" data-bind="start" value="${draft.period.start}"></div>
       <div class="fld" style="flex:1 1 160px">${lab(isEs ? 'FIN DEL PERIODO' : 'PERIOD END', 1)}<input type="date" class="inp" data-bind="end" value="${draft.period.end}"></div>
-      <div class="fld">${lab(isEs ? 'ESTADO' : 'STATUS', 1)}<div class="seg glass pill" id="status">${['current', 'final'].map(s => `<button type="button" class="${draft.status === s ? 'on' : ''}" data-act="status" data-v="${s}">${s === 'current' ? (isEs ? 'Actual' : 'Current') : (isEs ? 'Final' : 'Final')}</button>`).join('')}</div></div></div>
+      <div class="fld">${lab(isEs ? 'CLASIFICACIÓN' : 'CLASSIFICATION', 1)}<div class="seg glass pill" id="status">${['yearly', 'seasonal'].map(s => `<button type="button" class="${draft.status === s ? 'on' : ''}" data-act="status" data-v="${s}">${s === 'yearly' ? (isEs ? 'Anual' : 'Yearly') : (isEs ? 'De temporada' : 'Seasonal')}</button>`).join('')}</div></div></div>
     <div class="fld">${lab(isEs ? 'PUBLICADO POR' : 'PUBLISHED BY', 0)}<input class="inp" data-bind="publishedBy" value="${esc(draft.publishedBy || '')}"></div>
     <div class="fld">${lab(isEs ? 'INTRODUCCIÓN' : 'INTRO', 0)}<textarea class="inp" data-bind="intro">${esc(draft.intro || '')}</textarea><div class="cnt" id="introCount">${(draft.intro || '').length} ${isEs ? 'caracteres' : 'characters'}</div></div>`;
 }
