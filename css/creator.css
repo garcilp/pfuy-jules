@@ -5,8 +5,22 @@
 .p1{color:var(--gold)}.p2{color:var(--silver)}.p3{color:var(--bronze)}.pn{color:var(--sky)}
 
 .tagpill{font:11px 'JetBrains Mono',monospace;color:var(--muted);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:3px 10px}
-.actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 
+/* Buttons */
+.creator-page .btn{min-height:48px;padding:0 22px;display:inline-flex;align-items:center;justify-content:center;color:var(--text);font:500 15px 'Space Grotesk',sans-serif;cursor:pointer;border-radius:999px;text-decoration:none;transition:all 150ms ease}
+.creator-page .btn:hover{color:var(--text)}
+.creator-page .btn.primary{background:var(--sky);color:var(--bg);border:0;border-radius:999px;font-weight:700}
+.creator-page .btn.primary:hover{filter:brightness(1.08)}
+.creator-page .btn[disabled]{opacity:.5;cursor:not-allowed}
+
+.creator-page .head-panel{padding:28px 32px;border-radius:32px;display:flex;gap:20px;align-items:center;justify-content:space-between;flex-wrap:wrap;width:100%}
+.creator-page .head-text{display:flex;flex-direction:column;gap:10px}
+.creator-page .crumb{font:12px 'JetBrains Mono',monospace;color:var(--muted)}
+.creator-page .title-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.creator-page .title-row h1{font-size:40px;line-height:1.05}
+
+.creator-page .layout{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;width:100%}
 .side-col{flex:1 1 280px;max-width:100%;display:flex;flex-direction:column;gap:20px}
 .col{flex:999 1 560px;min-width:0;display:flex;flex-direction:column;gap:20px}
 
