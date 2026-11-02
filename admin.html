@@ -17,7 +17,7 @@
   <span class="badge" data-i18n="badge.admin">ADMIN</span>
 </header>
 <main class="admin-page page-single">
-  <section class="admin-heading"><div class="eyebrow mono" data-i18n="admin.eyebrow">PLAYER MANAGEMENT</div><h1 data-i18n="admin.title">Player data</h1><p class="muted" data-i18n="admin.desc">Update the profile details shown on Platfighters.uy.</p></section>
+  <section class="admin-heading"><div class="eyebrow mono" data-i18n="admin.eyebrow">ADMINISTRATION</div><h1 data-i18n="admin.title">Site Management</h1><p class="muted" data-i18n="admin.desc">Manage players, official power rankings, and event groupings on Platfighters.uy.</p></section>
   <section id="admin-login" class="panel glass admin-panel">
     <h2 data-i18n="admin.login.title">Administrator sign in</h2><p class="muted admin-copy" data-i18n="admin.login.desc">Sign in to edit player profile information.</p>
     <form id="login-form" class="admin-form">
@@ -28,6 +28,51 @@
   </section>
   <section id="admin-editor" class="panel glass admin-panel" hidden>
     <div class="editor-heading"><div><h2 data-i18n="admin.editor.title">Edit player</h2><p class="muted admin-copy" data-i18n="admin.editor.desc">Edit every profile field, game summary, character, matchup, and result in the full JSON document. The start.gg player ID stays fixed.</p></div><button id="signout" class="quiet-button" type="button" data-i18n="admin.editor.signout">Sign out</button></div>
+
+    <section class="merge-panel" aria-labelledby="rankings-heading" style="margin-top: 0; margin-bottom: 32px; border-bottom: 2px solid var(--line); padding-bottom: 28px;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px; margin-bottom:16px;">
+        <div>
+          <h3 id="rankings-heading" style="margin:0 0 4px 0;">Official Power Rankings</h3>
+          <p class="muted admin-copy" style="margin:0;">Create, edit, archive, or manage official website rankings.</p>
+        </div>
+        <a href="ranking-creator.html?mode=admin" class="action-button" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px;">+ Submit New PR</a>
+      </div>
+
+      <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:16px; align-items:center;">
+        <label style="margin:0; flex:1 1 200px;">
+          <span style="font-size:12px; display:block; margin-bottom:4px; font-weight:700;">FILTER BY GAME</span>
+          <select id="ranking-game-filter" class="inp" style="width:100%;">
+            <option value="all">All games</option>
+          </select>
+        </label>
+        <label style="margin:0; flex:2 1 260px;">
+          <span style="font-size:12px; display:block; margin-bottom:4px; font-weight:700;">SEARCH RANKINGS</span>
+          <input type="search" id="ranking-search" class="inp" placeholder="Search by ranking name..." style="width:100%;">
+        </label>
+        <label class="check-label" style="align-self:flex-end; margin-bottom:10px; cursor:pointer;">
+          <input type="checkbox" id="ranking-show-archived"> Show archived rankings
+        </label>
+      </div>
+
+      <div class="ranking-table-wrapper" style="overflow-x:auto; border-radius:12px; border:1px solid var(--line); background:rgba(0,0,0,0.15);">
+        <table id="rankings-table" style="width:100%; border-collapse:collapse; text-align:left; font-size:14px;">
+          <thead>
+            <tr style="border-bottom:1px solid var(--line); background:rgba(255,255,255,0.03);">
+              <th style="padding:10px 14px;">Name</th>
+              <th style="padding:10px 14px;">Game</th>
+              <th style="padding:10px 14px;">Classification</th>
+              <th style="padding:10px 14px;">Period</th>
+              <th style="padding:10px 14px; text-align:center;">Players</th>
+              <th style="padding:10px 14px; text-align:right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="rankings-table-body">
+            <tr><td colspan="6" style="padding:20px; text-align:center;" class="muted">Loading official rankings...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p id="ranking-admin-message" class="form-message mono" role="status" style="margin-top:10px;"></p>
+    </section>
     <form id="profile-form" class="admin-form">
       <label><span data-i18n="admin.editor.profile">Player profile</span><select id="profile-select" required></select></label>
       <fieldset id="player-game-exclusions" class="visibility-fieldset">

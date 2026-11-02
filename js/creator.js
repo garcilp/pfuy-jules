@@ -1,11 +1,18 @@
-// Platfighters.uy — ranking creator (front-end prototype). Plain JS, no build step.
-// State lives in `draft`, which has the same shape as data/rankings/<id>.json in the rankings pages.
-let draft, games, allProfiles = [], gameCharacters = {}, sel = 0, dragFrom = null, dirty = false, savedAt = '';
-let prSnapshot = null;
+// Platfighters.uy — ranking creator. Plain JS, no build step.
+// Supports Public mode and Admin mode with server-side authentication verification.
 
-// Check for PR snapshot from sessionStorage
+let draft, games = [], allProfiles = [], gameCharacters = {}, sel = 0, dragFrom = null, dirty = false, savedAt = '';
+let prSnapshot = null;
+let isAdmin = false;
+let adminCsrfToken = '';
+
+const urlParams = new URLSearchParams(window.location.search);
+const requestedMode = urlParams.get('mode');
+const rankingIdParam = urlParams.get('id');
+
+// Read snapshot if coming from PR
 try {
-  const isPrSource = new URLSearchParams(window.location.search).get('source') === 'pr';
+  const isPrSource = urlParams.get('source') === 'pr';
   const savedSnap = sessionStorage.getItem('platfighters_pr_snapshot');
   if (isPrSource && savedSnap) {
     prSnapshot = JSON.parse(savedSnap);
@@ -14,12 +21,36 @@ try {
   console.warn('Could not read PR snapshot:', e);
 }
 
-const rankingIdParam = new URLSearchParams(window.location.search).get('id');
+// Check admin session securely from backend
+async function checkAdminSession() {
+  try {
+    const res = await fetch('/api/admin/session', { credentials: 'same-origin' });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.authenticated) {
+        isAdmin = true;
+        adminCsrfToken = data.csrfToken || '';
+      }
+    }
+  } catch (e) {
+    isAdmin = false;
+  }
+  updateAdminUI();
+}
 
+function updateAdminUI() {
+  const adminGroup = $('#adminActionGroup');
+  if (adminGroup) {
+    adminGroup.hidden = !(isAdmin && requestedMode === 'admin');
+  }
+}
+
+// Initial data load
 const loadPromises = [
   fetch('data/games.json').then(r => r.json()),
   fetch('data/profiles/index.json').then(r => r.json()).catch(() => []),
-  fetch('data/characters.json').then(r => r.json()).catch(() => ({}))
+  fetch('data/characters.json').then(r => r.json()).catch(() => ({})),
+  checkAdminSession()
 ];
 
 if (rankingIdParam) {
@@ -31,8 +62,8 @@ if (rankingIdParam) {
 }
 
 Promise.all(loadPromises)
-  .then(([g, profiles, chars, existingRanking]) => {
-    games = g.sort((a, b) => a.name.localeCompare(b.name));
+  .then(([g, profiles, chars, _, existingRanking]) => {
+    games = (g || []).sort((a, b) => a.name.localeCompare(b.name));
     allProfiles = profiles || [];
     gameCharacters = chars || {};
 
@@ -42,40 +73,40 @@ Promise.all(loadPromises)
       else if (draft.status === 'final') draft.status = 'seasonal';
       dirty = false;
     } else if (prSnapshot) {
-      const matchingGame = games.find(gm => gm.slug === prSnapshot.game.slug || gm.id === prSnapshot.game.id) || games[0];
+      const matchingGame = games.find(gm => gm.slug === prSnapshot.game?.slug || gm.id === prSnapshot.game?.id) || games[0];
       draft = {
         id: '',
         title: '',
         game: { id: matchingGame.id, name: matchingGame.name, slug: matchingGame.slug },
         period: { start: '', end: '' },
-        status: 'draft',
+        status: 'yearly',
         publishedBy: '',
         intro: '',
         players: []
       };
       dirty = false;
     } else {
-      // Clean initial state for new rankings
       const defaultGame = games[0] || { id: 'r2', name: 'Rivals 2', slug: 'rivals-2' };
       draft = {
         id: '',
         title: '',
         game: { id: defaultGame.id, name: defaultGame.name, slug: defaultGame.slug },
         period: { start: '', end: '' },
-        status: 'draft',
+        status: 'yearly',
         publishedBy: '',
         intro: '',
         players: []
       };
       dirty = false;
     }
+
     renderDetails();
     renderAll();
   });
 
 // Modal search and selection state
 let playerModalQuery = '';
-let playerModalTarget = 'ranking'; // 'ranking' or { type: 'opponent', index: number }
+let playerModalTarget = 'ranking';
 
 function openPlayerModal(target = 'ranking') {
   playerModalTarget = target;
@@ -86,18 +117,14 @@ function openPlayerModal(target = 'ranking') {
   const titleEl = $('#playerModalTitle');
   const subEl = $('#playerModalSub');
   if (titleEl) {
-    if (target === 'ranking') {
-      titleEl.textContent = isEs ? 'Seleccionar Jugador' : 'Select Player';
-    } else {
-      titleEl.textContent = isEs ? 'Seleccionar Rival' : 'Select Opponent';
-    }
+    titleEl.textContent = (target === 'ranking')
+      ? (isEs ? 'Seleccionar Jugador' : 'Select Player')
+      : (isEs ? 'Seleccionar Rival' : 'Select Opponent');
   }
   if (subEl) {
-    if (target === 'ranking') {
-      subEl.textContent = isEs ? 'Busca y selecciona un jugador del directorio' : 'Search and select a player from the directory';
-    } else {
-      subEl.textContent = isEs ? 'Selecciona un rival de la base de datos de jugadores' : 'Select an opponent from the player database';
-    }
+    subEl.textContent = (target === 'ranking')
+      ? (isEs ? 'Busca y selecciona un jugador del directorio' : 'Search and select a player from the directory')
+      : (isEs ? 'Selecciona un rival de la base de datos de jugadores' : 'Select an opponent from the player database');
   }
   const searchInput = $('#playerSearchInput');
   if (searchInput) searchInput.value = '';
@@ -176,7 +203,10 @@ function renderPlayerModalList() {
 
 async function addPlayerFromDirectory(playerId) {
   const player = allProfiles.find(p => String(p.playerId) === String(playerId));
-  if (!player) return;
+  if (!player) {
+    alert('Player profile could not be found.');
+    return;
+  }
 
   if (playerModalTarget && playerModalTarget.type === 'opponent') {
     const p = draft.players[sel];
@@ -190,9 +220,11 @@ async function addPlayerFromDirectory(playerId) {
     return;
   }
 
-  // Prevent duplicate additions in ranking mode
   const currentIds = new Set((draft.players || []).map(p => String(p.playerId)).filter(Boolean));
-  if (currentIds.has(String(player.playerId))) return;
+  if (currentIds.has(String(player.playerId))) {
+    alert('This player is already included in the ranking.');
+    return;
+  }
 
   const newEntry = {
     tag: player.tag,
@@ -201,21 +233,6 @@ async function addPlayerFromDirectory(playerId) {
     photo: player.photo || `assets/players/${player.playerId}.png`
   };
 
-  // Optionally fetch rich profile info if available
-  if (player.slug) {
-    try {
-      const resp = await fetch(`data/profiles/${encodeURIComponent(player.slug)}.json`);
-      if (resp.ok) {
-        const fullProf = await resp.json();
-        if (fullProf.player) {
-          if (fullProf.player.photo) newEntry.photo = fullProf.player.photo;
-        }
-      }
-    } catch (e) {
-      // Non-fatal, use basic player data
-    }
-  }
-
   draft.players.push(newEntry);
   sel = draft.players.length - 1;
   dirty = true;
@@ -223,7 +240,6 @@ async function addPlayerFromDirectory(playerId) {
   renderAll();
 }
 
-// Notable Results Event Modal
 let playerEventResults = [];
 
 function closeEventModal() {
@@ -271,7 +287,6 @@ async function openEventModalForCurrentPlayer() {
         const res = await fetch(path);
         if (res.ok) {
           const profileData = await res.json();
-          // Extract results from games matching current game or all games
           const curGameSlug = draft.game ? draft.game.slug : '';
           const gamesArr = profileData.games || [];
           const matchedGame = gamesArr.find(g => g.slug === curGameSlug) || gamesArr[0];
@@ -280,9 +295,7 @@ async function openEventModalForCurrentPlayer() {
             break;
           }
         }
-      } catch (e) {
-        // try next
-      }
+      } catch (e) {}
     }
   }
 
@@ -340,21 +353,10 @@ document.addEventListener('input', onInput);
 document.addEventListener('click', onClick);
 document.addEventListener('change', onChange);
 document.addEventListener('click', e => {
-  if (e.target.id === 'closePlayerModalBtn' || e.target.closest('#closePlayerModalBtn')) {
-    closePlayerModal();
-  }
-  const modal = $('#player-select-modal');
-  if (e.target === modal) {
-    closePlayerModal();
-  }
-
-  if (e.target.id === 'closeEventModalBtn' || e.target.closest('#closeEventModalBtn')) {
-    closeEventModal();
-  }
-  const evModal = $('#event-select-modal');
-  if (e.target === evModal) {
-    closeEventModal();
-  }
+  if (e.target.id === 'closePlayerModalBtn' || e.target.closest('#closePlayerModalBtn')) closePlayerModal();
+  if (e.target === $('#player-select-modal')) closePlayerModal();
+  if (e.target.id === 'closeEventModalBtn' || e.target.closest('#closeEventModalBtn')) closeEventModal();
+  if (e.target === $('#event-select-modal')) closeEventModal();
   if (e.target.id === 'addBlankResultBtn') {
     const p = draft.players[sel];
     if (p) {
@@ -379,11 +381,9 @@ document.addEventListener('drop', e => {
   sel = draft.players.indexOf(cur); dragFrom = null; dirty = true; renderAll();
 });
 
-// ---- helpers ----
-const OPT = { realName: '', mains: [], text: '', notableWins: [], notableResults: [] };   // defaults when a section is switched on
+const OPT = { realName: '', mains: [], text: '', notableWins: [], notableResults: [] };
 const nums = v => String(v).trim() === '' ? null : Number(String(v).replace(/[^\d]/g, ''));
 const has = a => a && a.length;
-// The layout a player gets on the ranking page depends on how much data they have.
 const kind = p => ((p.text && p.text.trim()) || has(p.notableWins) || has(p.notableResults)) ? 'FULL'
   : (has(p.mains) || (p.realName && p.realName.trim())) ? 'MEDIUM' : 'MINIMUM';
 const getWhy = () => {
@@ -406,7 +406,6 @@ const lab2 = t => `<div class="lab"><span>${t}</span></div>`;
 const stock = name => `<span class="stock"><i>${esc(name[0])}</i><img src="assets/stock-icons/${esc(draft.game.slug)}/${slug(name)}.png" alt="" onerror="this.remove()"></span>`;
 const rowId = () => draft.id || `${draft.game.id}-${slug(draft.title || 'ranking')}`;
 
-// ---- rendering ----
 function renderAll() { renderSide(); renderEditor(); renderSub(); }
 function refresh() {
   renderSide();
@@ -428,7 +427,6 @@ function renderSub() {
       ? (isEs ? 'Guardado a las ' + savedAt : 'Saved at ' + savedAt)
       : (isEs ? 'Sin cambios aún' : 'No changes yet');
   $('#sub').textContent = `${isEs ? 'Comunidad de ' + draft.game.name : draft.game.name + ' community'} · ${statusStr}`;
-  $('#preview').href = `ranking.html?id=${encodeURIComponent(rowId())}`;
 }
 
 function populateFromSnapshot(count) {
@@ -436,7 +434,6 @@ function populateFromSnapshot(count) {
   const countNum = parseInt(count, 10);
   const playersToTake = prSnapshot.players.slice(0, countNum);
 
-  // Populate or replace generated ranking entries, preserving ordering and fields
   draft.players = playersToTake.map((p, idx) => ({
     placement: idx + 1,
     tag: p.tag || '',
@@ -474,13 +471,13 @@ function renderDetails() {
   }
 
   $('#details').innerHTML = `${snapshotControlsHtml}<div><h2>${isEs ? 'Detalles del ranking' : 'Ranking details'}</h2><div class="sub">${isEs ? 'Se muestra en el archivo y al inicio del artículo.' : 'Shown in the archive and at the top of the article.'}</div></div>
-    <div class="frow"><div class="fld" style="flex:2 1 320px">${lab(isEs ? 'NOMBRE' : 'NAME', 1)}<input class="inp" data-bind="title" value="${esc(draft.title)}"></div>
+    <div class="frow"><div class="fld" style="flex:2 1 320px">${lab(isEs ? 'NOMBRE' : 'NAME', 1)}<input class="inp" data-bind="title" value="${esc(draft.title)}" placeholder="e.g. Montevideo Season 1 PR"></div>
       <div class="fld" style="flex:1 1 200px">${lab(isEs ? 'JUEGO' : 'GAME', 1)}<select class="inp" data-bind="game">${games.map(g => `<option value="${g.id}"${g.id === draft.game.id ? ' selected' : ''}>${esc(g.name)}</option>`).join('')}</select></div></div>
     <div class="frow"><div class="fld" style="flex:1 1 160px">${lab(isEs ? 'INICIO DEL PERIODO' : 'PERIOD START', 1)}<input type="date" class="inp" data-bind="start" value="${draft.period.start}"></div>
       <div class="fld" style="flex:1 1 160px">${lab(isEs ? 'FIN DEL PERIODO' : 'PERIOD END', 1)}<input type="date" class="inp" data-bind="end" value="${draft.period.end}"></div>
       <div class="fld">${lab(isEs ? 'CLASIFICACIÓN' : 'CLASSIFICATION', 1)}<div class="seg glass pill" id="status">${['yearly', 'seasonal'].map(s => `<button type="button" class="${draft.status === s ? 'on' : ''}" data-act="status" data-v="${s}">${s === 'yearly' ? (isEs ? 'Anual' : 'Yearly') : (isEs ? 'De temporada' : 'Seasonal')}</button>`).join('')}</div></div></div>
     <div class="fld">${lab(isEs ? 'PUBLICADO POR' : 'PUBLISHED BY', 0)}<input class="inp" data-bind="publishedBy" value="${esc(draft.publishedBy || '')}"></div>
-    <div class="fld">${lab(isEs ? 'INTRODUCCIÓN' : 'INTRO', 0)}<textarea class="inp" data-bind="intro">${esc(draft.intro || '')}</textarea><div class="cnt" id="introCount">${(draft.intro || '').length} ${isEs ? 'caracteres' : 'characters'}</div></div>`;
+    <div class="fld">${lab(isEs ? 'INTRODUCCIÓN' : 'INTRO', 0)}<textarea class="inp" data-bind="intro" placeholder="Introductory notes...">${esc(draft.intro || '')}</textarea><div class="cnt" id="introCount">${(draft.intro || '').length} ${isEs ? 'caracteres' : 'characters'}</div></div>`;
 }
 
 function renderSide() {
@@ -503,7 +500,7 @@ function renderSide() {
     ps.map((p, i) => `<button type="button" class="prow${i === sel ? ' on' : ''}" draggable="true" data-act="sel" data-i="${i}"><span class="h">⋮⋮</span><span class="n ${pcls(i + 1)}">${i + 1}</span><span class="t">${esc(p.tag || (isEs ? 'Nuevo jugador' : 'New player'))}</span><span class="k">${kind(p)}</span></button>`).join('') +
     `<button type="button" class="btn glass pill addp" data-act="add-player">${isEs ? '+ Agregar jugador' : '+ Add player'}</button>
      <div class="note">${isEs ? 'Arrastra para reordenar. Los puestos siguen el orden.' : 'Drag to reorder. Placements follow the order.'} <button type="button" class="add" style="padding:0" data-act="sort">${isEs ? 'Ordenar por puntos' : 'Sort by points'}</button></div></div>
-    <div class="check glass"><b>${isEs ? 'Antes de publicar' : 'Before publishing'}</b>${item(okD, checkDetailsText, okD ? doneText : missingText)}${item(okP, checkPlayersText, okP ? doneText : missingText)}${item(true, checkPicsText, picsSub)}</div>`;
+    <div class="check glass"><b>${isEs ? 'Antes de publicar' : 'Checklist'}</b>${item(okD, checkDetailsText, okD ? doneText : missingText)}${item(okP, checkPlayersText, okP ? doneText : missingText)}${item(true, checkPicsText, picsSub)}</div>`;
 }
 
 function renderEditor() {
@@ -511,7 +508,7 @@ function renderEditor() {
   if (!draft.players || !draft.players.length) {
     $('#editor').innerHTML = `<div class="panel glass empty-state" style="padding:36px; text-align:center;">
       <h3>${isEs ? 'No hay jugadores en este ranking' : 'No players in this ranking'}</h3>
-      <p class="muted" style="margin:12px 0 20px;">${isEs ? 'Usa las opciones de población rápida arriba o agrega jugadores manualmente.' : 'Use the quick populate options above or add players manually.'}</p>
+      <p class="muted" style="margin:12px 0 20px;">${isEs ? 'Haz clic en "+ Agregar jugador" para seleccionar jugadores del directorio.' : 'Click "+ Add player" to select players from the directory.'}</p>
       <button type="button" class="btn glass pill" data-act="add-player">${isEs ? '+ Agregar jugador' : '+ Add player'}</button>
     </div>`;
     return;
@@ -541,7 +538,7 @@ function renderEditor() {
       <div class="l" style="align-items:center"><span class="kind" id="kindPill">${k} ENTRY</span><button type="button" class="add" data-act="remove-player">${isEs ? 'Eliminar jugador' : 'Remove player'}</button></div></div>
     <div class="why" id="why">${getWhy()[k]}</div>
     <div class="req"><div class="dzw"><div class="dz"><i>${esc((p.tag || '?')[0])}</i>${pic}</div>
-        <button type="button" class="btn glass pill" data-act="pick-photo">${isEs ? 'Cambiar imagen' : 'Replace picture'}</button><input type="file" id="photoFile" accept="image/png,image/jpeg" hidden><div class="note0" style="text-align:center">JPG or PNG</div></div>
+        <button type="button" class="btn glass pill" data-act="pick-photo">${isEs ? 'Cambiar imagen' : 'Replace picture'}</button><input type="file" id="photoFile" accept="image/png,image/jpeg" hidden><div class="note0" style="text-align:center">JPG or PNG (Optional)</div></div>
       <div class="reqf"><div class="fld" style="flex:0 0 100px">${lab(isEs ? 'PUESTO' : 'PLACEMENT', 1)}<input class="inp ro ${pcls(n)}" value="${n}" readonly aria-readonly="true"></div>
         <div class="fld" style="flex:2 1 240px">${lab(isEs ? 'TAG' : 'TAG', 1)}<input class="inp" data-pbind="tag" value="${esc(p.tag)}" placeholder="Gamertag"></div>
         <div class="frow" style="flex:1 1 100%; gap:16px;">
@@ -555,7 +552,6 @@ function renderEditor() {
     ${sec('text', isEs ? 'Descripción del jugador' : 'Player Description', `<textarea class="inp" data-pbind="text" style="min-height:128px">${esc(p.text ?? '')}</textarea><div class="cnt" id="textCount">${(p.text || '').length} ${isEs ? 'caracteres' : 'characters'}</div>`)}`;
 }
 
-// ---- events ----
 function onInput(e) {
   const t = e.target, d = t.dataset || {};
   if (t.id === 'playerSearchInput') {
@@ -565,9 +561,15 @@ function onInput(e) {
   }
   if (d.bind) {
     const k = d.bind, v = t.value;
-    if (k === 'game') { const g = games.find(x => x.id === v); draft.game = { id: g.id, name: g.name, slug: g.slug }; renderEditor(); }   // stock icon paths depend on the game
-    else if (k === 'start' || k === 'end') draft.period[k] = v;
-    else draft[k] = v;
+    if (k === 'game') {
+      const g = games.find(x => x.id === v);
+      if (g) draft.game = { id: g.id, name: g.name, slug: g.slug };
+      renderEditor();
+    } else if (k === 'start' || k === 'end') {
+      draft.period[k] = v;
+    } else {
+      draft[k] = v;
+    }
     if (k === 'intro') $('#introCount').textContent = `${v.length} characters`;
   } else if (d.pbind) {
     const p = draft.players[sel];
@@ -588,7 +590,12 @@ function onClick(e) {
   switch (a) {
     case 'sel': sel = i; renderAll(); return;
     case 'pick-photo': $('#photoFile').click(); return;
-    case 'save': save(); return;
+    case 'preview': doPreview(); return;
+    case 'import': triggerImport(); return;
+    case 'export': doExport(); return;
+    case 'share': doShare(); return;
+    case 'export-image': doExportImage(); return;
+    case 'publish': doPublish(); return;
     case 'pop-snapshot': populateFromSnapshot(b.dataset.n); return;
     case 'add-player': openPlayerModal('ranking'); return;
     case 'pick-opponent': openPlayerModal({ type: 'opponent', index: i }); return;
@@ -626,43 +633,391 @@ function onClick(e) {
   dirty = true; refresh();
 }
 
-// Picture upload: previewed in the page only. The saved JSON points at the player's `photo` path,
-// so copy the image file to that path (default assets/players/<tag-slug>.jpg) yourself.
 function onChange(e) {
-  if (e.target.id !== 'photoFile' || !e.target.files[0]) return;
-  draft.players[sel]._preview = URL.createObjectURL(e.target.files[0]);
-  dirty = true; renderEditor(); refresh();
+  if (e.target.id === 'photoFile' && e.target.files[0]) {
+    draft.players[sel]._preview = URL.createObjectURL(e.target.files[0]);
+    dirty = true; renderEditor(); refresh();
+  }
+  if (e.target.id === 'importFileInput' && e.target.files[0]) {
+    handleImportFile(e.target.files[0]);
+    e.target.value = '';
+  }
 }
 
-// ---- export: same shape as data/rankings/<id>.json in the rankings pages ----
-function exportJson() {
+function constructRankingJson() {
   const list = (a, ok) => (a || []).filter(ok);
-  const out = { id: rowId(), title: draft.title.trim(), game: { ...draft.game }, period: { ...draft.period }, status: draft.status };
+  const out = {
+    schemaVersion: 1,
+    id: rowId(),
+    title: draft.title.trim() || 'Custom Ranking',
+    game: { ...draft.game },
+    period: { ...draft.period },
+    status: draft.status || 'yearly'
+  };
   if (draft.publishedBy && draft.publishedBy.trim()) out.publishedBy = draft.publishedBy.trim();
   if (draft.intro && draft.intro.trim()) out.intro = draft.intro.trim();
-  out.players = draft.players.map((p, i) => {
-    const o = { placement: i + 1, tag: p.tag.trim() };
+
+  out.players = (draft.players || []).map((p, i) => {
+    const o = { placement: i + 1, tag: (p.tag || '').trim() };
     if (p.playerId) o.playerId = String(p.playerId).trim();
     if (p.points !== null && p.points !== undefined && !Number.isNaN(Number(p.points))) {
       o.points = Number(p.points);
     }
-    if (p.photo) o.photo = p.photo;
+    if (p.photo && !p.photo.startsWith('blob:')) o.photo = p.photo;
     if (p.realName && p.realName.trim()) o.realName = p.realName.trim();
     if (has(p.mains)) o.mains = [...p.mains];
     if (p.text && p.text.trim()) o.text = p.text.trim();
-    const w = list(p.notableWins, x => x.opponent.trim()); if (w.length) o.notableWins = w.map(x => x.times !== undefined && x.times !== null ? { opponent: x.opponent.trim(), times: x.times } : { opponent: x.opponent.trim(), tournament: (x.tournament || '').trim() });
-    const r = list(p.notableResults, x => x.event.trim()); if (r.length) o.notableResults = r.map(x => ({ placement: x.placement, event: x.event.trim(), entrants: x.entrants }));
+    const w = list(p.notableWins, x => x.opponent && x.opponent.trim());
+    if (w.length) {
+      o.notableWins = w.map(x => x.times !== undefined && x.times !== null
+        ? { opponent: x.opponent.trim(), times: Number(x.times) }
+        : { opponent: x.opponent.trim(), tournament: (x.tournament || '').trim() });
+    }
+    const r = list(p.notableResults, x => x.event && x.event.trim());
+    if (r.length) {
+      o.notableResults = r.map(x => ({
+        placement: x.placement !== null && x.placement !== undefined ? Number(x.placement) : null,
+        event: x.event.trim(),
+        entrants: x.entrants !== null && x.entrants !== undefined ? Number(x.entrants) : null
+      }));
+    }
     return o;
   });
   return out;
 }
 
-function save() {
-  const out = exportJson(), a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' }));
-  a.download = out.id + '.json'; a.click();
+function getDescriptiveFilename() {
+  const titlePart = slug(draft.title || 'power-ranking');
+  const gamePart = draft.game?.slug || 'ranking';
+  let yearPart = '';
+  if (draft.period?.start) {
+    yearPart = '-' + draft.period.start.split('-')[0];
+  }
+  return `${titlePart || gamePart}${yearPart}.json`;
+}
+
+function doExport() {
+  const out = constructRankingJson();
+  const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = getDescriptiveFilename();
+  a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-  dirty = false; savedAt = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); renderSub();
+}
+
+function triggerImport() {
+  if (dirty) {
+    if (!confirm('You have unsaved changes in the creator. Importing a ranking will overwrite your current form. Continue?')) {
+      return;
+    }
+  }
+  $('#importFileInput').click();
+}
+
+function validateAndSanitizeImport(data) {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    throw new Error('Invalid file format: ranking file must contain a JSON object.');
+  }
+
+  if (Object.prototype.hasOwnProperty.call(data, '__proto__') || Object.prototype.hasOwnProperty.call(data, 'constructor')) {
+    throw new Error('Security violation: malformed object properties detected.');
+  }
+
+  if (data.schemaVersion !== undefined && data.schemaVersion !== 1) {
+    throw new Error(`Unsupported schema version (${data.schemaVersion}). Only version 1 is supported.`);
+  }
+
+  const sanitized = {
+    id: typeof data.id === 'string' ? data.id.slice(0, 100) : '',
+    title: typeof data.title === 'string' ? data.title.slice(0, 150) : '',
+    game: { id: 'r2', name: 'Rivals 2', slug: 'rivals-2' },
+    period: { start: '', end: '' },
+    status: (data.status === 'seasonal' || data.status === 'final') ? 'seasonal' : 'yearly',
+    publishedBy: typeof data.publishedBy === 'string' ? data.publishedBy.slice(0, 100) : '',
+    intro: typeof data.intro === 'string' ? data.intro.slice(0, 2000) : '',
+    players: []
+  };
+
+  if (data.game && typeof data.game === 'object') {
+    const matched = games.find(g => g.id === data.game.id || g.slug === data.game.slug || g.name === data.game.name);
+    if (matched) {
+      sanitized.game = { id: matched.id, name: matched.name, slug: matched.slug };
+    }
+  }
+
+  if (data.period && typeof data.period === 'object') {
+    if (typeof data.period.start === 'string') sanitized.period.start = data.period.start.slice(0, 20);
+    if (typeof data.period.end === 'string') sanitized.period.end = data.period.end.slice(0, 20);
+  }
+
+  if (!Array.isArray(data.players)) {
+    throw new Error('Missing or invalid "players" array in ranking data.');
+  }
+  if (data.players.length > 200) {
+    throw new Error('Ranking contains too many players (maximum 200).');
+  }
+
+  const missingProfiles = [];
+  const knownProfileIds = new Set(allProfiles.map(p => String(p.playerId)));
+
+  data.players.forEach((p, idx) => {
+    if (!p || typeof p !== 'object' || Array.isArray(p)) return;
+    const tag = typeof p.tag === 'string' ? p.tag.slice(0, 80) : `Player ${idx + 1}`;
+    const pid = (p.playerId !== undefined && p.playerId !== null) ? String(p.playerId).trim() : '';
+
+    if (pid && !knownProfileIds.has(pid)) {
+      missingProfiles.push(`${tag} (ID: ${pid})`);
+    }
+
+    const playerObj = {
+      placement: idx + 1,
+      tag,
+      playerId: pid || undefined,
+      points: (p.points !== null && p.points !== undefined && !Number.isNaN(Number(p.points))) ? Number(p.points) : null,
+      photo: (typeof p.photo === 'string' && (p.photo.startsWith('assets/players/') || p.photo.startsWith('https://'))) ? p.photo.slice(0, 240) : undefined,
+      realName: typeof p.realName === 'string' ? p.realName.slice(0, 100) : undefined,
+      text: typeof p.text === 'string' ? p.text.slice(0, 2000) : undefined,
+      mains: Array.isArray(p.mains) ? p.mains.filter(m => typeof m === 'string').map(m => m.slice(0, 50)) : undefined
+    };
+
+    if (Array.isArray(p.notableWins)) {
+      playerObj.notableWins = p.notableWins.filter(w => w && typeof w === 'object' && typeof w.opponent === 'string').map(w => ({
+        opponent: w.opponent.slice(0, 80),
+        times: (w.times !== undefined && w.times !== null && !Number.isNaN(Number(w.times))) ? Number(w.times) : undefined,
+        tournament: typeof w.tournament === 'string' ? w.tournament.slice(0, 100) : undefined
+      }));
+    }
+
+    if (Array.isArray(p.notableResults)) {
+      playerObj.notableResults = p.notableResults.filter(r => r && typeof r === 'object' && typeof r.event === 'string').map(r => ({
+        placement: (r.placement !== null && r.placement !== undefined) ? Number(r.placement) : null,
+        event: r.event.slice(0, 120),
+        entrants: (r.entrants !== null && r.entrants !== undefined) ? Number(r.entrants) : null
+      }));
+    }
+
+    sanitized.players.push(playerObj);
+  });
+
+  return { sanitized, missingProfiles };
+}
+
+function handleImportFile(file) {
+  if (file.size > 2 * 1024 * 1024) {
+    alert('Selected file is too large (maximum 2 MB).');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      const { sanitized, missingProfiles } = validateAndSanitizeImport(parsed);
+      draft = sanitized;
+      sel = 0;
+      dirty = false;
+      renderDetails();
+      renderAll();
+
+      if (missingProfiles.length > 0) {
+        alert(`Note: The following ${missingProfiles.length} player profile(s) could not be resolved in the directory:\n\n${missingProfiles.slice(0, 5).join('\n')}${missingProfiles.length > 5 ? '\n...and more' : ''}\n\nTheir data has been imported, but their profiles may be outdated or missing.`);
+      }
+    } catch (err) {
+      alert(`Import error: ${err.message}`);
+    }
+  };
+  reader.onerror = () => alert('Failed to read the selected file.');
+  reader.readAsText(file);
+}
+
+function doPreview() {
+  const rankingData = constructRankingJson();
+  sessionStorage.setItem('platfighters_community_preview', JSON.stringify(rankingData));
+  window.open('ranking.html?preview=community', '_blank');
+}
+
+function encodeCommunityRanking(data) {
+  const jsonStr = JSON.stringify(data);
+  const base64 = btoa(encodeURIComponent(jsonStr).replace(/%([0-9A-F]{2})/g, (match, p1) => String.fromCharCode('0x' + p1)));
+  return base64;
+}
+
+function doShare() {
+  const rankingData = constructRankingJson();
+  const encoded = encodeCommunityRanking(rankingData);
+
+  if (encoded.length > 6000) {
+    alert('This ranking contains too much information for a shareable URL link.\n\nPlease use the "Export" button to download a JSON file to share with others.');
+    return;
+  }
+
+  const shareUrl = `${window.location.origin}${window.location.pathname.replace('ranking-creator.html', 'ranking.html')}#community=${encoded}`;
+
+  navigator.clipboard.writeText(shareUrl).then(() => {
+    alert(`Shareable link copied to clipboard!\n\nAnyone opening this link can view your community ranking.\n\n${shareUrl}`);
+  }).catch(() => {
+    prompt('Copy your shareable ranking link:', shareUrl);
+  });
+}
+
+function doExportImage() {
+  const rankingData = constructRankingJson();
+  if (!rankingData.players || !rankingData.players.length) {
+    alert('Add players to your ranking before exporting an image.');
+    return;
+  }
+
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+
+  const width = 1200;
+  const padding = 60;
+  const rowHeight = 70;
+  const headerHeight = 240;
+  const height = headerHeight + (rankingData.players.length * rowHeight) + padding;
+
+  canvas.width = width * 2;
+  canvas.height = height * 2;
+  ctx.scale(2, 2);
+
+  const grad = ctx.createLinearGradient(0, 0, width, height);
+  grad.addColorStop(0, '#050B1F');
+  grad.addColorStop(0.5, '#0B1538');
+  grad.addColorStop(1, '#050B1F');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, width, height);
+
+  ctx.save();
+  ctx.fillStyle = 'rgba(56, 189, 248, 0.08)';
+  ctx.beginPath();
+  ctx.arc(width - 150, 150, 250, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  ctx.fillStyle = '#38BDF8';
+  ctx.font = '700 16px "Space Grotesk", sans-serif';
+  ctx.fillText('PLATFIGHTERS.UY · COMMUNITY POWER RANKING', padding, 70);
+
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = '700 36px "Space Grotesk", sans-serif';
+  ctx.fillText(rankingData.title, padding, 120);
+
+  const metaText = `${rankingData.game.name} · ${rankingData.status.toUpperCase()} · ${rankingData.period.start || ''} → ${rankingData.period.end || ''}`;
+  ctx.fillStyle = '#94A3B8';
+  ctx.font = '500 16px "Space Grotesk", sans-serif';
+  ctx.fillText(metaText, padding, 155);
+
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(padding, 190);
+  ctx.lineTo(width - padding, 190);
+  ctx.stroke();
+
+  rankingData.players.forEach((p, idx) => {
+    const y = headerHeight + (idx * rowHeight);
+
+    if (idx % 2 === 0) {
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+      ctx.fillRect(padding, y - 36, width - (padding * 2), rowHeight);
+    }
+
+    let rankColor = '#38BDF8';
+    if (p.placement === 1) rankColor = '#EAB308';
+    else if (p.placement === 2) rankColor = '#94A3B8';
+    else if (p.placement === 3) rankColor = '#D97706';
+
+    ctx.fillStyle = rankColor;
+    ctx.font = '700 24px monospace';
+    ctx.fillText(String(p.placement).padStart(2, ' '), padding + 10, y + 6);
+
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '700 22px "Space Grotesk", sans-serif';
+    ctx.fillText(p.tag, padding + 70, y + 6);
+
+    if (p.realName) {
+      ctx.fillStyle = '#94A3B8';
+      ctx.font = '400 16px "Space Grotesk", sans-serif';
+      ctx.fillText(`(${p.realName})`, padding + 70 + ctx.measureText(p.tag).width + 12, y + 5);
+    }
+
+    if (p.mains && p.mains.length) {
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.8)';
+      ctx.font = '500 14px "Space Grotesk", sans-serif';
+      ctx.fillText(p.mains.join(' / '), width - padding - 220, y + 5);
+    }
+
+    if (p.points !== null && p.points !== undefined) {
+      ctx.fillStyle = '#E2E8F0';
+      ctx.font = '700 18px monospace';
+      const ptsStr = `${Number(p.points).toLocaleString('en-US')} pts`;
+      ctx.fillText(ptsStr, width - padding - 100, y + 6);
+    }
+  });
+
+  ctx.fillStyle = '#64748B';
+  ctx.font = '500 14px monospace';
+  ctx.fillText('Generated on Platfighters.uy · Community Ranking (Unofficial)', padding, height - 20);
+
+  const a = document.createElement('a');
+  a.download = `${slug(rankingData.title || 'power-ranking')}.png`;
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+}
+
+async function doPublish() {
+  if (!isAdmin) {
+    alert('Publishing requires active administrator credentials.');
+    return;
+  }
+
+  const okD = draft.title.trim() && draft.period.start && draft.period.end;
+  const okP = draft.players && draft.players.length > 0 && draft.players.every(p => p.tag && p.tag.trim());
+  if (!okD || !okP) {
+    alert('Please complete all required fields (Ranking title, period start/end, and valid players) before publishing.');
+    return;
+  }
+
+  const rankingPayload = constructRankingJson();
+
+  const isEditingExisting = rankingIdParam && draft.id === rankingIdParam;
+  const confirmMsg = isEditingExisting
+    ? `Publish changes to existing official ranking "${draft.title}" (${draft.id})? This will update the official database and public website files.`
+    : `Publish new official ranking "${draft.title}"? This will save it to the official database and publish it on Platfighters.uy.`;
+
+  if (!confirm(confirmMsg)) return;
+
+  const btn = $('#publishBtn');
+  if (btn) btn.disabled = true;
+
+  try {
+    const url = isEditingExisting
+      ? `/api/admin/rankings/${encodeURIComponent(draft.id)}`
+      : '/api/admin/rankings';
+    const method = isEditingExisting ? 'PUT' : 'POST';
+
+    const res = await fetch(url, {
+      method,
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Admin-Request': '1',
+        'X-CSRF-Token': adminCsrfToken
+      },
+      body: JSON.stringify({ ranking: rankingPayload })
+    });
+
+    const result = await res.json();
+    if (!res.ok) throw new Error(result.error || 'Publishing failed');
+
+    alert(`Official power ranking "${draft.title}" was published successfully!`);
+    dirty = false;
+    window.location.href = 'admin.html';
+  } catch (err) {
+    alert(`Could not publish ranking: ${err.message}`);
+  } finally {
+    if (btn) btn.disabled = false;
+  }
 }
 
 if (window.i18n && window.i18n.onChange) {
