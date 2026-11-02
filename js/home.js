@@ -7,6 +7,17 @@ const slug = x => String(x || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').repl
 const fmt = d => d ? new Date(`${d}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
 const collator = new Intl.Collator(undefined, { sensitivity: 'base', numeric: true });
 
+function isValidStartggUrl(url) {
+  if (!url || typeof url !== 'string') return false;
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.toLowerCase();
+    return (host === 'start.gg' || host.endsWith('.start.gg')) && parsed.pathname.length > 1;
+  } catch (e) {
+    return false;
+  }
+}
+
 let eventsIndex = [];
 let playerDirectory = [];
 let activeCommunities = [
@@ -101,6 +112,7 @@ function renderUpcomingEvents() {
         date: event.date,
         isTemporary: !!event.isTemporary,
         hasTakenPlace: event.hasTakenPlace,
+        startggUrl: event.tournamentSlug ? `https://www.start.gg/tournament/${encodeURIComponent(event.tournamentSlug)}` : '',
         games: new Map(),
         entrants: event.entrants || 0
       });
@@ -112,7 +124,14 @@ function renderUpcomingEvents() {
         t.hasTakenPlace = event.hasTakenPlace;
       }
     }
-    if (event.game) t.games.set(event.gameSlug || event.game, { slug: event.gameSlug, name: event.game });
+    if (event.game) {
+      const gSlug = event.gameSlug || event.game;
+      if (!t.games.has(gSlug)) {
+        t.games.set(gSlug, { slug: event.gameSlug, name: event.game, url: event.url || '' });
+      } else if (!t.games.get(gSlug).url && event.url) {
+        t.games.get(gSlug).url = event.url;
+      }
+    }
     if (!t.date || (event.date && event.date < t.date)) t.date = event.date;
     if (event.entrants && event.entrants > t.entrants) t.entrants = event.entrants;
   });
@@ -137,10 +156,36 @@ function renderUpcomingEvents() {
     const month = dt.toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
     const gameNames = [...e.games.values()].map(g => g.name).join(' · ');
     const entrantsStr = e.entrants ? `${e.entrants} registered` : 'Registration open';
-    const linkUrl = e.tournamentSlug ? `event.html?tournament=${encodeURIComponent(e.tournamentSlug)}` : 'events.html';
+
+    // Direct Start.gg navigation for upcoming tournaments:
+    // If the tournament has only one game and an event URL exists, use that specific event's URL;
+    // otherwise, use the tournament-level startggUrl or tournament start.gg URL.
+    // If no valid Start.gg URL is found, fall back gracefully to the internal tournament page.
+    let startggUrl = '';
+    const gamesList = [...e.games.values()];
+    if (gamesList.length === 1 && gamesList[0].url && isValidStartggUrl(gamesList[0].url)) {
+      startggUrl = gamesList[0].url;
+    } else if (e.startggUrl && isValidStartggUrl(e.startggUrl)) {
+      startggUrl = e.startggUrl;
+    } else {
+      const anyEventUrl = gamesList.find(g => g.url && isValidStartggUrl(g.url))?.url;
+      if (anyEventUrl) {
+        // Extract tournament URL from event URL: e.g. https://www.start.gg/tournament/xyz/event/... -> https://www.start.gg/tournament/xyz
+        const tourneyMatch = anyEventUrl.match(/^(https?:\/\/(?:www\.)?start\.gg\/tournament\/[^/?#]+)/i);
+        if (tourneyMatch) {
+          startggUrl = tourneyMatch[1];
+        } else {
+          startggUrl = anyEventUrl;
+        }
+      }
+    }
+
+    const isExternal = Boolean(startggUrl);
+    const linkUrl = startggUrl || (e.tournamentSlug ? `event.html?tournament=${encodeURIComponent(e.tournamentSlug)}` : 'events.html');
+    const targetAttrs = isExternal ? ' target="_blank" rel="noopener noreferrer"' : '';
 
     return `
-      <a class="event glass" href="${esc(linkUrl)}">
+      <a class="event glass" href="${esc(linkUrl)}"${targetAttrs}>
         <div class="datebox">
           <div class="mono muted">${weekday}</div>
           <div class="day">${day}</div>

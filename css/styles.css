@@ -172,11 +172,11 @@ svg{width:100%;height:auto}svg text{fill:var(--muted);font:12px 'JetBrains Mono'
 .player-list.condensed .player-avatar{flex-basis:40px;width:40px;height:40px;border-radius:12px;font-size:18px}
 .player-list.condensed .player-card-copy>b{font-size:16px}
 .player-list.condensed .player-card-meta>b{font-size:17px}
-.upcoming-panel{margin-bottom:24px}
-.upcoming-panel h2{margin-top:0;margin-bottom:16px}
+.upcoming-panel{margin-bottom:24px;border-color:rgba(245,197,66,.3)}
+.upcoming-panel h2{margin-top:0;margin-bottom:16px;color:var(--gold)}
 .event-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:14px}
 .event-list.condensed{display:flex;flex-direction:column;gap:8px}
-.event-card{min-width:0;min-height:92px;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:18px;border-radius:22px;color:var(--text);transition:background 150ms ease,transform 150ms ease,border-color 150ms ease}
+.event-card{min-width:0;min-height:92px;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:18px;border-radius:22px;color:var(--text);transition:background 150ms ease,transform 150ms ease,border-color 150ms ease,box-shadow 150ms ease}
 .event-list.condensed .event-card{min-height:64px;padding:9px 14px;border-radius:16px}
 a.event-card:hover{color:var(--text);background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.32);transform:translateY(-1px)}
 .event-card-copy{min-width:0;display:flex;flex-direction:column;gap:4px}
@@ -189,6 +189,35 @@ a.event-card:hover{color:var(--text);background:rgba(255,255,255,.14);border-col
 .event-avatar{position:relative;order:-1;display:grid;place-items:center;flex:0 0 56px;width:56px;height:56px;overflow:hidden;border-radius:16px;background:rgba(255,255,255,.1);color:var(--sky);font-size:20px;font-weight:700}
 .event-avatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .event-list.condensed .event-avatar{flex-basis:40px;width:40px;height:40px;border-radius:12px;font-size:16px}
+
+/* Upcoming event cards in Events directory */
+#upcoming-event-list .event-card{
+  background:rgba(245,197,66,.06);
+  border:1px solid rgba(245,197,66,.28);
+  box-shadow:inset 0 1px 0 rgba(245,197,66,.25),0 8px 24px rgba(0,0,0,.3);
+}
+#upcoming-event-list a.event-card:hover{
+  background:rgba(245,197,66,.12);
+  border-color:rgba(245,197,66,.5);
+  box-shadow:inset 0 1px 0 rgba(245,197,66,.4),0 0 20px rgba(245,197,66,.2);
+  transform:translateY(-1px);
+}
+#upcoming-event-list .event-avatar{
+  background:rgba(245,197,66,.12);
+  color:var(--gold);
+  border:1px solid rgba(245,197,66,.25);
+}
+#upcoming-event-list .event-card-arrow{
+  color:var(--gold);
+}
+#upcoming-event-list .event-card-badge{
+  font:700 11px 'JetBrains Mono',monospace;
+  color:var(--gold);
+  border:1px solid rgba(245,197,66,.5);
+  background:rgba(245,197,66,.12);
+  border-radius:999px;
+  padding:2px 8px;
+}
 .empty-state{grid-column:1/-1;min-height:140px;display:flex;flex-direction:column;justify-content:center;gap:8px}
 .admin-page{max-width:900px}
 .admin-heading{margin:24px 4px 20px}

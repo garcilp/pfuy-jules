@@ -254,6 +254,14 @@
   margin-top: 16px;
 }
 
+.home #events {
+  border-color: rgba(245, 197, 66, 0.3);
+}
+
+.home #events .head h2 {
+  color: var(--gold);
+}
+
 .home .event {
   padding: 18px;
   border-radius: 20px;
@@ -262,11 +270,16 @@
   align-items: center;
   color: var(--text);
   text-decoration: none;
-  transition: background 150ms ease, transform 150ms ease;
+  background: rgba(245, 197, 66, 0.06);
+  border: 1px solid rgba(245, 197, 66, 0.28);
+  box-shadow: inset 0 1px 0 rgba(245, 197, 66, 0.25), 0 8px 24px rgba(0, 0, 0, 0.3);
+  transition: background 150ms ease, transform 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
 }
 
 .home a.event:hover {
-  background: rgba(255, 255, 255, 0.14);
+  background: rgba(245, 197, 66, 0.12);
+  border-color: rgba(245, 197, 66, 0.5);
+  box-shadow: inset 0 1px 0 rgba(245, 197, 66, 0.4), 0 0 20px rgba(245, 197, 66, 0.2);
   transform: translateY(-2px);
   color: var(--text);
 }
@@ -275,17 +288,19 @@
   min-width: 52px;
   text-align: center;
   padding-right: 16px;
-  border-right: 1px solid var(--line);
+  border-right: 1px solid rgba(245, 197, 66, 0.22);
 }
 
 .home .datebox .mono {
   font-size: 11px;
+  color: rgba(245, 197, 66, 0.85);
 }
 
 .home .datebox .day {
   font-size: 32px;
   font-weight: 700;
   line-height: 1.1;
+  color: var(--gold);
 }
 
 .home .info {
@@ -300,6 +315,11 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: var(--text);
+}
+
+.home .info .muted {
+  color: var(--muted);
 }
 
 .home .info .mono {
@@ -309,8 +329,9 @@
 .home .next {
   align-self: flex-start;
   font: 11px 'JetBrains Mono', monospace;
-  color: var(--sky);
-  border: 1px solid var(--sky);
+  color: var(--gold);
+  border: 1px solid rgba(245, 197, 66, 0.6);
+  background: rgba(245, 197, 66, 0.12);
   border-radius: 999px;
   padding: 2px 8px;
   margin-bottom: 2px;
