@@ -57,6 +57,20 @@
     </div>
     <div id="playerSelectList" class="player-select-list"></div>
   </dialog>
+
+  <dialog id="event-select-modal" class="player-select-modal glass">
+    <div class="modal-header">
+      <div>
+        <h2 id="eventModalTitle">Select Event Result</h2>
+        <div id="eventModalSub" class="sub muted">Select an event from this player's tournament history</div>
+      </div>
+      <button type="button" class="x glass pill" id="closeEventModalBtn" aria-label="Close">×</button>
+    </div>
+    <div id="eventSelectList" class="player-select-list"></div>
+    <div style="margin-top:14px;display:flex;justify-content:flex-end;">
+      <button type="button" class="btn glass pill" id="addBlankResultBtn">+ Add blank result</button>
+    </div>
+  </dialog>
 </main>
 
 <footer class="foot mono muted" data-i18n="footer.creator">Platfighters.uy · Community Rankings</footer>

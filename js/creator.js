@@ -1,6 +1,6 @@
 // Platfighters.uy — ranking creator (front-end prototype). Plain JS, no build step.
 // State lives in `draft`, which has the same shape as data/rankings/<id>.json in the rankings pages.
-let draft, games, allProfiles = [], sel = 0, dragFrom = null, dirty = false, savedAt = '';
+let draft, games, allProfiles = [], gameCharacters = {}, sel = 0, dragFrom = null, dirty = false, savedAt = '';
 let prSnapshot = null;
 
 // Check for PR snapshot from sessionStorage
@@ -18,7 +18,8 @@ const rankingIdParam = new URLSearchParams(window.location.search).get('id');
 
 const loadPromises = [
   fetch('data/games.json').then(r => r.json()),
-  fetch('data/profiles/index.json').then(r => r.json()).catch(() => [])
+  fetch('data/profiles/index.json').then(r => r.json()).catch(() => []),
+  fetch('data/characters.json').then(r => r.json()).catch(() => ({}))
 ];
 
 if (rankingIdParam) {
@@ -30,9 +31,10 @@ if (rankingIdParam) {
 }
 
 Promise.all(loadPromises)
-  .then(([g, profiles, existingRanking]) => {
+  .then(([g, profiles, chars, existingRanking]) => {
     games = g.sort((a, b) => a.name.localeCompare(b.name));
     allProfiles = profiles || [];
+    gameCharacters = chars || {};
 
     if (existingRanking) {
       draft = existingRanking;
@@ -71,11 +73,30 @@ Promise.all(loadPromises)
 
 // Modal search and selection state
 let playerModalQuery = '';
+let playerModalTarget = 'ranking'; // 'ranking' or { type: 'opponent', index: number }
 
-function openPlayerModal() {
+function openPlayerModal(target = 'ranking') {
+  playerModalTarget = target;
   const modal = $('#player-select-modal');
   if (!modal) return;
   playerModalQuery = '';
+  const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
+  const titleEl = $('#playerModalTitle');
+  const subEl = $('#playerModalSub');
+  if (titleEl) {
+    if (target === 'ranking') {
+      titleEl.textContent = isEs ? 'Seleccionar Jugador' : 'Select Player';
+    } else {
+      titleEl.textContent = isEs ? 'Seleccionar Rival' : 'Select Opponent';
+    }
+  }
+  if (subEl) {
+    if (target === 'ranking') {
+      subEl.textContent = isEs ? 'Busca y selecciona un jugador del directorio' : 'Search and select a player from the directory';
+    } else {
+      subEl.textContent = isEs ? 'Selecciona un rival de la base de datos de jugadores' : 'Select an opponent from the player database';
+    }
+  }
   const searchInput = $('#playerSearchInput');
   if (searchInput) searchInput.value = '';
   renderPlayerModalList();
@@ -102,7 +123,8 @@ function renderPlayerModalList() {
   const listEl = $('#playerSelectList');
   if (!listEl) return;
 
-  const currentIds = new Set((draft.players || []).map(p => String(p.playerId)).filter(Boolean));
+  const isRankingMode = playerModalTarget === 'ranking';
+  const currentIds = isRankingMode ? new Set((draft.players || []).map(p => String(p.playerId)).filter(Boolean)) : new Set();
   const q = playerModalQuery.trim().toLowerCase();
 
   const filtered = allProfiles.filter(p => {
@@ -154,7 +176,19 @@ async function addPlayerFromDirectory(playerId) {
   const player = allProfiles.find(p => String(p.playerId) === String(playerId));
   if (!player) return;
 
-  // Prevent duplicate additions
+  if (playerModalTarget && playerModalTarget.type === 'opponent') {
+    const p = draft.players[sel];
+    if (p && p.notableWins && p.notableWins[playerModalTarget.index]) {
+      p.notableWins[playerModalTarget.index].opponent = player.tag;
+      dirty = true;
+      refresh();
+      renderEditor();
+    }
+    closePlayerModal();
+    return;
+  }
+
+  // Prevent duplicate additions in ranking mode
   const currentIds = new Set((draft.players || []).map(p => String(p.playerId)).filter(Boolean));
   if (currentIds.has(String(player.playerId))) return;
 
@@ -187,6 +221,119 @@ async function addPlayerFromDirectory(playerId) {
   renderAll();
 }
 
+// Notable Results Event Modal
+let playerEventResults = [];
+
+function closeEventModal() {
+  const modal = $('#event-select-modal');
+  if (!modal) return;
+  if (typeof modal.close === 'function') {
+    modal.close();
+  } else {
+    modal.removeAttribute('open');
+  }
+}
+
+async function openEventModalForCurrentPlayer() {
+  const p = draft.players[sel];
+  if (!p) return;
+  const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
+  const modal = $('#event-select-modal');
+  const listEl = $('#eventSelectList');
+  if (!modal || !listEl) {
+    p.notableResults = p.notableResults || [];
+    p.notableResults.push({ placement: null, event: '', entrants: null });
+    renderEditor();
+    return;
+  }
+
+  listEl.innerHTML = `<div class="player-empty-search">${isEs ? 'Cargando eventos del jugador...' : 'Loading player events...'}</div>`;
+
+  if (typeof modal.showModal === 'function') {
+    modal.showModal();
+  } else {
+    modal.setAttribute('open', '');
+  }
+
+  playerEventResults = [];
+  if (p.playerId) {
+    const matched = allProfiles.find(x => String(x.playerId) === String(p.playerId));
+    const slugName = matched?.slug || (p.tag ? slug(p.tag) : '');
+    const profilePaths = [
+      slugName ? `data/profiles/${slugName}-${p.playerId}.json` : null,
+      slugName ? `data/profiles/${slugName}.json` : null
+    ].filter(Boolean);
+
+    for (const path of profilePaths) {
+      try {
+        const res = await fetch(path);
+        if (res.ok) {
+          const profileData = await res.json();
+          // Extract results from games matching current game or all games
+          const curGameSlug = draft.game ? draft.game.slug : '';
+          const gamesArr = profileData.games || [];
+          const matchedGame = gamesArr.find(g => g.slug === curGameSlug) || gamesArr[0];
+          if (matchedGame && matchedGame.results) {
+            playerEventResults = matchedGame.results;
+            break;
+          }
+        }
+      } catch (e) {
+        // try next
+      }
+    }
+  }
+
+  renderEventModalList();
+}
+
+function renderEventModalList() {
+  const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
+  const listEl = $('#eventSelectList');
+  if (!listEl) return;
+
+  if (!playerEventResults.length) {
+    listEl.innerHTML = `<div class="player-empty-search">${isEs ? 'No se encontraron resultados de torneos para este jugador.' : 'No tournament results found for this player.'}</div>`;
+    return;
+  }
+
+  listEl.innerHTML = playerEventResults.map((r, idx) => {
+    const place = r.place ?? r.placement ?? '?';
+    const eventName = r.event || r.eventName || 'Tournament';
+    const entrants = r.entrants ? (isEs ? `${r.entrants} participantes` : `${r.entrants} entrants`) : '';
+    const date = r.date || '';
+    const meta = [entrants, date].filter(Boolean).join(' · ');
+
+    return `<button type="button" class="player-select-item" data-act="choose-event" data-idx="${idx}">
+      <span class="player-select-avatar"><span style="font-size:16px;font-weight:700;">${place}</span></span>
+      <div class="player-select-info">
+        <div class="player-select-tag-row">
+          <span class="player-select-tag">${esc(eventName)}</span>
+        </div>
+        <div class="player-select-meta">${meta}</div>
+      </div>
+      <span class="player-select-badge">${isEs ? 'Seleccionar' : 'Select'}</span>
+    </button>`;
+  }).join('');
+}
+
+function selectEventForNotableResult(idx) {
+  const p = draft.players[sel];
+  if (!p) return;
+  const ev = playerEventResults[idx];
+  if (!ev) return;
+  p.notableResults = p.notableResults || [];
+  p.notableResults.push({
+    placement: ev.place ?? ev.placement ?? null,
+    event: ev.event || ev.eventName || '',
+    entrants: ev.entrants ?? null
+  });
+  dirty = true;
+  closeEventModal();
+  refresh();
+  renderEditor();
+}
+
 document.addEventListener('input', onInput);
 document.addEventListener('click', onClick);
 document.addEventListener('change', onChange);
@@ -197,6 +344,25 @@ document.addEventListener('click', e => {
   const modal = $('#player-select-modal');
   if (e.target === modal) {
     closePlayerModal();
+  }
+
+  if (e.target.id === 'closeEventModalBtn' || e.target.closest('#closeEventModalBtn')) {
+    closeEventModal();
+  }
+  const evModal = $('#event-select-modal');
+  if (e.target === evModal) {
+    closeEventModal();
+  }
+  if (e.target.id === 'addBlankResultBtn') {
+    const p = draft.players[sel];
+    if (p) {
+      p.notableResults = p.notableResults || [];
+      p.notableResults.push({ placement: null, event: '', entrants: null });
+      dirty = true;
+      closeEventModal();
+      refresh();
+      renderEditor();
+    }
   }
 });
 document.addEventListener('keydown', e => { if (e.target.id === 'newMain' && e.key === 'Enter') { e.preventDefault(); $('[data-act="add-main"]').click(); } });
@@ -221,11 +387,11 @@ const kind = p => ((p.text && p.text.trim()) || has(p.notableWins) || has(p.nota
 const getWhy = () => {
   const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
   return isEs ? {
-    FULL: 'Se muestra como entrada completa porque tiene texto del año o victorias/resultados destacados.',
-    MEDIUM: 'Se muestra como entrada mediana porque tiene mains o nombre real.',
+    FULL: 'Se muestra como entrada completa porque tiene descripción del jugador o victorias/resultados destacados.',
+    MEDIUM: 'Se muestra como entrada mediana porque tiene personajes principales o nombre real.',
     MINIMUM: 'Se muestra como fila mínima: solo puesto, imagen, tag y puntos.'
   } : {
-    FULL: 'Shown as a full entry because it has a year text or notable wins or results.',
+    FULL: 'Shown as a full entry because it has a player description or notable wins or results.',
     MEDIUM: 'Shown as a medium entry because it has mains or a real name.',
     MINIMUM: 'Shown as a minimum row: placement, picture, tag and points only.'
   };
@@ -359,14 +525,15 @@ function renderEditor() {
   const rm = (act, i, what) => `<button type="button" class="x glass pill" data-act="${act}" data-i="${i}" aria-label="Remove ${what}">×</button>`;
   const cell = (cls, label, row, i, f, val, extra = '') => `<div class="${cls}">${lab2(label)}<input class="inp" data-row="${row}" data-i="${i}" data-f="${f}" value="${esc(val ?? '')}" ${extra}></div>`;
 
+  const oppCell = (i, val) => `<div class="g">${lab2(isEs ? 'RIVAL' : 'OPPONENT')}<div style="display:flex;gap:6px;"><input class="inp" data-row="notableWins" data-i="${i}" data-f="opponent" value="${esc(val ?? '')}"><button type="button" class="btn glass pill" data-act="pick-opponent" data-i="${i}" style="min-height:46px;padding:0 14px;white-space:nowrap;font-size:13px;" title="${isEs ? 'Seleccionar rival del directorio' : 'Select opponent from directory'}">🔍</button></div></div>`;
   const wins = (p.notableWins || []).map((w, i) => { const t = w.times !== undefined;
-    return `<div class="rowf">${cell('g', 'OPPONENT', 'notableWins', i, 'opponent', w.opponent)}<div>${lab2('FORMAT')}${seg(i, t ? 'times' : 'tournament')}</div>${t ? cell('g', 'TIMES', 'notableWins', i, 'times', w.times) : cell('g', 'TOURNAMENT', 'notableWins', i, 'tournament', w.tournament)}${rm('rm-win', i, 'win')}</div>`; }).join('');
+    return `<div class="rowf">${oppCell(i, w.opponent)}<div>${lab2(isEs ? 'FORMATO' : 'FORMAT')}${seg(i, t ? 'times' : 'tournament')}</div>${t ? cell('g', isEs ? 'VECES' : 'TIMES', 'notableWins', i, 'times', w.times) : cell('g', isEs ? 'TORNEO' : 'TOURNAMENT', 'notableWins', i, 'tournament', w.tournament)}${rm('rm-win', i, 'win')}</div>`; }).join('');
   const results = (p.notableResults || []).map((r, i) =>
     `<div class="rowf"><div style="flex:0 0 100px">${lab2('PLACEMENT')}<input class="inp" data-row="notableResults" data-i="${i}" data-f="placement" value="${r.placement ?? ''}"></div>${cell('g', 'EVENT', 'notableResults', i, 'event', r.event)}<div style="flex:0 0 120px">${lab2('ENTRANTS')}<input class="inp" data-row="notableResults" data-i="${i}" data-f="entrants" value="${r.entrants ?? ''}"></div>${rm('rm-res', i, 'result')}</div>`).join('');
+  const currentChars = (draft.game && gameCharacters[draft.game.slug]) || [];
+  const charDatalist = `<datalist id="characterSuggestions">${currentChars.map(c => `<option value="${esc(c)}">`).join('')}</datalist>`;
   const mains = `<div class="chips">${(p.mains || []).map((m, i) => `<span class="glass pill mchip">${stock(m)}${esc(m)}<button type="button" class="x glass pill" data-act="rm-main" data-i="${i}" aria-label="Remove ${esc(m)}">×</button></span>`).join('')}</div>
-    <div class="rowf"><div class="g"><input class="inp" id="newMain" placeholder="Character name"></div><button type="button" class="btn glass pill" data-act="add-main">+ Add main</button></div><div class="note0">Shown on the ranking as stock icons.</div>`;
-
-  const playerIdField = p.playerId ? `<div class="fld" style="flex:1 1 180px">${lab(isEs ? 'ID DE JUGADOR' : 'PLAYER ID', 1)}<input class="inp ro mono" value="${esc(p.playerId)}" readonly aria-readonly="true"></div>` : '';
+    <div class="rowf"><div class="g"><input class="inp" id="newMain" list="characterSuggestions" placeholder="${isEs ? 'Nombre del personaje' : 'Character name'}">${charDatalist}</div><button type="button" class="btn glass pill" data-act="add-main">+ ${isEs ? 'Agregar personaje' : 'Add main'}</button></div><div class="note0">${isEs ? 'Se muestran en el ranking como íconos de stock.' : 'Shown on the ranking as stock icons.'}</div>`;
 
   $('#editor').innerHTML = `<div class="ed-head"><div class="l"><span class="big ${pcls(n)}">${n}</span><span class="nm">${esc(p.tag || 'New player')}</span></div>
       <div class="l" style="align-items:center"><span class="kind" id="kindPill">${k} ENTRY</span><button type="button" class="add" data-act="remove-player">${isEs ? 'Eliminar jugador' : 'Remove player'}</button></div></div>
@@ -374,15 +541,14 @@ function renderEditor() {
     <div class="req"><div class="dzw"><div class="dz"><i>${esc((p.tag || '?')[0])}</i>${pic}</div>
         <button type="button" class="btn glass pill" data-act="pick-photo">${isEs ? 'Cambiar imagen' : 'Replace picture'}</button><input type="file" id="photoFile" accept="image/png,image/jpeg" hidden><div class="note0" style="text-align:center">JPG or PNG</div></div>
       <div class="reqf"><div class="fld" style="flex:0 0 100px">${lab(isEs ? 'PUESTO' : 'PLACEMENT', 1)}<input class="inp ro ${pcls(n)}" value="${n}" readonly aria-readonly="true"></div>
-        <div class="fld" style="flex:2 1 200px">${lab(isEs ? 'TAG' : 'TAG', 1)}<input class="inp" data-pbind="tag" value="${esc(p.tag)}" placeholder="Gamertag"></div>
-        ${playerIdField}
+        <div class="fld" style="flex:2 1 240px">${lab(isEs ? 'TAG' : 'TAG', 1)}<input class="inp" data-pbind="tag" value="${esc(p.tag)}" placeholder="Gamertag"></div>
         <div class="frow" style="flex:1 1 100%; gap:16px;">
           <div class="fld" style="flex:1 1 220px">${lab(isEs ? 'NOMBRE REAL' : 'REAL NAME', 0)}<input class="inp" data-pbind="realName" value="${esc(p.realName ?? '')}" placeholder="${isEs ? '[Nombre real]' : '[Real name]'}"></div>
           <div class="fld" style="flex:1 1 220px">${lab(isEs ? 'PUNTOS' : 'POINTS', 0)}<input class="inp mono" data-pbind="points" inputmode="numeric" value="${p.points == null ? '' : Number(p.points).toLocaleString('en-US')}" placeholder="e.g. 1,420"></div>
         </div>
         <div class="hint">${isEs ? 'El puesto está determinado por la posición en la lista.' : 'Placement is set by the player’s position in the list.'}</div></div></div>
-    ${sec('mains', 'Mains', mains)}
-    ${sec('text', 'Year text', `<textarea class="inp" data-pbind="text" style="min-height:128px">${esc(p.text ?? '')}</textarea><div class="cnt" id="textCount">${(p.text || '').length} characters</div>`)}
+    ${sec('mains', isEs ? 'Personajes principales' : 'Mains', mains)}
+    ${sec('text', isEs ? 'Descripción del jugador' : 'Player Description', `<textarea class="inp" data-pbind="text" style="min-height:128px">${esc(p.text ?? '')}</textarea><div class="cnt" id="textCount">${(p.text || '').length} ${isEs ? 'caracteres' : 'characters'}</div>`)}
     ${sec('notableWins', 'Notable wins', wins + '<button type="button" class="add" data-act="add-win">+ Add notable win</button>')}
     ${sec('notableResults', 'Notable results', results + '<button type="button" class="add" data-act="add-res">+ Add notable result</button>')}`;
 }
@@ -422,8 +588,10 @@ function onClick(e) {
     case 'pick-photo': $('#photoFile').click(); return;
     case 'save': save(); return;
     case 'pop-snapshot': populateFromSnapshot(b.dataset.n); return;
-    case 'add-player': openPlayerModal(); return;
+    case 'add-player': openPlayerModal('ranking'); return;
+    case 'pick-opponent': openPlayerModal({ type: 'opponent', index: i }); return;
     case 'choose-player': addPlayerFromDirectory(b.dataset.playerId); return;
+    case 'choose-event': selectEventForNotableResult(+b.dataset.idx); return;
     case 'remove-player':
       if (draft.players.length > 0) {
         draft.players.splice(sel, 1);
@@ -450,7 +618,7 @@ function onClick(e) {
     case 'fmt': { const w = p.notableWins[i]; if (b.dataset.v === 'times') { w.times = w.times ?? 2; delete w.tournament; } else { w.tournament = w.tournament ?? ''; delete w.times; } renderEditor(); break; }
     case 'add-win': p.notableWins.push({ opponent: '', tournament: '' }); renderEditor(); break;
     case 'rm-win': p.notableWins.splice(i, 1); renderEditor(); break;
-    case 'add-res': p.notableResults.push({ placement: null, event: '', entrants: null }); renderEditor(); break;
+    case 'add-res': openEventModalForCurrentPlayer(); return;
     case 'rm-res': p.notableResults.splice(i, 1); renderEditor(); break;
   }
   dirty = true; refresh();
