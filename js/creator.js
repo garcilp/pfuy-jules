@@ -548,9 +548,9 @@ function renderEditor() {
         </div>
         <div class="hint">${isEs ? 'El puesto está determinado por la posición en la lista.' : 'Placement is set by the player’s position in the list.'}</div></div></div>
     ${sec('mains', isEs ? 'Personajes principales' : 'Mains', mains)}
-    ${sec('text', isEs ? 'Descripción del jugador' : 'Player Description', `<textarea class="inp" data-pbind="text" style="min-height:128px">${esc(p.text ?? '')}</textarea><div class="cnt" id="textCount">${(p.text || '').length} ${isEs ? 'caracteres' : 'characters'}</div>`)}
     ${sec('notableWins', 'Notable wins', wins + '<button type="button" class="add" data-act="add-win">+ Add notable win</button>')}
-    ${sec('notableResults', 'Notable results', results + '<button type="button" class="add" data-act="add-res">+ Add notable result</button>')}`;
+    ${sec('notableResults', 'Notable results', results + '<button type="button" class="add" data-act="add-res">+ Add notable result</button>')}
+    ${sec('text', isEs ? 'Descripción del jugador' : 'Player Description', `<textarea class="inp" data-pbind="text" style="min-height:128px">${esc(p.text ?? '')}</textarea><div class="cnt" id="textCount">${(p.text || '').length} ${isEs ? 'caracteres' : 'characters'}</div>`)}`;
 }
 
 // ---- events ----
