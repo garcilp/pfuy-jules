@@ -172,7 +172,11 @@ function updateBreadcrumbsAndNav() {
 if (window.i18n && window.i18n.onChange) {
   window.i18n.onChange(() => {
     updateBreadcrumbsAndNav();
-    render();
+    if (activeSection === 'historical') {
+      renderHistoricalRankings();
+    } else {
+      render();
+    }
   });
 }
 
@@ -428,7 +432,7 @@ async function renderHistoricalRankings() {
             <!-- Row 1: Ranking Identity -->
             <div class="row-identity">
               <span class="name">${esc(r.name)}</span>
-              <span class="status ${r.status === 'current' ? 'current' : ''}">${r.status === 'current' ? 'CURRENT' : 'FINAL'}</span>
+              <span class="status ${r.status === 'yearly' || r.status === 'current' ? 'yearly' : 'seasonal'}">${r.status === 'yearly' || r.status === 'current' ? (window.i18n ? window.i18n.t('historical.yearly') : 'YEARLY') : (window.i18n ? window.i18n.t('historical.seasonal') : 'SEASONAL')}</span>
             </div>
 
             <!-- Row 2: Ranking Details -->
