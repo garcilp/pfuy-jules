@@ -12,7 +12,9 @@ const id = new URLSearchParams(location.search).get('id') || '';
 
 const photo = (p, size) => `<div class="photo ${size}"><i>${esc(p.tag ? p.tag[0] : '?')}</i><img src="${esc(p.photo || `assets/players/${slug(p.tag)}.jpg`)}" alt="" onerror="this.remove()"></div>`;
 const stock = (g, name) => `<span class="stock" title="${esc(name)}" role="img" aria-label="${esc(name)}"><i>${esc(name ? name[0] : '?')}</i><img src="assets/stock-icons/${g.slug}/${slug(name)}.png" alt="" onerror="this.remove()"></span>`;
-const pts = p => `${Number(p.points || 0).toLocaleString('en-US')} pts`;
+const pts = p => (p.points !== null && p.points !== undefined && !Number.isNaN(Number(p.points)))
+  ? `<span class="pts mono">${Number(p.points).toLocaleString('en-US')} pts</span>`
+  : '';
 
 function render(r) {
   document.title = `${r.title} · Platfighters.uy`;
@@ -27,15 +29,15 @@ function render(r) {
   const full = p => `<article class="entry full glass" id="p-${p.placement}">
     <div class="top-row">${photo(p, 'lg')}<div class="who">
       <div class="ident"><span class="rank ${pcls(p.placement)}">${p.placement}</span><h2>${esc(p.tag)}</h2></div>
-      ${real(p)}<div class="pts mono">${pts(p)}</div>${mains(p)}</div></div>
+      ${real(p)}${pts(p)}${mains(p)}</div></div>
     ${p.text ? `<p class="text">${esc(p.text)}</p>` : ''}
     ${p.notableWins || p.notableResults ? `<div class="lists">${list(isEs ? 'VICTORIAS DESTACADAS' : 'NOTABLE WINS', p.notableWins, win)}${list(isEs ? 'RESULTADOS DESTACADOS' : 'NOTABLE RESULTS', p.notableResults, res)}</div>` : ''}</article>`;
 
   const medium = p => `<article class="entry med glass" id="p-${p.placement}">
     <span class="rank-md ${pcls(p.placement)}">${p.placement}</span>${photo(p, 'md')}
-    <div class="who"><span class="tag">${esc(p.tag)}</span>${real(p)}${mains(p)}</div><span class="pts mono">${pts(p)}</span></article>`;
+    <div class="who"><span class="tag">${esc(p.tag)}</span>${real(p)}${mains(p)}</div>${pts(p)}</article>`;
 
-  const row = p => `<div class="row" id="p-${p.placement}"><span class="n ${pcls(p.placement)}">${p.placement}</span>${photo(p, 'sm')}<b>${esc(p.tag)}</b><span class="pts mono">${pts(p)}</span></div>`;
+  const row = p => `<div class="row" id="p-${p.placement}"><span class="n ${pcls(p.placement)}">${p.placement}</span>${photo(p, 'sm')}<b>${esc(p.tag)}</b>${pts(p)}</div>`;
 
   // Consecutive minimum entries share one panel.
   let html = '', run = [];

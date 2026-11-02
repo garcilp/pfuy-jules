@@ -160,19 +160,28 @@ function renderDetails() {
 function renderSide() {
   const ps = draft.players;
   const item = (ok, t, s) => `<div class="ci${ok ? ' done' : ''}"><i></i><span>${t}</span><small>${s}</small></div>`;
+  const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
   const okD = draft.title.trim() && draft.period.start && draft.period.end;
-  const okP = ps.every(p => p.tag.trim() && p.points !== null && p.points !== undefined);
+  const okP = ps.every(p => p.tag && p.tag.trim());
   const pics = ps.filter(p => p.photo || p._preview).length;
-  $('#side').innerHTML = `<div class="plist glass"><div class="hd"><b>Players</b><span class="mono muted sm0">${ps.length}</span></div>` +
-    ps.map((p, i) => `<button type="button" class="prow${i === sel ? ' on' : ''}" draggable="true" data-act="sel" data-i="${i}"><span class="h">⋮⋮</span><span class="n ${pcls(i + 1)}">${i + 1}</span><span class="t">${esc(p.tag || 'New player')}</span><span class="k">${kind(p)}</span></button>`).join('') +
-    `<button type="button" class="btn glass pill addp" data-act="add-player">+ Add player</button>
-     <div class="note">Drag to reorder. Placements follow the order. <button type="button" class="add" style="padding:0" data-act="sort">Sort by points</button></div></div>
-    <div class="check glass"><b>Before publishing</b>${item(okD, 'Name, game and period', okD ? 'DONE' : 'MISSING')}${item(okP, `Placement, tag and points for all ${ps.length} players`, okP ? 'DONE' : 'MISSING')}${item(pics === ps.length, 'Pictures', `${pics} OF ${ps.length}`)}</div>`;
+  const checkPlayersText = isEs
+    ? `Puesto y tag para los ${ps.length} jugadores`
+    : `Placement and tag for all ${ps.length} players`;
+  const checkDetailsText = isEs ? 'Nombre, juego y periodo' : 'Name, game and period';
+  const checkPicsText = isEs ? 'Imágenes' : 'Pictures';
+  const doneText = isEs ? 'LISTO' : 'DONE';
+  const missingText = isEs ? 'FALTANTE' : 'MISSING';
+
+  $('#side').innerHTML = `<div class="plist glass"><div class="hd"><b>${isEs ? 'Jugadores' : 'Players'}</b><span class="mono muted sm0">${ps.length}</span></div>` +
+    ps.map((p, i) => `<button type="button" class="prow${i === sel ? ' on' : ''}" draggable="true" data-act="sel" data-i="${i}"><span class="h">⋮⋮</span><span class="n ${pcls(i + 1)}">${i + 1}</span><span class="t">${esc(p.tag || (isEs ? 'Nuevo jugador' : 'New player'))}</span><span class="k">${kind(p)}</span></button>`).join('') +
+    `<button type="button" class="btn glass pill addp" data-act="add-player">${isEs ? '+ Agregar jugador' : '+ Add player'}</button>
+     <div class="note">${isEs ? 'Arrastra para reordenar. Los puestos siguen el orden.' : 'Drag to reorder. Placements follow the order.'} <button type="button" class="add" style="padding:0" data-act="sort">${isEs ? 'Ordenar por puntos' : 'Sort by points'}</button></div></div>
+    <div class="check glass"><b>${isEs ? 'Antes de publicar' : 'Before publishing'}</b>${item(okD, checkDetailsText, okD ? doneText : missingText)}${item(okP, checkPlayersText, okP ? doneText : missingText)}${item(pics === ps.length, checkPicsText, `${pics} ${isEs ? 'DE' : 'OF'} ${ps.length}`)}</div>`;
 }
 
 function renderEditor() {
+  const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
   if (!draft.players || !draft.players.length) {
-    const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
     $('#editor').innerHTML = `<div class="panel glass empty-state" style="padding:36px; text-align:center;">
       <h3>${isEs ? 'No hay jugadores en este ranking' : 'No players in this ranking'}</h3>
       <p class="muted" style="margin:12px 0 20px;">${isEs ? 'Usa las opciones de población rápida arriba o agrega jugadores manualmente.' : 'Use the quick populate options above or add players manually.'}</p>
@@ -201,11 +210,13 @@ function renderEditor() {
     <div class="why" id="why">${getWhy()[k]}</div>
     <div class="req"><div class="dzw"><div class="dz"><i>${esc((p.tag || '?')[0])}</i>${pic}</div>
         <button type="button" class="btn glass pill" data-act="pick-photo">Replace picture</button><input type="file" id="photoFile" accept="image/png,image/jpeg" hidden><div class="note0" style="text-align:center">JPG or PNG</div></div>
-      <div class="reqf"><div class="fld" style="flex:0 0 120px">${lab('PLACEMENT', 1)}<input class="inp ro ${pcls(n)}" value="${n}" readonly aria-readonly="true"></div>
-        <div class="fld" style="flex:1 1 200px">${lab('TAG', 1)}<input class="inp" data-pbind="tag" value="${esc(p.tag)}" placeholder="Gamertag"></div>
-        <div class="fld" style="flex:1 1 160px">${lab('POINTS', 1)}<input class="inp mono" data-pbind="points" inputmode="numeric" value="${p.points == null ? '' : Number(p.points).toLocaleString('en-US')}"></div>
-        <div class="hint">Placement is set by the player’s position in the list.</div></div></div>
-    ${sec('realName', 'Real name', `<input class="inp" data-pbind="realName" value="${esc(p.realName ?? '')}" placeholder="[Real name]">`)}
+      <div class="reqf"><div class="fld" style="flex:0 0 120px">${lab(isEs ? 'PUESTO' : 'PLACEMENT', 1)}<input class="inp ro ${pcls(n)}" value="${n}" readonly aria-readonly="true"></div>
+        <div class="fld" style="flex:1 1 240px">${lab(isEs ? 'TAG' : 'TAG', 1)}<input class="inp" data-pbind="tag" value="${esc(p.tag)}" placeholder="Gamertag"></div>
+        <div class="frow" style="flex:1 1 100%; gap:16px;">
+          <div class="fld" style="flex:1 1 220px">${lab(isEs ? 'NOMBRE REAL' : 'REAL NAME', 0)}<input class="inp" data-pbind="realName" value="${esc(p.realName ?? '')}" placeholder="[Real name]"></div>
+          <div class="fld" style="flex:1 1 220px">${lab(isEs ? 'PUNTOS' : 'POINTS', 0)}<input class="inp mono" data-pbind="points" inputmode="numeric" value="${p.points == null ? '' : Number(p.points).toLocaleString('en-US')}" placeholder="e.g. 1,420"></div>
+        </div>
+        <div class="hint">${isEs ? 'El puesto está determinado por la posición en la lista.' : 'Placement is set by the player’s position in the list.'}</div></div></div>
     ${sec('mains', 'Mains', mains)}
     ${sec('text', 'Year text', `<textarea class="inp" data-pbind="text" style="min-height:128px">${esc(p.text ?? '')}</textarea><div class="cnt" id="textCount">${(p.text || '').length} characters</div>`)}
     ${sec('notableWins', 'Notable wins', wins + '<button type="button" class="add" data-act="add-win">+ Add notable win</button>')}
@@ -244,7 +255,18 @@ function onClick(e) {
     case 'pop-snapshot': populateFromSnapshot(b.dataset.n); return;
     case 'add-player': draft.players.push({ tag: '', points: null }); sel = draft.players.length - 1; renderAll(); break;
     case 'remove-player': if (draft.players.length > 1) { draft.players.splice(sel, 1); sel = Math.max(0, sel - 1); renderAll(); } break;
-    case 'sort': { const cur = p; draft.players.sort((x, y) => (y.points || 0) - (x.points || 0)); sel = draft.players.indexOf(cur); renderAll(); break; }
+    case 'sort': {
+      const cur = p;
+      draft.players.sort((x, y) => {
+        const py = (y.points !== null && y.points !== undefined && !Number.isNaN(Number(y.points))) ? Number(y.points) : -Infinity;
+        const px = (x.points !== null && x.points !== undefined && !Number.isNaN(Number(x.points))) ? Number(x.points) : -Infinity;
+        return py - px;
+      });
+      sel = cur ? draft.players.indexOf(cur) : 0;
+      if (sel < 0) sel = 0;
+      renderAll();
+      break;
+    }
     case 'status': draft.status = b.dataset.v; document.querySelectorAll('#status button').forEach(x => x.classList.toggle('on', x.dataset.v === draft.status)); break;
     case 'toggle': { const k = b.dataset.k; if (p[k] === undefined) p[k] = structuredClone(OPT[k]); else delete p[k]; renderEditor(); break; }
     case 'add-main': { const v = $('#newMain').value.trim(); if (v) { p.mains.push(v); renderEditor(); $('#newMain').focus(); } break; }
@@ -273,7 +295,10 @@ function exportJson() {
   if (draft.publishedBy && draft.publishedBy.trim()) out.publishedBy = draft.publishedBy.trim();
   if (draft.intro && draft.intro.trim()) out.intro = draft.intro.trim();
   out.players = draft.players.map((p, i) => {
-    const o = { placement: i + 1, tag: p.tag.trim(), points: p.points };
+    const o = { placement: i + 1, tag: p.tag.trim() };
+    if (p.points !== null && p.points !== undefined && !Number.isNaN(Number(p.points))) {
+      o.points = Number(p.points);
+    }
     if (p.photo) o.photo = p.photo;
     if (p.realName && p.realName.trim()) o.realName = p.realName.trim();
     if (has(p.mains)) o.mains = [...p.mains];
