@@ -10,7 +10,10 @@ const id = new URLSearchParams(location.search).get('id') || '';
     $('#col').innerHTML = '<div class="empty glass">Ranking not found. <a href="rankings.html?section=historical">Back to all rankings</a></div>';
   });
 
-const photo = (p, size) => `<div class="photo ${size}"><i>${esc(p.tag ? p.tag[0] : '?')}</i><img src="${esc(p.photo || `assets/players/${slug(p.tag)}.jpg`)}" alt="" onerror="this.remove()"></div>`;
+const photo = (p, size) => {
+  const photoSrc = p.photo || (p.playerId ? `assets/players/${p.playerId}.png` : `assets/players/${slug(p.tag)}.jpg`);
+  return `<div class="photo ${size}"><i>${esc(p.tag ? p.tag[0] : '?')}</i><img src="${esc(photoSrc)}" alt="" onerror="this.remove()"></div>`;
+};
 const stock = (g, name) => `<span class="stock" title="${esc(name)}" role="img" aria-label="${esc(name)}"><i>${esc(name ? name[0] : '?')}</i><img src="assets/stock-icons/${g.slug}/${slug(name)}.png" alt="" onerror="this.remove()"></span>`;
 const pts = p => (p.points !== null && p.points !== undefined && !Number.isNaN(Number(p.points)))
   ? `<span class="pts mono">${Number(p.points).toLocaleString('en-US')} pts</span>`
@@ -26,18 +29,22 @@ function render(r) {
   const res = x => `<div>${ord(x.placement)} · ${esc(x.event)} · ${x.entrants} ${isEs ? 'participantes' : 'entrants'}</div>`;
   const list = (label, items, fn) => items && items.length ? `<div class="list"><h3>${label}</h3>${items.map(fn).join('')}</div>` : '';
 
+  const playerLink = (tag, pid, cls = '') => pid
+    ? `<a href="player.html?player=${encodeURIComponent(pid)}" class="opponent-link ${cls}">${esc(tag)}</a>`
+    : esc(tag);
+
   const full = p => `<article class="entry full glass" id="p-${p.placement}">
     <div class="top-row">${photo(p, 'lg')}<div class="who">
-      <div class="ident"><span class="rank ${pcls(p.placement)}">${p.placement}</span><h2>${esc(p.tag)}</h2></div>
+      <div class="ident"><span class="rank ${pcls(p.placement)}">${p.placement}</span><h2>${playerLink(p.tag, p.playerId)}</h2></div>
       ${real(p)}${pts(p)}${mains(p)}</div></div>
     ${p.text ? `<p class="text">${esc(p.text)}</p>` : ''}
     ${p.notableWins || p.notableResults ? `<div class="lists">${list(isEs ? 'VICTORIAS DESTACADAS' : 'NOTABLE WINS', p.notableWins, win)}${list(isEs ? 'RESULTADOS DESTACADOS' : 'NOTABLE RESULTS', p.notableResults, res)}</div>` : ''}</article>`;
 
   const medium = p => `<article class="entry med glass" id="p-${p.placement}">
     <span class="rank-md ${pcls(p.placement)}">${p.placement}</span>${photo(p, 'md')}
-    <div class="who"><span class="tag">${esc(p.tag)}</span>${real(p)}${mains(p)}</div>${pts(p)}</article>`;
+    <div class="who"><span class="tag">${playerLink(p.tag, p.playerId)}</span>${real(p)}${mains(p)}</div>${pts(p)}</article>`;
 
-  const row = p => `<div class="row" id="p-${p.placement}"><span class="n ${pcls(p.placement)}">${p.placement}</span>${photo(p, 'sm')}<b>${esc(p.tag)}</b>${pts(p)}</div>`;
+  const row = p => `<div class="row" id="p-${p.placement}"><span class="n ${pcls(p.placement)}">${p.placement}</span>${photo(p, 'sm')}<b>${playerLink(p.tag, p.playerId)}</b>${pts(p)}</div>`;
 
   // Consecutive minimum entries share one panel.
   let html = '', run = [];

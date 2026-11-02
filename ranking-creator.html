@@ -43,6 +43,20 @@
       <section id="editor" class="panel glass"></section>
     </div>
   </div>
+
+  <dialog id="player-select-modal" class="player-select-modal glass">
+    <div class="modal-header">
+      <div>
+        <h2 id="playerModalTitle">Select Player</h2>
+        <div id="playerModalSub" class="sub muted">Search and select a player from the directory</div>
+      </div>
+      <button type="button" class="x glass pill" id="closePlayerModalBtn" aria-label="Close">×</button>
+    </div>
+    <div class="player-search-bar">
+      <input type="search" id="playerSearchInput" class="inp" placeholder="Search by gamer tag, ID, or alias..." autocomplete="off">
+    </div>
+    <div id="playerSelectList" class="player-select-list"></div>
+  </dialog>
 </main>
 
 <footer class="foot mono muted" data-i18n="footer.creator">Platfighters.uy · Community Rankings</footer>

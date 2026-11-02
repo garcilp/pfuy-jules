@@ -246,6 +246,13 @@
       'creator.community': '{game} community',
       'creator.addN': 'Add {n}',
       'creator.prSnapshotControls': 'Quick Populate from Power Rankings',
+      'creator.modal.title': 'Select Player',
+      'creator.modal.sub': 'Search and select a player from the directory',
+      'creator.modal.searchPlaceholder': 'Search by gamer tag, ID, or alias...',
+      'creator.modal.empty': 'No players found matching "{query}"',
+      'creator.modal.alreadyAdded': 'Already added',
+      'creator.modal.events': '{n} events',
+      'creator.field.playerId': 'PLAYER ID',
 
       // Admin Interface
       'admin.eyebrow': 'PLAYER MANAGEMENT',
@@ -510,6 +517,13 @@
       'creator.community': 'Comunidad de {game}',
       'creator.addN': 'Agregar {n}',
       'creator.prSnapshotControls': 'Población rápida desde Power Rankings',
+      'creator.modal.title': 'Seleccionar Jugador',
+      'creator.modal.sub': 'Busca y selecciona un jugador del directorio',
+      'creator.modal.searchPlaceholder': 'Buscar por tag, ID o alias...',
+      'creator.modal.empty': 'No se encontraron jugadores que coincidan con "{query}"',
+      'creator.modal.alreadyAdded': 'Ya agregado',
+      'creator.modal.events': '{n} eventos',
+      'creator.field.playerId': 'ID DE JUGADOR',
 
       // Administración
       'admin.eyebrow': 'GESTIÓN DE JUGADORES',
