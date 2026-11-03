@@ -11,6 +11,7 @@ import sqlite3
 import subprocess
 import sys
 import time
+import uuid
 from base64 import binascii
 from collections import defaultdict
 from http.cookies import SimpleCookie
@@ -39,6 +40,7 @@ EXCLUSIONS_PATH = PROFILE_DIR / "exclusions.json"
 COMMUNITY_SOCIALS_PATH = ROOT / "data" / "community_socials.json"
 DATABASE = ROOT / "startgg-data" / "platfighters.sqlite3"
 PLAYER_ASSETS = ROOT / "assets" / "players"
+RANKING_PLAYER_ASSETS = ROOT / "assets" / "players" / "rankings"
 SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9-]{0,100}$")
 MAX_BODY = 7 * 1024 * 1024
 MAX_PHOTO = 5 * 1024 * 1024
@@ -753,6 +755,8 @@ class Handler(SimpleHTTPRequestHandler):
                 }
                 if pid:
                     sanitized_player["playerId"] = pid
+                if p.get("sponsor"):
+                    sanitized_player["sponsor"] = str(p["sponsor"]).strip()[:50]
                 if p.get("points") is not None and str(p.get("points")).strip() != "":
                     try:
                         sanitized_player["points"] = float(p["points"])
@@ -855,6 +859,34 @@ class Handler(SimpleHTTPRequestHandler):
             path = PLAYER_ASSETS / f"{player_id}{MIME_EXTENSIONS[mime]}"
             path.write_bytes(photo)
             self.send_json(200, {"path": f"assets/players/{path.name}"})
+        elif parsed.path == "/api/admin/ranking-photo":
+            player_id, data_url = str(body.get("playerId", "")).strip(), body.get("data", "")
+            if not isinstance(data_url, str) or "," not in data_url:
+                self.send_json(400, {"error": "Invalid picture upload."})
+                return
+            header, encoded = data_url.split(",", 1)
+            mime = header.removeprefix("data:").removesuffix(";base64")
+            if mime not in MIME_EXTENSIONS:
+                self.send_json(400, {"error": "Use a PNG, JPEG or WebP picture."})
+                return
+            try:
+                photo = base64.b64decode(encoded, validate=True)
+            except (ValueError, binascii.Error):
+                self.send_json(400, {"error": "The picture data is invalid."})
+                return
+            signatures = {
+                "image/png": photo.startswith(b"\x89PNG\r\n\x1a\n"),
+                "image/jpeg": photo.startswith(b"\xff\xd8\xff"),
+                "image/webp": len(photo) >= 12 and photo[:4] == b"RIFF" and photo[8:12] == b"WEBP",
+            }
+            if not photo or len(photo) > MAX_PHOTO or not signatures[mime]:
+                self.send_json(400, {"error": "The picture must be a valid image no larger than 5 MB."})
+                return
+            RANKING_PLAYER_ASSETS.mkdir(parents=True, exist_ok=True)
+            file_stem = f"{player_id}_{int(time.time())}" if player_id.isdigit() else f"p_{uuid.uuid4().hex[:12]}_{int(time.time())}"
+            path = RANKING_PLAYER_ASSETS / f"{file_stem}{MIME_EXTENSIONS[mime]}"
+            path.write_bytes(photo)
+            self.send_json(200, {"path": f"assets/players/rankings/{path.name}"})
         elif parsed.path == "/api/admin/community-socials":
             socials = body.get("socials")
             if not isinstance(socials, dict):
@@ -1127,6 +1159,8 @@ class Handler(SimpleHTTPRequestHandler):
                 }
                 if pid:
                     sanitized_player["playerId"] = pid
+                if p.get("sponsor"):
+                    sanitized_player["sponsor"] = str(p["sponsor"]).strip()[:50]
                 if p.get("points") is not None and str(p.get("points")).strip() != "":
                     try:
                         sanitized_player["points"] = float(p["points"])
