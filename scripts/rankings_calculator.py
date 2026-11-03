@@ -413,6 +413,9 @@ class RankingEngine:
         """Calculates rankings for a specific game, system, mode, and date range."""
         if start_date and end_date and start_date > end_date:
             raise ValueError("Start date must be before or on end date.")
+        if mode == "historical":
+            start_date = None
+            end_date = None
 
         raw_target_player_id = text_id(target_player_id) if target_player_id is not None else None
         if target_player_id is not None:
@@ -437,32 +440,35 @@ class RankingEngine:
     # Pre-Match Glicko Rating Pre-pass
     # -------------------------------------------------------------------------
 
-    def _compute_pre_match_glicko_ratings(self, sets, mode="historical", start_date=None):
+    def _compute_pre_match_glicko_ratings(self, sets, mode="historical", start_date=None, end_date=None):
         """Reconstructs pre-match Glicko-2 ratings for every set in chronological order by event.
 
         Respects calculation mode:
-        - historical / period_performance: reconstruct ratings from start of history.
-        - period_only: reset all initial ratings to neutral (1500, 350) for sets on/after start_date.
+        - historical: reconstruct ratings from start of history for all sets.
+        - period_performance: reconstruct ratings up to end_date. No sets after end_date are processed.
+        - period_only: only sets on/after start_date and on/before end_date are processed. Players start with neutral ratings.
         """
         calc = self.glicko_calc
         ratings = {}
 
-        def get_rating(pid, is_period_start=False):
-            if pid not in ratings or (is_period_start and mode == "period_only"):
+        def get_rating(pid):
+            if pid not in ratings:
                 ratings[pid] = calc.initial_rating()
             return ratings[pid]
 
         event_sets_map = {}
         for s in sets:
+            s_date = s["date"]
+            if end_date and s_date and s_date > end_date:
+                continue
+            if mode == "period_only" and start_date and s_date and s_date < start_date:
+                continue
             event_sets_map.setdefault(s["eventId"], []).append(s)
 
         pre_match_ratings = {}
         event_field_strengths = {}
 
         for e_id, e_sets in event_sets_map.items():
-            e_date = e_sets[0]["date"] if e_sets else None
-            is_in_period = not (start_date and e_date and e_date < start_date)
-
             event_players = set()
             for s in e_sets:
                 event_players.add(s["winnerId"])
@@ -473,8 +479,8 @@ class RankingEngine:
 
             for s in e_sets:
                 w_id, l_id = s["winnerId"], s["loserId"]
-                w_rat = get_rating(w_id, is_period_start=(mode == "period_only" and is_in_period))
-                l_rat = get_rating(l_id, is_period_start=(mode == "period_only" and is_in_period))
+                w_rat = get_rating(w_id)
+                l_rat = get_rating(l_id)
 
                 set_pre_snapshots[(s["setId"], w_id)] = dict(w_rat)
                 set_pre_snapshots[(s["setId"], l_id)] = dict(l_rat)
@@ -904,7 +910,7 @@ class RankingEngine:
 
     def _calculate_sof(self, sets, mode, start_date, end_date, target_player_id, game_slug, raw_target_player_id=None):
         """Evaluates competitive accomplishments in tournaments against pre-event field strengths."""
-        pre_match_ratings, event_field_strengths = self._compute_pre_match_glicko_ratings(sets, mode=mode, start_date=start_date)
+        pre_match_ratings, event_field_strengths = self._compute_pre_match_glicko_ratings(sets, mode=mode, start_date=start_date, end_date=end_date)
         event_placements = self.load_event_placements_for_game(game_slug)
 
         player_events = {}
@@ -1094,7 +1100,7 @@ class RankingEngine:
         Average Quality = Sum(q_i) / eligible_wins
         Adjusted QoW Score = Average Quality * (eligible_wins / (eligible_wins + 5.0)) * 20.0
         """
-        pre_match_ratings, _ = self._compute_pre_match_glicko_ratings(sets, mode=mode, start_date=start_date)
+        pre_match_ratings, _ = self._compute_pre_match_glicko_ratings(sets, mode=mode, start_date=start_date, end_date=end_date)
         calc = self.glicko_calc
         provisional_threshold = 3
         confidence_m = 5.0
@@ -1361,7 +1367,7 @@ class RankingEngine:
         - beta_min = 0.20 (Loss Protection Floor)
         - m_C = 15.0 (Sample Dampener)
         """
-        pre_match_ratings, _ = self._compute_pre_match_glicko_ratings(sets, mode=mode, start_date=start_date)
+        pre_match_ratings, _ = self._compute_pre_match_glicko_ratings(sets, mode=mode, start_date=start_date, end_date=end_date)
         calc = self.glicko_calc
 
         gamma = 0.30

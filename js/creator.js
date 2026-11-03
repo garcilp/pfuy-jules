@@ -406,7 +406,21 @@ const lab = (t, req) => {
   return `<div class="lab"><span>${t}</span><span>${req ? (isEs ? 'REQUERIDO' : 'REQUIRED') : (isEs ? 'OPCIONAL' : 'OPTIONAL')}</span></div>`;
 };
 const lab2 = t => `<div class="lab"><span>${t}</span></div>`;
-const stock = name => `<span class="stock"><i>${esc(name[0])}</i><img src="assets/stock-icons/${esc(draft.game.slug)}/${slug(name)}.png" alt="" onerror="this.remove()"></span>`;
+const charSlugAliases = {
+  'simon-belmont': 'simon',
+  'shovel-knight': 'shovelknight',
+  'sheik-zelda': 'sheik',
+  'la-reina': 'reina'
+};
+const charStockSlug = name => {
+  const s = slug(name);
+  return charSlugAliases[s] || s;
+};
+const stock = name => {
+  const gslug = draft.game?.slug || 'ultimate';
+  const cslug = charStockSlug(name);
+  return `<span class="stock"><i>${esc(name ? name[0] : '?')}</i><img src="assets/renders/${esc(gslug)}/stocks/${esc(cslug)}.webp" alt="" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='assets/renders/${esc(gslug)}/stocks/other.webp';}else{this.remove();}"></span>`;
+};
 const rowId = () => draft.id || `${draft.game.id}-${slug(draft.title || 'ranking')}`;
 
 function renderAll() { renderSide(); renderEditor(); renderSub(); }
