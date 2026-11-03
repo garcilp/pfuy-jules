@@ -12,7 +12,21 @@ const photo = (p, size) => {
   const photoSrc = p.photo || (p.playerId ? `assets/players/${p.playerId}.png` : `assets/players/${slug(p.tag)}.jpg`);
   return `<div class="photo ${size}"><i>${esc(p.tag ? p.tag[0] : '?')}</i><img src="${esc(photoSrc)}" alt="" onerror="this.remove()"></div>`;
 };
-const stock = (g, name) => `<span class="stock" title="${esc(name)}" role="img" aria-label="${esc(name)}"><i>${esc(name ? name[0] : '?')}</i><img src="assets/stock-icons/${g ? g.slug : 'rivals-2'}/${slug(name)}.png" alt="" onerror="this.remove()"></span>`;
+const charSlugAliases = {
+  'simon-belmont': 'simon',
+  'shovel-knight': 'shovelknight',
+  'sheik-zelda': 'sheik',
+  'la-reina': 'reina'
+};
+const charStockSlug = name => {
+  const s = slug(name);
+  return charSlugAliases[s] || s;
+};
+const stock = (g, name) => {
+  const gslug = (g && g.slug) ? g.slug : 'rivals-2';
+  const cslug = charStockSlug(name);
+  return `<span class="stock" title="${esc(name)}" role="img" aria-label="${esc(name)}"><i>${esc(name ? name[0] : '?')}</i><img src="assets/renders/${esc(gslug)}/stocks/${esc(cslug)}.webp" alt="" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='assets/renders/${esc(gslug)}/stocks/other.webp';}else{this.remove();}"></span>`;
+};
 const pts = p => (p.points !== null && p.points !== undefined && !Number.isNaN(Number(p.points)))
   ? `<span class="pts mono">${Number(p.points).toLocaleString('en-US')} pts</span>`
   : '';

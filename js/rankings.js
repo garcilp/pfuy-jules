@@ -227,6 +227,7 @@ async function init() {
   endDateInput.value = state.end;
   playerSearch.value = state.search;
 
+  syncDateInputsDisabledState();
   updateBreadcrumbsAndNav();
 
   // Add event listeners
@@ -298,14 +299,26 @@ function getActiveSystem() {
   return activeSubsection || 'overview';
 }
 
+function syncDateInputsDisabledState() {
+  const isHistorical = modeFilter.value === 'historical';
+  startDateInput.disabled = isHistorical;
+  endDateInput.disabled = isHistorical;
+  $$('.preset-btn').forEach(btn => {
+    btn.disabled = isHistorical;
+    btn.style.opacity = isHistorical ? '0.45' : '';
+    btn.style.cursor = isHistorical ? 'not-allowed' : '';
+  });
+}
+
 function getCurrentFilterState() {
+  const isHistorical = modeFilter.value === 'historical';
   return {
     section: activeSection,
     game: gameFilter.value,
     system: getActiveSystem(),
     mode: modeFilter.value,
-    start: startDateInput.value,
-    end: endDateInput.value,
+    start: isHistorical ? '' : startDateInput.value,
+    end: isHistorical ? '' : endDateInput.value,
     search: playerSearch.value.trim()
   };
 }
@@ -314,6 +327,7 @@ async function onFilterChange(event) {
   if (event && event.target === gameFilter) {
     selectedInspectorPlayerId = null;
   }
+  syncDateInputsDisabledState();
   visibleCount = batchSize;
   const state = getCurrentFilterState();
   updateURLState(state);
@@ -518,10 +532,11 @@ async function loadData() {
   const game = gameFilter.value;
   const system = getActiveSystem();
   const mode = modeFilter.value;
-  const start = startDateInput.value;
-  const end = endDateInput.value;
+  const isHistorical = mode === 'historical';
+  const start = isHistorical ? '' : startDateInput.value;
+  const end = isHistorical ? '' : endDateInput.value;
 
-  if (start && end && start > end) {
+  if (!isHistorical && start && end && start > end) {
     rankingStatus.textContent = 'Invalid date range: Start date must be before or on end date.';
     rankingsContent.innerHTML = '<div class="panel glass empty-state"><h2>Invalid Date Range</h2><p class="muted">Start date cannot be after end date.</p></div>';
     return;
@@ -1463,8 +1478,9 @@ window.openDiagnosticModal = async function(playerId) {
   const game = gameFilter.value;
   const system = getActiveSystem() === 'overview' || getActiveSystem() === 'comparison' ? 'glicko2' : getActiveSystem();
   const mode = modeFilter.value;
-  const start = startDateInput.value;
-  const end = endDateInput.value;
+  const isHistorical = mode === 'historical';
+  const start = isHistorical ? '' : startDateInput.value;
+  const end = isHistorical ? '' : endDateInput.value;
 
   modalPlayerInfo.innerHTML = '<p class="muted">Loading calculation diagnostic trace…</p>';
   modalBody.innerHTML = '';

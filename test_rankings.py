@@ -199,19 +199,29 @@ def test_calculation_modes(mock_db):
     conn, engine = mock_db
 
     # Range covering Feb 1 - Feb 28, 2024 (contains Event e102)
+    # Historical: ignores date filters and includes all tournaments across history
+    res_hist_all = engine.calculate("ultimate", system="glicko2", mode="historical")
     res_hist = engine.calculate("ultimate", system="glicko2", mode="historical", start_date="2024-02-01", end_date="2024-02-28")
+    assert len(res_hist["rankings"]) == len(res_hist_all["rankings"])
     p101_hist = next(p for p in res_hist["rankings"] if p["playerId"] == "101")
     assert p101_hist["matches"] == 3
 
+    # Period only: only tournaments in [start_date, end_date], players start fresh (neutral ratings)
     res_po = engine.calculate("ultimate", system="glicko2", mode="period_only", start_date="2024-02-01", end_date="2024-02-28")
     p101_po = next(p for p in res_po["rankings"] if p["playerId"] == "101")
     assert p101_po["matches"] == 1
     assert p101_po["losses"] == 1
+    assert p101_po["baselineScore"] == 0.0
 
+    # Period performance: uses pre-period rating as baseline, includes only period tournaments
     res_pp = engine.calculate("ultimate", system="glicko2", mode="period_performance", start_date="2024-02-01", end_date="2024-02-28")
     p101_pp = next(p for p in res_pp["rankings"] if p["playerId"] == "101")
     assert p101_pp["matches"] == 1
     assert p101_pp["baselineScore"] > 0
+    # Later tournaments do not influence Period performance
+    res_pp_narrow = engine.calculate("ultimate", system="glicko2", mode="period_performance", start_date="2024-01-01", end_date="2024-01-31")
+    p101_narrow = next(p for p in res_pp_narrow["rankings"] if p["playerId"] == "101")
+    assert p101_narrow["matches"] == 2
 
 def test_sof_incorporates_placements_and_field_strength(mock_db):
     conn, engine = mock_db

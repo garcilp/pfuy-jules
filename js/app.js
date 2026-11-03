@@ -125,7 +125,10 @@ Promise.all([loadProfile(), loadPlayerDirectory(), loadEventsIndex()]).then(([d]
 
 function render() {
   const { player, games } = data;
-  $('#site-badge').textContent = profileId ? 'PLAYER PROFILE' : 'SAMPLE DATA';
+  const siteBadge = $('#site-badge');
+  if (siteBadge) {
+    siteBadge.textContent = profileId ? 'PLAYER PROFILE' : 'SAMPLE DATA';
+  }
   const id = location.hash.slice(1) || 'overview';
   const sel = games.find(g => g.id === id);
   const G = sel ? [sel] : games;
