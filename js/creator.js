@@ -372,7 +372,138 @@ document.addEventListener('click', e => {
     }
   }
 });
-document.addEventListener('keydown', e => { if (e.target.id === 'newMain' && e.key === 'Enter') { e.preventDefault(); $('[data-act="add-main"]').click(); } });
+let highlightedMainsIndex = -1;
+
+function getMainsCandidates() {
+  const inp = $('#newMain');
+  const q = (inp ? inp.value : '').trim().toLowerCase();
+  const chars = (draft.game && gameCharacters[draft.game.slug]) || [];
+  if (!q) return chars;
+  return chars.filter(c => c.toLowerCase().includes(q));
+}
+
+function renderMainsDropdown() {
+  const dd = $('#mainsDropdown');
+  if (!dd) return;
+  const candidates = getMainsCandidates();
+  if (!candidates.length) {
+    dd.innerHTML = '<div class="mains-empty">No matching characters</div>';
+  } else {
+    dd.innerHTML = candidates.map((name, idx) => {
+      const isHigh = idx === highlightedMainsIndex ? ' highlighted' : '';
+      return `
+        <div class="mains-item${isHigh}" data-name="${esc(name)}">
+          <span class="stock">${stock(name)}</span>
+          <span class="mains-item-title">${esc(name)}</span>
+        </div>
+      `;
+    }).join('');
+  }
+  dd.hidden = false;
+}
+
+function closeMainsDropdown() {
+  const dd = $('#mainsDropdown');
+  if (dd) dd.hidden = true;
+  highlightedMainsIndex = -1;
+}
+
+function selectMainsOption(name) {
+  if (!name) return;
+  const p = draft.players[sel];
+  if (!p) return;
+  p.mains = p.mains || [];
+  p.mains.push(name);
+  closeMainsDropdown();
+  renderEditor();
+  const inp = $('#newMain');
+  if (inp) inp.focus();
+}
+
+document.addEventListener('input', e => {
+  if (e.target.id === 'newMain') {
+    highlightedMainsIndex = -1;
+    renderMainsDropdown();
+  }
+});
+
+document.addEventListener('focusin', e => {
+  if (e.target.id === 'newMain') {
+    highlightedMainsIndex = -1;
+    renderMainsDropdown();
+  }
+});
+
+document.addEventListener('keydown', e => {
+  if (e.target.id === 'newMain') {
+    const dd = $('#mainsDropdown');
+    if (!dd || dd.hidden) {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        renderMainsDropdown();
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        const v = e.target.value.trim();
+        if (v) selectMainsOption(v);
+      }
+      return;
+    }
+
+    const items = dd.querySelectorAll('.mains-item');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (items.length) {
+        highlightedMainsIndex = (highlightedMainsIndex + 1) % items.length;
+        items.forEach((it, i) => {
+          if (i === highlightedMainsIndex) {
+            it.classList.add('highlighted');
+            it.scrollIntoView({ block: 'nearest' });
+          } else {
+            it.classList.remove('highlighted');
+          }
+        });
+      }
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (items.length) {
+        highlightedMainsIndex = (highlightedMainsIndex - 1 + items.length) % items.length;
+        items.forEach((it, i) => {
+          if (i === highlightedMainsIndex) {
+            it.classList.add('highlighted');
+            it.scrollIntoView({ block: 'nearest' });
+          } else {
+            it.classList.remove('highlighted');
+          }
+        });
+      }
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (highlightedMainsIndex >= 0 && items[highlightedMainsIndex]) {
+        selectMainsOption(items[highlightedMainsIndex].getAttribute('data-name'));
+      } else {
+        const v = e.target.value.trim();
+        if (v) selectMainsOption(v);
+      }
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      closeMainsDropdown();
+    }
+  }
+});
+
+document.addEventListener('mousedown', e => {
+  const item = e.target.closest('.mains-item');
+  if (item) {
+    e.preventDefault();
+    selectMainsOption(item.getAttribute('data-name'));
+    return;
+  }
+  const inp = $('#newMain');
+  const dd = $('#mainsDropdown');
+  if (dd && !dd.hidden && inp && !inp.contains(e.target) && !dd.contains(e.target)) {
+    closeMainsDropdown();
+  }
+});
 document.addEventListener('dragstart', e => { const r = e.target.closest && e.target.closest('.prow'); if (r) { dragFrom = +r.dataset.i; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', ''); } });
 document.addEventListener('dragover', e => { const r = e.target.closest && e.target.closest('.prow'); if (r && dragFrom !== null) { e.preventDefault(); document.querySelectorAll('.prow.over').forEach(x => x.classList.remove('over')); r.classList.add('over'); } });
 document.addEventListener('drop', e => {
@@ -537,7 +668,7 @@ function renderEditor() {
   const picSrc = p._preview || p.photo || defaultPhoto;
   const pic = picSrc ? `<img src="${esc(picSrc)}" alt="" onerror="this.remove()">` : '';
   const sec = (key, title, body) => { const on = p[key] !== undefined;
-    return `<div class="sec glass"><div class="sh"><b>${title}</b><small>OPTIONAL</small><span class="sp"></span><button type="button" class="tog${on ? ' on' : ''}" role="switch" aria-checked="${on}" aria-label="${title}" data-act="toggle" data-k="${key}"></button></div>${on ? body : ''}</div>`; };
+    return `<div class="sec glass" data-sec="${key}"><div class="sh"><b>${title}</b><small>OPTIONAL</small><span class="sp"></span><button type="button" class="tog${on ? ' on' : ''}" role="switch" aria-checked="${on}" aria-label="${title}" data-act="toggle" data-k="${key}"></button></div>${on ? body : ''}</div>`; };
   const seg = (i, cur) => `<span class="seg glass pill">${[['tournament', 'Tournament'], ['times', 'Times']].map(([v, l]) => `<button type="button" class="${cur === v ? 'on' : ''}" data-act="fmt" data-i="${i}" data-v="${v}">${l}</button>`).join('')}</span>`;
   const rm = (act, i, what) => `<button type="button" class="x glass pill" data-act="${act}" data-i="${i}" aria-label="Remove ${what}">×</button>`;
   const cell = (cls, label, row, i, f, val, extra = '') => `<div class="${cls}">${lab2(label)}<input class="inp" data-row="${row}" data-i="${i}" data-f="${f}" value="${esc(val ?? '')}" ${extra}></div>`;
@@ -547,10 +678,8 @@ function renderEditor() {
     return `<div class="rowf">${oppCell(i, w.opponent)}<div>${lab2(isEs ? 'FORMATO' : 'FORMAT')}${seg(i, t ? 'times' : 'tournament')}</div>${t ? cell('g', isEs ? 'VECES' : 'TIMES', 'notableWins', i, 'times', w.times) : cell('g', isEs ? 'TORNEO' : 'TOURNAMENT', 'notableWins', i, 'tournament', w.tournament)}${rm('rm-win', i, 'win')}</div>`; }).join('');
   const results = (p.notableResults || []).map((r, i) =>
     `<div class="rowf"><div style="flex:0 0 100px">${lab2('PLACEMENT')}<input class="inp" data-row="notableResults" data-i="${i}" data-f="placement" value="${r.placement ?? ''}"></div>${cell('g', 'EVENT', 'notableResults', i, 'event', r.event)}<div style="flex:0 0 120px">${lab2('ENTRANTS')}<input class="inp" data-row="notableResults" data-i="${i}" data-f="entrants" value="${r.entrants ?? ''}"></div>${rm('rm-res', i, 'result')}</div>`).join('');
-  const currentChars = (draft.game && gameCharacters[draft.game.slug]) || [];
-  const charDatalist = `<datalist id="characterSuggestions">${currentChars.map(c => `<option value="${esc(c)}">`).join('')}</datalist>`;
   const mains = `<div class="chips">${(p.mains || []).map((m, i) => `<span class="glass pill mchip">${stock(m)}${esc(m)}<button type="button" class="x glass pill" data-act="rm-main" data-i="${i}" aria-label="Remove ${esc(m)}">×</button></span>`).join('')}</div>
-    <div class="rowf"><div class="g"><input class="inp" id="newMain" list="characterSuggestions" placeholder="${isEs ? 'Nombre del personaje' : 'Character name'}">${charDatalist}</div><button type="button" class="btn glass pill" data-act="add-main">+ ${isEs ? 'Agregar personaje' : 'Add main'}</button></div><div class="note0">${isEs ? 'Se muestran en el ranking como íconos de stock.' : 'Shown on the ranking as stock icons.'}</div>`;
+    <div class="rowf"><div class="g mains-input-wrap"><input class="inp" id="newMain" autocomplete="off" placeholder="${isEs ? 'Nombre del personaje' : 'Character name'}"><div id="mainsDropdown" class="mains-dropdown" hidden></div></div><button type="button" class="btn glass pill" data-act="add-main">+ ${isEs ? 'Agregar personaje' : 'Add main'}</button></div><div class="note0">${isEs ? 'Se muestran en el ranking como íconos de stock.' : 'Shown on the ranking as stock icons.'}</div>`;
 
   $('#editor').innerHTML = `<div class="ed-head"><div class="l"><span class="big ${pcls(n)}">${n}</span><span class="nm">${esc(p.tag || 'New player')}</span></div>
       <div class="l" style="align-items:center"><span class="kind" id="kindPill">${k} ENTRY</span><button type="button" class="add" data-act="remove-player">${isEs ? 'Eliminar jugador' : 'Remove player'}</button></div></div>
