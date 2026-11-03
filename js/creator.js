@@ -103,6 +103,17 @@ Promise.all(loadPromises)
       dirty = false;
     }
 
+    // Resolve character portraits for initial players
+    if (draft.players && draft.players.length) {
+      Promise.all(draft.players.map(async p => {
+        const prof = await getProfileData(p.playerId, p.tag);
+        p._resolvedPortrait = resolvePlayerPortrait(p, prof);
+      })).then(() => {
+        renderEditor();
+        renderSide();
+      });
+    }
+
     renderDetails();
     renderAll();
   });
@@ -232,8 +243,9 @@ async function addPlayerFromDirectory(playerId) {
   const newEntry = {
     tag: player.tag,
     playerId: String(player.playerId),
+    sponsor: player.sponsor || '',
     points: null,
-    photo: player.photo || `assets/players/${player.playerId}.png`
+    photo: (isAdmin && requestedMode === 'admin') ? (player.photo || `assets/players/${player.playerId}.png`) : undefined
   };
 
   draft.players.push(newEntry);
@@ -241,6 +253,13 @@ async function addPlayerFromDirectory(playerId) {
   dirty = true;
   closePlayerModal();
   renderAll();
+
+  // Preload profile in background to resolve top character portrait
+  getProfileData(newEntry.playerId, newEntry.tag).then(prof => {
+    newEntry._resolvedPortrait = resolvePlayerPortrait(newEntry, prof);
+    renderEditor();
+    renderSide();
+  });
 }
 
 let playerEventResults = [];
@@ -255,16 +274,25 @@ function closeEventModal() {
   }
 }
 
+let savedScrollY = 0;
+
+function preserveScroll(callback) {
+  savedScrollY = window.scrollY || document.documentElement.scrollTop;
+  callback();
+  window.scrollTo({ top: savedScrollY, behavior: 'instant' });
+}
+
 async function openEventModalForCurrentPlayer() {
   const p = draft.players[sel];
   if (!p) return;
+  savedScrollY = window.scrollY || document.documentElement.scrollTop;
   const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
   const modal = $('#event-select-modal');
   const listEl = $('#eventSelectList');
   if (!modal || !listEl) {
     p.notableResults = p.notableResults || [];
     p.notableResults.push({ placement: null, event: '', entrants: null });
-    renderEditor();
+    preserveScroll(() => renderEditor());
     return;
   }
 
@@ -272,6 +300,7 @@ async function openEventModalForCurrentPlayer() {
 
   if (typeof modal.showModal === 'function') {
     modal.showModal();
+    window.scrollTo({ top: savedScrollY, behavior: 'instant' });
   } else {
     modal.setAttribute('open', '');
   }
@@ -348,27 +377,42 @@ function selectEventForNotableResult(idx) {
   });
   dirty = true;
   closeEventModal();
-  refresh();
-  renderEditor();
+  preserveScroll(() => {
+    refresh();
+    renderEditor();
+  });
 }
 
 document.addEventListener('input', onInput);
 document.addEventListener('click', onClick);
 document.addEventListener('change', onChange);
 document.addEventListener('click', e => {
-  if (e.target.id === 'closePlayerModalBtn' || e.target.closest('#closePlayerModalBtn')) closePlayerModal();
+  if (e.target.id === 'closePlayerModalBtn' || e.target.closest('#closePlayerModalBtn')) {
+    e.preventDefault();
+    closePlayerModal();
+  }
   if (e.target === $('#player-select-modal')) closePlayerModal();
-  if (e.target.id === 'closeEventModalBtn' || e.target.closest('#closeEventModalBtn')) closeEventModal();
-  if (e.target === $('#event-select-modal')) closeEventModal();
+  if (e.target.id === 'closeEventModalBtn' || e.target.closest('#closeEventModalBtn')) {
+    e.preventDefault();
+    closeEventModal();
+    window.scrollTo({ top: savedScrollY, behavior: 'instant' });
+  }
+  if (e.target === $('#event-select-modal')) {
+    closeEventModal();
+    window.scrollTo({ top: savedScrollY, behavior: 'instant' });
+  }
   if (e.target.id === 'addBlankResultBtn') {
+    e.preventDefault();
     const p = draft.players[sel];
     if (p) {
       p.notableResults = p.notableResults || [];
       p.notableResults.push({ placement: null, event: '', entrants: null });
       dirty = true;
       closeEventModal();
-      refresh();
-      renderEditor();
+      preserveScroll(() => {
+        refresh();
+        renderEditor();
+      });
     }
   }
 });
@@ -517,6 +561,12 @@ document.addEventListener('drop', e => {
 
 const OPT = { realName: '', mains: [], text: '', notableWins: [], notableResults: [] };
 const nums = v => String(v).trim() === '' ? null : Number(String(v).replace(/[^\d]/g, ''));
+const parseDecimal = v => {
+  const s = String(v ?? '').trim().replace(/,/g, '');
+  if (!s) return null;
+  const n = Number(s);
+  return Number.isFinite(n) ? n : null;
+};
 const has = a => a && a.length;
 const kind = p => ((p.text && p.text.trim()) || has(p.notableWins) || has(p.notableResults)) ? 'FULL'
   : (has(p.mains) || (p.realName && p.realName.trim())) ? 'MEDIUM' : 'MINIMUM';
@@ -537,21 +587,68 @@ const lab = (t, req) => {
   return `<div class="lab"><span>${t}</span><span>${req ? (isEs ? 'REQUERIDO' : 'REQUIRED') : (isEs ? 'OPCIONAL' : 'OPTIONAL')}</span></div>`;
 };
 const lab2 = t => `<div class="lab"><span>${t}</span></div>`;
-const charSlugAliases = {
-  'simon-belmont': 'simon',
-  'shovel-knight': 'shovelknight',
-  'sheik-zelda': 'sheik',
-  'la-reina': 'reina'
-};
-const charStockSlug = name => {
-  const s = slug(name);
-  return charSlugAliases[s] || s;
-};
 const stock = name => {
   const gslug = draft.game?.slug || 'ultimate';
   const cslug = charStockSlug(name);
   return `<span class="stock"><i>${esc(name ? name[0] : '?')}</i><img src="assets/renders/${esc(gslug)}/stocks/${esc(cslug)}.webp" alt="" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='assets/renders/${esc(gslug)}/stocks/other.webp';}else{this.remove();}"></span>`;
 };
+
+// Profile cache for resolving top played character portraits
+const profileCache = new Map();
+
+async function getProfileData(playerId, tag) {
+  if (!playerId && !tag) return null;
+  const key = String(playerId || tag);
+  if (profileCache.has(key)) return profileCache.get(key);
+
+  const matched = allProfiles.find(x => String(x.playerId) === String(playerId) || (tag && slug(x.tag) === slug(tag)));
+  const slugName = matched?.slug || (tag ? slug(tag) : '');
+  const candidatePaths = [
+    slugName ? `data/profiles/${slugName}.json` : null,
+    (slugName && playerId) ? `data/profiles/${slugName}-${playerId}.json` : null
+  ].filter(Boolean);
+
+  for (const path of candidatePaths) {
+    try {
+      const res = await fetch(path);
+      if (res.ok) {
+        const data = await res.json();
+        profileCache.set(key, data);
+        return data;
+      }
+    } catch (e) {}
+  }
+  return null;
+}
+
+function resolvePlayerPortrait(p, profile) {
+  const gslug = draft?.game?.slug || 'ultimate';
+  if (profile && Array.isArray(profile.games)) {
+    const g = profile.games.find(x => x.slug === gslug) || profile.games[0];
+    if (g && Array.isArray(g.characters)) {
+      const topChar = g.characters.find(c => String(c.name || '').toLowerCase() !== 'other');
+      if (topChar && topChar.name) {
+        const cslug = charStockSlug(topChar.name);
+        return `assets/renders/${gslug}/portraits/${cslug}.webp`;
+      }
+    }
+  }
+  if (p && Array.isArray(p.mains) && p.mains.length) {
+    const cslug = charStockSlug(p.mains[0]);
+    return `assets/renders/${gslug}/portraits/${cslug}.webp`;
+  }
+  const defaultChar = (gameCharacters[gslug] && gameCharacters[gslug][0]) ? gameCharacters[gslug][0] : 'other';
+  return `assets/renders/${gslug}/portraits/${charStockSlug(defaultChar)}.webp`;
+}
+
+function getPlayerPictureSrc(p) {
+  const isAdminCreation = isAdmin && requestedMode === 'admin';
+  if (isAdminCreation) {
+    return p._preview || p.photo || (p.playerId ? `assets/players/${p.playerId}.png` : '');
+  }
+  return p._resolvedPortrait || (p.mains && p.mains.length ? `assets/renders/${draft?.game?.slug || 'ultimate'}/portraits/${charStockSlug(p.mains[0])}.webp` : '');
+}
+
 const rowId = () => draft.id || `${draft.game.id}-${slug(draft.title || 'ranking')}`;
 
 function renderAll() { renderSide(); renderEditor(); renderSub(); }
@@ -618,11 +715,23 @@ function renderDetails() {
     `;
   }
 
+  const isYearly = draft.status === 'yearly';
+  let curYear = '';
+  if (isYearly) {
+    curYear = (draft.period.start || '').slice(0, 4) || (draft.period.end || '').slice(0, 4) || new Date().getFullYear().toString();
+    draft.period.start = `${curYear}-01-01`;
+    draft.period.end = `${curYear}-12-31`;
+  }
+
+  const periodInputsHtml = isYearly
+    ? `<div class="fld" style="flex:1 1 160px">${lab(isEs ? 'AÑO' : 'YEAR', 1)}<input type="number" class="inp mono" data-bind="year" min="2000" max="2100" value="${esc(curYear)}" placeholder="2026"></div>`
+    : `<div class="fld" style="flex:1 1 160px">${lab(isEs ? 'INICIO DEL PERIODO' : 'PERIOD START', 1)}<input type="date" class="inp" data-bind="start" value="${draft.period.start}"></div>
+       <div class="fld" style="flex:1 1 160px">${lab(isEs ? 'FIN DEL PERIODO' : 'PERIOD END', 1)}<input type="date" class="inp" data-bind="end" value="${draft.period.end}"></div>`;
+
   $('#details').innerHTML = `${snapshotControlsHtml}<div><h2>${isEs ? 'Detalles del ranking' : 'Ranking details'}</h2><div class="sub">${isEs ? 'Se muestra en el archivo y al inicio del artículo.' : 'Shown in the archive and at the top of the article.'}</div></div>
     <div class="frow"><div class="fld" style="flex:2 1 320px">${lab(isEs ? 'NOMBRE' : 'NAME', 1)}<input class="inp" data-bind="title" value="${esc(draft.title)}" placeholder="e.g. Montevideo Season 1 PR"></div>
       <div class="fld" style="flex:1 1 200px">${lab(isEs ? 'JUEGO' : 'GAME', 1)}<select class="inp" data-bind="game">${games.map(g => `<option value="${g.id}"${g.id === draft.game.id ? ' selected' : ''}>${esc(g.name)}</option>`).join('')}</select></div></div>
-    <div class="frow"><div class="fld" style="flex:1 1 160px">${lab(isEs ? 'INICIO DEL PERIODO' : 'PERIOD START', 1)}<input type="date" class="inp" data-bind="start" value="${draft.period.start}"></div>
-      <div class="fld" style="flex:1 1 160px">${lab(isEs ? 'FIN DEL PERIODO' : 'PERIOD END', 1)}<input type="date" class="inp" data-bind="end" value="${draft.period.end}"></div>
+    <div class="frow">${periodInputsHtml}
       <div class="fld">${lab(isEs ? 'CLASIFICACIÓN' : 'CLASSIFICATION', 1)}<div class="seg glass pill" id="status">${['yearly', 'seasonal'].map(s => `<button type="button" class="${draft.status === s ? 'on' : ''}" data-act="status" data-v="${s}">${s === 'yearly' ? (isEs ? 'Anual' : 'Yearly') : (isEs ? 'De temporada' : 'Seasonal')}</button>`).join('')}</div></div></div>
     ${(isAdmin && requestedMode === 'admin') ? `<div class="fld">${lab(isEs ? 'PUBLICADO POR' : 'PUBLISHED BY', 0)}<input class="inp" data-bind="publishedBy" value="${esc(draft.publishedBy || '')}"></div>` : ''}
     <div class="fld">${lab(isEs ? 'CREADO POR' : 'CREATED BY', 0)}<input class="inp" data-bind="createdBy" maxlength="80" value="${esc(draft.createdBy || '')}" placeholder="${isEs ? 'Alias o nombre para mostrar' : 'Display name, alias, or handle'}"></div>
@@ -664,8 +773,8 @@ function renderEditor() {
   }
   const p = draft.players[sel] || draft.players[0];
   const n = sel + 1, k = kind(p);
-  const defaultPhoto = p.playerId ? `assets/players/${p.playerId}.png` : '';
-  const picSrc = p._preview || p.photo || defaultPhoto;
+  const isAdminCreation = isAdmin && requestedMode === 'admin';
+  const picSrc = getPlayerPictureSrc(p);
   const pic = picSrc ? `<img src="${esc(picSrc)}" alt="" onerror="this.remove()">` : '';
   const sec = (key, title, body) => { const on = p[key] !== undefined;
     return `<div class="sec glass" data-sec="${key}"><div class="sh"><b>${title}</b><small>OPTIONAL</small><span class="sp"></span><button type="button" class="tog${on ? ' on' : ''}" role="switch" aria-checked="${on}" aria-label="${title}" data-act="toggle" data-k="${key}"></button></div>${on ? body : ''}</div>`; };
@@ -685,12 +794,13 @@ function renderEditor() {
       <div class="l" style="align-items:center"><span class="kind" id="kindPill">${k} ENTRY</span><button type="button" class="add" data-act="remove-player">${isEs ? 'Eliminar jugador' : 'Remove player'}</button></div></div>
     <div class="why" id="why">${getWhy()[k]}</div>
     <div class="req"><div class="dzw"><div class="dz"><i>${esc((p.tag || '?')[0])}</i>${pic}</div>
-        <button type="button" class="btn glass pill" data-act="pick-photo">${isEs ? 'Cambiar imagen' : 'Replace picture'}</button><input type="file" id="photoFile" accept="image/png,image/jpeg" hidden><div class="note0" style="text-align:center">JPG or PNG (Optional)</div></div>
+        ${isAdminCreation ? `<button type="button" class="btn glass pill" data-act="pick-photo">${isEs ? 'Cambiar imagen' : 'Replace picture'}</button><input type="file" id="photoFile" accept="image/png,image/jpeg" hidden><div class="note0" style="text-align:center">JPG or PNG (Optional)</div>` : `<div class="note0" style="text-align:center">${isEs ? 'Retrato del personaje más jugado' : 'Most played character portrait'}</div>`}</div>
       <div class="reqf"><div class="fld" style="flex:0 0 100px">${lab(isEs ? 'PUESTO' : 'PLACEMENT', 1)}<input class="inp ro ${pcls(n)}" value="${n}" readonly aria-readonly="true"></div>
         <div class="fld" style="flex:2 1 240px">${lab(isEs ? 'TAG' : 'TAG', 1)}<input class="inp" data-pbind="tag" value="${esc(p.tag)}" placeholder="Gamertag"></div>
         <div class="frow" style="flex:1 1 100%; gap:16px;">
-          <div class="fld" style="flex:1 1 220px">${lab(isEs ? 'NOMBRE REAL' : 'REAL NAME', 0)}<input class="inp" data-pbind="realName" value="${esc(p.realName ?? '')}" placeholder="${isEs ? '[Nombre real]' : '[Real name]'}"></div>
-          <div class="fld" style="flex:1 1 220px">${lab(isEs ? 'PUNTOS' : 'POINTS', 0)}<input class="inp mono" data-pbind="points" inputmode="numeric" value="${p.points == null ? '' : Number(p.points).toLocaleString('en-US')}" placeholder="e.g. 1,420"></div>
+          <div class="fld" style="flex:1 1 180px">${lab(isEs ? 'SPONSOR' : 'SPONSOR', 0)}<input class="inp" data-pbind="sponsor" value="${esc(p.sponsor ?? '')}" placeholder="e.g. CLG"></div>
+          <div class="fld" style="flex:1 1 180px">${lab(isEs ? 'NOMBRE REAL' : 'REAL NAME', 0)}<input class="inp" data-pbind="realName" value="${esc(p.realName ?? '')}" placeholder="${isEs ? '[Nombre real]' : '[Real name]'}"></div>
+          <div class="fld" style="flex:1 1 180px">${lab(isEs ? 'PUNTOS' : 'POINTS', 0)}<input class="inp mono" data-pbind="points" inputmode="decimal" value="${p.points == null ? '' : p.points}" placeholder="e.g. 1,420"></div>
         </div>
         <div class="hint">${isEs ? 'El puesto está determinado por la posición en la lista.' : 'Placement is set by the player’s position in the list.'}</div></div></div>
     ${sec('mains', isEs ? 'Personajes principales' : 'Mains', mains)}
@@ -712,6 +822,12 @@ function onInput(e) {
       const g = games.find(x => x.id === v);
       if (g) draft.game = { id: g.id, name: g.name, slug: g.slug };
       renderEditor();
+    } else if (k === 'year') {
+      const yr = v.trim();
+      if (/^\d{4}$/.test(yr)) {
+        draft.period.start = `${yr}-01-01`;
+        draft.period.end = `${yr}-12-31`;
+      }
     } else if (k === 'start' || k === 'end') {
       draft.period[k] = v;
     } else {
@@ -720,7 +836,7 @@ function onInput(e) {
     if (k === 'intro') $('#introCount').textContent = `${v.length} characters`;
   } else if (d.pbind) {
     const p = draft.players[sel];
-    p[d.pbind] = d.pbind === 'points' ? nums(t.value) : t.value;
+    p[d.pbind] = d.pbind === 'points' ? parseDecimal(t.value) : t.value;
     if (d.pbind === 'text') $('#textCount').textContent = `${t.value.length} characters`;
     if (d.pbind === 'tag') $('.nm').textContent = t.value || 'New player';
   } else if (d.row) {
@@ -767,23 +883,84 @@ function onClick(e) {
       renderAll();
       break;
     }
-    case 'status': draft.status = b.dataset.v; document.querySelectorAll('#status button').forEach(x => x.classList.toggle('on', x.dataset.v === draft.status)); break;
+    case 'status':
+      draft.status = b.dataset.v;
+      if (draft.status === 'yearly') {
+        const yr = (draft.period.start || '').slice(0, 4) || new Date().getFullYear().toString();
+        draft.period.start = `${yr}-01-01`;
+        draft.period.end = `${yr}-12-31`;
+      }
+      renderDetails();
+      break;
     case 'toggle': { const k = b.dataset.k; if (p[k] === undefined) p[k] = structuredClone(OPT[k]); else delete p[k]; renderEditor(); break; }
     case 'add-main': { const v = $('#newMain').value.trim(); if (v) { p.mains.push(v); renderEditor(); $('#newMain').focus(); } break; }
     case 'rm-main': p.mains.splice(i, 1); renderEditor(); break;
     case 'fmt': { const w = p.notableWins[i]; if (b.dataset.v === 'times') { w.times = w.times ?? 2; delete w.tournament; } else { w.tournament = w.tournament ?? ''; delete w.times; } renderEditor(); break; }
     case 'add-win': p.notableWins.push({ opponent: '', tournament: '' }); renderEditor(); break;
     case 'rm-win': p.notableWins.splice(i, 1); renderEditor(); break;
-    case 'add-res': openEventModalForCurrentPlayer(); return;
-    case 'rm-res': p.notableResults.splice(i, 1); renderEditor(); break;
+    case 'add-res': e.preventDefault(); openEventModalForCurrentPlayer(); return;
+    case 'rm-res':
+      e.preventDefault();
+      p.notableResults.splice(i, 1);
+      preserveScroll(() => renderEditor());
+      break;
   }
   dirty = true; refresh();
 }
 
+async function handlePhotoUpload(file) {
+  if (!file) return;
+  const p = draft.players[sel];
+  if (!p) return;
+
+  // Local object URL for instant preview feedback
+  p._preview = URL.createObjectURL(file);
+  p._selectedPhotoFile = file;
+  dirty = true;
+  renderEditor();
+  refresh();
+
+  // If in admin mode, upload to backend ranking-photo endpoint immediately
+  if (isAdmin && requestedMode === 'admin') {
+    try {
+      const dataUrl = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error('Failed to read photo file.'));
+        reader.readAsDataURL(file);
+      });
+
+      const res = await fetch('/api/admin/ranking-photo', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Request': '1',
+          'X-CSRF-Token': adminCsrfToken
+        },
+        body: JSON.stringify({
+          playerId: p.playerId || '',
+          data: dataUrl
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Photo upload failed');
+      p.photo = data.path;
+      delete p._selectedPhotoFile;
+      dirty = true;
+      renderEditor();
+      refresh();
+    } catch (err) {
+      alert(`Could not upload photo: ${err.message}`);
+    }
+  }
+}
+
 function onChange(e) {
   if (e.target.id === 'photoFile' && e.target.files[0]) {
-    draft.players[sel]._preview = URL.createObjectURL(e.target.files[0]);
-    dirty = true; renderEditor(); refresh();
+    handlePhotoUpload(e.target.files[0]);
+    e.target.value = '';
   }
   if (e.target.id === 'importFileInput' && e.target.files[0]) {
     handleImportFile(e.target.files[0]);
@@ -808,6 +985,7 @@ function constructRankingJson() {
   out.players = (draft.players || []).map((p, i) => {
     const o = { placement: i + 1, tag: (p.tag || '').trim() };
     if (p.playerId) o.playerId = String(p.playerId).trim();
+    if (p.sponsor && p.sponsor.trim()) o.sponsor = p.sponsor.trim();
     if (p.points !== null && p.points !== undefined && !Number.isNaN(Number(p.points))) {
       o.points = Number(p.points);
     }
@@ -923,6 +1101,7 @@ function validateAndSanitizeImport(data) {
       placement: idx + 1,
       tag,
       playerId: pid || undefined,
+      sponsor: typeof p.sponsor === 'string' ? p.sponsor.slice(0, 50).trim() : undefined,
       points: (p.points !== null && p.points !== undefined && !Number.isNaN(Number(p.points))) ? Number(p.points) : null,
       photo: (typeof p.photo === 'string' && (p.photo.startsWith('assets/players/') || p.photo.startsWith('https://'))) ? p.photo.slice(0, 240) : undefined,
       realName: typeof p.realName === 'string' ? p.realName.slice(0, 100) : undefined,
@@ -981,6 +1160,9 @@ function handleImportFile(file) {
 
 function doPreview() {
   const rankingData = constructRankingJson();
+  if (isAdmin && requestedMode === 'admin') {
+    rankingData.isOfficial = true;
+  }
   sessionStorage.setItem('platfighters_community_preview', JSON.stringify(rankingData));
   window.open('ranking.html?preview=community', '_blank');
 }
