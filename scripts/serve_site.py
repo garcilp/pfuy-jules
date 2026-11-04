@@ -236,12 +236,23 @@ def atomic_json(path, value):
     temp.replace(path)
 
 
+NON_PROFILE_NAMES = {
+    "index.json",
+    "overrides.json",
+    "merges.json",
+    "startgg_metadata.json",
+    "amateur_brackets.json",
+    "event_groups.json",
+    "exclusions.json",
+}
+
+
 def profile_entries(public_only=False):
     entries_by_id = {}
     merged_ids = identity_merges()
     exclusions = visibility_exclusions() if public_only else None
     for path in sorted(PROFILE_DIR.glob("*.json")):
-        if path.name in {"index.json", "overrides.json"}:
+        if path.name in NON_PROFILE_NAMES:
             continue
         try:
             with path.open(encoding="utf-8") as stream:

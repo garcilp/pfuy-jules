@@ -47,6 +47,10 @@ async function fetchProfileData(playerId, tag) {
 }
 
 function resolveCharacterPortraitFallback(p, gslug, profile) {
+  if (p && Array.isArray(p.mains) && p.mains.length) {
+    const cslug = charStockSlug(p.mains[0]);
+    return `assets/renders/${gslug}/portraits/${cslug}.webp`;
+  }
   if (profile && Array.isArray(profile.games)) {
     const g = profile.games.find(x => x.slug === gslug) || profile.games[0];
     if (g && Array.isArray(g.characters)) {
@@ -56,10 +60,6 @@ function resolveCharacterPortraitFallback(p, gslug, profile) {
         return `assets/renders/${gslug}/portraits/${cslug}.webp`;
       }
     }
-  }
-  if (p && Array.isArray(p.mains) && p.mains.length) {
-    const cslug = charStockSlug(p.mains[0]);
-    return `assets/renders/${gslug}/portraits/${cslug}.webp`;
   }
   return `assets/renders/${gslug}/portraits/other.webp`;
 }
@@ -73,7 +73,7 @@ const photo = (p, size, gslug = 'ultimate', isRegularUserRanking = false) => {
     // Admin creation or official ranking: custom photo or character portrait fallback
     photoSrc = p.photo || p._characterPortrait || (p.playerId ? `assets/players/${p.playerId}.png` : `assets/players/${slug(p.tag)}.jpg`);
   }
-  return `<div class="photo ${size}"><i>${esc(p.tag ? p.tag[0] : '?')}</i><img src="${esc(photoSrc)}" alt="" onerror="this.remove()"></div>`;
+  return `<div class="photo ${size}"><img src="${esc(photoSrc)}" alt="" onerror="this.remove()"></div>`;
 };
 const stock = (g, name) => {
   const gslug = (g && g.slug) ? g.slug : 'rivals-2';
@@ -244,7 +244,7 @@ async function render(r) {
         ${badgeHtml}
       </div>
       <div class="meta" style="margin-top:12px;"><span class="glass pill chip">${esc(r.game ? r.game.name : '')}</span>${periodText ? `<span>${periodText}</span>` : ''}${r.publishedBy ? `<span>·</span><span>${isEs ? 'Publicado por ' + esc(r.publishedBy) : 'Published by ' + esc(r.publishedBy)}</span>` : ''}${metaCreatorHtml}</div>
-      ${r.intro ? `<p class="intro">${esc(r.intro)}</p>` : ''}</section>` + html;
+      ${r.intro ? `<div class="intro markdown-content">${renderMarkdown(r.intro)}</div>` : ''}</section>` + html;
 }
 
 if (window.i18n && window.i18n.onChange) {
