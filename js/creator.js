@@ -105,13 +105,11 @@ Promise.all(loadPromises)
 
     // Resolve character portraits for initial players
     if (draft.players && draft.players.length) {
-      Promise.all(draft.players.map(async p => {
-        const prof = await getProfileData(p.playerId, p.tag);
-        p._resolvedPortrait = resolvePlayerPortrait(p, prof);
-      })).then(() => {
-        renderEditor();
-        renderSide();
+      draft.players.forEach(p => {
+        p._resolvedPortrait = resolvePlayerPortrait(p);
       });
+      renderEditor();
+      renderSide();
     }
 
     renderDetails();
@@ -254,12 +252,10 @@ async function addPlayerFromDirectory(playerId) {
   closePlayerModal();
   renderAll();
 
-  // Preload profile in background to resolve top character portrait
-  getProfileData(newEntry.playerId, newEntry.tag).then(prof => {
-    newEntry._resolvedPortrait = resolvePlayerPortrait(newEntry, prof);
-    renderEditor();
-    renderSide();
-  });
+  // Resolve character portrait for regular creator mode
+  newEntry._resolvedPortrait = resolvePlayerPortrait(newEntry);
+  renderEditor();
+  renderSide();
 }
 
 let playerEventResults = [];
@@ -458,6 +454,7 @@ function selectMainsOption(name) {
   if (!p) return;
   p.mains = p.mains || [];
   p.mains.push(name);
+  p._resolvedPortrait = resolvePlayerPortrait(p);
   closeMainsDropdown();
   renderEditor();
   const inp = $('#newMain');
@@ -621,18 +618,8 @@ async function getProfileData(playerId, tag) {
   return null;
 }
 
-function resolvePlayerPortrait(p, profile) {
+function resolvePlayerPortrait(p) {
   const gslug = draft?.game?.slug || 'ultimate';
-  if (profile && Array.isArray(profile.games)) {
-    const g = profile.games.find(x => x.slug === gslug) || profile.games[0];
-    if (g && Array.isArray(g.characters)) {
-      const topChar = g.characters.find(c => String(c.name || '').toLowerCase() !== 'other');
-      if (topChar && topChar.name) {
-        const cslug = charStockSlug(topChar.name);
-        return `assets/renders/${gslug}/portraits/${cslug}.webp`;
-      }
-    }
-  }
   if (p && Array.isArray(p.mains) && p.mains.length) {
     const cslug = charStockSlug(p.mains[0]);
     return `assets/renders/${gslug}/portraits/${cslug}.webp`;
@@ -821,6 +808,11 @@ function onInput(e) {
     if (k === 'game') {
       const g = games.find(x => x.id === v);
       if (g) draft.game = { id: g.id, name: g.name, slug: g.slug };
+      if (draft.players) {
+        draft.players.forEach(p => {
+          p._resolvedPortrait = resolvePlayerPortrait(p);
+        });
+      }
       renderEditor();
     } else if (k === 'year') {
       const yr = v.trim();
@@ -894,7 +886,11 @@ function onClick(e) {
       break;
     case 'toggle': { const k = b.dataset.k; if (p[k] === undefined) p[k] = structuredClone(OPT[k]); else delete p[k]; renderEditor(); break; }
     case 'add-main': { const v = $('#newMain').value.trim(); if (v) { p.mains.push(v); renderEditor(); $('#newMain').focus(); } break; }
-    case 'rm-main': p.mains.splice(i, 1); renderEditor(); break;
+    case 'rm-main':
+      p.mains.splice(i, 1);
+      p._resolvedPortrait = resolvePlayerPortrait(p);
+      renderEditor();
+      break;
     case 'fmt': { const w = p.notableWins[i]; if (b.dataset.v === 'times') { w.times = w.times ?? 2; delete w.tournament; } else { w.tournament = w.tournament ?? ''; delete w.times; } renderEditor(); break; }
     case 'add-win': p.notableWins.push({ opponent: '', tournament: '' }); renderEditor(); break;
     case 'rm-win': p.notableWins.splice(i, 1); renderEditor(); break;

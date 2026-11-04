@@ -449,6 +449,28 @@ $('#profile-photo-file').addEventListener('change', event => {
 $('#tab-visual')?.addEventListener('click', () => setEditorMode('visual'));
 $('#tab-raw')?.addEventListener('click', () => setEditorMode('raw'));
 
+function setAdminSubsection(sub) {
+  const sections = ['players', 'events', 'rankings'];
+  sections.forEach(s => {
+    const tabBtn = $(`#subtab-${s}`);
+    const secEl = $(`#admin-section-${s}`);
+    const isCurrent = s === sub;
+    if (tabBtn) {
+      tabBtn.classList.toggle('active', isCurrent);
+      tabBtn.setAttribute('aria-selected', isCurrent);
+    }
+    if (secEl) {
+      secEl.hidden = !isCurrent;
+    }
+  });
+}
+
+document.querySelectorAll('.admin-section-nav button[data-admin-sub]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    setAdminSubsection(btn.dataset.adminSub);
+  });
+});
+
 $('#profile-form').addEventListener('submit', async event => {
   event.preventDefault();
   const message = $('#save-message');
