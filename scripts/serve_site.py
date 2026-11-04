@@ -105,7 +105,10 @@ def identity_merges():
         with path.open(encoding="utf-8") as stream:
             value = json.load(stream)
         return {str(source): str(target) for source, target in value.items()}
-    except (OSError, json.JSONDecodeError, AttributeError):
+    except json.JSONDecodeError as err:
+        print(f"Error: merges.json contains invalid JSON: {err}")
+        raise ValueError(f"merges.json contains invalid JSON: {err}")
+    except (OSError, AttributeError):
         return {}
 
 
@@ -182,7 +185,10 @@ def event_groups():
         with EVENT_GROUPS_PATH.open(encoding="utf-8") as stream:
             value = json.load(stream)
         return value if isinstance(value, dict) else {}
-    except (OSError, json.JSONDecodeError):
+    except json.JSONDecodeError as err:
+        print(f"Error: event_groups.json contains invalid JSON: {err}")
+        raise ValueError(f"event_groups.json contains invalid JSON: {err}")
+    except OSError:
         return {}
 
 
@@ -196,7 +202,10 @@ def visibility_exclusions():
             "events": sorted({key for item in events if (key := normalize_event_key(item))}),
             "playerGames": player_games if isinstance(player_games, dict) else {},
         }
-    except (OSError, json.JSONDecodeError, AttributeError, TypeError):
+    except json.JSONDecodeError as err:
+        print(f"Error: exclusions.json contains invalid JSON: {err}")
+        raise ValueError(f"exclusions.json contains invalid JSON: {err}")
+    except (OSError, AttributeError, TypeError):
         return {"events": [], "playerGames": {}}
 
 
@@ -207,7 +216,10 @@ def community_socials():
                 data = json.load(stream)
                 if isinstance(data, dict):
                     return data
-    except (OSError, json.JSONDecodeError):
+    except json.JSONDecodeError as err:
+        print(f"Error: community_socials.json contains invalid JSON: {err}")
+        raise ValueError(f"community_socials.json contains invalid JSON: {err}")
+    except OSError:
         pass
     return {}
 
@@ -417,19 +429,30 @@ class Handler(SimpleHTTPRequestHandler):
                 with (PROFILE_DIR / f"{slug}.json").open(encoding="utf-8") as stream:
                     self.send_json(200, {"profile": json.load(stream)})
             except FileNotFoundError:
-                self.send_json(404, {"error": "Profile not found."})
+                self.send_json(404, {"error": f"Profile file '{slug}.json' not found."})
+            except json.JSONDecodeError as err:
+                self.send_json(500, {"error": f"The profile file '{slug}.json' contains invalid JSON: {err}"})
         elif parsed.path == "/api/admin/merges":
             if not self.require_admin():
                 return
-            self.send_json(200, {"merges": identity_merges()})
+            try:
+                self.send_json(200, {"merges": identity_merges()})
+            except Exception as err:
+                self.send_json(500, {"error": str(err)})
         elif parsed.path == "/api/admin/community-socials":
             if not self.require_admin():
                 return
-            self.send_json(200, {"socials": community_socials()})
+            try:
+                self.send_json(200, {"socials": community_socials()})
+            except Exception as err:
+                self.send_json(500, {"error": str(err)})
         elif parsed.path == "/api/admin/event-groups":
             if not self.require_admin():
                 return
-            self.send_json(200, {"eventGroups": event_groups()})
+            try:
+                self.send_json(200, {"eventGroups": event_groups()})
+            except Exception as err:
+                self.send_json(500, {"error": str(err)})
         elif parsed.path in {"/api/admin/events", "/api/admin/imported-events"}:
             if not self.require_admin():
                 return
@@ -458,7 +481,10 @@ class Handler(SimpleHTTPRequestHandler):
         elif parsed.path == "/api/admin/exclusions":
             if not self.require_admin():
                 return
-            self.send_json(200, {"exclusions": visibility_exclusions()})
+            try:
+                self.send_json(200, {"exclusions": visibility_exclusions()})
+            except Exception as err:
+                self.send_json(500, {"error": str(err)})
         elif parsed.path == "/api/admin/rankings":
             if not self.require_admin():
                 return
@@ -1060,10 +1086,10 @@ class Handler(SimpleHTTPRequestHandler):
                 with path.open(encoding="utf-8") as stream:
                     original = json.load(stream)
             except FileNotFoundError:
-                self.send_json(404, {"error": "Profile not found."})
+                self.send_json(404, {"error": f"Profile file '{slug}.json' not found."})
                 return
-            except json.JSONDecodeError:
-                self.send_json(500, {"error": "The saved profile is not valid JSON."})
+            except json.JSONDecodeError as err:
+                self.send_json(500, {"error": f"The profile file '{slug}.json' contains invalid JSON: {err}"})
                 return
             player = profile.get("player")
             games = profile.get("games")
@@ -1104,8 +1130,8 @@ class Handler(SimpleHTTPRequestHandler):
                         overrides = json.load(stream)
                 except FileNotFoundError:
                     overrides = {}
-                except json.JSONDecodeError:
-                    self.send_json(500, {"error": "The profile overrides file is invalid."})
+                except json.JSONDecodeError as err:
+                    self.send_json(500, {"error": f"The profile overrides file 'overrides.json' contains invalid JSON: {err}"})
                     return
                 overrides[player_id] = {"profile": profile}
             atomic_json(path, profile)

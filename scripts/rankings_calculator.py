@@ -9,17 +9,41 @@ import json
 import math
 import re
 import sqlite3
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
+import os
 from pathlib import Path
 from urllib.parse import urlsplit
-from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATABASE = PROJECT_ROOT / "startgg-data" / "platfighters.sqlite3"
 PROFILE_DIR = PROJECT_ROOT / "data" / "profiles"
 RANKINGS_DIR = PROJECT_ROOT / "data" / "rankings"
 ALGORITHM_VERSION = "2.2.0"
-MONTEVIDEO_TZ = ZoneInfo("America/Montevideo")
+
+
+def resolve_montevideo_tz():
+    """Resolves the America/Montevideo timezone across diverse environments and platforms.
+
+    Tries standard ZoneInfo lookup first (which checks system zoneinfo paths and tzdata package).
+    If unresolvable from default paths, inspects standard OS timezone directories to load from file,
+    and falls back to a timezone-aware tzinfo object with Uruguay's standard UTC-3 offset.
+    """
+    try:
+        return ZoneInfo("America/Montevideo")
+    except (ZoneInfoNotFoundError, KeyError):
+        for base in ("/usr/share/zoneinfo", "/usr/lib/zoneinfo", "/etc/zoneinfo", "/usr/share/lib/zoneinfo"):
+            candidate = os.path.join(base, "America", "Montevideo")
+            if os.path.isfile(candidate):
+                try:
+                    with open(candidate, "rb") as tz_file:
+                        return ZoneInfo.from_file(tz_file, key="America/Montevideo")
+                except Exception:
+                    pass
+        return timezone(timedelta(hours=-3), name="America/Montevideo")
+
+
+MONTEVIDEO_TZ = resolve_montevideo_tz()
 
 
 # -----------------------------------------------------------------------------

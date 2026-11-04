@@ -47,7 +47,7 @@
         <p class="muted admin-copy" style="margin:0;">Edit player profile fields, toggle game activity visibility, and merge duplicate player identities.</p>
       </div>
 
-      <form id="profile-form" class="admin-form" style="margin-bottom: 32px; border-bottom: 1px solid var(--line); padding-bottom: 28px;">
+      <form id="profile-form" class="admin-form" style="margin-bottom: 32px; padding-bottom: 28px;">
         <label><span data-i18n="admin.editor.profile">Player profile</span><select id="profile-select" required></select></label>
         <fieldset id="player-game-exclusions" class="visibility-fieldset">
           <legend data-i18n="admin.editor.gameVis">Game visibility</legend>
@@ -95,7 +95,7 @@
         <p class="muted admin-copy" style="margin:0;">Group amateur and side brackets into main tournaments, configure global event exclusions, and manage community links.</p>
       </div>
 
-      <section class="merge-panel" aria-labelledby="event-group-heading" style="margin-top: 0; margin-bottom: 32px; border-bottom: 1px solid var(--line); padding-bottom: 28px;">
+      <section class="merge-panel" aria-labelledby="event-group-heading" style="margin-top: 0; margin-bottom: 32px; padding-bottom: 28px;">
         <h3 id="event-group-heading">Group an additional event</h3>
         <p class="muted admin-copy">Attach an event such as an amateur bracket to its main event. Select events from currently imported tournaments. Sets from the added event will appear under the main event with your phase label.</p>
         <form id="event-group-form" class="admin-form merge-form">
@@ -107,7 +107,7 @@
         <div id="event-group-list" class="event-group-list" aria-live="polite"></div>
       </section>
 
-      <section class="merge-panel" aria-labelledby="event-exclusion-heading" style="margin-top: 0; margin-bottom: 32px; border-bottom: 1px solid var(--line); padding-bottom: 28px;">
+      <section class="merge-panel" aria-labelledby="event-exclusion-heading" style="margin-top: 0; margin-bottom: 32px; padding-bottom: 28px;">
         <h3 id="event-exclusion-heading">Exclude an event</h3>
         <p class="muted admin-copy">Excluded events are omitted from every player profile, game statistic, result list, and player-directory filter.</p>
         <form id="event-exclusion-form" class="admin-form merge-form">

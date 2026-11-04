@@ -58,8 +58,9 @@ function setEditorMode(mode) {
     try {
       currentProfileObject = JSON.parse($('#profile-json').value);
       syncVisualFromObject(currentProfileObject);
-    } catch {
-      alert('The raw JSON contains syntax errors. Fix them before switching to the structured form.');
+    } catch (err) {
+      const fileName = currentSlug ? `${currentSlug}.json` : 'profile JSON';
+      alert(`The raw JSON for ${fileName} contains syntax errors (${err.message}). Fix them before switching to the structured form.`);
       setEditorMode('raw');
     }
   } else {
@@ -482,13 +483,15 @@ $('#profile-form').addEventListener('submit', async event => {
       profile = currentProfileObject;
       $('#profile-json').value = JSON.stringify(profile, null, 2);
     } else {
+      const fileName = currentSlug ? `${currentSlug}.json` : 'profile JSON';
       try { profile = JSON.parse($('#profile-json').value); }
-      catch { throw new Error('Profile data must be valid JSON.'); }
+      catch (err) { throw new Error(`Profile data for ${fileName} must be valid JSON: ${err.message}`); }
       currentProfileObject = profile;
       syncVisualFromObject(profile);
     }
+    const profileFileName = currentSlug ? `${currentSlug}.json` : 'profile JSON';
     if (!profile || typeof profile !== 'object' || !profile.player || !Array.isArray(profile.games)) {
-      throw new Error('Profile JSON must contain a player object and a games array.');
+      throw new Error(`Profile JSON in ${profileFileName} must contain a player object and a games array.`);
     }
     if (String(profile.player.startggPlayerId || '') !== currentPlayerId) {
       throw new Error('The start.gg player ID is the profile’s fixed source of truth and cannot be changed here.');
@@ -536,15 +539,15 @@ function renderCommunitySocials(socials = {}) {
         <h4 style="margin:0 0 12px 0;">${esc(g.name)}</h4>
         <div style="display:flex;flex-direction:column;gap:10px;">
           <div style="display:flex;align-items:center;gap:12px;">
-            <label style="width:120px;margin:0;"><input type="checkbox" id="soc-${g.slug}-wa-toggle" ${wa.enabled ? 'checked' : ''}> WhatsApp</label>
+            <span style="width:100px;font-weight:500;">WhatsApp</span>
             <input type="url" id="soc-${g.slug}-wa-url" placeholder="https://chat.whatsapp.com/..." value="${esc(wa.url || '')}" style="flex:1;">
           </div>
           <div style="display:flex;align-items:center;gap:12px;">
-            <label style="width:120px;margin:0;"><input type="checkbox" id="soc-${g.slug}-dc-toggle" ${dc.enabled ? 'checked' : ''}> Discord</label>
+            <span style="width:100px;font-weight:500;">Discord</span>
             <input type="url" id="soc-${g.slug}-dc-url" placeholder="https://discord.gg/..." value="${esc(dc.url || '')}" style="flex:1;">
           </div>
           <div style="display:flex;align-items:center;gap:12px;">
-            <label style="width:120px;margin:0;"><input type="checkbox" id="soc-${g.slug}-tw-toggle" ${tw.enabled ? 'checked' : ''}> Twitter / X</label>
+            <span style="width:100px;font-weight:500;">Twitter / X</span>
             <input type="url" id="soc-${g.slug}-tw-url" placeholder="https://twitter.com/..." value="${esc(tw.url || '')}" style="flex:1;">
           </div>
         </div>
@@ -560,18 +563,22 @@ $('#community-socials-form')?.addEventListener('submit', async (e) => {
   try {
     const socials = {};
     COMMUNITY_GAMES.forEach(g => {
+      const waUrl = $(`#soc-${g.slug}-wa-url`).value.trim();
+      const dcUrl = $(`#soc-${g.slug}-dc-url`).value.trim();
+      const twUrl = $(`#soc-${g.slug}-tw-url`).value.trim();
+
       socials[g.slug] = {
         whatsapp: {
-          enabled: $(`#soc-${g.slug}-wa-toggle`).checked,
-          url: $(`#soc-${g.slug}-wa-url`).value.trim()
+          enabled: Boolean(waUrl),
+          url: waUrl
         },
         discord: {
-          enabled: $(`#soc-${g.slug}-dc-toggle`).checked,
-          url: $(`#soc-${g.slug}-dc-url`).value.trim()
+          enabled: Boolean(dcUrl),
+          url: dcUrl
         },
         twitter: {
-          enabled: $(`#soc-${g.slug}-tw-toggle`).checked,
-          url: $(`#soc-${g.slug}-tw-url`).value.trim()
+          enabled: Boolean(twUrl),
+          url: twUrl
         }
       };
     });
