@@ -362,23 +362,37 @@
   gap: 16px;
   flex-wrap: wrap;
 }
+.ident.has-sponsor {
+  align-items: center;
+}
+.player-heading {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
 .rank {
   font-size: 40px;
   font-weight: 700;
   line-height: 1.05;
 }
+.ident.has-sponsor .rank {
+  font-size: 58px;
+  line-height: 1;
+}
 .ident h2 {
   font-size: 40px;
   line-height: 1.05;
+  margin: 0;
 }
 .player-sponsor {
-  font-family: inherit;
-  font-size: inherit;
-  font-weight: inherit;
-  line-height: inherit;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  line-height: 1.2;
   color: var(--muted);
-  vertical-align: baseline;
-  margin-right: 4px;
 }
 .pts {
   font-size: 20px;
@@ -481,6 +495,18 @@
   font-size: 24px;
   font-weight: 700;
 }
+.player-heading-med {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.player-heading-med .player-sponsor {
+  font-size: 11px;
+}
+.entry.med.has-sponsor .rank-md {
+  font-size: 34px;
+  line-height: 1;
+}
 .entry.med .who {
   flex: 1 1 200px;
   gap: 6px;
@@ -509,6 +535,19 @@
 }
 .row .n {
   font: 700 17px 'JetBrains Mono', monospace;
+}
+.row.has-sponsor .n {
+  font-size: 22px;
+  line-height: 1;
+}
+.row-player-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 1px;
+}
+.row-player-info .player-sponsor {
+  font-size: 10px;
 }
 .row b {
   font-size: 17px;

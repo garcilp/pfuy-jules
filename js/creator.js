@@ -45,11 +45,14 @@ function updateAdminUI() {
   }
 }
 
+let eventsIndexList = [];
+
 // Initial data load
 const loadPromises = [
   fetch('data/games.json').then(r => r.json()),
   fetch('data/profiles/index.json').then(r => r.json()).catch(() => []),
   fetch('data/characters.json').then(r => r.json()).catch(() => ({})),
+  fetch('data/events-index.json').then(r => r.json()).catch(() => []),
   checkAdminSession()
 ];
 
@@ -62,10 +65,11 @@ if (rankingIdParam) {
 }
 
 Promise.all(loadPromises)
-  .then(([g, profiles, chars, _, existingRanking]) => {
+  .then(([g, profiles, chars, evList, _, existingRanking]) => {
     games = (g || []).sort((a, b) => a.name.localeCompare(b.name));
     allProfiles = profiles || [];
     gameCharacters = chars || {};
+    eventsIndexList = evList || [];
 
     if (existingRanking) {
       draft = existingRanking;
@@ -221,14 +225,8 @@ async function addPlayerFromDirectory(playerId) {
   }
 
   if (playerModalTarget && playerModalTarget.type === 'opponent') {
-    const p = draft.players[sel];
-    if (p && p.notableWins && p.notableWins[playerModalTarget.index]) {
-      p.notableWins[playerModalTarget.index].opponent = player.tag;
-      dirty = true;
-      refresh();
-      renderEditor();
-    }
     closePlayerModal();
+    updateNotableWinStats(playerModalTarget.index, player.tag, player.playerId);
     return;
   }
 
@@ -306,8 +304,10 @@ async function openEventModalForCurrentPlayer() {
     const matched = allProfiles.find(x => String(x.playerId) === String(p.playerId));
     const slugName = matched?.slug || (p.tag ? slug(p.tag) : '');
     const profilePaths = [
-      slugName ? `data/profiles/${slugName}-${p.playerId}.json` : null,
-      slugName ? `data/profiles/${slugName}.json` : null
+      slugName ? `data/profiles/${slugName}.json` : null,
+      (slugName && p.playerId && !slugName.endsWith('-' + p.playerId)) ? `data/profiles/${slugName}-${p.playerId}.json` : null,
+      (p.tag && p.playerId) ? `data/profiles/${slug(p.tag)}-${p.playerId}.json` : null,
+      p.tag ? `data/profiles/${slug(p.tag)}.json` : null
     ].filter(Boolean);
 
     for (const path of profilePaths) {
@@ -330,6 +330,23 @@ async function openEventModalForCurrentPlayer() {
   renderEventModalList();
 }
 
+function extractTournamentName(rawEventName, eventKey) {
+  if (!rawEventName && !eventKey) return '';
+  const str = String(rawEventName || '').trim();
+  if (eventsIndexList && eventsIndexList.length) {
+    if (eventKey) {
+      const match = eventsIndexList.find(e => e.id === String(eventKey) || e.tournamentSlug === String(eventKey));
+      if (match && match.tournament) return match.tournament;
+    }
+    const matchTourn = eventsIndexList.find(e => e.tournament && (str === e.tournament || str.startsWith(e.tournament + ' ·')));
+    if (matchTourn) return matchTourn.tournament;
+  }
+  if (str.includes(' · ')) {
+    return str.split(' · ')[0].trim();
+  }
+  return str;
+}
+
 function renderEventModalList() {
   const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
   const listEl = $('#eventSelectList');
@@ -342,7 +359,7 @@ function renderEventModalList() {
 
   listEl.innerHTML = playerEventResults.map((r, idx) => {
     const place = r.place ?? r.placement ?? '?';
-    const eventName = r.event || r.eventName || 'Tournament';
+    const tournamentName = extractTournamentName(r.event || r.eventName || r.tournament, r.eventKey);
     const entrants = r.entrants ? (isEs ? `${r.entrants} participantes` : `${r.entrants} entrants`) : '';
     const date = r.date || '';
     const meta = [entrants, date].filter(Boolean).join(' · ');
@@ -351,7 +368,7 @@ function renderEventModalList() {
       <span class="player-select-avatar"><span style="font-size:16px;font-weight:700;">${place}</span></span>
       <div class="player-select-info">
         <div class="player-select-tag-row">
-          <span class="player-select-tag">${esc(eventName)}</span>
+          <span class="player-select-tag">${esc(tournamentName)}</span>
         </div>
         <div class="player-select-meta">${meta}</div>
       </div>
@@ -366,9 +383,10 @@ function selectEventForNotableResult(idx) {
   const ev = playerEventResults[idx];
   if (!ev) return;
   p.notableResults = p.notableResults || [];
+  const tournamentName = extractTournamentName(ev.event || ev.eventName || ev.tournament, ev.eventKey);
   p.notableResults.push({
     placement: ev.place ?? ev.placement ?? null,
-    event: ev.event || ev.eventName || '',
+    event: tournamentName,
     entrants: ev.entrants ?? null
   });
   dirty = true;
@@ -377,6 +395,75 @@ function selectEventForNotableResult(idx) {
     refresh();
     renderEditor();
   });
+}
+
+async function updateNotableWinStats(winIndex, opponentTag, opponentId) {
+  const p = draft.players[sel];
+  if (!p || !p.notableWins || !p.notableWins[winIndex]) return;
+  const w = p.notableWins[winIndex];
+  w.opponent = opponentTag;
+
+  try {
+    const prof = await getProfileData(p.playerId, p.tag);
+    if (prof) {
+      const gslug = draft.game?.slug || 'ultimate';
+      const curGame = (prof.games || []).find(g => g.slug === gslug || g.id === gslug) || prof.games?.[0];
+      if (curGame && Array.isArray(curGame.results)) {
+        const startDate = draft.period?.start || '';
+        const endDate = draft.period?.end || '';
+
+        const oppTagNorm = (opponentTag || '').trim().toLowerCase();
+        const oppMatched = allProfiles.find(x =>
+          (opponentId && String(x.playerId) === String(opponentId)) ||
+          (x.tag && x.tag.trim().toLowerCase() === oppTagNorm)
+        );
+        const oppAliases = new Set([oppTagNorm]);
+        if (oppMatched) {
+          if (oppMatched.tag) oppAliases.add(oppMatched.tag.trim().toLowerCase());
+          if (Array.isArray(oppMatched.aliases)) {
+            oppMatched.aliases.forEach(a => oppAliases.add(String(a).trim().toLowerCase()));
+          }
+        }
+
+        const winSets = [];
+        for (const res of curGame.results) {
+          const resDate = res.date || '';
+          if (startDate && resDate && resDate < startDate) continue;
+          if (endDate && resDate && resDate > endDate) continue;
+          for (const s of (res.sets || [])) {
+            const oppName = (s.opponent || '').trim().toLowerCase();
+            const outcome = (s.outcome || '').trim().toLowerCase();
+            if (oppAliases.has(oppName) && outcome === 'win') {
+              winSets.push({
+                date: resDate,
+                event: res.event || s.event || '',
+                eventKey: res.eventKey || s.eventKey || ''
+              });
+            }
+          }
+        }
+
+        if (winSets.length === 1) {
+          delete w.times;
+          const tourneyName = extractTournamentName(winSets[0].event, winSets[0].eventKey);
+          w.tournament = tourneyName || '';
+        } else if (winSets.length > 1) {
+          delete w.tournament;
+          w.times = winSets.length;
+        } else {
+          if (w.times === undefined && w.tournament === undefined) {
+            w.tournament = '';
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('Could not compute notable win stats:', err);
+  }
+
+  dirty = true;
+  refresh();
+  renderEditor();
 }
 
 document.addEventListener('input', onInput);
@@ -397,6 +484,15 @@ document.addEventListener('click', e => {
     closeEventModal();
     window.scrollTo({ top: savedScrollY, behavior: 'instant' });
   }
+  if (e.target.id === 'closeCropModalBtn' || e.target.closest('#closeCropModalBtn') || e.target.id === 'cancelCropBtn') {
+    e.preventDefault();
+    closeCropModal();
+  }
+  if (e.target === $('#crop-modal')) closeCropModal();
+  if (e.target.id === 'applyCropBtn') {
+    e.preventDefault();
+    confirmCrop();
+  }
   if (e.target.id === 'addBlankResultBtn') {
     e.preventDefault();
     const p = draft.players[sel];
@@ -412,6 +508,70 @@ document.addEventListener('click', e => {
     }
   }
 });
+
+document.addEventListener('mousedown', e => {
+  const viewport = e.target.closest('#cropViewport');
+  if (viewport) {
+    e.preventDefault();
+    cropIsDragging = true;
+    cropDragStartX = e.clientX;
+    cropDragStartY = e.clientY;
+    cropDragStartOffsetX = cropOffsetX;
+    cropDragStartOffsetY = cropOffsetY;
+  }
+});
+
+document.addEventListener('mousemove', e => {
+  if (cropIsDragging && cropImageObj) {
+    cropOffsetX = cropDragStartOffsetX + (e.clientX - cropDragStartX);
+    cropOffsetY = cropDragStartOffsetY + (e.clientY - cropDragStartY);
+    clampCropOffsets();
+    drawCropCanvas();
+  }
+});
+
+document.addEventListener('mouseup', () => {
+  cropIsDragging = false;
+});
+
+document.addEventListener('touchstart', e => {
+  const viewport = e.target.closest('#cropViewport');
+  if (viewport && e.touches[0]) {
+    cropIsDragging = true;
+    cropDragStartX = e.touches[0].clientX;
+    cropDragStartY = e.touches[0].clientY;
+    cropDragStartOffsetX = cropOffsetX;
+    cropDragStartOffsetY = cropOffsetY;
+  }
+}, { passive: true });
+
+document.addEventListener('touchmove', e => {
+  if (cropIsDragging && cropImageObj && e.touches[0]) {
+    cropOffsetX = cropDragStartOffsetX + (e.touches[0].clientX - cropDragStartX);
+    cropOffsetY = cropDragStartOffsetY + (e.touches[0].clientY - cropDragStartY);
+    clampCropOffsets();
+    drawCropCanvas();
+  }
+}, { passive: true });
+
+document.addEventListener('touchend', () => {
+  cropIsDragging = false;
+});
+
+document.addEventListener('wheel', e => {
+  const viewport = e.target.closest('#cropViewport');
+  if (viewport && cropImageObj) {
+    e.preventDefault();
+    const slider = $('#cropZoomSlider');
+    if (slider) {
+      const delta = e.deltaY > 0 ? -0.08 : 0.08;
+      const nextVal = Math.min(3, Math.max(1, parseFloat(slider.value) + delta));
+      slider.value = nextVal;
+      onCropZoom(nextVal);
+    }
+  }
+}, { passive: false });
+
 let highlightedMainsIndex = -1;
 
 function getMainsCandidates() {
@@ -455,10 +615,8 @@ function selectMainsOption(name) {
   p.mains = p.mains || [];
   p.mains.push(name);
   p._resolvedPortrait = resolvePlayerPortrait(p);
-  closeMainsDropdown();
   renderEditor();
-  const inp = $('#newMain');
-  if (inp) inp.focus();
+  closeMainsDropdown();
 }
 
 document.addEventListener('input', e => {
@@ -469,7 +627,7 @@ document.addEventListener('input', e => {
 });
 
 document.addEventListener('focusin', e => {
-  if (e.target.id === 'newMain') {
+  if (e.target.id === 'newMain' && e.target.value.trim()) {
     highlightedMainsIndex = -1;
     renderMainsDropdown();
   }
@@ -602,7 +760,9 @@ async function getProfileData(playerId, tag) {
   const slugName = matched?.slug || (tag ? slug(tag) : '');
   const candidatePaths = [
     slugName ? `data/profiles/${slugName}.json` : null,
-    (slugName && playerId) ? `data/profiles/${slugName}-${playerId}.json` : null
+    (slugName && playerId && !slugName.endsWith('-' + playerId)) ? `data/profiles/${slugName}-${playerId}.json` : null,
+    (tag && playerId) ? `data/profiles/${slug(tag)}-${playerId}.json` : null,
+    tag ? `data/profiles/${slug(tag)}.json` : null
   ].filter(Boolean);
 
   for (const path of candidatePaths) {
@@ -773,14 +933,14 @@ function renderEditor() {
   const wins = (p.notableWins || []).map((w, i) => { const t = w.times !== undefined;
     return `<div class="rowf">${oppCell(i, w.opponent)}<div>${lab2(isEs ? 'FORMATO' : 'FORMAT')}${seg(i, t ? 'times' : 'tournament')}</div>${t ? cell('g', isEs ? 'VECES' : 'TIMES', 'notableWins', i, 'times', w.times) : cell('g', isEs ? 'TORNEO' : 'TOURNAMENT', 'notableWins', i, 'tournament', w.tournament)}${rm('rm-win', i, 'win')}</div>`; }).join('');
   const results = (p.notableResults || []).map((r, i) =>
-    `<div class="rowf"><div style="flex:0 0 100px">${lab2('PLACEMENT')}<input class="inp" data-row="notableResults" data-i="${i}" data-f="placement" value="${r.placement ?? ''}"></div>${cell('g', 'EVENT', 'notableResults', i, 'event', r.event)}<div style="flex:0 0 120px">${lab2('ENTRANTS')}<input class="inp" data-row="notableResults" data-i="${i}" data-f="entrants" value="${r.entrants ?? ''}"></div>${rm('rm-res', i, 'result')}</div>`).join('');
+    `<div class="rowf"><div style="flex:0 0 100px">${lab2('PLACEMENT')}<input class="inp" data-row="notableResults" data-i="${i}" data-f="placement" value="${r.placement ?? ''}"></div>${cell('g', isEs ? 'TORNEO' : 'TOURNAMENT', 'notableResults', i, 'event', r.event)}<div style="flex:0 0 120px">${lab2('ENTRANTS')}<input class="inp" data-row="notableResults" data-i="${i}" data-f="entrants" value="${r.entrants ?? ''}"></div>${rm('rm-res', i, 'result')}</div>`).join('');
   const mains = `<div class="chips">${(p.mains || []).map((m, i) => `<span class="glass pill mchip">${stock(m)}${esc(m)}<button type="button" class="x glass pill" data-act="rm-main" data-i="${i}" aria-label="Remove ${esc(m)}">×</button></span>`).join('')}</div>
-    <div class="rowf"><div class="g mains-input-wrap"><input class="inp" id="newMain" autocomplete="off" placeholder="${isEs ? 'Nombre del personaje' : 'Character name'}"><div id="mainsDropdown" class="mains-dropdown" hidden></div></div><button type="button" class="btn glass pill" data-act="add-main">+ ${isEs ? 'Agregar personaje' : 'Add main'}</button></div><div class="note0">${isEs ? 'Se muestran en el ranking como íconos de stock.' : 'Shown on the ranking as stock icons.'}</div>`;
+    <div class="rowf"><div class="g mains-input-wrap" style="width:100%"><input class="inp" id="newMain" autocomplete="off" placeholder="${isEs ? 'Buscar personaje para agregar...' : 'Search character to add...'}"><div id="mainsDropdown" class="mains-dropdown" hidden></div></div></div><div class="note0">${isEs ? 'Selecciona un personaje de la lista para agregarlo como principal.' : 'Select a character from the list to add as main.'}</div>`;
 
   $('#editor').innerHTML = `<div class="ed-head"><div class="l"><span class="big ${pcls(n)}">${n}</span><span class="nm">${esc(p.tag || 'New player')}</span></div>
       <div class="l" style="align-items:center"><span class="kind" id="kindPill">${k} ENTRY</span><button type="button" class="add" data-act="remove-player">${isEs ? 'Eliminar jugador' : 'Remove player'}</button></div></div>
     <div class="why" id="why">${getWhy()[k]}</div>
-    <div class="req"><div class="dzw"><div class="dz"><i>${esc((p.tag || '?')[0])}</i>${pic}</div>
+    <div class="req"><div class="dzw"><div class="dz">${pic}</div>
         ${isAdminCreation ? `<button type="button" class="btn glass pill" data-act="pick-photo">${isEs ? 'Cambiar imagen' : 'Replace picture'}</button><input type="file" id="photoFile" accept="image/png,image/jpeg" hidden><div class="note0" style="text-align:center">JPG or PNG (Optional)</div>` : `<div class="note0" style="text-align:center">${isEs ? 'Retrato del personaje más jugado' : 'Most played character portrait'}</div>`}</div>
       <div class="reqf"><div class="fld" style="flex:0 0 100px">${lab(isEs ? 'PUESTO' : 'PLACEMENT', 1)}<input class="inp ro ${pcls(n)}" value="${n}" readonly aria-readonly="true"></div>
         <div class="fld" style="flex:2 1 240px">${lab(isEs ? 'TAG' : 'TAG', 1)}<input class="inp" data-pbind="tag" value="${esc(p.tag)}" placeholder="Gamertag"></div>
@@ -801,6 +961,10 @@ function onInput(e) {
   if (t.id === 'playerSearchInput') {
     playerModalQuery = t.value;
     renderPlayerModalList();
+    return;
+  }
+  if (t.id === 'cropZoomSlider') {
+    onCropZoom(parseFloat(t.value));
     return;
   }
   if (d.bind) {
@@ -904,6 +1068,145 @@ function onClick(e) {
   dirty = true; refresh();
 }
 
+let cropModalFile = null;
+let cropImageObj = null;
+let cropScale = 1;
+let cropBaseScale = 1;
+let cropOffsetX = 0;
+let cropOffsetY = 0;
+let cropIsDragging = false;
+let cropDragStartX = 0;
+let cropDragStartY = 0;
+let cropDragStartOffsetX = 0;
+let cropDragStartOffsetY = 0;
+
+function openCropModal(file) {
+  cropModalFile = file;
+  const modal = $('#crop-modal');
+  if (!modal) {
+    handlePhotoUpload(file);
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    cropImageObj = new Image();
+    cropImageObj.onload = () => {
+      setupCropCanvas();
+      if (typeof modal.showModal === 'function') {
+        modal.showModal();
+      } else {
+        modal.setAttribute('open', '');
+      }
+    };
+    cropImageObj.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function closeCropModal() {
+  const modal = $('#crop-modal');
+  if (!modal) return;
+  if (typeof modal.close === 'function') {
+    modal.close();
+  } else {
+    modal.removeAttribute('open');
+  }
+  cropModalFile = null;
+  cropImageObj = null;
+  cropIsDragging = false;
+}
+
+function setupCropCanvas() {
+  const canvas = $('#cropCanvas');
+  const slider = $('#cropZoomSlider');
+  if (!canvas || !cropImageObj) return;
+
+  canvas.width = 240;
+  canvas.height = 293;
+
+  cropBaseScale = Math.max(canvas.width / cropImageObj.width, canvas.height / cropImageObj.height);
+  cropScale = cropBaseScale;
+  if (slider) slider.value = 1;
+
+  cropOffsetX = (canvas.width - cropImageObj.width * cropScale) / 2;
+  cropOffsetY = (canvas.height - cropImageObj.height * cropScale) / 2;
+
+  drawCropCanvas();
+}
+
+function drawCropCanvas() {
+  const canvas = $('#cropCanvas');
+  if (!canvas || !cropImageObj) return;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(
+    cropImageObj,
+    cropOffsetX,
+    cropOffsetY,
+    cropImageObj.width * cropScale,
+    cropImageObj.height * cropScale
+  );
+}
+
+function onCropZoom(newZoom) {
+  const canvas = $('#cropCanvas');
+  if (!canvas || !cropImageObj) return;
+  const oldScale = cropScale;
+  const newScale = cropBaseScale * newZoom;
+  const cx = canvas.width / 2;
+  const cy = canvas.height / 2;
+
+  cropOffsetX = cx - (cx - cropOffsetX) * (newScale / oldScale);
+  cropOffsetY = cy - (cy - cropOffsetY) * (newScale / oldScale);
+  cropScale = newScale;
+
+  clampCropOffsets();
+  drawCropCanvas();
+}
+
+function clampCropOffsets() {
+  const canvas = $('#cropCanvas');
+  if (!canvas || !cropImageObj) return;
+  const minX = canvas.width - cropImageObj.width * cropScale;
+  const minY = canvas.height - cropImageObj.height * cropScale;
+  cropOffsetX = Math.min(0, Math.max(minX, cropOffsetX));
+  cropOffsetY = Math.min(0, Math.max(minY, cropOffsetY));
+}
+
+function confirmCrop() {
+  const canvas = $('#cropCanvas');
+  if (!canvas || !cropImageObj) {
+    if (cropModalFile) handlePhotoUpload(cropModalFile);
+    closeCropModal();
+    return;
+  }
+
+  const exportCanvas = document.createElement('canvas');
+  exportCanvas.width = 360;
+  exportCanvas.height = 440;
+  const exportCtx = exportCanvas.getContext('2d');
+
+  const exportRatio = exportCanvas.width / canvas.width;
+  exportCtx.drawImage(
+    cropImageObj,
+    cropOffsetX * exportRatio,
+    cropOffsetY * exportRatio,
+    cropImageObj.width * cropScale * exportRatio,
+    cropImageObj.height * cropScale * exportRatio
+  );
+
+  exportCanvas.toBlob((blob) => {
+    if (blob) {
+      const croppedFile = new File([blob], 'player-portrait.png', { type: 'image/png' });
+      handlePhotoUpload(croppedFile);
+    } else if (cropModalFile) {
+      handlePhotoUpload(cropModalFile);
+    }
+    closeCropModal();
+  }, 'image/png');
+}
+
 async function handlePhotoUpload(file) {
   if (!file) return;
   const p = draft.players[sel];
@@ -955,12 +1258,15 @@ async function handlePhotoUpload(file) {
 
 function onChange(e) {
   if (e.target.id === 'photoFile' && e.target.files[0]) {
-    handlePhotoUpload(e.target.files[0]);
+    openCropModal(e.target.files[0]);
     e.target.value = '';
   }
   if (e.target.id === 'importFileInput' && e.target.files[0]) {
     handleImportFile(e.target.files[0]);
     e.target.value = '';
+  }
+  if (e.target.dataset && e.target.dataset.row === 'notableWins' && e.target.dataset.f === 'opponent') {
+    updateNotableWinStats(+e.target.dataset.i, e.target.value.trim());
   }
 }
 

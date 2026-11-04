@@ -184,20 +184,38 @@ async function render(r) {
     ? `<a href="player.html?player=${encodeURIComponent(pid)}" class="opponent-link ${cls}">${esc(tag)}</a>`
     : esc(tag);
 
-  const sponsorBadge = p => p.sponsor ? `<span class="player-sponsor">${esc(p.sponsor)}</span> ` : '';
+  const crewBadge = p => p.sponsor ? `<span class="player-sponsor">${esc(p.sponsor)}</span>` : '';
 
-  const full = p => `<article class="entry full glass" id="p-${p.placement}">
+  const full = p => `<article class="entry full glass${p.sponsor ? ' has-sponsor' : ''}" id="p-${p.placement}">
     <div class="top-row">${photo(p, 'lg', gslug, isRegularUserRanking)}<div class="who">
-      <div class="ident"><span class="rank ${pcls(p.placement)}">${p.placement}</span><h2>${sponsorBadge(p)}${playerLink(p.tag, p.playerId)}</h2></div>
+      <div class="ident${p.sponsor ? ' has-sponsor' : ''}">
+        <span class="rank ${pcls(p.placement)}">${p.placement}</span>
+        <div class="player-heading">
+          ${crewBadge(p)}
+          <h2>${playerLink(p.tag, p.playerId)}</h2>
+        </div>
+      </div>
       ${real(p)}${pts(p)}${mains(p)}</div></div>
     ${p.text ? `<div class="text markdown-content">${renderMarkdown(p.text)}</div>` : ''}
     ${p.notableWins || p.notableResults ? `<div class="lists">${list(isEs ? 'VICTORIAS DESTACADAS' : 'NOTABLE WINS', p.notableWins, win)}${list(isEs ? 'RESULTADOS DESTACADOS' : 'NOTABLE RESULTS', p.notableResults, res)}</div>` : ''}</article>`;
 
-  const medium = p => `<article class="entry med glass" id="p-${p.placement}">
+  const medium = p => `<article class="entry med glass${p.sponsor ? ' has-sponsor' : ''}" id="p-${p.placement}">
     <span class="rank-md ${pcls(p.placement)}">${p.placement}</span>${photo(p, 'md', gslug, isRegularUserRanking)}
-    <div class="who"><span class="tag">${sponsorBadge(p)}${playerLink(p.tag, p.playerId)}</span>${real(p)}${mains(p)}</div>${pts(p)}</article>`;
+    <div class="who">
+      <div class="player-heading-med">
+        ${crewBadge(p)}
+        <span class="tag">${playerLink(p.tag, p.playerId)}</span>
+      </div>
+      ${real(p)}${mains(p)}
+    </div>${pts(p)}</article>`;
 
-  const row = p => `<div class="row" id="p-${p.placement}"><span class="n ${pcls(p.placement)}">${p.placement}</span>${photo(p, 'sm', gslug, isRegularUserRanking)}<b>${sponsorBadge(p)}${playerLink(p.tag, p.playerId)}</b>${pts(p)}</div>`;
+  const row = p => `<div class="row${p.sponsor ? ' has-sponsor' : ''}" id="p-${p.placement}">
+    <span class="n ${pcls(p.placement)}">${p.placement}</span>${photo(p, 'sm', gslug, isRegularUserRanking)}
+    <div class="row-player-info">
+      ${crewBadge(p)}
+      <b>${playerLink(p.tag, p.playerId)}</b>
+    </div>
+    ${pts(p)}</div>`;
 
   let html = '', run = [];
   const flush = () => { if (run.length) html += `<div class="minlist glass">${run.map(row).join('')}</div>`; run = []; };
