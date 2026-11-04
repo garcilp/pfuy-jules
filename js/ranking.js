@@ -217,9 +217,11 @@ async function render(r) {
     </div>
     ${pts(p)}</div>`;
 
+  // In the article body, display the players in reverse order (lowest ranked first, #1 last)
+  const displayPlayers = [...players].reverse();
   let html = '', run = [];
   const flush = () => { if (run.length) html += `<div class="minlist glass">${run.map(row).join('')}</div>`; run = []; };
-  players.forEach(p => {
+  displayPlayers.forEach(p => {
     if (p.text || (p.notableWins && p.notableWins.length) || (p.notableResults && p.notableResults.length)) { flush(); html += full(p); }
     else if ((p.mains && p.mains.length) || p.realName) { flush(); html += medium(p); }
     else run.push(p);
@@ -242,8 +244,27 @@ async function render(r) {
     ? (isEs ? 'RANKING PERSONALIZADO' : 'CUSTOM RANKING')
     : 'POWER RANKINGS';
 
-  $('#side').innerHTML = `<div class="top"><div class="eyebrow mono">${eyebrowTitle}</div><b>${esc(r.title)}</b><span class="muted">${esc(r.game ? r.game.name : '')} · ${players.length} ${isEs ? 'jugadores' : 'players'}</span></div>` +
-    players.map(p => `<a class="jump" href="#p-${p.placement}"><span class="n ${pcls(p.placement)}">${p.placement}</span>${esc(p.tag)}</a>`).join('');
+  const sideEl = $('#side');
+  sideEl.classList.add('collapsed');
+  sideEl.innerHTML = `<button type="button" class="side-top-toggle" id="side-toggle" aria-expanded="false" aria-controls="side-players">
+    <div class="top-info">
+      <div class="eyebrow mono">${eyebrowTitle}</div>
+      <b>${esc(r.title)}</b>
+      <span class="muted">${esc(r.game ? r.game.name : '')} · ${players.length} ${isEs ? 'jugadores' : 'players'}</span>
+    </div>
+    <span class="side-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+  </button>
+  <div class="side-players" id="side-players">
+    ${players.map(p => `<a class="jump" href="#p-${p.placement}"><span class="n ${pcls(p.placement)}">${p.placement}</span>${esc(p.tag)}</a>`).join('')}
+  </div>`;
+
+  const toggleBtn = $('#side-toggle');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      const isCollapsed = sideEl.classList.toggle('collapsed');
+      toggleBtn.setAttribute('aria-expanded', String(!isCollapsed));
+    });
+  }
 
   const breadcrumb = isCommunity
     ? `<a href="ranking-creator.html">Ranking Creator</a> › ${esc(r.game ? r.game.name : '')} › ${esc(r.title)}`
