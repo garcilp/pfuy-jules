@@ -82,6 +82,31 @@
       <button type="button" class="btn glass pill" id="addBlankResultBtn">+ Add blank result</button>
     </div>
   </dialog>
+
+  <dialog id="crop-modal" class="player-select-modal glass crop-modal">
+    <div class="modal-header">
+      <div>
+        <h2 id="cropModalTitle">Crop Player Picture</h2>
+        <div id="cropModalSub" class="sub muted">Drag image to adjust crop position and use the slider to zoom</div>
+      </div>
+      <button type="button" class="x glass pill" id="closeCropModalBtn" aria-label="Close">×</button>
+    </div>
+    <div class="crop-modal-body">
+      <div class="crop-viewport" id="cropViewport">
+        <canvas id="cropCanvas" width="240" height="293"></canvas>
+      </div>
+      <div class="crop-controls">
+        <div class="crop-control-group">
+          <label for="cropZoomSlider" class="sub mono" id="cropZoomLabel">ZOOM</label>
+          <input type="range" id="cropZoomSlider" min="1" max="3" step="0.01" value="1" class="crop-zoom-slider">
+        </div>
+      </div>
+    </div>
+    <div class="crop-modal-footer">
+      <button type="button" class="btn glass pill" id="cancelCropBtn">Cancel</button>
+      <button type="button" class="btn glass pill crop-apply-btn" id="applyCropBtn">Apply Picture</button>
+    </div>
+  </dialog>
 </main>
 
 <footer class="foot mono muted" data-i18n="footer.creator">Platfighters.uy · Community Rankings</footer>
