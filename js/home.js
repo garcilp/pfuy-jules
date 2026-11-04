@@ -155,7 +155,6 @@ function renderUpcomingEvents() {
     const weekday = dt.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
     const month = dt.toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
     const gameNames = [...e.games.values()].map(g => g.name).join(' · ');
-    const entrantsStr = e.entrants ? `${e.entrants} registered` : 'Registration open';
 
     // Direct Start.gg navigation for upcoming tournaments:
     // If the tournament has only one game and an event URL exists, use that specific event's URL;
@@ -195,7 +194,6 @@ function renderUpcomingEvents() {
           ${i === 0 ? '<span class="next">NEXT</span>' : ''}
           <b>${esc(e.tournament)}</b>
           <span class="muted">${esc(gameNames || 'Platform Fighter')}</span>
-          <span class="mono muted">${esc(entrantsStr)}</span>
         </div>
       </a>
     `;
@@ -628,14 +626,18 @@ async function renderHubs() {
   container.innerHTML = hubs.map(h => {
     const soc = h.socials || {};
     const buttons = [];
-    if (soc.whatsapp && soc.whatsapp.enabled && soc.whatsapp.url) {
-      buttons.push(`<a class="hub-social-btn" href="${esc(soc.whatsapp.url)}" target="_blank" rel="noopener noreferrer" title="WhatsApp community" aria-label="WhatsApp">${icons.whatsapp}</a>`);
+    const waUrl = (soc.whatsapp && typeof soc.whatsapp === 'object' ? soc.whatsapp.url : soc.whatsapp) || '';
+    const dcUrl = (soc.discord && typeof soc.discord === 'object' ? soc.discord.url : soc.discord) || '';
+    const twUrl = (soc.twitter && typeof soc.twitter === 'object' ? soc.twitter.url : soc.twitter) || '';
+
+    if (waUrl && waUrl.trim()) {
+      buttons.push(`<a class="hub-social-btn" href="${esc(waUrl.trim())}" target="_blank" rel="noopener noreferrer" title="WhatsApp community" aria-label="WhatsApp">${icons.whatsapp}</a>`);
     }
-    if (soc.discord && soc.discord.enabled && soc.discord.url) {
-      buttons.push(`<a class="hub-social-btn" href="${esc(soc.discord.url)}" target="_blank" rel="noopener noreferrer" title="Discord community" aria-label="Discord">${icons.discord}</a>`);
+    if (dcUrl && dcUrl.trim()) {
+      buttons.push(`<a class="hub-social-btn" href="${esc(dcUrl.trim())}" target="_blank" rel="noopener noreferrer" title="Discord community" aria-label="Discord">${icons.discord}</a>`);
     }
-    if (soc.twitter && soc.twitter.enabled && soc.twitter.url) {
-      buttons.push(`<a class="hub-social-btn" href="${esc(soc.twitter.url)}" target="_blank" rel="noopener noreferrer" title="Twitter / X profile" aria-label="Twitter / X">${icons.twitter}</a>`);
+    if (twUrl && twUrl.trim()) {
+      buttons.push(`<a class="hub-social-btn" href="${esc(twUrl.trim())}" target="_blank" rel="noopener noreferrer" title="Twitter / X profile" aria-label="Twitter / X">${icons.twitter}</a>`);
     }
 
     return `
