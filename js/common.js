@@ -43,7 +43,7 @@ function renderMarkdown(text) {
   s = s.replace(/`([^`\n]+)`/g, (_, code) => {
     const idx = inlineCodes.length;
     inlineCodes.push(`<code>${code}</code>`);
-    return `@@INLINECODE_${idx}@@`;
+    return `§§INLINECODE${idx}§§`;
   });
 
   // Split into block paragraphs separated by two or more newlines
@@ -99,16 +99,55 @@ function renderMarkdown(text) {
       return `<blockquote>${formatInline(bqContent)}</blockquote>`;
     }
 
-    // Unordered list
-    if (/^[-*]\s+/.test(block)) {
-      const items = block.split('\n').filter(l => /^[-*]\s+/.test(l)).map(l => `<li>${formatInline(l.replace(/^[-*]\s+/, ''))}</li>`).join('');
-      return `<ul>${items}</ul>`;
-    }
+    // Lists (unordered and ordered, supporting nested / indented lists)
+    if (/^(\s*)([-*]|\d+\.)\s+/.test(block)) {
+      const lines = block.split('\n');
+      const stack = [];
+      let listHtml = '';
 
-    // Ordered list
-    if (/^\d+\.\s+/.test(block)) {
-      const items = block.split('\n').filter(l => /^\d+\.\s+/.test(l)).map(l => `<li>${formatInline(l.replace(/^\d+\.\s+/, ''))}</li>`).join('');
-      return `<ol>${items}</ol>`;
+      for (const line of lines) {
+        const match = line.match(/^(\s*)([-*]|\d+\.)\s+(.*)$/);
+        if (!match) continue;
+        const rawIndent = match[1];
+        const indent = rawIndent.replace(/\t/g, '  ').length;
+        const marker = match[2];
+        const type = (marker === '-' || marker === '*') ? 'ul' : 'ol';
+        const content = formatInline(match[3]);
+
+        if (stack.length === 0) {
+          stack.push({ type, indent });
+          listHtml += `<${type}><li>${content}`;
+        } else {
+          let top = stack[stack.length - 1];
+          if (indent > top.indent) {
+            stack.push({ type, indent });
+            listHtml += `<${type}><li>${content}`;
+          } else {
+            while (stack.length > 1 && indent < stack[stack.length - 1].indent) {
+              const popped = stack.pop();
+              listHtml += `</li></${popped.type}>`;
+            }
+            top = stack[stack.length - 1];
+            if (top.type !== type && indent === top.indent) {
+              const popped = stack.pop();
+              listHtml += `</li></${popped.type}>`;
+              stack.push({ type, indent });
+              listHtml += `<${type}><li>${content}`;
+            } else {
+              listHtml += `</li><li>${content}`;
+            }
+          }
+        }
+      }
+
+      while (stack.length > 0) {
+        const popped = stack.pop();
+        listHtml += `</li></${popped.type}>`;
+      }
+
+      if (listHtml) {
+        return listHtml;
+      }
     }
 
     // Regular paragraph
@@ -118,7 +157,7 @@ function renderMarkdown(text) {
   let result = renderedBlocks.filter(Boolean).join('');
 
   // Restore inline codes
-  result = result.replace(/@@INLINECODE_(\d+)@@/g, (_, idx) => inlineCodes[+idx] || '');
+  result = result.replace(/§§INLINECODE(\d+)§§/g, (_, idx) => inlineCodes[+idx] || '');
 
   // Restore code blocks
   result = result.replace(/@@CODEBLOCK_(\d+)@@/g, (_, idx) => codeBlocks[+idx] || '');
