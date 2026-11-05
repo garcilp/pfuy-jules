@@ -10,6 +10,9 @@ const nameCollator = new Intl.Collator(undefined, { sensitivity: 'base', numeric
 
 async function loadPlayers() {
   try {
+    if (window.PRBadges) {
+      await window.PRBadges.loadAllRankings();
+    }
     const response = await fetch('data/profiles/index.json', { cache: 'no-store' });
     if (!response.ok) throw new Error('No generated player directory is available yet.');
     const entries = await response.json();
@@ -80,11 +83,19 @@ function render() {
       ? (events === 1 ? 'TORNEO' : 'TORNEOS')
       : (events === 1 ? 'EVENT' : 'EVENTS');
     const picture = p.photo || `assets/players/${entry.playerId}.png`;
-    return `<a class="player-card glass" href="index.html?player=${encodeURIComponent(entry.playerId)}">
+    const playerTag = p.tag || entry.tag;
+    let miniBadgesHtml = '';
+    if (window.PRBadges && playerTag) {
+      const rList = window.PRBadges.getPlayerRankings(playerTag);
+      if (rList.length) {
+        miniBadgesHtml = `<span class="player-mini-badges" onclick="event.stopPropagation();">${rList.slice(0, 3).map(e => window.PRBadges.renderMini(e)).join('')}</span>`;
+      }
+    }
+    return `<div class="player-card glass" role="link" tabindex="0" onclick="if(!event.target.closest('.pr-badge')){window.location.href='index.html?player=${encodeURIComponent(entry.playerId)}'}" onkeydown="if((event.key==='Enter'||event.key===' ')&&!event.target.closest('.pr-badge')){event.preventDefault();window.location.href='index.html?player=${encodeURIComponent(entry.playerId)}'}">
       <span class="player-avatar"><img src="${esc(picture)}" alt="" loading="lazy"></span>
-      <span class="player-card-copy">${p.sponsor ? `<span class="mono muted player-sponsor">${esc(p.sponsor)}</span>` : ''}<b>${esc(p.tag || entry.tag)}</b><span class="muted">${esc(location || games.map(g => g.name).join(' · ') || (isEs ? 'Jugador' : 'Player'))}</span></span>
+      <span class="player-card-copy">${p.sponsor ? `<span class="mono muted player-sponsor">${esc(p.sponsor)}</span>` : ''}<span class="player-tag-row"><b>${esc(playerTag)}</b>${miniBadgesHtml}</span><span class="muted">${esc(location || games.map(g => g.name).join(' · ') || (isEs ? 'Jugador' : 'Player'))}</span></span>
       <span class="player-card-meta"><b>${events}</b><span class="mono muted">${eventLabel}</span></span>
-    </a>`;
+    </div>`;
   }).join('') : (isEs
     ? '<div class="panel glass empty-state"><h2>Sin resultados</h2><p class="muted">Prueba con otro nombre, tag, sponsor o juego.</p></div>'
     : '<div class="panel glass empty-state"><h2>No matches</h2><p class="muted">Try another player name, tag, sponsor or game.</p></div>');
