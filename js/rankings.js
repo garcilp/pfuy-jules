@@ -202,6 +202,10 @@ async function init() {
   activeSection = state.section;
   activeSubsection = state.system;
 
+  if (window.PRBadges) {
+    window.PRBadges.loadAllRankings().catch(e => console.warn(e));
+  }
+
   // Load available games
   try {
     const res = await fetch('/api/games');
@@ -995,6 +999,13 @@ window.createPRFromCurrentRankings = function() {
   window.location.href = 'ranking-creator.html?source=pr';
 };
 
+function renderInlineMiniBadges(playerTag) {
+  if (!window.PRBadges || !playerTag) return '';
+  const entries = window.PRBadges.getPlayerRankings(playerTag);
+  if (!entries.length) return '';
+  return `<span class="player-mini-badges" onclick="event.stopPropagation();">${entries.slice(0, 3).map(e => window.PRBadges.renderMini(e)).join('')}</span>`;
+}
+
 function renderCustomPowerRankings() {
   cleanupObserver();
 
@@ -1201,6 +1212,7 @@ function renderCustomPowerRankings() {
                 <span class="player-avatar mini"><img src="assets/players/${esc(p.playerId)}.png" alt="" onerror="this.remove()"></span>
                 <b>${esc(p.playerTag)}</b>
               </a>
+              ${renderInlineMiniBadges(p.playerTag)}
             </div>
             <span class="score-col mono font-bold">${p.score}</span>
             <span class="mono" style="color:${PR_COMPONENTS.glicko2.color};">${Math.round((p.weightedContributions.glicko2||0)*10)/10} <small class="muted">(${Math.round((p.normalizedScores.glicko2||0)*10)/10})</small></span>
@@ -1317,6 +1329,7 @@ function renderIndividualSystem(systemKey) {
                 ${p.isProvisional ? `<span class="badge warning mono" style="font-size:0.75rem; padding:0.1rem 0.4rem; margin-left:0.4rem;" title="Provisional ranking (< 3 eligible wins)">Provisional</span>` : ''}
                 ${p.isUnranked ? `<span class="badge muted mono" style="font-size:0.75rem; padding:0.1rem 0.4rem; margin-left:0.4rem;" title="No eligible wins recorded">Unranked</span>` : ''}
               </a>
+              ${renderInlineMiniBadges(p.playerTag)}
             </div>
             <span class="score-col mono font-bold">${p.isUnranked ? '-' : p.score}</span>
             <span class="winrate-col mono">${p.winRate !== undefined ? p.winRate + '%' : '-'}</span>
@@ -1448,6 +1461,7 @@ function renderComparison() {
               <a href="index.html?player=${encodeURIComponent(p.playerId)}" class="player-card-link">
                 <b>${esc(p.playerTag)}</b>
               </a>
+              ${renderInlineMiniBadges(p.playerTag)}
             </div>
             <span class="mono">${p.glicko2 ? (p.glicko2.rank ? `#${p.glicko2.rank} (${p.glicko2.score})` : `- (${p.glicko2.score})`) : '-'}</span>
             <span class="mono">${p.sof ? (p.sof.rank ? `#${p.sof.rank} (${p.sof.score})` : `- (${p.sof.score})`) : '-'}</span>

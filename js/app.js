@@ -115,7 +115,12 @@ async function loadProfile() {
   return response.json();
 }
 
-Promise.all([loadProfile(), loadPlayerDirectory(), loadEventsIndex()]).then(([d]) => {
+Promise.all([
+  loadProfile(),
+  loadPlayerDirectory(),
+  loadEventsIndex(),
+  window.PRBadges ? window.PRBadges.loadAllRankings() : Promise.resolve(null)
+]).then(([d]) => {
   data = d;
   render();
   addEventListener('hashchange', () => { resultPage = 1; selectedBestPlacement = null; selectedBestFinishKey = null; render(); });
@@ -283,9 +288,55 @@ function render() {
       : `<div class="${tileClass}">${contents}</div>`;
   }).join('') + characterFeatureTile;
 
+  // PR Badges for Player
+  let prBadgesHtml = '';
+  if (window.PRBadges) {
+    if (!sel) {
+      // Overview tab: Compact badges showing latest ranking per game
+      const latestRankings = window.PRBadges.getLatestPlayerRankingsByGame(player.tag);
+      if (latestRankings.length > 0) {
+        const badgesListHtml = latestRankings.map(entry => window.PRBadges.renderCompact(entry)).join('');
+        const allPlayerRankings = window.PRBadges.getPlayerRankings(player.tag);
+        const standaloneBadgesHtml = allPlayerRankings.map(entry => window.PRBadges.renderLarge(entry)).join('');
+        prBadgesHtml = `
+          <div class="panel glass pr-overview-card">
+            <div class="pr-overview-title">
+              <h2 style="margin:0;font-size:18px;">Power Rankings</h2>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <span class="muted mono" style="font-size:12px;">Latest official PR per game</span>
+                <button type="button" class="quiet-button mono pr-resume-btn" style="font-size:11px;padding:3px 8px;border:1px solid rgba(255,255,255,0.15);border-radius:6px;cursor:pointer;">Resume / Standalone View</button>
+              </div>
+            </div>
+            <div class="pr-overview-badges">
+              ${badgesListHtml}
+            </div>
+          </div>
+          <dialog id="pr-resume-modal" class="pr-standalone-modal glass">
+            <div class="modal-header">
+              <div>
+                <span class="eyebrow mono">PLAYER RESUME</span>
+                <h3 style="margin:2px 0 0;font-size:22px;">${esc(player.tag)} · PR Badges</h3>
+              </div>
+              <button type="button" class="quiet-button close-btn" onclick="this.closest('dialog').close()">✕</button>
+            </div>
+            <div class="pr-standalone-badges-grid">
+              ${standaloneBadgesHtml}
+            </div>
+          </dialog>
+        `;
+      }
+    } else {
+      // Game tab: Table of all rankings for this game
+      const gameRankings = window.PRBadges.getPlayerRankingsForGame(player.tag, sel.id || sel.slug);
+      if (gameRankings.length > 0) {
+        prBadgesHtml = window.PRBadges.renderGameRankingsTable(gameRankings, sel.name);
+      }
+    }
+  }
+
   let middle;
   if (!sel) {
-    middle = `<h2 class="sec" style="margin:4px 4px 0">Games played</h2><div class="cards">` +
+    middle = prBadgesHtml + `<h2 class="sec" style="margin:4px 4px 0">Games played</h2><div class="cards">` +
       gamesBySetsPlayed.map(g => {
           const character = g.characters?.[0]?.name || 'other';
         const eventWins = (g.results || []).filter(result => Number(result.place) === 1).length;
@@ -297,7 +348,7 @@ function render() {
         <span class="rec">${g.wins}–${g.losses}</span><span class="muted">${bestLabel}</span></a>`;
       }).join('') + `</div>`;
   } else {
-    middle = `<div class="row2">
+    middle = prBadgesHtml + `<div class="row2">
       <div class="panel glass"><h2>Character usage</h2>${(sel.characters || []).map(c =>
         `<div class="usage"><div class="usage-row"><span class="stock-icon"><span>${esc(c.name[0])}</span><img src="assets/renders/${esc(sel.slug)}/stocks/${slug(c.name)}.webp" alt="" onload="this.previousElementSibling.remove()" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='assets/renders/${esc(sel.slug)}/stocks/other.webp'}else{this.parentElement.remove()}"></span><span>${esc(c.name)}</span><span class="mono usage-percent">${Number(c.usage).toFixed(1)}%</span></div><div class="bar"><i style="width:${Number(c.usage) || 0}%"></i></div></div>`).join('') || '<p class="muted">No character selections recorded.</p>'}</div>
       <div class="panel glass"><h2>Notable wins</h2>${notableWins.map(x => {
@@ -470,6 +521,10 @@ function render() {
     `</div>${rows.length < allRows.length ? '<button class="quiet-button load-more-results" type="button">Show more events</button>' : ''}</div>`;
   $('#main').innerHTML = `<div class="tiles">${tiles}</div>${middle}${bestPlacementHistory}${opponentHistory}${results}`;
   fitStatValues();
+  $('#main').querySelector('.pr-resume-btn')?.addEventListener('click', () => {
+    const modal = $('#pr-resume-modal');
+    if (modal) modal.showModal();
+  });
   $('#main').querySelector('.load-more-results')?.addEventListener('click', () => {
     resultPage += 1;
     render();
