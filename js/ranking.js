@@ -221,6 +221,16 @@ async function render(r) {
   const displayPlayers = [...players].reverse();
   let html = '', run = [];
   const flush = () => { if (run.length) html += `<div class="minlist glass">${run.map(row).join('')}</div>`; run = []; };
+
+  const imageBoxHtml = (r.imageBox && r.imageBox.url) ? `
+    <figure class="article-image-box glass">
+      <img src="${esc(r.imageBox.url)}" alt="${esc(r.imageBox.caption || r.title || '')}" onerror="this.closest('.article-image-box').remove()">
+      ${r.imageBox.caption ? `<figcaption class="article-image-caption">${esc(r.imageBox.caption)}</figcaption>` : ''}
+    </figure>
+  ` : '';
+
+  const imgPlacement = r.imageBox?.placement || 'after_intro';
+
   displayPlayers.forEach(p => {
     if (p.text || (p.notableWins && p.notableWins.length) || (p.notableResults && p.notableResults.length)) { flush(); html += full(p); }
     else if ((p.mains && p.mains.length) || p.realName) { flush(); html += medium(p); }
@@ -276,14 +286,26 @@ async function render(r) {
     ? `<span>·</span><span class="ranking-created-by">${isEs ? 'Creado por ' + esc(creatorStr) : 'Created by ' + esc(creatorStr)}</span>`
     : '';
 
-  $('#col').innerHTML = `<section class="head-panel glass">
+  const headPanelHtml = `<section class="head-panel glass">
       <div class="eyebrow mono">${breadcrumb}</div>
       <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-top:8px;">
         <h1 class="display" style="margin:0;">${esc(r.title)}</h1>
         ${badgeHtml}
       </div>
       <div class="meta" style="margin-top:12px;"><span class="glass pill chip">${esc(r.game ? r.game.name : '')}</span>${periodText ? `<span>${periodText}</span>` : ''}${r.publishedBy ? `<span>·</span><span>${isEs ? 'Publicado por ' + esc(r.publishedBy) : 'Published by ' + esc(r.publishedBy)}</span>` : ''}${metaCreatorHtml}</div>
-      ${r.intro ? `<div class="intro markdown-content">${renderMarkdown(r.intro)}</div>` : ''}</section>` + html;
+      ${r.intro ? `<div class="intro markdown-content">${renderMarkdown(r.intro)}</div>` : ''}</section>`;
+
+  let finalHtml = '';
+  if (imgPlacement === 'beginning') {
+    finalHtml = imageBoxHtml + headPanelHtml + html;
+  } else if (imgPlacement === 'end') {
+    finalHtml = headPanelHtml + html + imageBoxHtml;
+  } else {
+    // default: after_intro
+    finalHtml = headPanelHtml + imageBoxHtml + html;
+  }
+
+  $('#col').innerHTML = finalHtml;
 }
 
 if (window.i18n && window.i18n.onChange) {
