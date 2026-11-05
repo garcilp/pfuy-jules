@@ -3,9 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#050B1F">
 <title>Power ranking · Platfighters.uy</title>
 <link rel="icon" href="assets/logo.jpg">
+<script>
+(function(){
+  var t=null;
+  try{t=localStorage.getItem('pfuy-theme');}catch(e){}
+  if(!t){
+    if(window.matchMedia&&window.matchMedia('(prefers-contrast: more)').matches){t='high-contrast';}
+    else if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches){t='daylight';}
+    else{t='default';}
+  }
+  document.documentElement.dataset.theme=t;
+})();
+</script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="css/themes.css">
 <link rel="stylesheet" href="css/styles.css">
 <link rel="stylesheet" href="css/historical-rankings.css">
 </head>
@@ -30,5 +44,6 @@
 <script src="js/i18n.js"></script>
 <script src="js/common.js"></script>
 <script src="js/ranking.js"></script>
+<script src="js/theme.js"></script>
 </body>
 </html>

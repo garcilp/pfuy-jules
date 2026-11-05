@@ -110,16 +110,16 @@
   max-height: 380px;
   overflow-y: auto;
   overscroll-behavior: contain;
-  background: #050B1F;
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: var(--bg);
+  border: 1px solid var(--glass-border);
   border-radius: 20px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 16px 40px var(--glass-shadow);
   z-index: 100;
   display: flex;
   flex-direction: column;
   padding: 8px;
   scrollbar-width: thin;
-  scrollbar-color: rgba(159, 214, 255, 0.35) transparent;
+  scrollbar-color: color-mix(in srgb, var(--accent) 35%, transparent) transparent;
 }
 
 .home .search-results::-webkit-scrollbar {
@@ -132,7 +132,7 @@
 }
 
 .home .search-results::-webkit-scrollbar-thumb {
-  background: rgba(159, 214, 255, 0.35);
+  background: color-mix(in srgb, var(--accent) 35%, transparent);
   border-radius: 999px;
 }
 
@@ -154,7 +154,7 @@
 
 .home .search-item:hover,
 .home .search-item:focus-visible {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--faint);
   color: var(--text);
 }
 
@@ -185,7 +185,7 @@
   font: 11px 'JetBrains Mono', monospace;
   padding: 2px 8px;
   border-radius: 999px;
-  background: rgba(159, 214, 255, 0.15);
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
   color: var(--sky);
   flex-shrink: 0;
 }
@@ -255,7 +255,7 @@
 }
 
 .home #events {
-  border-color: rgba(245, 197, 66, 0.3);
+  border-color: color-mix(in srgb, var(--gold) 30%, transparent);
 }
 
 .home #events .head h2 {
@@ -270,16 +270,16 @@
   align-items: center;
   color: var(--text);
   text-decoration: none;
-  background: rgba(245, 197, 66, 0.06);
-  border: 1px solid rgba(245, 197, 66, 0.28);
-  box-shadow: inset 0 1px 0 rgba(245, 197, 66, 0.25), 0 8px 24px rgba(0, 0, 0, 0.3);
+  background: color-mix(in srgb, var(--gold) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold) 30%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--gold) 25%, transparent), 0 8px 24px var(--glass-shadow);
   transition: background 150ms ease, transform 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
 }
 
 .home a.event:hover {
-  background: rgba(245, 197, 66, 0.12);
-  border-color: rgba(245, 197, 66, 0.5);
-  box-shadow: inset 0 1px 0 rgba(245, 197, 66, 0.4), 0 0 20px rgba(245, 197, 66, 0.2);
+  background: color-mix(in srgb, var(--gold) 15%, transparent);
+  border-color: color-mix(in srgb, var(--gold) 50%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--gold) 40%, transparent), 0 0 20px color-mix(in srgb, var(--gold) 20%, transparent);
   transform: translateY(-2px);
   color: var(--text);
 }
@@ -288,12 +288,12 @@
   min-width: 52px;
   text-align: center;
   padding-right: 16px;
-  border-right: 1px solid rgba(245, 197, 66, 0.22);
+  border-right: 1px solid color-mix(in srgb, var(--gold) 25%, transparent);
 }
 
 .home .datebox .mono {
   font-size: 11px;
-  color: rgba(245, 197, 66, 0.85);
+  color: var(--gold);
 }
 
 .home .datebox .day {
@@ -330,8 +330,8 @@
   align-self: flex-start;
   font: 11px 'JetBrains Mono', monospace;
   color: var(--gold);
-  border: 1px solid rgba(245, 197, 66, 0.6);
-  background: rgba(245, 197, 66, 0.12);
+  border: 1px solid color-mix(in srgb, var(--gold) 60%, transparent);
+  background: color-mix(in srgb, var(--gold) 15%, transparent);
   border-radius: 999px;
   padding: 2px 8px;
   margin-bottom: 2px;
@@ -539,7 +539,7 @@
   font-size: 90px;
   font-weight: 700;
   line-height: 1;
-  color: rgba(255, 255, 255, 0.08);
+  color: var(--faint);
   pointer-events: none;
   z-index: 0;
 }
@@ -609,7 +609,7 @@
 }
 
 .home .social a:hover {
-  background: rgba(255, 255, 255, 0.16);
+  background: var(--faint);
   color: var(--text);
 }
 
@@ -627,8 +627,8 @@
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--glass-fill);
+  border: 1px solid var(--glass-border);
   color: var(--text);
   text-decoration: none;
   transition: background 150ms ease, transform 150ms ease, border-color 150ms ease;
@@ -641,10 +641,10 @@
 }
 
 .home .hub-social-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--glass-fill);
   border-color: var(--sky);
   transform: translateY(-2px);
-  color: #fff;
+  color: var(--text);
 }
 
 .home .empty-notice {
