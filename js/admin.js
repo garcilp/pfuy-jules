@@ -532,7 +532,7 @@ function renderCommunitySocials(socials = {}) {
     const gSocial = socials[g.slug] || {};
     const wa = gSocial.whatsapp || { enabled: false, url: '' };
     const dc = gSocial.discord || { enabled: false, url: '' };
-    const tw = gSocial.twitter || { enabled: false, url: '' };
+    const ig = gSocial.instagram || gSocial.twitter || { enabled: false, url: '' };
 
     return `
       <div style="margin-bottom:20px;padding:16px;background:rgba(255,255,255,0.04);border-radius:12px;border:1px solid var(--line);">
@@ -547,8 +547,8 @@ function renderCommunitySocials(socials = {}) {
             <input type="url" id="soc-${g.slug}-dc-url" placeholder="https://discord.gg/..." value="${esc(dc.url || '')}" style="flex:1;">
           </div>
           <div style="display:flex;align-items:center;gap:12px;">
-            <span style="width:100px;font-weight:500;">Twitter / X</span>
-            <input type="url" id="soc-${g.slug}-tw-url" placeholder="https://twitter.com/..." value="${esc(tw.url || '')}" style="flex:1;">
+            <span style="width:100px;font-weight:500;">Instagram</span>
+            <input type="url" id="soc-${g.slug}-ig-url" placeholder="https://instagram.com/..." value="${esc(ig.url || '')}" style="flex:1;">
           </div>
         </div>
       </div>
@@ -565,7 +565,7 @@ $('#community-socials-form')?.addEventListener('submit', async (e) => {
     COMMUNITY_GAMES.forEach(g => {
       const waUrl = $(`#soc-${g.slug}-wa-url`).value.trim();
       const dcUrl = $(`#soc-${g.slug}-dc-url`).value.trim();
-      const twUrl = $(`#soc-${g.slug}-tw-url`).value.trim();
+      const igUrl = $(`#soc-${g.slug}-ig-url`).value.trim();
 
       socials[g.slug] = {
         whatsapp: {
@@ -576,9 +576,9 @@ $('#community-socials-form')?.addEventListener('submit', async (e) => {
           enabled: Boolean(dcUrl),
           url: dcUrl
         },
-        twitter: {
-          enabled: Boolean(twUrl),
-          url: twUrl
+        instagram: {
+          enabled: Boolean(igUrl),
+          url: igUrl
         }
       };
     });

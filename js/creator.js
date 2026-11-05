@@ -1,7 +1,7 @@
 // Platfighters.uy — ranking creator. Plain JS, no build step.
 // Supports Public mode and Admin mode with server-side authentication verification.
 
-let draft, games = [], allProfiles = [], gameCharacters = {}, sel = 0, dragFrom = null, dirty = false, savedAt = '';
+let draft, games = [], allProfiles = [], gameCharacters = {}, sel = 0, dragFrom = null, dragSubtype = null, dragSubFrom = null, dirty = false, savedAt = '';
 let prSnapshot = null;
 let isAdmin = false;
 let adminCsrfToken = '';
@@ -88,6 +88,7 @@ Promise.all(loadPromises)
         publishedBy: '',
         createdBy: '',
         intro: '',
+        imageBox: null,
         players: []
       };
       dirty = false;
@@ -102,6 +103,7 @@ Promise.all(loadPromises)
         publishedBy: '',
         createdBy: '',
         intro: '',
+        imageBox: null,
         players: []
       };
       dirty = false;
@@ -319,7 +321,14 @@ async function openEventModalForCurrentPlayer() {
           const gamesArr = profileData.games || [];
           const matchedGame = gamesArr.find(g => g.slug === curGameSlug) || gamesArr[0];
           if (matchedGame && matchedGame.results) {
-            playerEventResults = matchedGame.results;
+            const startDate = draft.period?.start || '';
+            const endDate = draft.period?.end || '';
+            playerEventResults = matchedGame.results.filter(r => {
+              const resDate = r.date || '';
+              if (startDate && resDate && resDate < startDate) return false;
+              if (endDate && resDate && resDate > endDate) return false;
+              return true;
+            });
             break;
           }
         }
@@ -703,15 +712,67 @@ document.addEventListener('mousedown', e => {
     closeMainsDropdown();
   }
 });
-document.addEventListener('dragstart', e => { const r = e.target.closest && e.target.closest('.prow'); if (r) { dragFrom = +r.dataset.i; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', ''); } });
-document.addEventListener('dragover', e => { const r = e.target.closest && e.target.closest('.prow'); if (r && dragFrom !== null) { e.preventDefault(); document.querySelectorAll('.prow.over').forEach(x => x.classList.remove('over')); r.classList.add('over'); } });
+document.addEventListener('dragstart', e => {
+  const prow = e.target.closest && e.target.closest('.prow');
+  if (prow) {
+    dragFrom = +prow.dataset.i;
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', '');
+    return;
+  }
+  const sortable = e.target.closest && e.target.closest('.rowf-sortable');
+  if (sortable) {
+    dragSubtype = sortable.dataset.sortSection;
+    dragSubFrom = +sortable.dataset.i;
+    sortable.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', '');
+  }
+});
+document.addEventListener('dragover', e => {
+  const prow = e.target.closest && e.target.closest('.prow');
+  if (prow && dragFrom !== null) {
+    e.preventDefault();
+    document.querySelectorAll('.prow.over').forEach(x => x.classList.remove('over'));
+    prow.classList.add('over');
+    return;
+  }
+  const sortable = e.target.closest && e.target.closest('.rowf-sortable');
+  if (sortable && dragSubtype && sortable.dataset.sortSection === dragSubtype && dragSubFrom !== null) {
+    e.preventDefault();
+    document.querySelectorAll('.rowf-sortable.drag-over').forEach(x => x.classList.remove('drag-over'));
+    sortable.classList.add('drag-over');
+  }
+});
+document.addEventListener('dragend', () => {
+  document.querySelectorAll('.rowf-sortable.dragging').forEach(x => x.classList.remove('dragging'));
+  document.querySelectorAll('.rowf-sortable.drag-over').forEach(x => x.classList.remove('drag-over'));
+  dragSubtype = null;
+  dragSubFrom = null;
+});
 document.addEventListener('drop', e => {
-  const r = e.target.closest && e.target.closest('.prow');
-  if (!r || dragFrom === null) return;
-  e.preventDefault();
-  const cur = draft.players[sel], [m] = draft.players.splice(dragFrom, 1);
-  draft.players.splice(+r.dataset.i, 0, m);
-  sel = draft.players.indexOf(cur); dragFrom = null; dirty = true; renderAll();
+  const prow = e.target.closest && e.target.closest('.prow');
+  if (prow && dragFrom !== null) {
+    e.preventDefault();
+    const cur = draft.players[sel], [m] = draft.players.splice(dragFrom, 1);
+    draft.players.splice(+prow.dataset.i, 0, m);
+    sel = draft.players.indexOf(cur); dragFrom = null; dirty = true; renderAll();
+    return;
+  }
+  const sortable = e.target.closest && e.target.closest('.rowf-sortable');
+  if (sortable && dragSubtype && sortable.dataset.sortSection === dragSubtype && dragSubFrom !== null) {
+    e.preventDefault();
+    const toIndex = +sortable.dataset.i;
+    const p = draft.players[sel];
+    if (p && Array.isArray(p[dragSubtype]) && dragSubFrom !== toIndex) {
+      const [item] = p[dragSubtype].splice(dragSubFrom, 1);
+      p[dragSubtype].splice(toIndex, 0, item);
+      dirty = true;
+      preserveScroll(() => renderEditor());
+    }
+    dragSubtype = null;
+    dragSubFrom = null;
+  }
 });
 
 const OPT = { realName: '', mains: [], text: '', notableWins: [], notableResults: [] };
@@ -737,10 +798,7 @@ const getWhy = () => {
     MINIMUM: 'Shown as a minimum row: placement, picture, tag and points only.'
   };
 };
-const lab = (t, req) => {
-  const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
-  return `<div class="lab"><span>${t}</span><span>${req ? (isEs ? 'REQUERIDO' : 'REQUIRED') : (isEs ? 'OPCIONAL' : 'OPTIONAL')}</span></div>`;
-};
+const lab = t => `<div class="lab"><span>${t}</span></div>`;
 const lab2 = t => `<div class="lab"><span>${t}</span></div>`;
 const stock = name => {
   const gslug = draft.game?.slug || 'ultimate';
@@ -871,18 +929,67 @@ function renderDetails() {
   }
 
   const periodInputsHtml = isYearly
-    ? `<div class="fld" style="flex:1 1 160px">${lab(isEs ? 'AÑO' : 'YEAR', 1)}<input type="number" class="inp mono" data-bind="year" min="2000" max="2100" value="${esc(curYear)}" placeholder="2026"></div>`
-    : `<div class="fld" style="flex:1 1 160px">${lab(isEs ? 'INICIO DEL PERIODO' : 'PERIOD START', 1)}<input type="date" class="inp" data-bind="start" value="${draft.period.start}"></div>
-       <div class="fld" style="flex:1 1 160px">${lab(isEs ? 'FIN DEL PERIODO' : 'PERIOD END', 1)}<input type="date" class="inp" data-bind="end" value="${draft.period.end}"></div>`;
+    ? `<div class="fld" style="flex:1 1 160px">${lab(isEs ? 'AÑO' : 'YEAR')}<input type="number" class="inp inp-req mono" data-bind="year" min="2000" max="2100" value="${esc(curYear)}" placeholder="2026"></div>`
+    : `<div class="fld" style="flex:1 1 160px">${lab(isEs ? 'INICIO DEL PERIODO' : 'PERIOD START')}<input type="date" class="inp inp-req" data-bind="start" value="${draft.period.start}"></div>
+       <div class="fld" style="flex:1 1 160px">${lab(isEs ? 'FIN DEL PERIODO' : 'PERIOD END')}<input type="date" class="inp inp-req" data-bind="end" value="${draft.period.end}"></div>`;
 
   $('#details').innerHTML = `${snapshotControlsHtml}<div><h2>${isEs ? 'Detalles del ranking' : 'Ranking details'}</h2><div class="sub">${isEs ? 'Se muestra en el archivo y al inicio del artículo.' : 'Shown in the archive and at the top of the article.'}</div></div>
-    <div class="frow"><div class="fld" style="flex:2 1 320px">${lab(isEs ? 'NOMBRE' : 'NAME', 1)}<input class="inp" data-bind="title" value="${esc(draft.title)}" placeholder="e.g. Montevideo Season 1 PR"></div>
-      <div class="fld" style="flex:1 1 200px">${lab(isEs ? 'JUEGO' : 'GAME', 1)}<select class="inp" data-bind="game">${games.map(g => `<option value="${g.id}"${g.id === draft.game.id ? ' selected' : ''}>${esc(g.name)}</option>`).join('')}</select></div></div>
+    <div class="frow"><div class="fld" style="flex:2 1 320px">${lab(isEs ? 'NOMBRE' : 'NAME')}<input class="inp inp-req" data-bind="title" value="${esc(draft.title)}" placeholder="e.g. Montevideo Season 1 PR"></div>
+      <div class="fld" style="flex:1 1 200px">${lab(isEs ? 'JUEGO' : 'GAME')}<select class="inp inp-req" data-bind="game">${games.map(g => `<option value="${g.id}"${g.id === draft.game.id ? ' selected' : ''}>${esc(g.name)}</option>`).join('')}</select></div></div>
     <div class="frow">${periodInputsHtml}
-      <div class="fld">${lab(isEs ? 'CLASIFICACIÓN' : 'CLASSIFICATION', 1)}<div class="seg glass pill" id="status">${['yearly', 'seasonal'].map(s => `<button type="button" class="${draft.status === s ? 'on' : ''}" data-act="status" data-v="${s}">${s === 'yearly' ? (isEs ? 'Anual' : 'Yearly') : (isEs ? 'De temporada' : 'Seasonal')}</button>`).join('')}</div></div></div>
-    ${(isAdmin && requestedMode === 'admin') ? `<div class="fld">${lab(isEs ? 'PUBLICADO POR' : 'PUBLISHED BY', 0)}<input class="inp" data-bind="publishedBy" value="${esc(draft.publishedBy || '')}"></div>` : ''}
-    <div class="fld">${lab(isEs ? 'CREADO POR' : 'CREATED BY', 0)}<input class="inp" data-bind="createdBy" maxlength="80" value="${esc(draft.createdBy || '')}" placeholder="${isEs ? 'Alias o nombre para mostrar' : 'Display name, alias, or handle'}"></div>
-    <div class="fld">${lab(isEs ? 'INTRODUCCIÓN' : 'INTRO', 0)}<textarea class="inp" data-bind="intro" placeholder="Introductory notes...">${esc(draft.intro || '')}</textarea><div class="cnt" id="introCount">${(draft.intro || '').length} ${isEs ? 'caracteres' : 'characters'}</div></div>`;
+      <div class="fld">${lab(isEs ? 'CLASIFICACIÓN' : 'CLASSIFICATION')}<div class="seg seg-req glass pill" id="status">${['yearly', 'seasonal'].map(s => `<button type="button" class="${draft.status === s ? 'on' : ''}" data-act="status" data-v="${s}">${s === 'yearly' ? (isEs ? 'Anual' : 'Yearly') : (isEs ? 'De temporada' : 'Seasonal')}</button>`).join('')}</div></div></div>
+    ${(isAdmin && requestedMode === 'admin') ? `<div class="fld">${lab(isEs ? 'PUBLICADO POR' : 'PUBLISHED BY')}<input class="inp" data-bind="publishedBy" value="${esc(draft.publishedBy || '')}"></div>` : ''}
+    <div class="fld">${lab(isEs ? 'CREADO POR' : 'CREATED BY')}<input class="inp" data-bind="createdBy" maxlength="80" value="${esc(draft.createdBy || '')}" placeholder="${isEs ? 'Alias o nombre para mostrar' : 'Display name, alias, or handle'}"></div>
+    <div class="fld">${lab(isEs ? 'INTRODUCCIÓN' : 'INTRO')}<textarea class="inp" data-bind="intro" placeholder="Introductory notes...">${esc(draft.intro || '')}</textarea><div class="cnt" id="introCount">${(draft.intro || '').length} ${isEs ? 'caracteres' : 'characters'}</div></div>
+    ${renderImageBoxDetails()}`;
+}
+
+function renderImageBoxDetails() {
+  const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
+  const imgBox = draft.imageBox || { url: '', placement: 'after_intro', caption: '' };
+  const hasImg = Boolean(imgBox.url);
+
+  const placementOptions = [
+    ['beginning', isEs ? '1. Inicio (antes de la introducción)' : '1. Beginning (before introduction)'],
+    ['after_intro', isEs ? '2. Después de la introducción' : '2. After the introduction'],
+    ['end', isEs ? '3. Final (después del último jugador)' : '3. End (after final player)']
+  ];
+
+  return `
+    <div class="sec glass" data-sec="imageBox" style="margin-top:8px;">
+      <div class="sh">
+        <b>${isEs ? 'Cuadro de Imagen' : 'Image Box'}</b>
+        <span class="sp"></span>
+        ${hasImg ? `<button type="button" class="btn glass pill" data-act="clear-image-box" style="padding:4px 12px;font-size:12px;">${isEs ? 'Quitar imagen' : 'Remove image'}</button>` : ''}
+      </div>
+      <div class="frow" style="gap:16px;">
+        <div class="fld" style="flex:2 1 280px;">
+          ${lab(isEs ? 'URL DE LA IMAGEN' : 'IMAGE URL')}
+          <div style="display:flex;gap:8px;">
+            <input class="inp" data-img-bind="url" value="${esc(imgBox.url || '')}" placeholder="https://... or upload local file">
+            <button type="button" class="btn glass pill" data-act="pick-box-image" style="white-space:nowrap;min-height:46px;padding:0 14px;">📁 ${isEs ? 'Subir' : 'Upload'}</button>
+            <input type="file" id="imageBoxFileInput" accept="image/png,image/jpeg,image/webp" hidden>
+          </div>
+        </div>
+        <div class="fld" style="flex:1 1 240px;">
+          ${lab(isEs ? 'UBICACIÓN EN EL ARTÍCULO' : 'PLACEMENT IN ARTICLE')}
+          <select class="inp" data-img-bind="placement">
+            ${placementOptions.map(([val, label]) => `<option value="${val}"${imgBox.placement === val ? ' selected' : ''}>${label}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="fld" style="margin-top:8px;">
+        ${lab(isEs ? 'EPÍGRAFE / TEXTO DE LA IMAGEN' : 'IMAGE CAPTION')}
+        <input class="inp" data-img-bind="caption" value="${esc(imgBox.caption || '')}" placeholder="${isEs ? 'Leyenda opcional bajo la imagen' : 'Optional caption below the image'}">
+      </div>
+      ${hasImg ? `
+        <div class="image-box-preview">
+          <img src="${esc(imgBox.url)}" alt="" onerror="this.src='';">
+          <button type="button" class="x glass pill remove-img-box-btn" data-act="clear-image-box" aria-label="Remove image">×</button>
+        </div>
+      ` : ''}
+    </div>
+  `;
 }
 
 function renderSide() {
@@ -924,16 +1031,16 @@ function renderEditor() {
   const picSrc = getPlayerPictureSrc(p);
   const pic = picSrc ? `<img src="${esc(picSrc)}" alt="" onerror="this.remove()">` : '';
   const sec = (key, title, body) => { const on = p[key] !== undefined;
-    return `<div class="sec glass" data-sec="${key}"><div class="sh"><b>${title}</b><small>OPTIONAL</small><span class="sp"></span><button type="button" class="tog${on ? ' on' : ''}" role="switch" aria-checked="${on}" aria-label="${title}" data-act="toggle" data-k="${key}"></button></div>${on ? body : ''}</div>`; };
+    return `<div class="sec glass" data-sec="${key}"><div class="sh"><b>${title}</b><span class="sp"></span><button type="button" class="tog${on ? ' on' : ''}" role="switch" aria-checked="${on}" aria-label="${title}" data-act="toggle" data-k="${key}"></button></div>${on ? body : ''}</div>`; };
   const seg = (i, cur) => `<span class="seg glass pill">${[['tournament', 'Tournament'], ['times', 'Times']].map(([v, l]) => `<button type="button" class="${cur === v ? 'on' : ''}" data-act="fmt" data-i="${i}" data-v="${v}">${l}</button>`).join('')}</span>`;
   const rm = (act, i, what) => `<button type="button" class="x glass pill" data-act="${act}" data-i="${i}" aria-label="Remove ${what}">×</button>`;
   const cell = (cls, label, row, i, f, val, extra = '') => `<div class="${cls}">${lab2(label)}<input class="inp" data-row="${row}" data-i="${i}" data-f="${f}" value="${esc(val ?? '')}" ${extra}></div>`;
 
   const oppCell = (i, val) => `<div class="g">${lab2(isEs ? 'RIVAL' : 'OPPONENT')}<div style="display:flex;gap:6px;"><input class="inp" data-row="notableWins" data-i="${i}" data-f="opponent" value="${esc(val ?? '')}"><button type="button" class="btn glass pill" data-act="pick-opponent" data-i="${i}" style="min-height:46px;padding:0 14px;white-space:nowrap;font-size:13px;" title="${isEs ? 'Seleccionar rival del directorio' : 'Select opponent from directory'}">🔍</button></div></div>`;
   const wins = (p.notableWins || []).map((w, i) => { const t = w.times !== undefined;
-    return `<div class="rowf">${oppCell(i, w.opponent)}<div>${lab2(isEs ? 'FORMATO' : 'FORMAT')}${seg(i, t ? 'times' : 'tournament')}</div>${t ? cell('g', isEs ? 'VECES' : 'TIMES', 'notableWins', i, 'times', w.times) : cell('g', isEs ? 'TORNEO' : 'TOURNAMENT', 'notableWins', i, 'tournament', w.tournament)}${rm('rm-win', i, 'win')}</div>`; }).join('');
+    return `<div class="rowf rowf-sortable" draggable="true" data-sort-section="notableWins" data-i="${i}"><span class="drag-handle" title="${isEs ? 'Arrastrar para reordenar' : 'Drag to reorder'}">⋮⋮</span>${oppCell(i, w.opponent)}<div>${lab2(isEs ? 'FORMATO' : 'FORMAT')}${seg(i, t ? 'times' : 'tournament')}</div>${t ? cell('g', isEs ? 'VECES' : 'TIMES', 'notableWins', i, 'times', w.times) : cell('g', isEs ? 'TORNEO' : 'TOURNAMENT', 'notableWins', i, 'tournament', w.tournament)}${rm('rm-win', i, 'win')}</div>`; }).join('');
   const results = (p.notableResults || []).map((r, i) =>
-    `<div class="rowf"><div style="flex:0 0 100px">${lab2('PLACEMENT')}<input class="inp" data-row="notableResults" data-i="${i}" data-f="placement" value="${r.placement ?? ''}"></div>${cell('g', isEs ? 'TORNEO' : 'TOURNAMENT', 'notableResults', i, 'event', r.event)}<div style="flex:0 0 120px">${lab2('ENTRANTS')}<input class="inp" data-row="notableResults" data-i="${i}" data-f="entrants" value="${r.entrants ?? ''}"></div>${rm('rm-res', i, 'result')}</div>`).join('');
+    `<div class="rowf rowf-sortable" draggable="true" data-sort-section="notableResults" data-i="${i}"><span class="drag-handle" title="${isEs ? 'Arrastrar para reordenar' : 'Drag to reorder'}">⋮⋮</span><div style="flex:0 0 100px">${lab2('PLACEMENT')}<input class="inp" data-row="notableResults" data-i="${i}" data-f="placement" value="${r.placement ?? ''}"></div>${cell('g', isEs ? 'TORNEO' : 'TOURNAMENT', 'notableResults', i, 'event', r.event)}<div style="flex:0 0 120px">${lab2('ENTRANTS')}<input class="inp" data-row="notableResults" data-i="${i}" data-f="entrants" value="${r.entrants ?? ''}"></div>${rm('rm-res', i, 'result')}</div>`).join('');
   const mains = `<div class="chips">${(p.mains || []).map((m, i) => `<span class="glass pill mchip">${stock(m)}${esc(m)}<button type="button" class="x glass pill" data-act="rm-main" data-i="${i}" aria-label="Remove ${esc(m)}">×</button></span>`).join('')}</div>
     <div class="rowf"><div class="g mains-input-wrap" style="width:100%"><input class="inp" id="newMain" autocomplete="off" placeholder="${isEs ? 'Buscar personaje para agregar...' : 'Search character to add...'}"><div id="mainsDropdown" class="mains-dropdown" hidden></div></div></div><div class="note0">${isEs ? 'Selecciona un personaje de la lista para agregarlo como principal.' : 'Select a character from the list to add as main.'}</div>`;
 
@@ -941,13 +1048,13 @@ function renderEditor() {
       <div class="l" style="align-items:center"><span class="kind" id="kindPill">${k} ENTRY</span><button type="button" class="add" data-act="remove-player">${isEs ? 'Eliminar jugador' : 'Remove player'}</button></div></div>
     <div class="why" id="why">${getWhy()[k]}</div>
     <div class="req"><div class="dzw"><div class="dz">${pic}</div>
-        ${isAdminCreation ? `<button type="button" class="btn glass pill" data-act="pick-photo">${isEs ? 'Cambiar imagen' : 'Replace picture'}</button><input type="file" id="photoFile" accept="image/png,image/jpeg" hidden><div class="note0" style="text-align:center">JPG or PNG (Optional)</div>` : `<div class="note0" style="text-align:center">${isEs ? 'Retrato del personaje más jugado' : 'Most played character portrait'}</div>`}</div>
-      <div class="reqf"><div class="fld" style="flex:0 0 100px">${lab(isEs ? 'PUESTO' : 'PLACEMENT', 1)}<input class="inp ro ${pcls(n)}" value="${n}" readonly aria-readonly="true"></div>
-        <div class="fld" style="flex:2 1 240px">${lab(isEs ? 'TAG' : 'TAG', 1)}<input class="inp" data-pbind="tag" value="${esc(p.tag)}" placeholder="Gamertag"></div>
+        ${isAdminCreation ? `<button type="button" class="btn glass pill" data-act="pick-photo">${isEs ? 'Cambiar imagen' : 'Replace picture'}</button><input type="file" id="photoFile" accept="image/png,image/jpeg" hidden><div class="note0" style="text-align:center">JPG or PNG</div>` : `<div class="note0" style="text-align:center">${isEs ? 'Retrato del personaje más jugado' : 'Most played character portrait'}</div>`}</div>
+      <div class="reqf"><div class="fld" style="flex:0 0 100px">${lab(isEs ? 'PUESTO' : 'PLACEMENT')}<input class="inp inp-req ro ${pcls(n)}" value="${n}" readonly aria-readonly="true"></div>
+        <div class="fld" style="flex:2 1 240px">${lab(isEs ? 'TAG' : 'TAG')}<input class="inp inp-req" data-pbind="tag" value="${esc(p.tag)}" placeholder="Gamertag"></div>
         <div class="frow" style="flex:1 1 100%; gap:16px;">
-          <div class="fld" style="flex:1 1 180px">${lab(isEs ? 'SPONSOR' : 'SPONSOR', 0)}<input class="inp" data-pbind="sponsor" value="${esc(p.sponsor ?? '')}" placeholder="e.g. CLG"></div>
-          <div class="fld" style="flex:1 1 180px">${lab(isEs ? 'NOMBRE REAL' : 'REAL NAME', 0)}<input class="inp" data-pbind="realName" value="${esc(p.realName ?? '')}" placeholder="${isEs ? '[Nombre real]' : '[Real name]'}"></div>
-          <div class="fld" style="flex:1 1 180px">${lab(isEs ? 'PUNTOS' : 'POINTS', 0)}<input class="inp mono" data-pbind="points" inputmode="decimal" value="${p.points == null ? '' : p.points}" placeholder="e.g. 1,420"></div>
+          <div class="fld" style="flex:1 1 180px">${lab(isEs ? 'SPONSOR' : 'SPONSOR')}<input class="inp" data-pbind="sponsor" value="${esc(p.sponsor ?? '')}" placeholder="e.g. CLG"></div>
+          <div class="fld" style="flex:1 1 180px">${lab(isEs ? 'NOMBRE REAL' : 'REAL NAME')}<input class="inp" data-pbind="realName" value="${esc(p.realName ?? '')}" placeholder="${isEs ? '[Nombre real]' : '[Real name]'}"></div>
+          <div class="fld" style="flex:1 1 180px">${lab(isEs ? 'PUNTOS' : 'POINTS')}<input class="inp mono" data-pbind="points" inputmode="decimal" value="${p.points == null ? '' : p.points}" placeholder="e.g. 1,420"></div>
         </div>
         <div class="hint">${isEs ? 'El puesto está determinado por la posición en la lista.' : 'Placement is set by the player’s position in the list.'}</div></div></div>
     ${sec('mains', isEs ? 'Personajes principales' : 'Mains', mains)}
@@ -990,6 +1097,15 @@ function onInput(e) {
       draft[k] = v;
     }
     if (k === 'intro') $('#introCount').textContent = `${v.length} characters`;
+  } else if (d.imgBind) {
+    draft.imageBox = draft.imageBox || { url: '', placement: 'after_intro', caption: '' };
+    draft.imageBox[d.imgBind] = t.value;
+    if (!draft.imageBox.url && !draft.imageBox.caption) {
+      draft.imageBox = null;
+    }
+    dirty = true;
+    renderDetails();
+    return;
   } else if (d.pbind) {
     const p = draft.players[sel];
     p[d.pbind] = d.pbind === 'points' ? parseDecimal(t.value) : t.value;
@@ -1015,6 +1131,18 @@ function onClick(e) {
     case 'share': doShare(); return;
     case 'export-image': doExportImage(); return;
     case 'publish': doPublish(); return;
+    case 'pick-box-image': {
+      const fi = $('#imageBoxFileInput');
+      if (fi) fi.click();
+      return;
+    }
+    case 'clear-image-box': {
+      draft.imageBox = null;
+      dirty = true;
+      renderDetails();
+      refresh();
+      return;
+    }
     case 'pop-snapshot': populateFromSnapshot(b.dataset.n); return;
     case 'add-player': openPlayerModal('ranking'); return;
     case 'pick-opponent': openPlayerModal({ type: 'opponent', index: i }); return;
@@ -1207,6 +1335,54 @@ function confirmCrop() {
   }, 'image/png');
 }
 
+async function handleImageBoxUpload(file) {
+  if (!file) return;
+  const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
+
+  // Convert to dataUrl or upload if admin
+  try {
+    const dataUrl = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(new Error('Failed to read image file.'));
+      reader.readAsDataURL(file);
+    });
+
+    draft.imageBox = draft.imageBox || { url: '', placement: 'after_intro', caption: '' };
+
+    if (isAdmin && requestedMode === 'admin') {
+      try {
+        const res = await fetch('/api/admin/ranking-photo', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Admin-Request': '1',
+            'X-CSRF-Token': adminCsrfToken
+          },
+          body: JSON.stringify({
+            playerId: 'box_image',
+            data: dataUrl
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Upload failed');
+        draft.imageBox.url = data.path;
+      } catch (e) {
+        draft.imageBox.url = dataUrl;
+      }
+    } else {
+      draft.imageBox.url = dataUrl;
+    }
+
+    dirty = true;
+    renderDetails();
+    refresh();
+  } catch (err) {
+    alert(isEs ? `Error al cargar la imagen: ${err.message}` : `Could not upload image: ${err.message}`);
+  }
+}
+
 async function handlePhotoUpload(file) {
   if (!file) return;
   const p = draft.players[sel];
@@ -1261,12 +1437,22 @@ function onChange(e) {
     openCropModal(e.target.files[0]);
     e.target.value = '';
   }
+  if (e.target.id === 'imageBoxFileInput' && e.target.files[0]) {
+    handleImageBoxUpload(e.target.files[0]);
+    e.target.value = '';
+  }
   if (e.target.id === 'importFileInput' && e.target.files[0]) {
     handleImportFile(e.target.files[0]);
     e.target.value = '';
   }
   if (e.target.dataset && e.target.dataset.row === 'notableWins' && e.target.dataset.f === 'opponent') {
     updateNotableWinStats(+e.target.dataset.i, e.target.value.trim());
+  }
+  if (e.target.dataset && e.target.dataset.imgBind) {
+    draft.imageBox = draft.imageBox || { url: '', placement: 'after_intro', caption: '' };
+    draft.imageBox[e.target.dataset.imgBind] = e.target.value;
+    dirty = true;
+    renderDetails();
   }
 }
 
@@ -1283,6 +1469,13 @@ function constructRankingJson() {
   if (draft.publishedBy && draft.publishedBy.trim()) out.publishedBy = draft.publishedBy.trim();
   if (draft.createdBy && draft.createdBy.trim()) out.createdBy = draft.createdBy.trim().slice(0, 80);
   if (draft.intro && draft.intro.trim()) out.intro = draft.intro.trim();
+  if (draft.imageBox && draft.imageBox.url && draft.imageBox.url.trim()) {
+    out.imageBox = {
+      url: draft.imageBox.url.trim(),
+      placement: ['beginning', 'after_intro', 'end'].includes(draft.imageBox.placement) ? draft.imageBox.placement : 'after_intro',
+      caption: (draft.imageBox.caption || '').trim().slice(0, 300)
+    };
+  }
 
   out.players = (draft.players || []).map((p, i) => {
     const o = { placement: i + 1, tag: (p.tag || '').trim() };
@@ -1365,8 +1558,17 @@ function validateAndSanitizeImport(data) {
     publishedBy: (isAdmin && requestedMode === 'admin' && typeof data.publishedBy === 'string') ? data.publishedBy.slice(0, 100).trim() : '',
     createdBy: typeof data.createdBy === 'string' ? data.createdBy.slice(0, 80).trim() : '',
     intro: typeof data.intro === 'string' ? data.intro.slice(0, 2000) : '',
+    imageBox: null,
     players: []
   };
+
+  if (data.imageBox && typeof data.imageBox === 'object' && typeof data.imageBox.url === 'string' && data.imageBox.url.trim()) {
+    sanitized.imageBox = {
+      url: data.imageBox.url.trim(),
+      placement: ['beginning', 'after_intro', 'end'].includes(data.imageBox.placement) ? data.imageBox.placement : 'after_intro',
+      caption: typeof data.imageBox.caption === 'string' ? data.imageBox.caption.slice(0, 300) : ''
+    };
+  }
 
   if (data.game && typeof data.game === 'object') {
     const matched = games.find(g => g.id === data.game.id || g.slug === data.game.slug || g.name === data.game.name);

@@ -431,7 +431,7 @@
   line-height: 1.05;
 }
 .ident.has-sponsor .rank {
-  font-size: 58px;
+  font-size: 46px;
   line-height: 1;
 }
 .ident h2 {
@@ -574,7 +574,7 @@
   font-size: 11px;
 }
 .entry.med.has-sponsor .rank-md {
-  font-size: 34px;
+  font-size: 30px;
   line-height: 1;
 }
 .entry.med .who {
@@ -607,7 +607,7 @@
   font: 700 17px 'JetBrains Mono', monospace;
 }
 .row.has-sponsor .n {
-  font-size: 22px;
+  font-size: 23px;
   line-height: 1;
 }
 .row-player-info {
@@ -624,6 +624,31 @@
 }
 .row .pts {
   font-size: 16px;
+}
+
+/* Article image box */
+.article-image-box {
+  width: 100%;
+  border-radius: 28px;
+  overflow: hidden;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+.article-image-box img {
+  width: 100%;
+  max-height: 540px;
+  object-fit: contain;
+  border-radius: 20px;
+  display: block;
+}
+.article-image-caption {
+  font-size: 14px;
+  color: var(--muted);
+  text-align: center;
+  line-height: 1.4;
 }
 
 /* Pictures and stock icons */
