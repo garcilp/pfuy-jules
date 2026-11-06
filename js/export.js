@@ -389,13 +389,14 @@ async function renderRankingCanvas(rankingData, options = {}) {
     ctx.restore();
   }
 
-  // "TOP N OF M" in mono 16px accent
+  // Ranking chip: "TOP X" when total players <= 10, otherwise "TOP X OF Y"
+  const rankingChipText = (M <= 10) ? `TOP ${N}` : `TOP ${N} OF ${M}`;
   ctx.save();
   ctx.font = '500 16px "JetBrains Mono", monospace';
   ctx.fillStyle = EXPORT_THEME.accent;
   ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
-  ctx.fillText(`TOP ${N} OF ${M}`, curChipX, chipsY + pillHeight / 2);
+  ctx.fillText(rankingChipText, curChipX, chipsY + pillHeight / 2);
   ctx.restore();
 
   // 5. List: rows 10px apart, in zone y=250 to y=1250
