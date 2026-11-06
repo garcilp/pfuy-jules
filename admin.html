@@ -49,9 +49,9 @@
     </div>
 
     <nav class="admin-section-nav editor-tabs" role="tablist" aria-label="Admin sections" style="margin-bottom:28px; border-bottom:1px solid var(--line); padding-bottom:12px;">
-      <button id="subtab-players" class="ranking-tab active" type="button" role="tab" aria-selected="true" data-admin-sub="players">1. Players</button>
-      <button id="subtab-events" class="ranking-tab" type="button" role="tab" aria-selected="false" data-admin-sub="events">2. Events</button>
-      <button id="subtab-rankings" class="ranking-tab" type="button" role="tab" aria-selected="false" data-admin-sub="rankings">3. Rankings</button>
+      <button id="subtab-players" class="ranking-tab active" type="button" role="tab" aria-selected="true" data-admin-sub="players">Players</button>
+      <button id="subtab-events" class="ranking-tab" type="button" role="tab" aria-selected="false" data-admin-sub="events">Events</button>
+      <button id="subtab-rankings" class="ranking-tab" type="button" role="tab" aria-selected="false" data-admin-sub="rankings">Rankings</button>
     </nav>
 
     <!-- SECTION 1: PLAYERS -->
@@ -62,7 +62,10 @@
       </div>
 
       <form id="profile-form" class="admin-form" style="margin-bottom: 32px; padding-bottom: 28px;">
-        <label><span data-i18n="admin.editor.profile">Player profile</span><select id="profile-select" required></select></label>
+        <div style="display:flex; gap:12px; align-items:flex-end;">
+          <label style="flex:1;"><span data-i18n="admin.editor.profile">Player profile</span><select id="profile-select" required></select></label>
+          <a id="view-public-profile-btn" href="#" target="_blank" rel="noopener noreferrer" class="quiet-button" style="display:inline-flex; align-items:center; justify-content:center; text-decoration:none; white-space:nowrap; height:48px; box-sizing:border-box;">View public profile ↗</a>
+        </div>
         <fieldset id="player-game-exclusions" class="visibility-fieldset">
           <legend data-i18n="admin.editor.gameVis">Game visibility</legend>
           <p class="muted admin-copy" data-i18n="admin.editor.gameVisDesc">Check games to hide this player’s activity from those games across the site.</p>

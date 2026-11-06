@@ -466,16 +466,29 @@ async function renderRivalry() {
 
   try {
     // Load real head-to-head records dynamically from player profile data
-    const res = await fetch('data/profiles/iguana-264244.json');
-    if (!res.ok) {
+    const [resB, resA] = await Promise.all([
+      fetch('data/profiles/iguana-264244.json'),
+      fetch('data/profiles/sol-d-330371.json')
+    ]);
+    if (!resB.ok) {
       container.closest('.panel')?.remove();
       return;
     }
-    const profile = await res.json();
+    const profileB = await resB.json();
+    const profileA = resA.ok ? await resA.json() : null;
+
+    const tagA = profileA?.player?.tag || 'Sol!d';
+    const tagB = profileB?.player?.tag || 'Iguana';
+    const idA = profileA?.player?.startggPlayerId || '330371';
+    const idB = profileB?.player?.startggPlayerId || '264244';
+
     const gamesList = [];
 
-    (profile.games || []).forEach(g => {
-      const match = (g.headToHead || []).find(h => h.opponent === 'SOL!D');
+    (profileB.games || []).forEach(g => {
+      const match = (g.headToHead || []).find(h => {
+        const opp = (h.opponent || '').toLowerCase();
+        return opp === 'sol!d' || opp === tagA.toLowerCase();
+      });
       if (match && match.sets > 0) {
         const winsB = match.wins || 0;
         const winsA = Math.max(0, match.sets - winsB);
@@ -503,9 +516,9 @@ async function renderRivalry() {
         <span>ALL-TIME HEAD-TO-HEAD</span>
       </div>
       <div class="rival">
-        <b><a class="opponent-link" href="player.html?player=894493">Sol!d</a></b>
+        <b><a class="opponent-link" href="player.html?player=${encodeURIComponent(idA)}">${esc(tagA)}</a></b>
         <span class="rec">${totalA}–${totalB}</span>
-        <b><a class="opponent-link" href="player.html?player=264244">Iguana</a></b>
+        <b><a class="opponent-link" href="player.html?player=${encodeURIComponent(idB)}">${esc(tagB)}</a></b>
       </div>
       <p class="muted sm" style="text-align:center">${totalSets} sets across ${gamesList.length} game${gamesList.length === 1 ? '' : 's'}</p>
       ${gamesList.map(g => `
@@ -515,8 +528,8 @@ async function renderRivalry() {
         </div>
       `).join('')}
       <div style="margin-top:12px;text-align:center;">
-        <a class="link" href="player.html?player=894493">View Sol!d profile</a> ·
-        <a class="link" href="player.html?player=264244">View Iguana profile</a>
+        <a class="link" href="player.html?player=${encodeURIComponent(idA)}">${isEs ? `Ver perfil de ${esc(tagA)}` : `View ${esc(tagA)} profile`}</a> ·
+        <a class="link" href="player.html?player=${encodeURIComponent(idB)}">${isEs ? `Ver perfil de ${esc(tagB)}` : `View ${esc(tagB)} profile`}</a>
       </div>
     `;
   } catch (err) {
