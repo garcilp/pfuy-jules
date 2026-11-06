@@ -1695,118 +1695,34 @@ function doShare() {
   });
 }
 
-function doExportImage() {
+async function doExportImage() {
   const rankingData = constructRankingJson();
   if (!rankingData.players || !rankingData.players.length) {
     alert('Add players to your ranking before exporting an image.');
     return;
   }
 
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
+  // Preserve live previews/custom photos in draft players for export
+  if (Array.isArray(draft.players)) {
+    rankingData.players.forEach((p, idx) => {
+      const draftPlayer = draft.players[idx];
+      if (draftPlayer) {
+        if (draftPlayer._preview) p._preview = draftPlayer._preview;
+        if (draftPlayer._resolvedPortrait) p._resolvedPortrait = draftPlayer._resolvedPortrait;
+        if (draftPlayer.photo) p.photo = draftPlayer.photo;
+        if (draftPlayer.playerId) p.playerId = draftPlayer.playerId;
+      }
+    });
+  }
 
-  const width = 1200;
-  const padding = 60;
-  const rowHeight = 70;
-  const headerHeight = 240;
-  const height = headerHeight + (rankingData.players.length * rowHeight) + padding;
-
-  canvas.width = width * 2;
-  canvas.height = height * 2;
-  ctx.scale(2, 2);
-
-  const grad = ctx.createLinearGradient(0, 0, width, height);
-  grad.addColorStop(0, '#050B1F');
-  grad.addColorStop(0.5, '#0B1538');
-  grad.addColorStop(1, '#050B1F');
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, width, height);
-
-  ctx.save();
-  ctx.fillStyle = 'rgba(56, 189, 248, 0.08)';
-  ctx.beginPath();
-  ctx.arc(width - 150, 150, 250, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.restore();
-
-  const creatorName = (rankingData.createdBy && typeof rankingData.createdBy === 'string') ? rankingData.createdBy.trim() : '';
-
-  ctx.fillStyle = '#38BDF8';
-  ctx.font = '700 16px "Space Grotesk", sans-serif';
-  const headerAttribution = creatorName
-    ? `PLATFIGHTERS.UY · CUSTOM RANKING · CREATED BY ${creatorName.toUpperCase()}`
-    : 'PLATFIGHTERS.UY · CUSTOM RANKING';
-  ctx.fillText(headerAttribution, padding, 70);
-
-  ctx.fillStyle = '#FFFFFF';
-  ctx.font = '700 36px "Space Grotesk", sans-serif';
-  ctx.fillText(rankingData.title, padding, 120);
-
-  const metaCreator = creatorName ? ` · Created by ${creatorName}` : '';
-  const metaText = `${rankingData.game.name} · ${rankingData.status.toUpperCase()} · ${rankingData.period.start || ''} → ${rankingData.period.end || ''}${metaCreator}`;
-  ctx.fillStyle = '#94A3B8';
-  ctx.font = '500 16px "Space Grotesk", sans-serif';
-  ctx.fillText(metaText, padding, 155);
-
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(padding, 190);
-  ctx.lineTo(width - padding, 190);
-  ctx.stroke();
-
-  rankingData.players.forEach((p, idx) => {
-    const y = headerHeight + (idx * rowHeight);
-
-    if (idx % 2 === 0) {
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
-      ctx.fillRect(padding, y - 36, width - (padding * 2), rowHeight);
-    }
-
-    let rankColor = '#38BDF8';
-    if (p.placement === 1) rankColor = '#EAB308';
-    else if (p.placement === 2) rankColor = '#94A3B8';
-    else if (p.placement === 3) rankColor = '#D97706';
-
-    ctx.fillStyle = rankColor;
-    ctx.font = '700 24px monospace';
-    ctx.fillText(String(p.placement).padStart(2, ' '), padding + 10, y + 6);
-
-    ctx.fillStyle = '#FFFFFF';
-    ctx.font = '700 22px "Space Grotesk", sans-serif';
-    ctx.fillText(p.tag, padding + 70, y + 6);
-
-    if (p.realName) {
-      ctx.fillStyle = '#94A3B8';
-      ctx.font = '400 16px "Space Grotesk", sans-serif';
-      ctx.fillText(`(${p.realName})`, padding + 70 + ctx.measureText(p.tag).width + 12, y + 5);
-    }
-
-    if (p.mains && p.mains.length) {
-      ctx.fillStyle = 'rgba(56, 189, 248, 0.8)';
-      ctx.font = '500 14px "Space Grotesk", sans-serif';
-      ctx.fillText(p.mains.join(' / '), width - padding - 220, y + 5);
-    }
-
-    if (p.points !== null && p.points !== undefined) {
-      ctx.fillStyle = '#E2E8F0';
-      ctx.font = '700 18px monospace';
-      const ptsStr = `${Number(p.points).toLocaleString('en-US')} pts`;
-      ctx.fillText(ptsStr, width - padding - 100, y + 6);
-    }
-  });
-
-  ctx.fillStyle = '#64748B';
-  ctx.font = '500 14px monospace';
-  const footerAttribution = creatorName
-    ? `Generated on Platfighters.uy · Custom Ranking · Created by ${creatorName}`
-    : 'Generated on Platfighters.uy · Custom Ranking';
-  ctx.fillText(footerAttribution, padding, height - 20);
-
-  const a = document.createElement('a');
-  a.download = `${slug(rankingData.title || 'power-ranking')}.png`;
-  a.href = canvas.toDataURL('image/png');
-  a.click();
+  try {
+    await exportRankingImage(rankingData, {
+      isAdmin: isAdmin && requestedMode === 'admin'
+    });
+  } catch (err) {
+    console.error('Failed to export ranking image:', err);
+    alert('An error occurred while generating the ranking image.');
+  }
 }
 
 async function doPublish() {
