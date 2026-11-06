@@ -45,14 +45,14 @@
           "wins": 0
         }
       ],
-      "events": 2,
+      "events": 1,
       "wins": 1,
       "losses": 4,
       "upsets": 1,
-      "bestPlace": 32,
-      "bestEvent": "Mashito GO! #3 · Singles B",
-      "avgPlace": 32.5,
-      "avgSeed": 26,
+      "bestPlace": 33,
+      "bestEvent": "Mashito GO! #3 · Smash Ultimate singles",
+      "avgPlace": 33.0,
+      "avgSeed": 49,
       "characters": [
         {
           "name": "Byleth",
@@ -77,6 +77,7 @@
               "opponent": "Krav",
               "score": "0–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 49,
               "opponentSeed": 16,
               "isUpset": false,
@@ -92,6 +93,7 @@
               "opponent": "carrot",
               "score": "2–0",
               "outcome": "win",
+              "opponentExcluded": false,
               "ownSeed": 49,
               "opponentSeed": 48,
               "isUpset": true,
@@ -107,16 +109,49 @@
               "opponent": "merume",
               "score": "1–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 49,
               "opponentSeed": 25,
               "isUpset": false,
               "startedAt": 1775934418,
               "phaseOrder": 1,
               "roundOrder": -4
+            },
+            {
+              "eventKey": "tournament/mashito-go-3/event/singles-b",
+              "event": "Mashito GO! #3 · Singles B",
+              "phase": "Categoria B",
+              "round": "Winners Round 2",
+              "opponent": "Dieguix",
+              "score": "0–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1775937994,
+              "phaseOrder": 1,
+              "roundOrder": 2
+            },
+            {
+              "eventKey": "tournament/mashito-go-3/event/singles-b",
+              "event": "Mashito GO! #3 · Singles B",
+              "phase": "Categoria B",
+              "round": "Losers Round 2",
+              "opponent": "Caliker",
+              "score": "0–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1775940858,
+              "phaseOrder": 1,
+              "roundOrder": -5
             }
           ],
           "characterCounts": {
-            "Byleth": 7
+            "Byleth": 11
           },
           "sourceEvents": [
             {
@@ -129,58 +164,13 @@
               "characterCounts": {
                 "Byleth": 7
               }
-            }
-          ]
-        },
-        {
-          "event": "Mashito GO! #3 · Singles B",
-          "eventKey": "tournament/mashito-go-3/event/singles-b",
-          "date": "2026-04-11",
-          "seed": 3,
-          "place": 32,
-          "entrants": 19,
-          "sets": [
-            {
-              "eventKey": "tournament/mashito-go-3/event/singles-b",
-              "event": "Mashito GO! #3 · Singles B",
-              "phase": "Bracket",
-              "round": "Winners Round 2",
-              "opponent": "Dieguix",
-              "score": "0–2",
-              "outcome": "loss",
-              "ownSeed": null,
-              "opponentSeed": null,
-              "isUpset": false,
-              "startedAt": 1775937994,
-              "phaseOrder": 1,
-              "roundOrder": 2
             },
-            {
-              "eventKey": "tournament/mashito-go-3/event/singles-b",
-              "event": "Mashito GO! #3 · Singles B",
-              "phase": "Bracket",
-              "round": "Losers Round 2",
-              "opponent": "Caliker",
-              "score": "0–2",
-              "outcome": "loss",
-              "ownSeed": null,
-              "opponentSeed": null,
-              "isUpset": false,
-              "startedAt": 1775940858,
-              "phaseOrder": 1,
-              "roundOrder": -5
-            }
-          ],
-          "characterCounts": {
-            "Byleth": 4
-          },
-          "sourceEvents": [
             {
               "eventKey": "tournament/mashito-go-3/event/singles-b",
               "event": "Mashito GO! #3 · Singles B",
               "date": "2026-04-11",
               "seed": 3,
-              "place": 32,
+              "place": 67,
               "entrants": 19,
               "characterCounts": {
                 "Byleth": 4

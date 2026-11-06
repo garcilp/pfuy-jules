@@ -90,14 +90,14 @@
           "wins": 0
         }
       ],
-      "events": 6,
+      "events": 4,
       "wins": 3,
       "losses": 12,
       "upsets": 0,
-      "bestPlace": 25,
-      "bestEvent": "Mashito GO! #2 · Singles B",
-      "avgPlace": 29.7,
-      "avgSeed": 24,
+      "bestPlace": 26,
+      "bestEvent": "Mashito GO! #4 · Categoria B",
+      "avgPlace": 31.2,
+      "avgSeed": 31,
       "characters": [
         {
           "name": "Kirby",
@@ -130,6 +130,7 @@
               "opponent": "TowasPato",
               "score": "0–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 35,
               "opponentSeed": 30,
               "isUpset": false,
@@ -145,6 +146,7 @@
               "opponent": "merume",
               "score": "0–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 35,
               "opponentSeed": 22,
               "isUpset": false,
@@ -188,6 +190,7 @@
               "opponent": "Dono",
               "score": "0–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": null,
               "opponentSeed": null,
               "isUpset": false,
@@ -203,6 +206,7 @@
               "opponent": "Nexx",
               "score": "0–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": null,
               "opponentSeed": null,
               "isUpset": false,
@@ -244,6 +248,7 @@
               "opponent": "RoLo",
               "score": "0–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 43,
               "opponentSeed": 22,
               "isUpset": false,
@@ -259,6 +264,7 @@
               "opponent": "mateo",
               "score": "2–0",
               "outcome": "win",
+              "opponentExcluded": false,
               "ownSeed": 43,
               "opponentSeed": 54,
               "isUpset": false,
@@ -274,16 +280,65 @@
               "opponent": "Thithi",
               "score": "0–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 43,
               "opponentSeed": 30,
               "isUpset": false,
               "startedAt": 1775934457,
               "phaseOrder": 1,
               "roundOrder": -4
+            },
+            {
+              "eventKey": "tournament/mashito-go-3/event/singles-b",
+              "event": "Mashito GO! #3 · Singles B",
+              "phase": "Categoria B",
+              "round": "Winners Round 2",
+              "opponent": "Pal.Siito",
+              "score": "1–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1775937502,
+              "phaseOrder": 1,
+              "roundOrder": 2
+            },
+            {
+              "eventKey": "tournament/mashito-go-3/event/singles-b",
+              "event": "Mashito GO! #3 · Singles B",
+              "phase": "Categoria B",
+              "round": "Losers Round 2",
+              "opponent": "Misheon",
+              "score": "2–1",
+              "outcome": "win",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1775940332,
+              "phaseOrder": 1,
+              "roundOrder": -5
+            },
+            {
+              "eventKey": "tournament/mashito-go-3/event/singles-b",
+              "event": "Mashito GO! #3 · Singles B",
+              "phase": "Categoria B",
+              "round": "Losers Round 3",
+              "opponent": "Dieguix",
+              "score": "0–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1775942147,
+              "phaseOrder": 1,
+              "roundOrder": -6
             }
           ],
           "characterCounts": {
-            "Kirby": 6
+            "Kirby": 14
           },
           "sourceEvents": [
             {
@@ -296,73 +351,13 @@
               "characterCounts": {
                 "Kirby": 6
               }
-            }
-          ]
-        },
-        {
-          "event": "Mashito GO! #3 · Singles B",
-          "eventKey": "tournament/mashito-go-3/event/singles-b",
-          "date": "2026-04-11",
-          "seed": 13,
-          "place": 28,
-          "entrants": 19,
-          "sets": [
-            {
-              "eventKey": "tournament/mashito-go-3/event/singles-b",
-              "event": "Mashito GO! #3 · Singles B",
-              "phase": "Bracket",
-              "round": "Winners Round 2",
-              "opponent": "Pal.Siito",
-              "score": "1–2",
-              "outcome": "loss",
-              "ownSeed": null,
-              "opponentSeed": null,
-              "isUpset": false,
-              "startedAt": 1775937502,
-              "phaseOrder": 1,
-              "roundOrder": 2
             },
-            {
-              "eventKey": "tournament/mashito-go-3/event/singles-b",
-              "event": "Mashito GO! #3 · Singles B",
-              "phase": "Bracket",
-              "round": "Losers Round 2",
-              "opponent": "Misheon",
-              "score": "2–1",
-              "outcome": "win",
-              "ownSeed": null,
-              "opponentSeed": null,
-              "isUpset": false,
-              "startedAt": 1775940332,
-              "phaseOrder": 1,
-              "roundOrder": -5
-            },
-            {
-              "eventKey": "tournament/mashito-go-3/event/singles-b",
-              "event": "Mashito GO! #3 · Singles B",
-              "phase": "Bracket",
-              "round": "Losers Round 3",
-              "opponent": "Dieguix",
-              "score": "0–2",
-              "outcome": "loss",
-              "ownSeed": null,
-              "opponentSeed": null,
-              "isUpset": false,
-              "startedAt": 1775942147,
-              "phaseOrder": 1,
-              "roundOrder": -6
-            }
-          ],
-          "characterCounts": {
-            "Kirby": 8
-          },
-          "sourceEvents": [
             {
               "eventKey": "tournament/mashito-go-3/event/singles-b",
               "event": "Mashito GO! #3 · Singles B",
               "date": "2026-04-11",
               "seed": 13,
-              "place": 28,
+              "place": 63,
               "entrants": 19,
               "characterCounts": {
                 "Kirby": 8
@@ -386,6 +381,7 @@
               "opponent": "Jamón con dulce de leche",
               "score": "0–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 38,
               "opponentSeed": 27,
               "isUpset": false,
@@ -401,16 +397,66 @@
               "opponent": "Gaby",
               "score": "0–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 38,
               "opponentSeed": 19,
               "isUpset": false,
               "startedAt": 1774118493,
               "phaseOrder": 1,
               "roundOrder": -4
+            },
+            {
+              "eventKey": "tournament/mashito-go-2/event/singles-b",
+              "event": "Mashito GO! #2 · Singles B",
+              "phase": "Categoria B",
+              "round": "Winners Round 1",
+              "opponent": "JoaquinYn",
+              "score": "2–1",
+              "outcome": "win",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1774125965,
+              "phaseOrder": 1,
+              "roundOrder": 1
+            },
+            {
+              "eventKey": "tournament/mashito-go-2/event/singles-b",
+              "event": "Mashito GO! #2 · Singles B",
+              "phase": "Categoria B",
+              "round": "Winners Quarter-Final",
+              "opponent": "Pal.Siito",
+              "score": "1–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1774127797,
+              "phaseOrder": 1,
+              "roundOrder": 2
+            },
+            {
+              "eventKey": "tournament/mashito-go-2/event/singles-b",
+              "event": "Mashito GO! #2 · Singles B",
+              "phase": "Categoria B",
+              "round": "Losers Round 2",
+              "opponent": "Zenkor",
+              "score": "0–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1774128776,
+              "phaseOrder": 1,
+              "roundOrder": -4
             }
           ],
           "characterCounts": {
-            "Kirby": 2
+            "Kirby": 9,
+            "King Dedede": 1
           },
           "sourceEvents": [
             {
@@ -423,74 +469,13 @@
               "characterCounts": {
                 "Kirby": 2
               }
-            }
-          ]
-        },
-        {
-          "event": "Mashito GO! #2 · Singles B",
-          "eventKey": "tournament/mashito-go-2/event/singles-b",
-          "date": "2026-03-21",
-          "seed": 11,
-          "place": 25,
-          "entrants": 16,
-          "sets": [
-            {
-              "eventKey": "tournament/mashito-go-2/event/singles-b",
-              "event": "Mashito GO! #2 · Singles B",
-              "phase": "Bracket",
-              "round": "Winners Round 1",
-              "opponent": "JoaquinYn",
-              "score": "2–1",
-              "outcome": "win",
-              "ownSeed": null,
-              "opponentSeed": null,
-              "isUpset": false,
-              "startedAt": 1774125965,
-              "phaseOrder": 1,
-              "roundOrder": 1
             },
-            {
-              "eventKey": "tournament/mashito-go-2/event/singles-b",
-              "event": "Mashito GO! #2 · Singles B",
-              "phase": "Bracket",
-              "round": "Winners Quarter-Final",
-              "opponent": "Pal.Siito",
-              "score": "1–2",
-              "outcome": "loss",
-              "ownSeed": null,
-              "opponentSeed": null,
-              "isUpset": false,
-              "startedAt": 1774127797,
-              "phaseOrder": 1,
-              "roundOrder": 2
-            },
-            {
-              "eventKey": "tournament/mashito-go-2/event/singles-b",
-              "event": "Mashito GO! #2 · Singles B",
-              "phase": "Bracket",
-              "round": "Losers Round 2",
-              "opponent": "Zenkor",
-              "score": "0–2",
-              "outcome": "loss",
-              "ownSeed": null,
-              "opponentSeed": null,
-              "isUpset": false,
-              "startedAt": 1774128776,
-              "phaseOrder": 1,
-              "roundOrder": -4
-            }
-          ],
-          "characterCounts": {
-            "King Dedede": 1,
-            "Kirby": 7
-          },
-          "sourceEvents": [
             {
               "eventKey": "tournament/mashito-go-2/event/singles-b",
               "event": "Mashito GO! #2 · Singles B",
               "date": "2026-03-21",
               "seed": 11,
-              "place": 25,
+              "place": 50,
               "entrants": 16,
               "characterCounts": {
                 "King Dedede": 1,

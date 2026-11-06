@@ -100,14 +100,14 @@
           "wins": 1
         }
       ],
-      "events": 6,
+      "events": 4,
       "wins": 7,
       "losses": 12,
       "upsets": 1,
-      "bestPlace": 21,
-      "bestEvent": "Mashito GO! #2 · Singles B",
-      "avgPlace": 27.7,
-      "avgSeed": 21,
+      "bestPlace": 22,
+      "bestEvent": "Mashito GO! #4 · Categoria B",
+      "avgPlace": 30.2,
+      "avgSeed": 30,
       "characters": [
         {
           "name": "Pyra & Mythra",
@@ -140,6 +140,7 @@
               "opponent": "Witrowen",
               "score": "2–1",
               "outcome": "win",
+              "opponentExcluded": false,
               "ownSeed": 33,
               "opponentSeed": 32,
               "isUpset": true,
@@ -155,6 +156,7 @@
               "opponent": "Kapito22",
               "score": "0–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 33,
               "opponentSeed": 1,
               "isUpset": false,
@@ -170,6 +172,7 @@
               "opponent": "Agualdemar",
               "score": "0–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 33,
               "opponentSeed": 41,
               "isUpset": false,
@@ -215,6 +218,7 @@
               "opponent": "Kami",
               "score": "2–0",
               "outcome": "win",
+              "opponentExcluded": false,
               "ownSeed": null,
               "opponentSeed": null,
               "isUpset": false,
@@ -230,6 +234,7 @@
               "opponent": "Witrowen",
               "score": "2–0",
               "outcome": "win",
+              "opponentExcluded": false,
               "ownSeed": null,
               "opponentSeed": null,
               "isUpset": false,
@@ -245,6 +250,7 @@
               "opponent": "Azrad",
               "score": "0–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": null,
               "opponentSeed": null,
               "isUpset": false,
@@ -260,6 +266,7 @@
               "opponent": "Nexx",
               "score": "0–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": null,
               "opponentSeed": null,
               "isUpset": false,
@@ -301,6 +308,7 @@
               "opponent": "merume",
               "score": "0–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 40,
               "opponentSeed": 25,
               "isUpset": false,
@@ -316,17 +324,82 @@
               "opponent": "Krav",
               "score": "0–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 40,
               "opponentSeed": 16,
               "isUpset": false,
               "startedAt": 1775932633,
               "phaseOrder": 1,
               "roundOrder": -4
+            },
+            {
+              "eventKey": "tournament/mashito-go-3/event/singles-b",
+              "event": "Mashito GO! #3 · Singles B",
+              "phase": "Categoria B",
+              "round": "Winners Round 2",
+              "opponent": "s0uler",
+              "score": "2–1",
+              "outcome": "win",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1775937502,
+              "phaseOrder": 1,
+              "roundOrder": 2
+            },
+            {
+              "eventKey": "tournament/mashito-go-3/event/singles-b",
+              "event": "Mashito GO! #3 · Singles B",
+              "phase": "Categoria B",
+              "round": "Winners Quarter-Final",
+              "opponent": "tatu8052",
+              "score": "2–0",
+              "outcome": "win",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1775940207,
+              "phaseOrder": 1,
+              "roundOrder": 3
+            },
+            {
+              "eventKey": "tournament/mashito-go-3/event/singles-b",
+              "event": "Mashito GO! #3 · Singles B",
+              "phase": "Categoria B",
+              "round": "Winners Semi-Final",
+              "opponent": "nicolazer",
+              "score": "1–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1775942340,
+              "phaseOrder": 1,
+              "roundOrder": 4
+            },
+            {
+              "eventKey": "tournament/mashito-go-3/event/singles-b",
+              "event": "Mashito GO! #3 · Singles B",
+              "phase": "Categoria B",
+              "round": "Losers Quarter-Final",
+              "opponent": "Dieguix",
+              "score": "1–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1775944002,
+              "phaseOrder": 1,
+              "roundOrder": -8
             }
           ],
           "characterCounts": {
-            "Daisy": 1,
-            "Pyra & Mythra": 3
+            "Daisy": 3,
+            "Pyra & Mythra": 12
           },
           "sourceEvents": [
             {
@@ -340,89 +413,13 @@
                 "Daisy": 1,
                 "Pyra & Mythra": 3
               }
-            }
-          ]
-        },
-        {
-          "event": "Mashito GO! #3 · Singles B",
-          "eventKey": "tournament/mashito-go-3/event/singles-b",
-          "date": "2026-04-11",
-          "seed": 4,
-          "place": 24,
-          "entrants": 19,
-          "sets": [
-            {
-              "eventKey": "tournament/mashito-go-3/event/singles-b",
-              "event": "Mashito GO! #3 · Singles B",
-              "phase": "Bracket",
-              "round": "Winners Round 2",
-              "opponent": "s0uler",
-              "score": "2–1",
-              "outcome": "win",
-              "ownSeed": null,
-              "opponentSeed": null,
-              "isUpset": false,
-              "startedAt": 1775937502,
-              "phaseOrder": 1,
-              "roundOrder": 2
             },
-            {
-              "eventKey": "tournament/mashito-go-3/event/singles-b",
-              "event": "Mashito GO! #3 · Singles B",
-              "phase": "Bracket",
-              "round": "Winners Quarter-Final",
-              "opponent": "tatu8052",
-              "score": "2–0",
-              "outcome": "win",
-              "ownSeed": null,
-              "opponentSeed": null,
-              "isUpset": false,
-              "startedAt": 1775940207,
-              "phaseOrder": 1,
-              "roundOrder": 3
-            },
-            {
-              "eventKey": "tournament/mashito-go-3/event/singles-b",
-              "event": "Mashito GO! #3 · Singles B",
-              "phase": "Bracket",
-              "round": "Winners Semi-Final",
-              "opponent": "nicolazer",
-              "score": "1–2",
-              "outcome": "loss",
-              "ownSeed": null,
-              "opponentSeed": null,
-              "isUpset": false,
-              "startedAt": 1775942340,
-              "phaseOrder": 1,
-              "roundOrder": 4
-            },
-            {
-              "eventKey": "tournament/mashito-go-3/event/singles-b",
-              "event": "Mashito GO! #3 · Singles B",
-              "phase": "Bracket",
-              "round": "Losers Quarter-Final",
-              "opponent": "Dieguix",
-              "score": "1–2",
-              "outcome": "loss",
-              "ownSeed": null,
-              "opponentSeed": null,
-              "isUpset": false,
-              "startedAt": 1775944002,
-              "phaseOrder": 1,
-              "roundOrder": -8
-            }
-          ],
-          "characterCounts": {
-            "Daisy": 2,
-            "Pyra & Mythra": 9
-          },
-          "sourceEvents": [
             {
               "eventKey": "tournament/mashito-go-3/event/singles-b",
               "event": "Mashito GO! #3 · Singles B",
               "date": "2026-04-11",
               "seed": 4,
-              "place": 24,
+              "place": 59,
               "entrants": 19,
               "characterCounts": {
                 "Daisy": 2,
@@ -447,6 +444,7 @@
               "opponent": "Fanca",
               "score": "0–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 41,
               "opponentSeed": 24,
               "isUpset": false,
@@ -462,17 +460,82 @@
               "opponent": "Gerix",
               "score": "0–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 41,
               "opponentSeed": 32,
               "isUpset": false,
               "startedAt": 1774119329,
               "phaseOrder": 1,
               "roundOrder": -4
+            },
+            {
+              "eventKey": "tournament/mashito-go-2/event/singles-b",
+              "event": "Mashito GO! #2 · Singles B",
+              "phase": "Categoria B",
+              "round": "Winners Round 1",
+              "opponent": "Rivels T.R.D",
+              "score": "2–1",
+              "outcome": "win",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1774124975,
+              "phaseOrder": 1,
+              "roundOrder": 1
+            },
+            {
+              "eventKey": "tournament/mashito-go-2/event/singles-b",
+              "event": "Mashito GO! #2 · Singles B",
+              "phase": "Categoria B",
+              "round": "Winners Quarter-Final",
+              "opponent": "s0uler",
+              "score": "2–1",
+              "outcome": "win",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1774127797,
+              "phaseOrder": 1,
+              "roundOrder": 2
+            },
+            {
+              "eventKey": "tournament/mashito-go-2/event/singles-b",
+              "event": "Mashito GO! #2 · Singles B",
+              "phase": "Categoria B",
+              "round": "Winners Semi-Final",
+              "opponent": "TowasPato",
+              "score": "1–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1774129370,
+              "phaseOrder": 1,
+              "roundOrder": 3
+            },
+            {
+              "eventKey": "tournament/mashito-go-2/event/singles-b",
+              "event": "Mashito GO! #2 · Singles B",
+              "phase": "Categoria B",
+              "round": "Losers Quarter-Final",
+              "opponent": "nicolazer",
+              "score": "0–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1774131016,
+              "phaseOrder": 1,
+              "roundOrder": -6
             }
           ],
           "characterCounts": {
-            "Daisy": 1,
-            "Pyra & Mythra": 3
+            "Daisy": 2,
+            "Pyra & Mythra": 13
           },
           "sourceEvents": [
             {
@@ -486,89 +549,13 @@
                 "Daisy": 1,
                 "Pyra & Mythra": 3
               }
-            }
-          ]
-        },
-        {
-          "event": "Mashito GO! #2 · Singles B",
-          "eventKey": "tournament/mashito-go-2/event/singles-b",
-          "date": "2026-03-21",
-          "seed": 3,
-          "place": 21,
-          "entrants": 16,
-          "sets": [
-            {
-              "eventKey": "tournament/mashito-go-2/event/singles-b",
-              "event": "Mashito GO! #2 · Singles B",
-              "phase": "Bracket",
-              "round": "Winners Round 1",
-              "opponent": "Rivels T.R.D",
-              "score": "2–1",
-              "outcome": "win",
-              "ownSeed": null,
-              "opponentSeed": null,
-              "isUpset": false,
-              "startedAt": 1774124975,
-              "phaseOrder": 1,
-              "roundOrder": 1
             },
-            {
-              "eventKey": "tournament/mashito-go-2/event/singles-b",
-              "event": "Mashito GO! #2 · Singles B",
-              "phase": "Bracket",
-              "round": "Winners Quarter-Final",
-              "opponent": "s0uler",
-              "score": "2–1",
-              "outcome": "win",
-              "ownSeed": null,
-              "opponentSeed": null,
-              "isUpset": false,
-              "startedAt": 1774127797,
-              "phaseOrder": 1,
-              "roundOrder": 2
-            },
-            {
-              "eventKey": "tournament/mashito-go-2/event/singles-b",
-              "event": "Mashito GO! #2 · Singles B",
-              "phase": "Bracket",
-              "round": "Winners Semi-Final",
-              "opponent": "TowasPato",
-              "score": "1–2",
-              "outcome": "loss",
-              "ownSeed": null,
-              "opponentSeed": null,
-              "isUpset": false,
-              "startedAt": 1774129370,
-              "phaseOrder": 1,
-              "roundOrder": 3
-            },
-            {
-              "eventKey": "tournament/mashito-go-2/event/singles-b",
-              "event": "Mashito GO! #2 · Singles B",
-              "phase": "Bracket",
-              "round": "Losers Quarter-Final",
-              "opponent": "nicolazer",
-              "score": "0–2",
-              "outcome": "loss",
-              "ownSeed": null,
-              "opponentSeed": null,
-              "isUpset": false,
-              "startedAt": 1774131016,
-              "phaseOrder": 1,
-              "roundOrder": -6
-            }
-          ],
-          "characterCounts": {
-            "Daisy": 1,
-            "Pyra & Mythra": 10
-          },
-          "sourceEvents": [
             {
               "eventKey": "tournament/mashito-go-2/event/singles-b",
               "event": "Mashito GO! #2 · Singles B",
               "date": "2026-03-21",
               "seed": 3,
-              "place": 21,
+              "place": 46,
               "entrants": 16,
               "characterCounts": {
                 "Daisy": 1,

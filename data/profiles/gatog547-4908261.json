@@ -90,14 +90,14 @@
           "wins": 1
         }
       ],
-      "events": 4,
+      "events": 3,
       "wins": 5,
       "losses": 10,
       "upsets": 0,
       "bestPlace": 17,
       "bestEvent": "Ultimate Smashdown #33 · Ultimate Singles",
-      "avgPlace": 24.0,
-      "avgSeed": 26,
+      "avgPlace": 25.0,
+      "avgSeed": 31,
       "characters": [
         {
           "name": "Incineroar",
@@ -130,6 +130,7 @@
               "opponent": "iguana",
               "score": "2–0",
               "outcome": "win",
+              "opponentExcluded": false,
               "ownSeed": 29,
               "opponentSeed": 36,
               "isUpset": false,
@@ -145,6 +146,7 @@
               "opponent": "ZAPO",
               "score": "0–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 29,
               "opponentSeed": 4,
               "isUpset": false,
@@ -160,16 +162,81 @@
               "opponent": "Psycho",
               "score": "0–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 29,
               "opponentSeed": 20,
               "isUpset": false,
               "startedAt": 1774119692,
               "phaseOrder": 1,
               "roundOrder": -5
+            },
+            {
+              "eventKey": "tournament/mashito-go-2/event/singles-b",
+              "event": "Mashito GO! #2 · Singles B",
+              "phase": "Categoria B",
+              "round": "Winners Round 1",
+              "opponent": "Gerix",
+              "score": "2–0",
+              "outcome": "win",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1774125008,
+              "phaseOrder": 1,
+              "roundOrder": 1
+            },
+            {
+              "eventKey": "tournament/mashito-go-2/event/singles-b",
+              "event": "Mashito GO! #2 · Singles B",
+              "phase": "Categoria B",
+              "round": "Winners Quarter-Final",
+              "opponent": "Maty",
+              "score": "2–1",
+              "outcome": "win",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1774127132,
+              "phaseOrder": 1,
+              "roundOrder": 2
+            },
+            {
+              "eventKey": "tournament/mashito-go-2/event/singles-b",
+              "event": "Mashito GO! #2 · Singles B",
+              "phase": "Categoria B",
+              "round": "Winners Semi-Final",
+              "opponent": "warwick",
+              "score": "0–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1774127993,
+              "phaseOrder": 1,
+              "roundOrder": 3
+            },
+            {
+              "eventKey": "tournament/mashito-go-2/event/singles-b",
+              "event": "Mashito GO! #2 · Singles B",
+              "phase": "Categoria B",
+              "round": "Losers Quarter-Final",
+              "opponent": "Galletas con Membrillo",
+              "score": "0–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1774130277,
+              "phaseOrder": 1,
+              "roundOrder": -6
             }
           ],
           "characterCounts": {
-            "Incineroar": 6
+            "Incineroar": 15
           },
           "sourceEvents": [
             {
@@ -182,88 +249,13 @@
               "characterCounts": {
                 "Incineroar": 6
               }
-            }
-          ]
-        },
-        {
-          "event": "Mashito GO! #2 · Singles B",
-          "eventKey": "tournament/mashito-go-2/event/singles-b",
-          "date": "2026-03-21",
-          "seed": 13,
-          "place": 21,
-          "entrants": 16,
-          "sets": [
-            {
-              "eventKey": "tournament/mashito-go-2/event/singles-b",
-              "event": "Mashito GO! #2 · Singles B",
-              "phase": "Bracket",
-              "round": "Winners Round 1",
-              "opponent": "Gerix",
-              "score": "2–0",
-              "outcome": "win",
-              "ownSeed": null,
-              "opponentSeed": null,
-              "isUpset": false,
-              "startedAt": 1774125008,
-              "phaseOrder": 1,
-              "roundOrder": 1
             },
-            {
-              "eventKey": "tournament/mashito-go-2/event/singles-b",
-              "event": "Mashito GO! #2 · Singles B",
-              "phase": "Bracket",
-              "round": "Winners Quarter-Final",
-              "opponent": "Maty",
-              "score": "2–1",
-              "outcome": "win",
-              "ownSeed": null,
-              "opponentSeed": null,
-              "isUpset": false,
-              "startedAt": 1774127132,
-              "phaseOrder": 1,
-              "roundOrder": 2
-            },
-            {
-              "eventKey": "tournament/mashito-go-2/event/singles-b",
-              "event": "Mashito GO! #2 · Singles B",
-              "phase": "Bracket",
-              "round": "Winners Semi-Final",
-              "opponent": "warwick",
-              "score": "0–2",
-              "outcome": "loss",
-              "ownSeed": null,
-              "opponentSeed": null,
-              "isUpset": false,
-              "startedAt": 1774127993,
-              "phaseOrder": 1,
-              "roundOrder": 3
-            },
-            {
-              "eventKey": "tournament/mashito-go-2/event/singles-b",
-              "event": "Mashito GO! #2 · Singles B",
-              "phase": "Bracket",
-              "round": "Losers Quarter-Final",
-              "opponent": "Galletas con Membrillo",
-              "score": "0–2",
-              "outcome": "loss",
-              "ownSeed": null,
-              "opponentSeed": null,
-              "isUpset": false,
-              "startedAt": 1774130277,
-              "phaseOrder": 1,
-              "roundOrder": -6
-            }
-          ],
-          "characterCounts": {
-            "Incineroar": 9
-          },
-          "sourceEvents": [
             {
               "eventKey": "tournament/mashito-go-2/event/singles-b",
               "event": "Mashito GO! #2 · Singles B",
               "date": "2026-03-21",
               "seed": 13,
-              "place": 21,
+              "place": 46,
               "entrants": 16,
               "characterCounts": {
                 "Incineroar": 9
@@ -287,6 +279,7 @@
               "opponent": "Lucho",
               "score": "0–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 21,
               "opponentSeed": 12,
               "isUpset": false,
@@ -302,6 +295,7 @@
               "opponent": "elcusquerman",
               "score": "0–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 21,
               "opponentSeed": 15,
               "isUpset": false,
@@ -343,6 +337,7 @@
               "opponent": "Bits",
               "score": "0–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 42,
               "opponentSeed": 23,
               "isUpset": false,
@@ -358,6 +353,7 @@
               "opponent": "RoLo",
               "score": "0–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 42,
               "opponentSeed": 31,
               "isUpset": false,
@@ -373,6 +369,7 @@
               "opponent": "Witrowen",
               "score": "0–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": null,
               "opponentSeed": null,
               "isUpset": false,
@@ -388,6 +385,7 @@
               "opponent": "Rayquaza",
               "score": "2–0",
               "outcome": "win",
+              "opponentExcluded": false,
               "ownSeed": null,
               "opponentSeed": null,
               "isUpset": false,
@@ -403,6 +401,7 @@
               "opponent": "TowasPato",
               "score": "2–0",
               "outcome": "win",
+              "opponentExcluded": false,
               "ownSeed": null,
               "opponentSeed": null,
               "isUpset": false,
@@ -418,6 +417,7 @@
               "opponent": "Bits",
               "score": "1–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": null,
               "opponentSeed": null,
               "isUpset": false,

@@ -50,14 +50,14 @@
           "wins": 0
         }
       ],
-      "events": 2,
+      "events": 1,
       "wins": 2,
       "losses": 4,
       "upsets": 0,
-      "bestPlace": 23,
-      "bestEvent": "Mashito GO! #2 · Singles B",
-      "avgPlace": 28.0,
-      "avgSeed": 17,
+      "bestPlace": 33,
+      "bestEvent": "Mashito GO! #2 · Smash Ultimate singles",
+      "avgPlace": 33.0,
+      "avgSeed": 33,
       "characters": [
         {
           "name": "Jigglypuff",
@@ -82,6 +82,7 @@
               "opponent": "Gerix",
               "score": "1–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 33,
               "opponentSeed": 32,
               "isUpset": false,
@@ -97,16 +98,81 @@
               "opponent": "Fanca",
               "score": "0–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 33,
               "opponentSeed": 24,
               "isUpset": false,
               "startedAt": 1774119364,
               "phaseOrder": 1,
               "roundOrder": -4
+            },
+            {
+              "eventKey": "tournament/mashito-go-2/event/singles-b",
+              "event": "Mashito GO! #2 · Singles B",
+              "phase": "Categoria B",
+              "round": "Winners Round 1",
+              "opponent": "warwick",
+              "score": "0–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1774124026,
+              "phaseOrder": 1,
+              "roundOrder": 1
+            },
+            {
+              "eventKey": "tournament/mashito-go-2/event/singles-b",
+              "event": "Mashito GO! #2 · Singles B",
+              "phase": "Categoria B",
+              "round": "Losers Round 1",
+              "opponent": "Witrowen",
+              "score": "2–0",
+              "outcome": "win",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1774127347,
+              "phaseOrder": 1,
+              "roundOrder": -3
+            },
+            {
+              "eventKey": "tournament/mashito-go-2/event/singles-b",
+              "event": "Mashito GO! #2 · Singles B",
+              "phase": "Categoria B",
+              "round": "Losers Round 2",
+              "opponent": "s0uler",
+              "score": "2–0",
+              "outcome": "win",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1774128776,
+              "phaseOrder": 1,
+              "roundOrder": -4
+            },
+            {
+              "eventKey": "tournament/mashito-go-2/event/singles-b",
+              "event": "Mashito GO! #2 · Singles B",
+              "phase": "Categoria B",
+              "round": "Losers Round 3",
+              "opponent": "Galletas con Membrillo",
+              "score": "0–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1774129562,
+              "phaseOrder": 1,
+              "roundOrder": -5
             }
           ],
           "characterCounts": {
-            "Jigglypuff": 5
+            "Jigglypuff": 13
           },
           "sourceEvents": [
             {
@@ -119,88 +185,13 @@
               "characterCounts": {
                 "Jigglypuff": 5
               }
-            }
-          ]
-        },
-        {
-          "event": "Mashito GO! #2 · Singles B",
-          "eventKey": "tournament/mashito-go-2/event/singles-b",
-          "date": "2026-03-21",
-          "seed": 1,
-          "place": 23,
-          "entrants": 16,
-          "sets": [
-            {
-              "eventKey": "tournament/mashito-go-2/event/singles-b",
-              "event": "Mashito GO! #2 · Singles B",
-              "phase": "Bracket",
-              "round": "Winners Round 1",
-              "opponent": "warwick",
-              "score": "0–2",
-              "outcome": "loss",
-              "ownSeed": null,
-              "opponentSeed": null,
-              "isUpset": false,
-              "startedAt": 1774124026,
-              "phaseOrder": 1,
-              "roundOrder": 1
             },
-            {
-              "eventKey": "tournament/mashito-go-2/event/singles-b",
-              "event": "Mashito GO! #2 · Singles B",
-              "phase": "Bracket",
-              "round": "Losers Round 1",
-              "opponent": "Witrowen",
-              "score": "2–0",
-              "outcome": "win",
-              "ownSeed": null,
-              "opponentSeed": null,
-              "isUpset": false,
-              "startedAt": 1774127347,
-              "phaseOrder": 1,
-              "roundOrder": -3
-            },
-            {
-              "eventKey": "tournament/mashito-go-2/event/singles-b",
-              "event": "Mashito GO! #2 · Singles B",
-              "phase": "Bracket",
-              "round": "Losers Round 2",
-              "opponent": "s0uler",
-              "score": "2–0",
-              "outcome": "win",
-              "ownSeed": null,
-              "opponentSeed": null,
-              "isUpset": false,
-              "startedAt": 1774128776,
-              "phaseOrder": 1,
-              "roundOrder": -4
-            },
-            {
-              "eventKey": "tournament/mashito-go-2/event/singles-b",
-              "event": "Mashito GO! #2 · Singles B",
-              "phase": "Bracket",
-              "round": "Losers Round 3",
-              "opponent": "Galletas con Membrillo",
-              "score": "0–2",
-              "outcome": "loss",
-              "ownSeed": null,
-              "opponentSeed": null,
-              "isUpset": false,
-              "startedAt": 1774129562,
-              "phaseOrder": 1,
-              "roundOrder": -5
-            }
-          ],
-          "characterCounts": {
-            "Jigglypuff": 8
-          },
-          "sourceEvents": [
             {
               "eventKey": "tournament/mashito-go-2/event/singles-b",
               "event": "Mashito GO! #2 · Singles B",
               "date": "2026-03-21",
               "seed": 1,
-              "place": 23,
+              "place": 48,
               "entrants": 16,
               "characterCounts": {
                 "Jigglypuff": 8

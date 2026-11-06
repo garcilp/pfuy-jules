@@ -75,14 +75,14 @@
           "wins": 0
         }
       ],
-      "events": 3,
+      "events": 2,
       "wins": 4,
       "losses": 7,
       "upsets": 1,
       "bestPlace": 17,
       "bestEvent": "Mashito? GO · Smash Ultimate singles",
-      "avgPlace": 25.3,
-      "avgSeed": 22,
+      "avgPlace": 25.0,
+      "avgSeed": 32,
       "characters": [
         {
           "name": "Young Link",
@@ -111,6 +111,7 @@
               "opponent": "Gerix",
               "score": "0–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 32,
               "opponentSeed": 33,
               "isUpset": false,
@@ -126,16 +127,82 @@
               "opponent": "warwick",
               "score": "1–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 32,
               "opponentSeed": 24,
               "isUpset": false,
               "startedAt": 1775932947,
               "phaseOrder": 1,
               "roundOrder": -4
+            },
+            {
+              "eventKey": "tournament/mashito-go-3/event/singles-b",
+              "event": "Mashito GO! #3 · Singles B",
+              "phase": "Categoria B",
+              "round": "Winners Round 2",
+              "opponent": "Bits",
+              "score": "0–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1775938368,
+              "phaseOrder": 1,
+              "roundOrder": 2
+            },
+            {
+              "eventKey": "tournament/mashito-go-3/event/singles-b",
+              "event": "Mashito GO! #3 · Singles B",
+              "phase": "Categoria B",
+              "round": "Losers Round 2",
+              "opponent": "F el paladin",
+              "score": "2–0",
+              "outcome": "win",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1775939686,
+              "phaseOrder": 1,
+              "roundOrder": -5
+            },
+            {
+              "eventKey": "tournament/mashito-go-3/event/singles-b",
+              "event": "Mashito GO! #3 · Singles B",
+              "phase": "Categoria B",
+              "round": "Losers Round 3",
+              "opponent": "Kyo",
+              "score": "2–0",
+              "outcome": "win",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1775942283,
+              "phaseOrder": 1,
+              "roundOrder": -6
+            },
+            {
+              "eventKey": "tournament/mashito-go-3/event/singles-b",
+              "event": "Mashito GO! #3 · Singles B",
+              "phase": "Categoria B",
+              "round": "Losers Round 4",
+              "opponent": "Caliker",
+              "score": "0–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1775942977,
+              "phaseOrder": 1,
+              "roundOrder": -7
             }
           ],
           "characterCounts": {
-            "Young Link": 5
+            "Young Link": 11,
+            "King K. Rool": 2
           },
           "sourceEvents": [
             {
@@ -148,89 +215,13 @@
               "characterCounts": {
                 "Young Link": 5
               }
-            }
-          ]
-        },
-        {
-          "event": "Mashito GO! #3 · Singles B",
-          "eventKey": "tournament/mashito-go-3/event/singles-b",
-          "date": "2026-04-11",
-          "seed": 2,
-          "place": 26,
-          "entrants": 19,
-          "sets": [
-            {
-              "eventKey": "tournament/mashito-go-3/event/singles-b",
-              "event": "Mashito GO! #3 · Singles B",
-              "phase": "Bracket",
-              "round": "Winners Round 2",
-              "opponent": "Bits",
-              "score": "0–2",
-              "outcome": "loss",
-              "ownSeed": null,
-              "opponentSeed": null,
-              "isUpset": false,
-              "startedAt": 1775938368,
-              "phaseOrder": 1,
-              "roundOrder": 2
             },
-            {
-              "eventKey": "tournament/mashito-go-3/event/singles-b",
-              "event": "Mashito GO! #3 · Singles B",
-              "phase": "Bracket",
-              "round": "Losers Round 2",
-              "opponent": "F el paladin",
-              "score": "2–0",
-              "outcome": "win",
-              "ownSeed": null,
-              "opponentSeed": null,
-              "isUpset": false,
-              "startedAt": 1775939686,
-              "phaseOrder": 1,
-              "roundOrder": -5
-            },
-            {
-              "eventKey": "tournament/mashito-go-3/event/singles-b",
-              "event": "Mashito GO! #3 · Singles B",
-              "phase": "Bracket",
-              "round": "Losers Round 3",
-              "opponent": "Kyo",
-              "score": "2–0",
-              "outcome": "win",
-              "ownSeed": null,
-              "opponentSeed": null,
-              "isUpset": false,
-              "startedAt": 1775942283,
-              "phaseOrder": 1,
-              "roundOrder": -6
-            },
-            {
-              "eventKey": "tournament/mashito-go-3/event/singles-b",
-              "event": "Mashito GO! #3 · Singles B",
-              "phase": "Bracket",
-              "round": "Losers Round 4",
-              "opponent": "Caliker",
-              "score": "0–2",
-              "outcome": "loss",
-              "ownSeed": null,
-              "opponentSeed": null,
-              "isUpset": false,
-              "startedAt": 1775942977,
-              "phaseOrder": 1,
-              "roundOrder": -7
-            }
-          ],
-          "characterCounts": {
-            "King K. Rool": 2,
-            "Young Link": 6
-          },
-          "sourceEvents": [
             {
               "eventKey": "tournament/mashito-go-3/event/singles-b",
               "event": "Mashito GO! #3 · Singles B",
               "date": "2026-04-11",
               "seed": 2,
-              "place": 26,
+              "place": 61,
               "entrants": 19,
               "characterCounts": {
                 "King K. Rool": 2,
@@ -255,6 +246,7 @@
               "opponent": "Jotacast",
               "score": "2–0",
               "outcome": "win",
+              "opponentExcluded": false,
               "ownSeed": 31,
               "opponentSeed": 34,
               "isUpset": false,
@@ -270,6 +262,7 @@
               "opponent": "J",
               "score": "0–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 31,
               "opponentSeed": 2,
               "isUpset": false,
@@ -285,6 +278,7 @@
               "opponent": "elcusquerman",
               "score": "2–1",
               "outcome": "win",
+              "opponentExcluded": false,
               "ownSeed": 31,
               "opponentSeed": 15,
               "isUpset": true,
@@ -300,6 +294,7 @@
               "opponent": "RIGONARDO",
               "score": "0–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 18,
               "opponentSeed": 15,
               "isUpset": false,
@@ -315,6 +310,7 @@
               "opponent": "Vodokex",
               "score": "0–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 18,
               "opponentSeed": 12,
               "isUpset": false,

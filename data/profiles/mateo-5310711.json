@@ -40,14 +40,14 @@
           "wins": 0
         }
       ],
-      "events": 2,
+      "events": 1,
       "wins": 0,
       "losses": 4,
       "upsets": 0,
-      "bestPlace": 36,
-      "bestEvent": "Mashito GO! #3 · Singles B",
-      "avgPlace": 42.5,
-      "avgSeed": 33,
+      "bestPlace": 49,
+      "bestEvent": "Mashito GO! #3 · Smash Ultimate singles",
+      "avgPlace": 49.0,
+      "avgSeed": 54,
       "characters": [
         {
           "name": "Greninja",
@@ -72,6 +72,7 @@
               "opponent": "Freakazoiid",
               "score": "0–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 54,
               "opponentSeed": 11,
               "isUpset": false,
@@ -87,16 +88,49 @@
               "opponent": "s0uler",
               "score": "0–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 54,
               "opponentSeed": 43,
               "isUpset": false,
               "startedAt": 1775931534,
               "phaseOrder": 1,
               "roundOrder": -3
+            },
+            {
+              "eventKey": "tournament/mashito-go-3/event/singles-b",
+              "event": "Mashito GO! #3 · Singles B",
+              "phase": "Categoria B",
+              "round": "Winners Round 2",
+              "opponent": "tatu8052",
+              "score": "1–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1775937925,
+              "phaseOrder": 1,
+              "roundOrder": 2
+            },
+            {
+              "eventKey": "tournament/mashito-go-3/event/singles-b",
+              "event": "Mashito GO! #3 · Singles B",
+              "phase": "Categoria B",
+              "round": "Losers Round 1",
+              "opponent": "Misheon",
+              "score": "0–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1775938876,
+              "phaseOrder": 1,
+              "roundOrder": -4
             }
           ],
           "characterCounts": {
-            "Greninja": 4
+            "Greninja": 9
           },
           "sourceEvents": [
             {
@@ -109,58 +143,13 @@
               "characterCounts": {
                 "Greninja": 4
               }
-            }
-          ]
-        },
-        {
-          "event": "Mashito GO! #3 · Singles B",
-          "eventKey": "tournament/mashito-go-3/event/singles-b",
-          "date": "2026-04-11",
-          "seed": 12,
-          "place": 36,
-          "entrants": 19,
-          "sets": [
-            {
-              "eventKey": "tournament/mashito-go-3/event/singles-b",
-              "event": "Mashito GO! #3 · Singles B",
-              "phase": "Bracket",
-              "round": "Winners Round 2",
-              "opponent": "tatu8052",
-              "score": "1–2",
-              "outcome": "loss",
-              "ownSeed": null,
-              "opponentSeed": null,
-              "isUpset": false,
-              "startedAt": 1775937925,
-              "phaseOrder": 1,
-              "roundOrder": 2
             },
-            {
-              "eventKey": "tournament/mashito-go-3/event/singles-b",
-              "event": "Mashito GO! #3 · Singles B",
-              "phase": "Bracket",
-              "round": "Losers Round 1",
-              "opponent": "Misheon",
-              "score": "0–2",
-              "outcome": "loss",
-              "ownSeed": null,
-              "opponentSeed": null,
-              "isUpset": false,
-              "startedAt": 1775938876,
-              "phaseOrder": 1,
-              "roundOrder": -4
-            }
-          ],
-          "characterCounts": {
-            "Greninja": 5
-          },
-          "sourceEvents": [
             {
               "eventKey": "tournament/mashito-go-3/event/singles-b",
               "event": "Mashito GO! #3 · Singles B",
               "date": "2026-04-11",
               "seed": 12,
-              "place": 36,
+              "place": 71,
               "entrants": 19,
               "characterCounts": {
                 "Greninja": 5

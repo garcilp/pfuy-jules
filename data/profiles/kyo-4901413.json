@@ -80,14 +80,14 @@
           "wins": 0
         }
       ],
-      "events": 4,
+      "events": 3,
       "wins": 3,
       "losses": 9,
       "upsets": 1,
       "bestPlace": 25,
       "bestEvent": "2 times",
-      "avgPlace": 27.8,
-      "avgSeed": 30,
+      "avgPlace": 27.7,
+      "avgSeed": 38,
       "characters": [
         {
           "name": "Pikachu",
@@ -120,6 +120,7 @@
               "opponent": "Belipe",
               "score": "0–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 37,
               "opponentSeed": 5,
               "isUpset": false,
@@ -135,6 +136,7 @@
               "opponent": "Nexx",
               "score": "2–1",
               "outcome": "win",
+              "opponentExcluded": false,
               "ownSeed": 37,
               "opponentSeed": 45,
               "isUpset": false,
@@ -150,6 +152,7 @@
               "opponent": "Zoro",
               "score": "0–1",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 25,
               "opponentSeed": 8,
               "isUpset": false,
@@ -165,6 +168,7 @@
               "opponent": "Maxeer",
               "score": "1–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 25,
               "opponentSeed": 24,
               "isUpset": false,
@@ -206,6 +210,7 @@
               "opponent": "Diecordea",
               "score": "1–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 39,
               "opponentSeed": 26,
               "isUpset": false,
@@ -221,16 +226,65 @@
               "opponent": "#Washu",
               "score": "0–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 39,
               "opponentSeed": 18,
               "isUpset": false,
               "startedAt": 1775933793,
               "phaseOrder": 1,
               "roundOrder": -4
+            },
+            {
+              "eventKey": "tournament/mashito-go-3/event/singles-b",
+              "event": "Mashito GO! #3 · Singles B",
+              "phase": "Categoria B",
+              "round": "Winners Round 2",
+              "opponent": "JoaquinYn",
+              "score": "2–1",
+              "outcome": "win",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1775937150,
+              "phaseOrder": 1,
+              "roundOrder": 2
+            },
+            {
+              "eventKey": "tournament/mashito-go-3/event/singles-b",
+              "event": "Mashito GO! #3 · Singles B",
+              "phase": "Categoria B",
+              "round": "Winners Quarter-Final",
+              "opponent": "nicolazer",
+              "score": "0–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1775941186,
+              "phaseOrder": 1,
+              "roundOrder": 3
+            },
+            {
+              "eventKey": "tournament/mashito-go-3/event/singles-b",
+              "event": "Mashito GO! #3 · Singles B",
+              "phase": "Categoria B",
+              "round": "Losers Round 3",
+              "opponent": "iampro104",
+              "score": "0–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1775942283,
+              "phaseOrder": 1,
+              "roundOrder": -6
             }
           ],
           "characterCounts": {
-            "Pikachu": 5
+            "Pikachu": 12
           },
           "sourceEvents": [
             {
@@ -243,73 +297,13 @@
               "characterCounts": {
                 "Pikachu": 5
               }
-            }
-          ]
-        },
-        {
-          "event": "Mashito GO! #3 · Singles B",
-          "eventKey": "tournament/mashito-go-3/event/singles-b",
-          "date": "2026-04-11",
-          "seed": 8,
-          "place": 28,
-          "entrants": 19,
-          "sets": [
-            {
-              "eventKey": "tournament/mashito-go-3/event/singles-b",
-              "event": "Mashito GO! #3 · Singles B",
-              "phase": "Bracket",
-              "round": "Winners Round 2",
-              "opponent": "JoaquinYn",
-              "score": "2–1",
-              "outcome": "win",
-              "ownSeed": null,
-              "opponentSeed": null,
-              "isUpset": false,
-              "startedAt": 1775937150,
-              "phaseOrder": 1,
-              "roundOrder": 2
             },
-            {
-              "eventKey": "tournament/mashito-go-3/event/singles-b",
-              "event": "Mashito GO! #3 · Singles B",
-              "phase": "Bracket",
-              "round": "Winners Quarter-Final",
-              "opponent": "nicolazer",
-              "score": "0–2",
-              "outcome": "loss",
-              "ownSeed": null,
-              "opponentSeed": null,
-              "isUpset": false,
-              "startedAt": 1775941186,
-              "phaseOrder": 1,
-              "roundOrder": 3
-            },
-            {
-              "eventKey": "tournament/mashito-go-3/event/singles-b",
-              "event": "Mashito GO! #3 · Singles B",
-              "phase": "Bracket",
-              "round": "Losers Round 3",
-              "opponent": "iampro104",
-              "score": "0–2",
-              "outcome": "loss",
-              "ownSeed": null,
-              "opponentSeed": null,
-              "isUpset": false,
-              "startedAt": 1775942283,
-              "phaseOrder": 1,
-              "roundOrder": -6
-            }
-          ],
-          "characterCounts": {
-            "Pikachu": 7
-          },
-          "sourceEvents": [
             {
               "eventKey": "tournament/mashito-go-3/event/singles-b",
               "event": "Mashito GO! #3 · Singles B",
               "date": "2026-04-11",
               "seed": 8,
-              "place": 28,
+              "place": 63,
               "entrants": 19,
               "characterCounts": {
                 "Pikachu": 7
@@ -333,6 +327,7 @@
               "opponent": "Misheon",
               "score": "2–1",
               "outcome": "win",
+              "opponentExcluded": false,
               "ownSeed": 37,
               "opponentSeed": 28,
               "isUpset": true,
@@ -348,6 +343,7 @@
               "opponent": "Lazerth",
               "score": "0–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 37,
               "opponentSeed": 5,
               "isUpset": false,
@@ -363,6 +359,7 @@
               "opponent": "Cryos",
               "score": "0–2",
               "outcome": "loss",
+              "opponentExcluded": false,
               "ownSeed": 37,
               "opponentSeed": 21,
               "isUpset": false,

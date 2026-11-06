@@ -9,6 +9,7 @@ h1,h2,p{margin:0}.mono{font-family:'JetBrains Mono',monospace}.muted{color:var(-
 .glass {
     position: relative;
     isolation: isolate;
+    z-index: 0;
     background: transparent;
     border: 1px solid var(--glass-border);
     box-shadow: 0 16px 48px var(--glass-shadow);
@@ -19,7 +20,7 @@ h1,h2,p{margin:0}.mono{font-family:'JetBrains Mono',monospace}.muted{color:var(-
     content: "";
     position: absolute;
     inset: 0;
-    z-index: 0;
+    z-index: -1;
     border-radius: inherit;
     pointer-events: none;
 
