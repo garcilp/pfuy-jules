@@ -270,6 +270,135 @@ function closeEventModal() {
   }
 }
 
+// --- Notable Wins Modal ---
+let playerWinOpponents = [];
+
+function closeWinModal() {
+  const modal = $('#win-select-modal');
+  if (!modal) return;
+  if (typeof modal.close === 'function') {
+    modal.close();
+  } else {
+    modal.removeAttribute('open');
+  }
+}
+
+async function openWinModalForCurrentPlayer() {
+  const p = draft.players[sel];
+  if (!p) return;
+  savedScrollY = window.scrollY || document.documentElement.scrollTop;
+  const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
+  const modal = $('#win-select-modal');
+  const listEl = $('#winSelectList');
+  if (!modal || !listEl) {
+    p.notableWins = p.notableWins || [];
+    p.notableWins.push({ opponent: '', tournament: '' });
+    preserveScroll(() => renderEditor());
+    return;
+  }
+
+  listEl.innerHTML = `<div class="player-empty-search">${isEs ? 'Calculando victorias del jugador...' : 'Loading player wins...'}</div>`;
+
+  if (typeof modal.showModal === 'function') {
+    modal.showModal();
+    window.scrollTo({ top: savedScrollY, behavior: 'instant' });
+  } else {
+    modal.setAttribute('open', '');
+  }
+
+  playerWinOpponents = [];
+
+  const prof = await getProfileData(p.playerId, p.tag);
+  if (prof) {
+    const gslug = draft.game?.slug || 'ultimate';
+    const curGame = (prof.games || []).find(g => g.slug === gslug || g.id === gslug) || prof.games?.[0];
+    if (curGame && Array.isArray(curGame.results)) {
+      const startDate = draft.period?.start || '';
+      const endDate = draft.period?.end || '';
+
+      const byOpp = new Map();
+      for (const res of curGame.results) {
+        const resDate = res.date || '';
+        if (startDate && resDate && resDate < startDate) continue;
+        if (endDate && resDate && resDate > endDate) continue;
+        for (const s of (res.sets || [])) {
+          const outcome = (s.outcome || '').trim().toLowerCase();
+          if (outcome !== 'win') continue;
+          const oppDisplay = (s.opponent || '').trim();
+          const oppKey = oppDisplay.toLowerCase();
+          if (!oppKey) continue;
+          if (!byOpp.has(oppKey)) byOpp.set(oppKey, { displayTag: oppDisplay, wins: [] });
+          byOpp.get(oppKey).wins.push({
+            event: res.event || s.event || '',
+            eventKey: res.eventKey || s.eventKey || '',
+            date: resDate
+          });
+        }
+      }
+
+      playerWinOpponents = [...byOpp.entries()]
+        .sort((a, b) => b[1].wins.length - a[1].wins.length || a[1].displayTag.localeCompare(b[1].displayTag))
+        .map(([, v]) => {
+          const count = v.wins.length;
+          if (count === 1) {
+            const tourneyName = extractTournamentName(v.wins[0].event, v.wins[0].eventKey);
+            return { opponent: v.displayTag, tournament: tourneyName };
+          } else {
+            return { opponent: v.displayTag, times: count };
+          }
+        });
+    }
+  }
+
+  renderWinModalList();
+}
+
+function renderWinModalList() {
+  const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
+  const listEl = $('#winSelectList');
+  if (!listEl) return;
+
+  if (!playerWinOpponents.length) {
+    listEl.innerHTML = `<div class="player-empty-search">${isEs ? 'No se encontraron victorias en este periodo.' : 'No wins found in this period.'}</div>`;
+    return;
+  }
+
+  listEl.innerHTML = playerWinOpponents.map((w, idx) => {
+    const detail = w.times !== undefined
+      ? `${w.times} ${isEs ? 'veces' : 'wins'}`
+      : esc(w.tournament || '');
+    return `<button type="button" class="player-select-item" data-act="choose-win" data-idx="${idx}">
+      <span class="player-select-avatar"><span style="font-size:14px;font-weight:700;">✓</span></span>
+      <div class="player-select-info">
+        <div class="player-select-tag-row">
+          <span class="player-select-tag">${esc(w.opponent)}</span>
+        </div>
+        <div class="player-select-meta">${detail}</div>
+      </div>
+      <span class="player-select-badge">${isEs ? 'Seleccionar' : 'Select'}</span>
+    </button>`;
+  }).join('');
+}
+
+function selectWinOpponent(idx) {
+  const p = draft.players[sel];
+  if (!p) return;
+  const w = playerWinOpponents[idx];
+  if (!w) return;
+  p.notableWins = p.notableWins || [];
+  if (w.times !== undefined) {
+    p.notableWins.push({ opponent: w.opponent, times: w.times });
+  } else {
+    p.notableWins.push({ opponent: w.opponent, tournament: w.tournament || '' });
+  }
+  dirty = true;
+  closeWinModal();
+  preserveScroll(() => {
+    refresh();
+    renderEditor();
+  });
+}
+
 let savedScrollY = 0;
 
 function preserveScroll(callback) {
@@ -510,6 +639,29 @@ document.addEventListener('click', e => {
       p.notableResults.push({ placement: null, event: '', entrants: null });
       dirty = true;
       closeEventModal();
+      preserveScroll(() => {
+        refresh();
+        renderEditor();
+      });
+    }
+  }
+  if (e.target.id === 'closeWinModalBtn' || e.target.closest('#closeWinModalBtn')) {
+    e.preventDefault();
+    closeWinModal();
+    window.scrollTo({ top: savedScrollY, behavior: 'instant' });
+  }
+  if (e.target === $('#win-select-modal')) {
+    closeWinModal();
+    window.scrollTo({ top: savedScrollY, behavior: 'instant' });
+  }
+  if (e.target.id === 'addBlankWinBtn') {
+    e.preventDefault();
+    const p = draft.players[sel];
+    if (p) {
+      p.notableWins = p.notableWins || [];
+      p.notableWins.push({ opponent: '', tournament: '' });
+      dirty = true;
+      closeWinModal();
       preserveScroll(() => {
         refresh();
         renderEditor();
@@ -945,6 +1097,8 @@ function renderDetails() {
 }
 
 function renderImageBoxDetails() {
+  const isAdminCreation = isAdmin && requestedMode === 'admin';
+  if (!isAdminCreation) return '';
   const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
   const imgBox = draft.imageBox || { url: '', placement: 'after_intro', caption: '' };
   const hasImg = Boolean(imgBox.url);
@@ -958,7 +1112,7 @@ function renderImageBoxDetails() {
   return `
     <div class="sec glass" data-sec="imageBox" style="margin-top:8px;">
       <div class="sh">
-        <b>${isEs ? 'Cuadro de Imagen' : 'Image Box'}</b>
+        <b>${isEs ? 'Imagen del Power Ranking' : 'Power Ranking Picture'}</b>
         <span class="sp"></span>
         ${hasImg ? `<button type="button" class="btn glass pill" data-act="clear-image-box" style="padding:4px 12px;font-size:12px;">${isEs ? 'Quitar imagen' : 'Remove image'}</button>` : ''}
       </div>
@@ -999,14 +1153,20 @@ function renderSide() {
   const okD = draft.title.trim() && draft.period.start && draft.period.end;
   const okP = ps.length > 0 && ps.every(p => p.tag && p.tag.trim());
   const pics = ps.filter(p => p.photo || p._preview).length;
+  const mainsCount = ps.filter(p => Array.isArray(p.mains) && p.mains.length > 0).length;
+  const isAdminCreation = isAdmin && requestedMode === 'admin';
   const checkPlayersText = isEs
     ? `Puesto y tag para los ${ps.length} jugadores`
     : `Placement and tag for all ${ps.length} players`;
   const checkDetailsText = isEs ? 'Nombre, juego y periodo' : 'Name, game and period';
-  const checkPicsText = isEs ? 'Imágenes (opcional)' : 'Pictures (optional)';
+  const checkPicsText = isAdminCreation
+    ? (isEs ? 'Imágenes (opcional)' : 'Pictures (optional)')
+    : (isEs ? 'Personajes principales' : 'Mains');
   const doneText = isEs ? 'LISTO' : 'DONE';
   const missingText = isEs ? 'FALTANTE' : 'MISSING';
-  const picsSub = `${pics} ${isEs ? 'DE' : 'OF'} ${ps.length}`;
+  const picsSub = isAdminCreation
+    ? `${pics} ${isEs ? 'DE' : 'OF'} ${ps.length}`
+    : `${mainsCount} ${isEs ? 'DE' : 'OF'} ${ps.length}`;
 
   $('#side').innerHTML = `<div class="plist glass"><div class="hd"><b>${isEs ? 'Jugadores' : 'Players'}</b><span class="mono muted sm0">${ps.length}</span></div>` +
     ps.map((p, i) => `<button type="button" class="prow${i === sel ? ' on' : ''}" draggable="true" data-act="sel" data-i="${i}"><span class="h">⋮⋮</span><span class="n ${pcls(i + 1)}">${i + 1}</span><span class="t">${esc(p.tag || (isEs ? 'Nuevo jugador' : 'New player'))}</span><span class="k">${kind(p)}</span></button>`).join('') +
@@ -1148,6 +1308,7 @@ function onClick(e) {
     case 'pick-opponent': openPlayerModal({ type: 'opponent', index: i }); return;
     case 'choose-player': addPlayerFromDirectory(b.dataset.playerId); return;
     case 'choose-event': selectEventForNotableResult(+b.dataset.idx); return;
+    case 'choose-win': selectWinOpponent(+b.dataset.idx); return;
     case 'remove-player':
       if (draft.players.length > 0) {
         draft.players.splice(sel, 1);
@@ -1184,7 +1345,7 @@ function onClick(e) {
       renderEditor();
       break;
     case 'fmt': { const w = p.notableWins[i]; if (b.dataset.v === 'times') { w.times = w.times ?? 2; delete w.tournament; } else { w.tournament = w.tournament ?? ''; delete w.times; } renderEditor(); break; }
-    case 'add-win': p.notableWins.push({ opponent: '', tournament: '' }); renderEditor(); break;
+    case 'add-win': e.preventDefault(); openWinModalForCurrentPlayer(); return;
     case 'rm-win': p.notableWins.splice(i, 1); renderEditor(); break;
     case 'add-res': e.preventDefault(); openEventModalForCurrentPlayer(); return;
     case 'rm-res':

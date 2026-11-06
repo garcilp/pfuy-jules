@@ -83,6 +83,20 @@
     <div id="playerSelectList" class="player-select-list"></div>
   </dialog>
 
+  <dialog id="win-select-modal" class="player-select-modal glass">
+    <div class="modal-header">
+      <div>
+        <h2 id="winModalTitle">Select Notable Win</h2>
+        <div id="winModalSub" class="sub muted">Select an opponent defeated during this period</div>
+      </div>
+      <button type="button" class="x glass pill" id="closeWinModalBtn" aria-label="Close">×</button>
+    </div>
+    <div id="winSelectList" class="player-select-list"></div>
+    <div style="margin-top:14px;display:flex;justify-content:flex-end;">
+      <button type="button" class="btn glass pill" id="addBlankWinBtn">+ Add blank win</button>
+    </div>
+  </dialog>
+
   <dialog id="event-select-modal" class="player-select-modal glass">
     <div class="modal-header">
       <div>
