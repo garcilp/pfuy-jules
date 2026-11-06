@@ -86,7 +86,15 @@
     meta.setAttribute('content', theme.bg);
   }
 
+  let transitionTimer = null;
   function applyTheme(themeId, persist = true) {
+    if (document.body) {
+      document.body.classList.add('theme-transitioning');
+      clearTimeout(transitionTimer);
+      transitionTimer = setTimeout(() => {
+        document.body.classList.remove('theme-transitioning');
+      }, 200);
+    }
     document.documentElement.dataset.theme = themeId;
     syncThemeColorMeta(themeId);
     if (persist) {

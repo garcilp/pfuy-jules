@@ -363,36 +363,50 @@ function renderOnThisWeek() {
     return;
   }
 
-  // Deduplicate tournaments if multiple sub-entries
-  const seenTournaments = new Set();
-  const items = [];
+  // Group tournaments and collect all events if multiple sub-entries
+  const groupedTournaments = new Map();
   matchingEvents.forEach(e => {
     const key = e.tournamentSlug || e.tournament;
-    if (!seenTournaments.has(key)) {
-      seenTournaments.add(key);
+    if (!groupedTournaments.has(key)) {
       const year = parseInt(e.date.split('-')[0], 10);
-      items.push({
+      groupedTournaments.set(key, {
         yearsAgo: currentYear - year,
         year,
         date: e.date,
-        event: e.tournament,
+        tournament: e.tournament,
         slug: e.tournamentSlug,
         game: e.game,
-        entrants: e.entrants
+        events: [],
+        entrants: 0
       });
+    }
+    const item = groupedTournaments.get(key);
+    if (e.event && !item.events.includes(e.event)) {
+      item.events.push(e.event);
+    }
+    if (e.entrants) {
+      item.entrants += e.entrants;
+    }
+    if (e.game && !item.game) {
+      item.game = e.game;
     }
   });
 
+  const items = [...groupedTournaments.values()];
   items.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
 
   container.innerHTML = items.map(h => {
     const tourneyUrl = h.slug ? `event.html?tournament=${encodeURIComponent(h.slug)}` : 'events.html';
+    const subtitle = h.events.length > 1
+      ? h.events.join(' · ')
+      : (h.game || (h.events.length === 1 ? h.events[0] : 'Tournament'));
+
     return `
       <div class="tr day">
         <span class="mono muted">${h.year}</span>
         <span>
-          <a class="opponent-link" href="${esc(tourneyUrl)}"><b>${esc(h.event)}</b></a>
-          <small>${esc(h.game || 'Tournament')}${h.entrants ? ` · ${h.entrants} entrants` : ''}</small>
+          <a class="opponent-link" href="${esc(tourneyUrl)}"><b>${esc(h.tournament)}</b></a>
+          <small>${esc(subtitle)}${h.entrants ? ` · ${h.entrants} entrants` : ''}</small>
         </span>
         <span class="mono muted sm0">${h.yearsAgo} yr${h.yearsAgo === 1 ? '' : 's'} ago</span>
       </div>
