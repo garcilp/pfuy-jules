@@ -116,8 +116,15 @@
 
 /* Theme color transitions (150ms), disabled under prefers-reduced-motion */
 @media (prefers-reduced-motion: no-preference) {
-  body, .glass, .panel, .pill, a, button, input, select {
-    transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+  body.theme-transitioning,
+  body.theme-transitioning .glass,
+  body.theme-transitioning .panel,
+  body.theme-transitioning .pill,
+  body.theme-transitioning a,
+  body.theme-transitioning button,
+  body.theme-transitioning input,
+  body.theme-transitioning select {
+    transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease, box-shadow 150ms ease !important;
   }
 }
 
