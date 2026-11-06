@@ -146,6 +146,20 @@ def parse_numeric_score(val):
 
 def get_latest_player_tags(connection, merges):
     latest = {}
+    # First load authoritative tags from player profiles as single source of truth
+    try:
+        index_path = PROFILE_DIR / "index.json"
+        if index_path.is_file():
+            with index_path.open(encoding="utf-8") as file:
+                for entry in json.load(file):
+                    player_id = entry.get("playerId")
+                    tag = entry.get("tag")
+                    if player_id and tag and str(tag).strip().casefold() != "deleted user":
+                        canonical = canonical_id(str(player_id), merges)
+                        latest.setdefault(canonical, str(tag).strip())
+    except Exception:
+        pass
+
     rows = connection.execute(
         "SELECT p.player_id, p.gamer_tag FROM participants p "
         "JOIN entrant_participants ep ON ep.participant_id=p.id "

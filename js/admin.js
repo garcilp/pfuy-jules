@@ -25,7 +25,7 @@ function syncObjectFromVisual() {
   if (!currentProfileObject.player) currentProfileObject.player = {};
   const p = currentProfileObject.player;
   if ($('#player-tag')) p.tag = $('#player-tag').value.trim();
-  if ($('#player-sponsor')) p.sponsor = $('#player-sponsor').value.trim() || null;
+  if ($('#player-sponsor')) p.sponsor = $('#player-sponsor').value.trim() || '';
   if ($('#player-city')) p.city = $('#player-city').value.trim() || '';
   if ($('#player-country')) p.country = $('#player-country').value.trim() || '';
   if ($('#player-location')) p.location = $('#player-location').value.trim() || '';
@@ -171,10 +171,14 @@ async function loadProfiles(selected = '') {
     renderCommunitySocials(socials || {});
     renderGameFilter(games || []);
     const select = $('#profile-select');
-    select.innerHTML = profiles.map(p => `<option value="${esc(p.slug)}">${esc(p.tag)} · ${esc(p.playerId || 'local profile')}</option>`).join('');
+    select.innerHTML = profiles.map(p => `<option value="${esc(p.slug)}" data-player-id="${esc(p.playerId || '')}">${esc(p.tag)} · ${esc(p.playerId || 'local profile')}</option>`).join('');
     const source = $('#merge-source');
     const target = $('#merge-target');
-    const options = profiles.filter(p => p.playerId).map(p => `<option value="${esc(p.playerId)}">${esc(p.tag)} · ${esc(p.playerId)}</option>`).join('');
+    const options = profiles.filter(p => p.playerId).map(p => {
+      const eventCount = p.events ?? (p.games || []).reduce((sum, g) => sum + (g.events || 0), 0);
+      const eventLabel = `${eventCount} event${eventCount === 1 ? '' : 's'}`;
+      return `<option value="${esc(p.playerId)}">${esc(p.tag)} · ID: ${esc(p.playerId)} (${esc(eventLabel)})</option>`;
+    }).join('');
     source.innerHTML = options;
     target.innerHTML = options;
     if (source.options.length > 1) source.selectedIndex = 1;
@@ -259,6 +263,12 @@ async function loadProfile(slug) {
   await loadPlayerGameOptions(currentPlayerId);
   $('#photo-name').textContent = profile.player?.photo || 'PNG, JPEG or WebP · up to 5 MB';
   $('#save-message').textContent = '';
+
+  const publicLink = $('#view-public-profile-btn');
+  if (publicLink) {
+    const targetParam = currentPlayerId || currentSlug;
+    publicLink.href = `player.html?player=${encodeURIComponent(targetParam)}`;
+  }
 }
 
 $('#login-form').addEventListener('submit', async event => {

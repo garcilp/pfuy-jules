@@ -266,6 +266,19 @@ def current_player_tags(connection, merges):
     cache_key = id(connection)
     if cache_key not in _CURRENT_PLAYER_TAGS:
         latest = {}
+        try:
+            index_path = PROFILE_DIR / "index.json"
+            if index_path.is_file():
+                with index_path.open(encoding="utf-8") as file:
+                    for entry in json.load(file):
+                        player_id = entry.get("playerId")
+                        tag = entry.get("tag")
+                        if player_id and tag and str(tag).strip().casefold() != "deleted user":
+                            canonical = canonical_id(str(player_id), merges)
+                            latest.setdefault(canonical, str(tag).strip())
+        except Exception:
+            pass
+
         rows = connection.execute(
             "SELECT p.player_id, p.gamer_tag FROM participants p "
             "JOIN entrant_participants ep ON ep.participant_id=p.id "
@@ -1407,6 +1420,30 @@ def main():
             query += "GROUP BY p.id, part.gamer_tag ORDER BY p.id, COUNT(*) DESC, part.gamer_tag"
             candidates = connection.execute(query, params).fetchall()
             chosen = {}
+            # Prioritize existing profile tags as single source of truth
+            try:
+                index_path = PROFILE_DIR / "index.json"
+                if index_path.is_file():
+                    with index_path.open(encoding="utf-8") as file:
+                        for entry in json.load(file):
+                            p_id = entry.get("playerId")
+                            p_tag = entry.get("tag")
+                            if p_id and p_tag and str(p_tag).strip().casefold() != "deleted user":
+                                chosen[canonical_id(str(p_id), identity_merges())] = str(p_tag).strip()
+            except Exception:
+                pass
+            overrides_path = PROFILE_DIR / "overrides.json"
+            if overrides_path.is_file():
+                try:
+                    with overrides_path.open(encoding="utf-8") as file:
+                        overrides = json.load(file)
+                    for p_id, ovr in overrides.items():
+                        ovr_tag = ovr.get("tag") or (ovr.get("profile", {}).get("player", {}).get("tag"))
+                        if ovr_tag:
+                            chosen[canonical_id(str(p_id), identity_merges())] = str(ovr_tag).strip()
+                except Exception:
+                    pass
+
             for row in candidates:
                 canonical = canonical_id(row["id"], identity_merges())
                 if canonical != str(row["id"]):
