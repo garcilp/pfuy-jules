@@ -207,6 +207,14 @@ async function loadProfiles(selected = '') {
     target.innerHTML = options;
     if (source.options.length > 1) source.selectedIndex = 1;
     if (target.options.length) target.selectedIndex = 0;
+    const bulkSource = $('#bulk-player-source');
+    const bulkTarget = $('#bulk-player-target');
+    if (bulkSource && bulkTarget) {
+      bulkSource.innerHTML = options;
+      bulkTarget.innerHTML = options;
+      if (bulkSource.options.length > 1) bulkSource.selectedIndex = 1;
+      if (bulkTarget.options.length) bulkTarget.selectedIndex = 0;
+    }
     if (Object.keys(merges).length) {
       $('#merge-message').textContent = `${Object.keys(merges).length} merged identity${Object.keys(merges).length === 1 ? '' : 'ies'} saved.`;
     }
@@ -228,16 +236,21 @@ function renderGameFilter(games = []) {
 function renderEventSelects(events = []) {
   const parentSelect = $('#event-parent-url');
   const childSelect = $('#event-child-url');
-  if (!parentSelect || !childSelect) return;
+  const bulkSourceSelect = $('#bulk-event-source');
+  const bulkTargetSelect = $('#bulk-event-target');
   if (events.length) {
     const options = '<option value="" disabled selected>Select an event…</option>' +
       events.map(e => `<option value="${esc(e.sourceUrl)}">${esc(e.tournamentName)} · ${esc(e.eventName)} (${esc(e.gameName)})</option>`).join('');
-    parentSelect.innerHTML = options;
-    childSelect.innerHTML = options;
+    if (parentSelect) parentSelect.innerHTML = options;
+    if (childSelect) childSelect.innerHTML = options;
+    if (bulkSourceSelect) bulkSourceSelect.innerHTML = options;
+    if (bulkTargetSelect) bulkTargetSelect.innerHTML = options;
   } else {
     const empty = '<option value="" disabled selected>No imported events available</option>';
-    parentSelect.innerHTML = empty;
-    childSelect.innerHTML = empty;
+    if (parentSelect) parentSelect.innerHTML = empty;
+    if (childSelect) childSelect.innerHTML = empty;
+    if (bulkSourceSelect) bulkSourceSelect.innerHTML = empty;
+    if (bulkTargetSelect) bulkTargetSelect.innerHTML = empty;
   }
 }
 
@@ -425,6 +438,230 @@ $('#merge-form').addEventListener('submit', async event => {
   } catch (error) { message.textContent = error.message; }
 });
 
+// BULK PLAYER MERGING
+let bulkPlayerQueue = [];
+let editingPlayerIndex = -1;
+
+function renderBulkPlayerQueue() {
+  const list = $('#bulk-player-queue-list');
+  const countEl = $('#bulk-player-queue-count');
+  const clearBtn = $('#bulk-player-clear-btn');
+  const executeBtn = $('#bulk-player-execute-btn');
+  if (!list) return;
+
+  if (countEl) countEl.textContent = `Queued operations (${bulkPlayerQueue.length})`;
+
+  if (!bulkPlayerQueue.length) {
+    list.innerHTML = '<p class="muted event-group-empty">No player merges currently queued.</p>';
+    if (clearBtn) clearBtn.style.display = 'none';
+    if (executeBtn) {
+      executeBtn.disabled = true;
+      executeBtn.textContent = 'Execute Batch';
+    }
+    return;
+  }
+
+  if (clearBtn) clearBtn.style.display = 'inline-block';
+  if (executeBtn) {
+    executeBtn.disabled = false;
+    executeBtn.textContent = `Execute Batch (${bulkPlayerQueue.length})`;
+  }
+
+  list.innerHTML = bulkPlayerQueue.map((item, idx) => `
+    <div class="event-group-item" style="${item.error ? 'border-color: rgba(239, 68, 68, 0.5); background: rgba(239, 68, 68, 0.05);' : ''}">
+      <span>
+        <b>${esc(item.sourceLabel)} → ${esc(item.targetLabel)}</b>
+        <small>FROM: ${esc(item.sourceId)} → TO: ${esc(item.targetId)}</small>
+        ${item.error ? `<small style="color:#f87171; margin-top:4px; font-weight:600;">⚠ ${esc(item.error)}</small>` : ''}
+      </span>
+      <div style="display:flex; gap:8px; align-items:center; flex-shrink:0;">
+        <button class="quiet-button" type="button" data-edit-bulk-player="${idx}">Edit</button>
+        <button class="quiet-button" type="button" data-remove-bulk-player="${idx}" style="color:#f87171;">Remove</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function resetBulkPlayerEditMode() {
+  editingPlayerIndex = -1;
+  const queueBtn = $('#bulk-player-queue-btn');
+  const cancelBtn = $('#bulk-player-cancel-edit-btn');
+  const msg = $('#bulk-player-form-message');
+  if (queueBtn) queueBtn.textContent = '+ Queue Merge';
+  if (cancelBtn) cancelBtn.style.display = 'none';
+  if (msg) msg.textContent = '';
+}
+
+$('#bulk-player-form')?.addEventListener('submit', event => {
+  event.preventDefault();
+  const sourceSelect = $('#bulk-player-source');
+  const targetSelect = $('#bulk-player-target');
+  const msg = $('#bulk-player-form-message');
+  const sourceId = sourceSelect.value;
+  const targetId = targetSelect.value;
+
+  if (!sourceId || !targetId || sourceId === targetId) {
+    if (msg) msg.textContent = 'Choose two different player profiles.';
+    return;
+  }
+
+  const duplicateSource = bulkPlayerQueue.some((item, i) =>
+    (editingPlayerIndex === -1 || i !== editingPlayerIndex) && item.sourceId === sourceId
+  );
+  if (duplicateSource) {
+    if (msg) msg.textContent = 'This player is already queued as a source merge.';
+    return;
+  }
+
+  const createsLoop = bulkPlayerQueue.some((item, i) =>
+    (editingPlayerIndex === -1 || i !== editingPlayerIndex) && item.sourceId === targetId && item.targetId === sourceId
+  );
+  if (createsLoop) {
+    if (msg) msg.textContent = 'This operation would create an identity loop with another queued merge.';
+    return;
+  }
+
+  const sourceLabel = sourceSelect.selectedOptions[0]?.textContent || sourceId;
+  const targetLabel = targetSelect.selectedOptions[0]?.textContent || targetId;
+
+  if (editingPlayerIndex >= 0) {
+    bulkPlayerQueue[editingPlayerIndex] = {
+      ...bulkPlayerQueue[editingPlayerIndex],
+      sourceId,
+      targetId,
+      sourceLabel,
+      targetLabel,
+      error: undefined
+    };
+    resetBulkPlayerEditMode();
+  } else {
+    bulkPlayerQueue.push({
+      id: Date.now() + Math.random(),
+      sourceId,
+      targetId,
+      sourceLabel,
+      targetLabel
+    });
+    if (msg) msg.textContent = '';
+  }
+
+  renderBulkPlayerQueue();
+});
+
+$('#bulk-player-cancel-edit-btn')?.addEventListener('click', () => {
+  resetBulkPlayerEditMode();
+});
+
+$('#bulk-player-clear-btn')?.addEventListener('click', () => {
+  if (!confirm('Clear all queued player merge operations?')) return;
+  bulkPlayerQueue = [];
+  resetBulkPlayerEditMode();
+  renderBulkPlayerQueue();
+  $('#bulk-player-message').textContent = 'Queue cleared.';
+});
+
+$('#bulk-player-queue-list')?.addEventListener('click', event => {
+  const editBtn = event.target.closest('[data-edit-bulk-player]');
+  const removeBtn = event.target.closest('[data-remove-bulk-player]');
+
+  if (editBtn) {
+    const idx = parseInt(editBtn.dataset.editBulkPlayer, 10);
+    const item = bulkPlayerQueue[idx];
+    if (!item) return;
+
+    editingPlayerIndex = idx;
+    const sourceSelect = $('#bulk-player-source');
+    const targetSelect = $('#bulk-player-target');
+    if (sourceSelect) sourceSelect.value = item.sourceId;
+    if (targetSelect) targetSelect.value = item.targetId;
+
+    const queueBtn = $('#bulk-player-queue-btn');
+    const cancelBtn = $('#bulk-player-cancel-edit-btn');
+    if (queueBtn) queueBtn.textContent = 'Save Changes';
+    if (cancelBtn) cancelBtn.style.display = 'inline-block';
+    $('#bulk-player-form-message').textContent = `Editing queued merge #${idx + 1}`;
+    sourceSelect?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    return;
+  }
+
+  if (removeBtn) {
+    const idx = parseInt(removeBtn.dataset.removeBulkPlayer, 10);
+    if (editingPlayerIndex === idx) {
+      resetBulkPlayerEditMode();
+    } else if (editingPlayerIndex > idx) {
+      editingPlayerIndex--;
+    }
+    bulkPlayerQueue.splice(idx, 1);
+    renderBulkPlayerQueue();
+    return;
+  }
+});
+
+$('#bulk-player-execute-btn')?.addEventListener('click', async () => {
+  if (!bulkPlayerQueue.length) return;
+  const message = $('#bulk-player-message');
+  if (!confirm(`Execute batch merge of ${bulkPlayerQueue.length} player operation(s)? Profiles and rankings will be rebuilt once.`)) return;
+
+  message.textContent = 'Checking for overlaps and preparing batch execution…';
+  const executeBtn = $('#bulk-player-execute-btn');
+  if (executeBtn) executeBtn.disabled = true;
+
+  try {
+    const operations = bulkPlayerQueue.map(item => ({ sourceId: item.sourceId, targetId: item.targetId }));
+    let res = await api('/api/admin/bulk-merge-players', { method: 'POST', body: JSON.stringify({ operations }) });
+
+    if (res && res.warning && res.overlaps && res.overlaps.length > 0) {
+      const overlapDetails = res.overlaps.map(o => {
+        const eventsList = o.overlaps.map(ev => {
+          const dateStr = ev.startAt ? new Date(ev.startAt * 1000).toLocaleDateString() : 'Unknown date';
+          return `  • ${ev.tournamentName || 'Tournament'} - ${ev.eventName || 'Event'} (${ev.gameSlug || 'game'}, ${dateStr})`;
+        }).join('\n');
+        return `Operation ${o.sourceId} → ${o.targetId}:\n${eventsList}`;
+      }).join('\n\n');
+
+      const confirmed = confirm(
+        `Warning: Shared tournament event participation was found in ${res.overlaps.length} operation(s):\n\n${overlapDetails}\n\nDo you want to proceed with executing the batch merge?`
+      );
+      if (!confirmed) {
+        message.textContent = 'Batch execution cancelled.';
+        if (executeBtn) executeBtn.disabled = false;
+        return;
+      }
+      message.textContent = 'Executing batch merge and rebuilding profiles…';
+      res = await api('/api/admin/bulk-merge-players', { method: 'POST', body: JSON.stringify({ operations, confirmed: true }) });
+    }
+
+    const completed = res.completed || [];
+    const failed = res.failed || [];
+    const completedSources = new Set(completed.map(c => c.sourceId || c.operation?.sourceId || c.operation?.from));
+
+    bulkPlayerQueue = bulkPlayerQueue.filter(item => !completedSources.has(item.sourceId));
+
+    if (failed.length > 0) {
+      const errorMap = new Map();
+      failed.forEach(f => {
+        const src = f.operation?.sourceId || f.operation?.from;
+        if (src) errorMap.set(src, f.error || 'Operation failed');
+      });
+      bulkPlayerQueue.forEach(item => {
+        if (errorMap.has(item.sourceId)) {
+          item.error = errorMap.get(item.sourceId);
+        }
+      });
+      message.textContent = `Batch executed with issues: ${completed.length} completed, ${failed.length} failed. See queue below.`;
+    } else {
+      message.textContent = `Batch executed successfully: ${completed.length} player merge(s) completed.`;
+    }
+
+    resetBulkPlayerEditMode();
+    renderBulkPlayerQueue();
+    await loadProfiles();
+  } catch (err) {
+    message.textContent = `Batch execution failed: ${err.message}`;
+    if (executeBtn) executeBtn.disabled = false;
+  }
+});
+
 $('#event-group-form').addEventListener('submit', async event => {
   event.preventDefault();
   const message = $('#event-group-message');
@@ -454,6 +691,232 @@ $('#event-group-list').addEventListener('click', async event => {
     const { eventGroups } = await api('/api/admin/event-groups');
     renderEventGroups(eventGroups);
   } catch (error) { message.textContent = error.message; }
+});
+
+// BULK EVENT MERGING
+let bulkEventQueue = [];
+let editingEventIndex = -1;
+
+function renderBulkEventQueue() {
+  const list = $('#bulk-event-queue-list');
+  const countEl = $('#bulk-event-queue-count');
+  const clearBtn = $('#bulk-event-clear-btn');
+  const executeBtn = $('#bulk-event-execute-btn');
+  if (!list) return;
+
+  if (countEl) countEl.textContent = `Queued operations (${bulkEventQueue.length})`;
+
+  if (!bulkEventQueue.length) {
+    list.innerHTML = '<p class="muted event-group-empty">No event merges currently queued.</p>';
+    if (clearBtn) clearBtn.style.display = 'none';
+    if (executeBtn) {
+      executeBtn.disabled = true;
+      executeBtn.textContent = 'Execute Batch';
+    }
+    return;
+  }
+
+  if (clearBtn) clearBtn.style.display = 'inline-block';
+  if (executeBtn) {
+    executeBtn.disabled = false;
+    executeBtn.textContent = `Execute Batch (${bulkEventQueue.length})`;
+  }
+
+  list.innerHTML = bulkEventQueue.map((item, idx) => `
+    <div class="event-group-item" style="${item.error ? 'border-color: rgba(239, 68, 68, 0.5); background: rgba(239, 68, 68, 0.05);' : ''}">
+      <span>
+        <b>${esc(item.childLabel)} → ${esc(item.parentLabel)}</b>
+        <small>NAME: "${esc(item.phase)}" · FROM: ${esc(item.child)} → TO: ${esc(item.parent)}</small>
+        ${item.error ? `<small style="color:#f87171; margin-top:4px; font-weight:600;">⚠ ${esc(item.error)}</small>` : ''}
+      </span>
+      <div style="display:flex; gap:8px; align-items:center; flex-shrink:0;">
+        <button class="quiet-button" type="button" data-edit-bulk-event="${idx}">Edit</button>
+        <button class="quiet-button" type="button" data-remove-bulk-event="${idx}" style="color:#f87171;">Remove</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function resetBulkEventEditMode() {
+  editingEventIndex = -1;
+  const queueBtn = $('#bulk-event-queue-btn');
+  const cancelBtn = $('#bulk-event-cancel-edit-btn');
+  const msg = $('#bulk-event-form-message');
+  if (queueBtn) queueBtn.textContent = '+ Queue Merge';
+  if (cancelBtn) cancelBtn.style.display = 'none';
+  if (msg) msg.textContent = '';
+}
+
+$('#bulk-event-source')?.addEventListener('change', () => {
+  const nameInput = $('#bulk-event-name');
+  if (nameInput && !nameInput.value.trim()) {
+    const selectedText = $('#bulk-event-source')?.selectedOptions[0]?.textContent || '';
+    if (/amateur|bracket b|cat b|categoria b/i.test(selectedText)) {
+      nameInput.value = 'Categoria B';
+    }
+  }
+});
+
+$('#bulk-event-form')?.addEventListener('submit', event => {
+  event.preventDefault();
+  const sourceSelect = $('#bulk-event-source');
+  const targetSelect = $('#bulk-event-target');
+  const nameInput = $('#bulk-event-name');
+  const msg = $('#bulk-event-form-message');
+
+  const child = sourceSelect.value;
+  const parent = targetSelect.value;
+  const phase = nameInput.value.trim();
+
+  if (!child || !parent || child === parent) {
+    if (msg) msg.textContent = 'Source event and destination event must be different.';
+    return;
+  }
+  if (!phase) {
+    if (msg) msg.textContent = 'Enter a display name inside tournament (NAME).';
+    return;
+  }
+
+  const duplicateSource = bulkEventQueue.some((item, i) =>
+    (editingEventIndex === -1 || i !== editingEventIndex) && item.child === child
+  );
+  if (duplicateSource) {
+    if (msg) msg.textContent = 'This source event is already queued to be merged.';
+    return;
+  }
+
+  const createsCycle = bulkEventQueue.some((item, i) =>
+    (editingEventIndex === -1 || i !== editingEventIndex) && item.child === parent && item.parent === child
+  );
+  if (createsCycle) {
+    if (msg) msg.textContent = 'This operation would create a cycle with another queued event merge.';
+    return;
+  }
+
+  const childLabel = sourceSelect.selectedOptions[0]?.textContent || child;
+  const parentLabel = targetSelect.selectedOptions[0]?.textContent || parent;
+
+  if (editingEventIndex >= 0) {
+    bulkEventQueue[editingEventIndex] = {
+      ...bulkEventQueue[editingEventIndex],
+      child,
+      parent,
+      phase,
+      childLabel,
+      parentLabel,
+      error: undefined
+    };
+    resetBulkEventEditMode();
+  } else {
+    bulkEventQueue.push({
+      id: Date.now() + Math.random(),
+      child,
+      parent,
+      phase,
+      childLabel,
+      parentLabel
+    });
+    if (msg) msg.textContent = '';
+  }
+
+  renderBulkEventQueue();
+});
+
+$('#bulk-event-cancel-edit-btn')?.addEventListener('click', () => {
+  resetBulkEventEditMode();
+});
+
+$('#bulk-event-clear-btn')?.addEventListener('click', () => {
+  if (!confirm('Clear all queued event merge operations?')) return;
+  bulkEventQueue = [];
+  resetBulkEventEditMode();
+  renderBulkEventQueue();
+  $('#bulk-event-message').textContent = 'Queue cleared.';
+});
+
+$('#bulk-event-queue-list')?.addEventListener('click', event => {
+  const editBtn = event.target.closest('[data-edit-bulk-event]');
+  const removeBtn = event.target.closest('[data-remove-bulk-event]');
+
+  if (editBtn) {
+    const idx = parseInt(editBtn.dataset.editBulkEvent, 10);
+    const item = bulkEventQueue[idx];
+    if (!item) return;
+
+    editingEventIndex = idx;
+    const sourceSelect = $('#bulk-event-source');
+    const targetSelect = $('#bulk-event-target');
+    const nameInput = $('#bulk-event-name');
+    if (sourceSelect) sourceSelect.value = item.child;
+    if (targetSelect) targetSelect.value = item.parent;
+    if (nameInput) nameInput.value = item.phase;
+
+    const queueBtn = $('#bulk-event-queue-btn');
+    const cancelBtn = $('#bulk-event-cancel-edit-btn');
+    if (queueBtn) queueBtn.textContent = 'Save Changes';
+    if (cancelBtn) cancelBtn.style.display = 'inline-block';
+    $('#bulk-event-form-message').textContent = `Editing queued merge #${idx + 1}`;
+    sourceSelect?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    return;
+  }
+
+  if (removeBtn) {
+    const idx = parseInt(removeBtn.dataset.removeBulkEvent, 10);
+    if (editingEventIndex === idx) {
+      resetBulkEventEditMode();
+    } else if (editingEventIndex > idx) {
+      editingEventIndex--;
+    }
+    bulkEventQueue.splice(idx, 1);
+    renderBulkEventQueue();
+    return;
+  }
+});
+
+$('#bulk-event-execute-btn')?.addEventListener('click', async () => {
+  if (!bulkEventQueue.length) return;
+  const message = $('#bulk-event-message');
+  if (!confirm(`Execute batch merge of ${bulkEventQueue.length} event operation(s)? Tournament profiles will be rebuilt once.`)) return;
+
+  message.textContent = 'Executing batch event merge and rebuilding profiles…';
+  const executeBtn = $('#bulk-event-execute-btn');
+  if (executeBtn) executeBtn.disabled = true;
+
+  try {
+    const operations = bulkEventQueue.map(item => ({ child: item.child, parent: item.parent, phase: item.phase }));
+    const res = await api('/api/admin/bulk-merge-events', { method: 'POST', body: JSON.stringify({ operations }) });
+
+    const completed = res.completed || [];
+    const failed = res.failed || [];
+    const completedChildren = new Set(completed.map(c => c.child || c.operation?.child || c.operation?.from));
+
+    bulkEventQueue = bulkEventQueue.filter(item => !completedChildren.has(item.child));
+
+    if (failed.length > 0) {
+      const errorMap = new Map();
+      failed.forEach(f => {
+        const ch = f.operation?.child || f.operation?.from;
+        if (ch) errorMap.set(ch, f.error || 'Operation failed');
+      });
+      bulkEventQueue.forEach(item => {
+        if (errorMap.has(item.child)) {
+          item.error = errorMap.get(item.child);
+        }
+      });
+      message.textContent = `Batch executed with issues: ${completed.length} completed, ${failed.length} failed. See queue below.`;
+    } else {
+      message.textContent = `Batch executed successfully: ${completed.length} event merge(s) completed.`;
+    }
+
+    resetBulkEventEditMode();
+    renderBulkEventQueue();
+    if (res.eventGroups) {
+      renderEventGroups(res.eventGroups);
+    }
+  } catch (err) {
+    message.textContent = `Batch execution failed: ${err.message}`;
+    if (executeBtn) executeBtn.disabled = false;
+  }
 });
 
 $('#event-exclusion-form').addEventListener('submit', async event => {
