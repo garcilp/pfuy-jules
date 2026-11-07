@@ -125,19 +125,45 @@
           });
         }
 
+        // Helper to get publication timestamp from ranking object
+        function getPubTime(r) {
+          if (r.publishedAt) {
+            const t = Number(r.publishedAt);
+            if (!isNaN(t)) return t > 1e11 ? t : t * 1000;
+            const parsed = new Date(r.publishedAt).getTime();
+            if (!isNaN(parsed)) return parsed;
+          }
+          if (r.createdAt) {
+            const t = Number(r.createdAt);
+            if (!isNaN(t)) return t > 1e11 ? t : t * 1000;
+          }
+          if (r.updatedAt) {
+            const t = Number(r.updatedAt);
+            if (!isNaN(t)) return t > 1e11 ? t : t * 1000;
+          }
+          const endDate = r.period?.end || r.end || r.period?.start || r.start;
+          if (endDate) {
+            const parsed = new Date(`${endDate}T00:00:00`).getTime();
+            if (!isNaN(parsed)) return parsed;
+          }
+          return 0;
+        }
+
         // Fetch detail json for each ranking to get player list & points
         const detailPromises = summaries.map(async summary => {
           try {
             const detailRes = await fetch(`data/rankings/${encodeURIComponent(summary.id)}.json`, { cache: 'no-store' });
             if (!detailRes.ok) return null;
             const detail = await detailRes.json();
-            return {
+            const combined = {
               ...summary,
               ...detail,
               id: summary.id,
               game: detail.game || gamesMap.get(summary.gameId) || { id: summary.gameId, name: summary.gameId },
               players: detail.players || []
             };
+            combined._pubTime = getPubTime(combined);
+            return combined;
           } catch (e) {
             console.warn(`Could not load ranking ${summary.id}`, e);
             return null;
@@ -146,29 +172,56 @@
 
         const fullRankings = (await Promise.all(detailPromises)).filter(Boolean);
 
-        // Sort chronologically ascending to compute period labels (year vs year.n)
-        // Group by gameId + startYear
-        const gameYearGroups = new Map();
+        // Group seasonal rankings by game + calendar year (based on publication date or period start)
+        // Group by gameId + year
+        const gameYearSeasonalGroups = new Map();
         fullRankings.forEach(r => {
           const gameId = r.game?.id || r.gameId;
-          const startYear = (r.period?.start || r.start || '2000').slice(0, 4);
-          const key = `${gameId}:${startYear}`;
-          if (!gameYearGroups.has(key)) gameYearGroups.set(key, []);
-          gameYearGroups.get(key).push(r);
+          const pubDate = new Date(r._pubTime || Date.now());
+          const year = (r.period?.start || r.start || String(pubDate.getFullYear())).slice(0, 4);
+          const isSeasonal = r.status === 'seasonal';
+
+          if (isSeasonal) {
+            const key = `${gameId}:${year}`;
+            if (!gameYearSeasonalGroups.has(key)) gameYearSeasonalGroups.set(key, []);
+            gameYearSeasonalGroups.get(key).push(r);
+          } else {
+            // Yearly ranking
+            r._badgeText = `PR · ${year}`;
+            r._periodFormatted = `${year}`;
+          }
         });
 
-        // Sort each group by start date
-        gameYearGroups.forEach((groupRankings) => {
-          groupRankings.sort((a, b) => {
-            const da = a.period?.start || a.start || '';
-            const db = b.period?.start || b.start || '';
-            return da.localeCompare(db);
+        // Sort each seasonal group chronologically by publication date
+        gameYearSeasonalGroups.forEach((seasonalRankings, key) => {
+          const year = key.split(':')[1];
+          seasonalRankings.sort((a, b) => a._pubTime - b._pubTime);
+          seasonalRankings.forEach((r, idx) => {
+            const seasonNum = idx + 1;
+            r._seasonNum = seasonNum;
+            r._badgeText = `PR · ${year}.${seasonNum}`;
+            r._periodFormatted = `${year}.${seasonNum}`;
           });
-          const hasMultiple = groupRankings.length > 1;
-          groupRankings.forEach((r, idx) => {
-            const startYear = (r.period?.start || r.start || '2000').slice(0, 4);
-            r._periodFormatted = hasMultiple ? `${startYear}.${idx + 1}` : `${startYear}`;
+        });
+
+        // Compute the latest chronologically published ranking per game
+        const latestRankingByGame = new Map();
+        const rankingsGroupedByGame = new Map();
+        fullRankings.forEach(r => {
+          const g = r.game;
+          const gKeys = [r.gameId, g?.id, g?.slug].filter(Boolean).map(k => String(k).toLowerCase());
+          gKeys.forEach(k => {
+            if (!rankingsGroupedByGame.has(k)) rankingsGroupedByGame.set(k, []);
+            rankingsGroupedByGame.get(k).push(r);
           });
+        });
+
+        rankingsGroupedByGame.forEach((list, gKey) => {
+          // Sort by publication time descending (latest first)
+          list.sort((a, b) => b._pubTime - a._pubTime);
+          if (list.length > 0) {
+            latestRankingByGame.set(gKey, list[0]);
+          }
         });
 
         // Build player index: Map(playerTagLower -> list of rankings with player's entry)
@@ -197,12 +250,13 @@
         rankingsCache = {
           rankings: fullRankings,
           playerRankings: playerRankingsMap,
+          latestRankingByGame: latestRankingByGame,
           games: data.games || []
         };
         return rankingsCache;
       } catch (err) {
         console.error('Failed to load all rankings for badges', err);
-        return { rankings: [], playerRankings: new Map(), games: [] };
+        return { rankings: [], playerRankings: new Map(), latestRankingByGame: new Map(), games: [] };
       }
     })();
 
@@ -213,6 +267,42 @@
     if (!rankingsCache || !playerTag) return [];
     const norm = String(playerTag).trim().toLowerCase();
     return rankingsCache.playerRankings.get(norm) || [];
+  }
+
+  function getLatestRankingForGame(gameIdOrSlug) {
+    if (!rankingsCache || !gameIdOrSlug) return null;
+    const target = String(gameIdOrSlug).toLowerCase().trim();
+    if (rankingsCache.latestRankingByGame?.has(target)) {
+      return rankingsCache.latestRankingByGame.get(target);
+    }
+    // Search in fullRankings
+    const matches = (rankingsCache.rankings || []).filter(r => {
+      const g = r.game;
+      return (g?.id && g.id.toLowerCase() === target) ||
+             (g?.slug && g.slug.toLowerCase() === target) ||
+             (r.gameId && r.gameId.toLowerCase() === target);
+    });
+    if (!matches.length) return null;
+    matches.sort((a, b) => (b._pubTime || 0) - (a._pubTime || 0));
+    return matches[0];
+  }
+
+  function getPlayerEntryInLatestRanking(playerTag, gameIdOrSlug) {
+    if (!playerTag || !gameIdOrSlug) return null;
+    const latestRanking = getLatestRankingForGame(gameIdOrSlug);
+    if (!latestRanking || !latestRanking.players) return null;
+
+    const normPlayer = String(playerTag).trim().toLowerCase();
+    const pEntry = latestRanking.players.find(p => String(p.tag || '').trim().toLowerCase() === normPlayer);
+    if (!pEntry) return null;
+
+    return {
+      ranking: latestRanking,
+      playerEntry: pEntry,
+      placement: pEntry.placement,
+      points: pEntry.points,
+      badgeText: latestRanking._badgeText || 'PR'
+    };
   }
 
   function getLatestPlayerRankingsByGame(playerTag) {
@@ -349,22 +439,43 @@
     const tier = getPlacementTier(p.placement);
     const ordStr = getOrdinal(p.placement);
     const gameName = r.game?.name || 'Smash';
-    const periodStr = r._periodFormatted || (r.period?.start || r.start || '2025').slice(0, 4);
+    const periodStr = options.periodText || entry.badgeText || r._badgeText || r._periodFormatted || (r.period?.start || r.start || '2025').slice(0, 4);
     const rankingUrl = `ranking.html?id=${encodeURIComponent(r.id)}`;
     const extraClass = options.className || '';
 
+    // If showGameName is false, only show the badge text (or vice versa)
+    const showGame = options.showGame !== false;
+    const tag = options.tag || (options.isButton ? 'button' : 'span');
+    const isAnchor = options.isAnchor ?? (!options.tag && !options.isButton && !options.nested);
+
+    if (isAnchor) {
+      return `
+        <a class="pr-badge pr-badge-compact tier-${tier.key} glass ${extraClass}" href="${escapeHtml(rankingUrl)}" aria-label="${escapeHtml(gameName)} ${escapeHtml(periodStr)}: ${escapeHtml(ordStr)} place" tabindex="0">
+          <div class="pr-badge-hex-wrap">
+            ${renderHexagonSvg(tier, 48, 3)}
+            <span class="pr-badge-ord">${escapeHtml(ordStr)}</span>
+          </div>
+          <div class="pr-badge-content">
+            ${showGame ? `<span class="pr-badge-game">${escapeHtml(gameName)}</span>` : ''}
+            <span class="pr-badge-period mono">${escapeHtml(periodStr)}</span>
+          </div>
+          ${renderHoverCard(entry)}
+        </a>
+      `;
+    }
+
     return `
-      <a class="pr-badge pr-badge-compact tier-${tier.key} glass ${extraClass}" href="${escapeHtml(rankingUrl)}" aria-label="${escapeHtml(gameName)} ${escapeHtml(periodStr)}: ${escapeHtml(ordStr)} place" tabindex="0">
+      <${tag} class="pr-badge pr-badge-compact tier-${tier.key} glass ${extraClass}" data-ranking-url="${escapeHtml(rankingUrl)}" aria-label="${escapeHtml(gameName)} ${escapeHtml(periodStr)}: ${escapeHtml(ordStr)} place" tabindex="0" onclick="event.stopPropagation(); window.location.href='${escapeHtml(rankingUrl)}'">
         <div class="pr-badge-hex-wrap">
           ${renderHexagonSvg(tier, 48, 3)}
           <span class="pr-badge-ord">${escapeHtml(ordStr)}</span>
         </div>
         <div class="pr-badge-content">
-          <span class="pr-badge-game">${escapeHtml(gameName)}</span>
+          ${showGame ? `<span class="pr-badge-game">${escapeHtml(gameName)}</span>` : ''}
           <span class="pr-badge-period mono">${escapeHtml(periodStr)}</span>
         </div>
         ${renderHoverCard(entry)}
-      </a>
+      </${tag}>
     `;
   }
 
@@ -499,6 +610,8 @@
   const PRBadges = {
     loadAllRankings,
     getPlayerRankings,
+    getLatestRankingForGame,
+    getPlayerEntryInLatestRanking,
     getLatestPlayerRankingsByGame,
     getPlayerRankingsForGame,
     getPlacementTier,

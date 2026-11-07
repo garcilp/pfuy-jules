@@ -1212,7 +1212,6 @@ function renderCustomPowerRankings() {
                 <span class="player-avatar mini"><img src="assets/players/${esc(p.playerId)}.png" alt="" onerror="this.remove()"></span>
                 <b>${esc(p.playerTag)}</b>
               </a>
-              ${renderInlineMiniBadges(p.playerTag)}
             </div>
             <span class="score-col mono font-bold">${p.score}</span>
             <span class="mono" style="color:${PR_COMPONENTS.glicko2.color};">${Math.round((p.weightedContributions.glicko2||0)*10)/10} <small class="muted">(${Math.round((p.normalizedScores.glicko2||0)*10)/10})</small></span>
