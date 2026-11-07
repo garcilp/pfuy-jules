@@ -8,6 +8,29 @@ let activeEditorMode = 'visual';
 let selectedPhoto = null;
 let csrfToken = '';
 let officialRankingsList = [];
+let eventsCache = [];
+let eventsIndexMap = new Map();
+
+async function initEventsIndex() {
+  try {
+    const res = await fetch('data/events-index.json', { cache: 'no-store' });
+    if (res.ok) {
+      const items = await res.json();
+      items.forEach(item => {
+        if (item.tournamentSlug && item.tournament) {
+          eventsIndexMap.set(item.tournamentSlug.toLowerCase(), item.tournament);
+        }
+        if (item.url) {
+          const norm = item.url.replace(/^https?:\/\/(www\.)?start\.gg\//, '').replace(/\/$/, '').toLowerCase();
+          eventsIndexMap.set(norm, item.tournament);
+        }
+      });
+    }
+  } catch (e) {
+    console.warn('Could not load events index:', e);
+  }
+}
+initEventsIndex();
 
 function syncVisualFromObject(profile) {
   const p = profile?.player || {};
@@ -165,6 +188,7 @@ async function loadProfiles(selected = '') {
       api('/api/admin/community-socials').catch(() => ({ socials: {} })),
       api('/api/games').catch(() => ({ games: [] }))
     ]);
+    eventsCache = events || [];
     renderEventGroups(eventGroups);
     renderExcludedEvents(exclusions.events || []);
     renderEventSelects(events || []);
@@ -217,6 +241,36 @@ function renderEventSelects(events = []) {
   }
 }
 
+function getTournamentNameForEventKey(eventKey) {
+  if (!eventKey) return '';
+  const normKey = String(eventKey).replace(/^https?:\/\/(www\.)?start\.gg\//, '').replace(/\/$/, '').toLowerCase();
+
+  // 1. Check in eventsCache (from /api/admin/events)
+  if (eventsCache && eventsCache.length) {
+    const found = eventsCache.find(e => {
+      const eNorm = String(e.sourceUrl || '').replace(/^https?:\/\/(www\.)?start\.gg\//, '').replace(/\/$/, '').toLowerCase();
+      return eNorm === normKey;
+    });
+    if (found && found.tournamentName) return found.tournamentName;
+  }
+
+  // 2. Check in eventsIndexMap
+  if (eventsIndexMap.has(normKey)) {
+    return eventsIndexMap.get(normKey);
+  }
+
+  // 3. Extract tournament slug from key (tournament/<slug>/...)
+  const parts = normKey.split('/');
+  if (parts.length >= 2 && parts[0] === 'tournament') {
+    const tSlug = parts[1];
+    if (eventsIndexMap.has(tSlug)) {
+      return eventsIndexMap.get(tSlug);
+    }
+  }
+
+  return '';
+}
+
 function renderEventGroups(groups = {}) {
   const list = $('#event-group-list');
   const entries = Object.entries(groups);
@@ -224,9 +278,19 @@ function renderEventGroups(groups = {}) {
     list.innerHTML = '<p class="muted event-group-empty">No additional events have been grouped yet.</p>';
     return;
   }
-  list.innerHTML = entries.map(([child, group]) =>
-    `<div class="event-group-item"><span><b>${esc(group.phase)}</b><small>${esc(child)} → ${esc(group.parent)}</small></span><button class="quiet-button" type="button" data-remove-event-group="${esc(child)}">Remove</button></div>`
-  ).join('');
+  list.innerHTML = entries.map(([child, group]) => {
+    // When displaying event groupings, show the tournament name instead of the Amateur Bracket name
+    const childTourney = group.childTournament || getTournamentNameForEventKey(child);
+    const parentTourney = group.parentTournament || getTournamentNameForEventKey(group.parent);
+
+    // Primary display heading: tournament name (falling back to parentTourney or phase)
+    const displayName = childTourney || parentTourney || group.phase;
+    const subtitle = (childTourney && parentTourney && childTourney !== parentTourney)
+      ? `${esc(childTourney)} → ${esc(parentTourney)}`
+      : `${esc(child)} → ${esc(group.parent)}`;
+
+    return `<div class="event-group-item"><span><b>${esc(displayName)}</b><small>${subtitle} · ${esc(group.phase)}</small></span><button class="quiet-button" type="button" data-remove-event-group="${esc(child)}">Remove</button></div>`;
+  }).join('');
 }
 
 function renderExcludedEvents(events = []) {

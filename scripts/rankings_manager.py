@@ -220,6 +220,7 @@ def sync_static_rankings(con: sqlite3.Connection = None):
                 "intro": row["intro"] or "",
                 "status": row["status"],
                 "players": players,
+                "createdAt": row["created_at"],
                 "updatedAt": row["updated_at"],
             }
 
@@ -237,6 +238,8 @@ def sync_static_rankings(con: sqlite3.Connection = None):
                     "status": row["status"],
                     "top": top_tag,
                     "players": len(players),
+                    "createdAt": row["created_at"],
+                    "updatedAt": row["updated_at"],
                 })
             else:
                 detail_path = RANKINGS_DATA_DIR / f"{rid}.json"

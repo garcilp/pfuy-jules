@@ -450,7 +450,34 @@ class Handler(SimpleHTTPRequestHandler):
             if not self.require_admin():
                 return
             try:
-                self.send_json(200, {"eventGroups": event_groups()})
+                groups = event_groups()
+                with sqlite3.connect(DATABASE) as conn:
+                    rows = conn.execute("SELECT e.source_url, t.name FROM events e JOIN tournaments t ON e.tournament_slug = t.slug").fetchall()
+                    tourneys = dict(conn.execute("SELECT slug, name FROM tournaments").fetchall())
+                url_to_tourney = {}
+                for r in rows:
+                    url_to_tourney[normalize_event_key(r[0])] = r[1]
+                    url_to_tourney[r[0]] = r[1]
+
+                enriched = {}
+                for child_key, grp in groups.items():
+                    parent_key = grp.get("parent", "")
+                    child_tourney = url_to_tourney.get(normalize_event_key(child_key))
+                    if not child_tourney:
+                        child_slug = child_key.split("/")[1] if "/" in child_key else child_key
+                        child_tourney = tourneys.get(child_slug, child_slug)
+                    parent_tourney = url_to_tourney.get(normalize_event_key(parent_key))
+                    if not parent_tourney:
+                        parent_slug = parent_key.split("/")[1] if "/" in parent_key else parent_key
+                        parent_tourney = tourneys.get(parent_slug, parent_slug)
+
+                    enriched[child_key] = {
+                        "parent": parent_key,
+                        "phase": grp.get("phase", ""),
+                        "childTournament": child_tourney,
+                        "parentTournament": parent_tourney
+                    }
+                self.send_json(200, {"eventGroups": enriched})
             except Exception as err:
                 self.send_json(500, {"error": str(err)})
         elif parsed.path in {"/api/admin/events", "/api/admin/imported-events"}:
@@ -996,7 +1023,33 @@ class Handler(SimpleHTTPRequestHandler):
                 self.send_json(500, {"error": "Could not rebuild profiles after updating the event grouping. " + (result.stderr[-1000:] or result.stdout[-1000:])})
                 return
             refresh_index()
-            self.send_json(200, {"eventGroups": groups})
+            # Return enriched event groups
+            with sqlite3.connect(DATABASE) as conn:
+                rows = conn.execute("SELECT e.source_url, t.name FROM events e JOIN tournaments t ON e.tournament_slug = t.slug").fetchall()
+                tourneys = dict(conn.execute("SELECT slug, name FROM tournaments").fetchall())
+            url_to_tourney = {}
+            for r in rows:
+                url_to_tourney[normalize_event_key(r[0])] = r[1]
+                url_to_tourney[r[0]] = r[1]
+
+            enriched = {}
+            for k, grp in groups.items():
+                p_key = grp.get("parent", "")
+                c_tourney = url_to_tourney.get(normalize_event_key(k))
+                if not c_tourney:
+                    c_slug = k.split("/")[1] if "/" in k else k
+                    c_tourney = tourneys.get(c_slug, c_slug)
+                p_tourney = url_to_tourney.get(normalize_event_key(p_key))
+                if not p_tourney:
+                    p_slug = p_key.split("/")[1] if "/" in p_key else p_key
+                    p_tourney = tourneys.get(p_slug, p_slug)
+                enriched[k] = {
+                    "parent": p_key,
+                    "phase": grp.get("phase", ""),
+                    "childTournament": c_tourney,
+                    "parentTournament": p_tourney
+                }
+            self.send_json(200, {"eventGroups": enriched})
         elif parsed.path == "/api/admin/exclusions":
             config = visibility_exclusions()
             previous = json.loads(json.dumps(config))
