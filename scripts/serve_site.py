@@ -192,6 +192,36 @@ def event_groups():
         return {}
 
 
+def enrich_event_groups(groups):
+    with sqlite3.connect(DATABASE) as conn:
+        rows = conn.execute("SELECT e.source_url, t.name FROM events e JOIN tournaments t ON e.tournament_slug = t.slug").fetchall()
+        tourneys = dict(conn.execute("SELECT slug, name FROM tournaments").fetchall())
+    url_to_tourney = {}
+    for r in rows:
+        url_to_tourney[normalize_event_key(r[0])] = r[1]
+        url_to_tourney[r[0]] = r[1]
+
+    enriched = {}
+    for child_key, grp in groups.items():
+        parent_key = grp.get("parent", "")
+        child_tourney = url_to_tourney.get(normalize_event_key(child_key))
+        if not child_tourney:
+            child_slug = child_key.split("/")[1] if "/" in child_key else child_key
+            child_tourney = tourneys.get(child_slug, child_slug)
+        parent_tourney = url_to_tourney.get(normalize_event_key(parent_key))
+        if not parent_tourney:
+            parent_slug = parent_key.split("/")[1] if "/" in parent_key else parent_key
+            parent_tourney = tourneys.get(parent_slug, parent_slug)
+
+        enriched[child_key] = {
+            "parent": parent_key,
+            "phase": grp.get("phase", ""),
+            "childTournament": child_tourney,
+            "parentTournament": parent_tourney
+        }
+    return enriched
+
+
 def visibility_exclusions():
     try:
         with EXCLUSIONS_PATH.open(encoding="utf-8") as stream:
@@ -452,33 +482,7 @@ class Handler(SimpleHTTPRequestHandler):
                 return
             try:
                 groups = event_groups()
-                with sqlite3.connect(DATABASE) as conn:
-                    rows = conn.execute("SELECT e.source_url, t.name FROM events e JOIN tournaments t ON e.tournament_slug = t.slug").fetchall()
-                    tourneys = dict(conn.execute("SELECT slug, name FROM tournaments").fetchall())
-                url_to_tourney = {}
-                for r in rows:
-                    url_to_tourney[normalize_event_key(r[0])] = r[1]
-                    url_to_tourney[r[0]] = r[1]
-
-                enriched = {}
-                for child_key, grp in groups.items():
-                    parent_key = grp.get("parent", "")
-                    child_tourney = url_to_tourney.get(normalize_event_key(child_key))
-                    if not child_tourney:
-                        child_slug = child_key.split("/")[1] if "/" in child_key else child_key
-                        child_tourney = tourneys.get(child_slug, child_slug)
-                    parent_tourney = url_to_tourney.get(normalize_event_key(parent_key))
-                    if not parent_tourney:
-                        parent_slug = parent_key.split("/")[1] if "/" in parent_key else parent_key
-                        parent_tourney = tourneys.get(parent_slug, parent_slug)
-
-                    enriched[child_key] = {
-                        "parent": parent_key,
-                        "phase": grp.get("phase", ""),
-                        "childTournament": child_tourney,
-                        "parentTournament": parent_tourney
-                    }
-                self.send_json(200, {"eventGroups": enriched})
+                self.send_json(200, {"eventGroups": enrich_event_groups(groups)})
             except Exception as err:
                 self.send_json(500, {"error": str(err)})
         elif parsed.path in {"/api/admin/events", "/api/admin/imported-events"}:
@@ -1045,33 +1049,166 @@ class Handler(SimpleHTTPRequestHandler):
                 self.send_json(500, {"error": "Could not rebuild profiles after updating the event grouping. " + (result.stderr[-1000:] or result.stdout[-1000:])})
                 return
             refresh_index()
-            # Return enriched event groups
-            with sqlite3.connect(DATABASE) as conn:
-                rows = conn.execute("SELECT e.source_url, t.name FROM events e JOIN tournaments t ON e.tournament_slug = t.slug").fetchall()
-                tourneys = dict(conn.execute("SELECT slug, name FROM tournaments").fetchall())
-            url_to_tourney = {}
-            for r in rows:
-                url_to_tourney[normalize_event_key(r[0])] = r[1]
-                url_to_tourney[r[0]] = r[1]
+            self.send_json(200, {"eventGroups": enrich_event_groups(groups)})
+        elif parsed.path in ("/api/admin/bulk-merge-players", "/api/admin/merges/bulk"):
+            operations = body.get("operations")
+            if not isinstance(operations, list) or not operations:
+                self.send_json(400, {"error": "No merge operations provided in batch."})
+                return
+            confirmed = body.get("confirmed", False)
+            profiles_set = {entry["playerId"] for entry in profile_entries() if entry["playerId"]}
+            merges = identity_merges()
+            previous_merges = dict(merges)
+            working_merges = dict(merges)
 
-            enriched = {}
-            for k, grp in groups.items():
-                p_key = grp.get("parent", "")
-                c_tourney = url_to_tourney.get(normalize_event_key(k))
-                if not c_tourney:
-                    c_slug = k.split("/")[1] if "/" in k else k
-                    c_tourney = tourneys.get(c_slug, c_slug)
-                p_tourney = url_to_tourney.get(normalize_event_key(p_key))
-                if not p_tourney:
-                    p_slug = p_key.split("/")[1] if "/" in p_key else p_key
-                    p_tourney = tourneys.get(p_slug, p_slug)
-                enriched[k] = {
-                    "parent": p_key,
-                    "phase": grp.get("phase", ""),
-                    "childTournament": c_tourney,
-                    "parentTournament": p_tourney
-                }
-            self.send_json(200, {"eventGroups": enriched})
+            validated_ops = []
+            errors = []
+            all_overlaps = []
+
+            for idx, op in enumerate(operations):
+                if not isinstance(op, dict):
+                    errors.append({"index": idx, "operation": op, "error": "Invalid operation format."})
+                    continue
+                source = str(op.get("sourceId") or op.get("from") or "").strip()
+                target = str(op.get("targetId") or op.get("to") or "").strip()
+
+                if not source or not target or source == target:
+                    errors.append({"index": idx, "operation": op, "error": "Choose two different player profiles."})
+                    continue
+                if source in working_merges:
+                    errors.append({"index": idx, "operation": op, "error": f"Player {source} is already merged into another profile."})
+                    continue
+                if source not in profiles_set:
+                    errors.append({"index": idx, "operation": op, "error": f"Player {source} must be an unmerged profile in the admin list."})
+                    continue
+                if target not in profiles_set and target not in working_merges.values():
+                    errors.append({"index": idx, "operation": op, "error": f"Player {target} must be an unmerged profile in the admin list."})
+                    continue
+                if canonical_id(target, working_merges) == source or canonical_id(target, {**working_merges, source: target}) == source:
+                    errors.append({"index": idx, "operation": op, "error": f"Merge would create an identity loop."})
+                    continue
+
+                if not confirmed:
+                    overlaps = get_player_overlapping_events(source, target)
+                    if overlaps:
+                        all_overlaps.append({
+                            "sourceId": source,
+                            "targetId": target,
+                            "overlaps": overlaps
+                        })
+
+                working_merges[source] = target
+                validated_ops.append({"index": idx, "operation": op, "sourceId": source, "targetId": target})
+
+            if not confirmed and all_overlaps:
+                self.send_json(200, {
+                    "warning": True,
+                    "overlaps": all_overlaps,
+                    "message": f"{len(all_overlaps)} operation(s) have overlapping tournament participation."
+                })
+                return
+
+            if not validated_ops:
+                self.send_json(400, {
+                    "error": "None of the queued player merge operations were valid.",
+                    "completed": [],
+                    "failed": errors
+                })
+                return
+
+            atomic_json(PROFILE_DIR / "merges.json", working_merges)
+            result = rebuild_profiles()
+            if result.returncode:
+                atomic_json(PROFILE_DIR / "merges.json", previous_merges)
+                self.send_json(500, {
+                    "error": "Could not rebuild profiles after batch merge: " + (result.stderr[-1000:] or result.stdout[-1000:]),
+                    "completed": [],
+                    "failed": [{"index": op["index"], "operation": op["operation"], "error": "Rebuild failed; changes rolled back"} for op in validated_ops] + errors
+                })
+                return
+            refresh_index()
+            self.send_json(200, {
+                "completed": validated_ops,
+                "failed": errors,
+                "profiles": profile_entries()
+            })
+        elif parsed.path in ("/api/admin/bulk-merge-events", "/api/admin/event-groups/bulk"):
+            operations = body.get("operations")
+            if not isinstance(operations, list) or not operations:
+                self.send_json(400, {"error": "No event merge operations provided in batch."})
+                return
+            groups = event_groups()
+            previous_groups = dict(groups)
+            working_groups = dict(groups)
+
+            validated_ops = []
+            errors = []
+
+            for idx, op in enumerate(operations):
+                if not isinstance(op, dict):
+                    errors.append({"index": idx, "operation": op, "error": "Invalid operation format."})
+                    continue
+                child_raw = op.get("child") or op.get("from") or ""
+                parent_raw = op.get("parent") or op.get("to") or ""
+                phase_raw = op.get("phase") or op.get("name") or ""
+
+                child_key = normalize_event_key(child_raw)
+                parent_key = normalize_event_key(parent_raw)
+                phase = str(phase_raw).strip()
+
+                if not child_key:
+                    errors.append({"index": idx, "operation": op, "error": "Enter a valid start.gg event URL for the source event (FROM)."})
+                    continue
+                if not parent_key or parent_key == child_key:
+                    errors.append({"index": idx, "operation": op, "error": "Source event (FROM) and destination event (TO) must be different valid event URLs."})
+                    continue
+                if not phase or len(phase) > 80:
+                    errors.append({"index": idx, "operation": op, "error": "Enter a phase display name (NAME) up to 80 characters."})
+                    continue
+
+                curr = parent_key
+                cycle = False
+                seen = {child_key}
+                while curr in working_groups:
+                    if curr in seen:
+                        cycle = True
+                        break
+                    seen.add(curr)
+                    curr = working_groups[curr].get("parent")
+                    if curr == child_key:
+                        cycle = True
+                        break
+                if cycle:
+                    errors.append({"index": idx, "operation": op, "error": "Event merge would create a grouping cycle."})
+                    continue
+
+                working_groups[child_key] = {"parent": parent_key, "phase": phase}
+                validated_ops.append({"index": idx, "operation": op, "child": child_key, "parent": parent_key, "phase": phase})
+
+            if not validated_ops:
+                self.send_json(400, {
+                    "error": "None of the queued event merge operations were valid.",
+                    "completed": [],
+                    "failed": errors
+                })
+                return
+
+            atomic_json(EVENT_GROUPS_PATH, working_groups)
+            result = rebuild_profiles()
+            if result.returncode:
+                atomic_json(EVENT_GROUPS_PATH, previous_groups)
+                self.send_json(500, {
+                    "error": "Could not rebuild profiles after updating event groupings: " + (result.stderr[-1000:] or result.stdout[-1000:]),
+                    "completed": [],
+                    "failed": [{"index": op["index"], "operation": op["operation"], "error": "Rebuild failed; changes rolled back"} for op in validated_ops] + errors
+                })
+                return
+            refresh_index()
+            self.send_json(200, {
+                "completed": validated_ops,
+                "failed": errors,
+                "eventGroups": enrich_event_groups(working_groups)
+            })
         elif parsed.path == "/api/admin/exclusions":
             config = visibility_exclusions()
             previous = json.loads(json.dumps(config))

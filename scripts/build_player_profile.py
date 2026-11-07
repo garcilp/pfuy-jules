@@ -1259,9 +1259,10 @@ def write_event_details(connection):
                     })
             else:
                 is_amateur = is_event_amateur or (key in event_links and event_links[key].get("is_amateur"))
+                phase_title = event_links[key].get("phase") if key in event_links and event_links[key].get("phase") else None
                 sub_events.append({
                     "id": event_id,
-                    "title": "Categoria B" if is_amateur else game_name,
+                    "title": phase_title or ("Categoria B" if is_amateur else game_name),
                     "game": game_name,
                     "gameSlug": game_slug,
                     "entrants": entrant_count,
