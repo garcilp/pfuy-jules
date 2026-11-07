@@ -19,6 +19,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATABASE = PROJECT_ROOT / "startgg-data" / "platfighters.sqlite3"
 PROFILE_DIR = PROJECT_ROOT / "data" / "profiles"
 RANKINGS_DIR = PROJECT_ROOT / "data" / "rankings"
+RANKING_DATA_DIR = RANKINGS_DIR / "data"
 ALGORITHM_VERSION = "2.2.0"
 
 
@@ -287,17 +288,57 @@ class Glicko2Calculator:
 # -----------------------------------------------------------------------------
 
 class RankingEngine:
-    def __init__(self, connection=None):
-        self.connection = connection or sqlite3.connect(DATABASE)
-        self.connection.row_factory = sqlite3.Row
+    def __init__(self, connection=None, use_json=None, data_dir=None):
+        self.connection = connection
+        self.data_dir = Path(data_dir) if data_dir else RANKING_DATA_DIR
         self.merges = identity_merges()
         self.exclusions = visibility_exclusions()
-        self.latest_tags = get_latest_player_tags(self.connection, self.merges)
         self.glicko_calc = Glicko2Calculator()
+        self._cached_game_data = {}
 
-    def load_sets_for_game(self, game_slug):
+        if use_json is None:
+            self.use_json = (connection is None)
+        else:
+            self.use_json = use_json
+
+        if not self.use_json or connection is not None:
+            if self.connection is None and DATABASE.is_file():
+                self.connection = sqlite3.connect(DATABASE)
+                self.connection.row_factory = sqlite3.Row
+            elif self.connection is not None and self.connection.row_factory is None:
+                self.connection.row_factory = sqlite3.Row
+
+        if self.connection is not None:
+            self.latest_tags = get_latest_player_tags(self.connection, self.merges)
+        else:
+            self.latest_tags = {}
+            try:
+                index_path = PROFILE_DIR / "index.json"
+                if index_path.is_file():
+                    with index_path.open(encoding="utf-8") as file:
+                        for entry in json.load(file):
+                            player_id = entry.get("playerId")
+                            tag = entry.get("tag")
+                            if player_id and tag and str(tag).strip().casefold() != "deleted user":
+                                canonical = canonical_id(str(player_id), self.merges)
+                                self.latest_tags.setdefault(canonical, str(tag).strip())
+            except Exception:
+                pass
+
+    def _ensure_connection(self):
+        if self.connection is None:
+            if not DATABASE.is_file():
+                return None
+            self.connection = sqlite3.connect(DATABASE)
+            self.connection.row_factory = sqlite3.Row
+        return self.connection
+
+    def load_sets_from_db(self, game_slug):
         """Loads all valid sets for a game in chronological order with score details."""
-        rows = self.connection.execute(
+        conn = self._ensure_connection()
+        if conn is None:
+            return []
+        rows = conn.execute(
             "SELECT s.id AS set_id, s.event_id, s.winner_entrant_id, s.display_score, "
             "s.started_at, s.start_at, s.completed_at, "
             "e.source_url, e.name AS event_name, "
@@ -326,7 +367,7 @@ class RankingEngine:
             if not winner_entrant:
                 continue
 
-            entrants = self.connection.execute(
+            entrants = conn.execute(
                 "SELECT entrant_id, score_display, score_label, score "
                 "FROM set_entrants WHERE set_id = ?",
                 (text_id(row["set_id"]),),
@@ -343,7 +384,7 @@ class RankingEngine:
             entrant_scores = {}
             for e in entrants:
                 eid = text_id(e["entrant_id"])
-                p_row = self.connection.execute(
+                p_row = conn.execute(
                     "SELECT p.player_id FROM entrant_participants ep "
                     "JOIN participants p ON p.id = ep.participant_id "
                     "WHERE ep.entrant_id = ? AND p.player_id IS NOT NULL",
@@ -394,9 +435,51 @@ class RankingEngine:
 
         return valid_sets
 
+    def load_sets_for_game(self, game_slug):
+        if not self.use_json:
+            return self.load_sets_from_db(game_slug)
+        game_data = self._get_game_data(game_slug)
+        if game_data and "sets" in game_data:
+            return game_data["sets"]
+        return self.load_sets_from_db(game_slug)
+
     def load_event_placements_for_game(self, game_slug):
+        if not self.use_json:
+            return self.load_event_placements_from_db(game_slug)
+        game_data = self._get_game_data(game_slug)
+        if game_data and "placements" in game_data:
+            return game_data["placements"]
+        return self.load_event_placements_from_db(game_slug)
+
+    def _get_game_data(self, game_slug):
+        if game_slug in self._cached_game_data:
+            return self._cached_game_data[game_slug]
+        json_file = self.data_dir / f"{game_slug}.json"
+        if not json_file.is_file():
+            if (self.connection or DATABASE.is_file()) and self.data_dir == RANKING_DATA_DIR:
+                try:
+                    export_ranking_data(connection=self.connection, output_dir=self.data_dir)
+                except Exception as err:
+                    pass
+        if json_file.is_file():
+            try:
+                with json_file.open(encoding="utf-8") as f:
+                    data = json.load(f)
+                    if isinstance(data, dict) and "sets" in data and "placements" in data:
+                        for pid, tag in data.get("latestTags", {}).items():
+                            self.latest_tags.setdefault(pid, tag)
+                        self._cached_game_data[game_slug] = data
+                        return data
+            except Exception:
+                pass
+        return None
+
+    def load_event_placements_from_db(self, game_slug):
         """Loads event standings and entrant counts for SoF calculations."""
-        rows = self.connection.execute(
+        conn = self._ensure_connection()
+        if conn is None:
+            return []
+        rows = conn.execute(
             "SELECT es.event_id, es.entrant_id, es.placement, e.num_entrants, "
             "e.source_url, e.name AS event_name, t.slug AS tournament_slug, t.name AS tournament_name, "
             "COALESCE(t.start_at, (SELECT MIN(COALESCE(s.started_at, s.start_at, s.completed_at)) "
@@ -415,7 +498,7 @@ class RankingEngine:
             if event_key and event_key in self.exclusions["events"]:
                 continue
 
-            p_row = self.connection.execute(
+            p_row = conn.execute(
                 "SELECT p.player_id FROM entrant_participants ep "
                 "JOIN participants p ON p.id = ep.participant_id "
                 "WHERE ep.entrant_id = ? AND p.player_id IS NOT NULL",
@@ -1623,6 +1706,96 @@ class RankingEngine:
 # Pre-generation & Cache Export
 # -----------------------------------------------------------------------------
 
+def export_ranking_data(connection=None, output_dir=None):
+    out_dir = Path(output_dir) if output_dir else RANKING_DATA_DIR
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    owns_connection = False
+    if connection is None:
+        if not DATABASE.is_file():
+            raise FileNotFoundError(f"Database not found at {DATABASE}")
+        connection = sqlite3.connect(DATABASE)
+        connection.row_factory = sqlite3.Row
+        owns_connection = True
+    elif connection.row_factory is None:
+        connection.row_factory = sqlite3.Row
+
+    try:
+        games_rows = connection.execute(
+            "SELECT DISTINCT v.slug, v.name FROM videogames v "
+            "JOIN events e ON e.videogame_slug = v.slug "
+            "WHERE e.is_temporary = 0 ORDER BY v.name ASC"
+        ).fetchall()
+        games = [{"slug": r["slug"], "name": r["name"]} for r in games_rows]
+
+        merges = identity_merges()
+        latest_tags = get_latest_player_tags(connection, merges)
+
+        raw_engine = RankingEngine(connection=connection, use_json=False)
+
+        manifest_games = []
+        now_iso = datetime.now(timezone.utc).isoformat()
+
+        for g in games:
+            slug = g["slug"]
+            sets = raw_engine.load_sets_from_db(slug)
+            placements = raw_engine.load_event_placements_from_db(slug)
+
+            active_pids = set()
+            for s in sets:
+                active_pids.add(s["winnerId"])
+                active_pids.add(s["loserId"])
+            for p in placements:
+                active_pids.add(p["playerId"])
+
+            game_tags = {pid: latest_tags[pid] for pid in active_pids if pid in latest_tags}
+
+            game_data = {
+                "metadata": {
+                    "gameSlug": slug,
+                    "gameName": g["name"],
+                    "version": ALGORITHM_VERSION,
+                    "exportedAt": now_iso,
+                    "totalSets": len(sets),
+                    "totalPlacements": len(placements),
+                    "totalPlayers": len(active_pids),
+                },
+                "latestTags": game_tags,
+                "sets": sets,
+                "placements": placements,
+            }
+
+            out_file = out_dir / f"{slug}.json"
+            with out_file.open("w", encoding="utf-8") as f:
+                json.dump(game_data, f, indent=2, ensure_ascii=False)
+                f.write("\n")
+
+            manifest_games.append({
+                "slug": slug,
+                "name": g["name"],
+                "totalSets": len(sets),
+                "totalPlacements": len(placements),
+                "totalPlayers": len(active_pids),
+                "file": f"{slug}.json",
+            })
+
+        manifest = {
+            "version": ALGORITHM_VERSION,
+            "exportedAt": now_iso,
+            "games": manifest_games,
+        }
+
+        index_file = out_dir / "index.json"
+        with index_file.open("w", encoding="utf-8") as f:
+            json.dump(manifest, f, indent=2, ensure_ascii=False)
+            f.write("\n")
+
+        return manifest
+    finally:
+        if owns_connection:
+            connection.close()
+
+
 def export_default_rankings():
     """Generates default ranking JSON files under data/rankings/ for static serving."""
     RANKINGS_DIR.mkdir(parents=True, exist_ok=True)
@@ -1655,12 +1828,15 @@ def main():
     parser.add_argument("--start", help="start date YYYY-MM-DD")
     parser.add_argument("--end", help="end date YYYY-MM-DD")
     parser.add_argument("--player-id", help="start.gg player ID for diagnostic output")
-    parser.add_argument("--export-all", action="store_true", help="pre-generate default static ranking files")
+    parser.add_argument("--export-data", action="store_true", help="export structured JSON ranking data from SQLite")
+    parser.add_argument("--export-all", action="store_true", help="pre-generate default static ranking files and export data")
 
     args = parser.parse_args()
 
-    if args.export_all:
-        export_default_rankings()
+    if args.export_data or args.export_all:
+        export_ranking_data()
+        if args.export_all:
+            export_default_rankings()
         return
 
     engine = RankingEngine()
