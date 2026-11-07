@@ -262,19 +262,25 @@ async function init() {
       const preset = btn.dataset.preset;
       const today = new Date().toISOString().split('T')[0];
       if (preset === 'all') {
+        modeFilter.value = 'historical';
         startDateInput.value = '';
         endDateInput.value = '';
-      } else if (preset === '2025') {
-        startDateInput.value = '2025-01-01';
-        endDateInput.value = '2025-12-31';
-      } else if (preset === '2024') {
-        startDateInput.value = '2024-01-01';
-        endDateInput.value = '2024-12-31';
-      } else if (preset === '6m') {
-        const d = new Date();
-        d.setMonth(d.getMonth() - 6);
-        startDateInput.value = d.toISOString().split('T')[0];
-        endDateInput.value = today;
+      } else {
+        if (modeFilter.value === 'historical') {
+          modeFilter.value = 'period_only';
+        }
+        if (preset === '2025') {
+          startDateInput.value = '2025-01-01';
+          endDateInput.value = '2025-12-31';
+        } else if (preset === '2024') {
+          startDateInput.value = '2024-01-01';
+          endDateInput.value = '2024-12-31';
+        } else if (preset === '6m') {
+          const d = new Date();
+          d.setMonth(d.getMonth() - 6);
+          startDateInput.value = d.toISOString().split('T')[0];
+          endDateInput.value = today;
+        }
       }
       onFilterChange();
     });
@@ -307,11 +313,6 @@ function syncDateInputsDisabledState() {
   const isHistorical = modeFilter.value === 'historical';
   startDateInput.disabled = isHistorical;
   endDateInput.disabled = isHistorical;
-  $$('.preset-btn').forEach(btn => {
-    btn.disabled = isHistorical;
-    btn.style.opacity = isHistorical ? '0.45' : '';
-    btn.style.cursor = isHistorical ? 'not-allowed' : '';
-  });
 }
 
 function getCurrentFilterState() {
@@ -539,10 +540,32 @@ async function loadData() {
   const isHistorical = mode === 'historical';
   const start = isHistorical ? '' : startDateInput.value;
   const end = isHistorical ? '' : endDateInput.value;
+  const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
+
+  if (mode === 'period_only' && !start && !end) {
+    const msg = isEs
+      ? 'Selecciona una fecha de inicio, fecha de fin o rango de fechas para el modo Solo período.'
+      : 'Please select a start date, an end date, or a date range for Period-only mode.';
+    rankingStatus.textContent = msg;
+    rankingsContent.innerHTML = `<div class="panel glass empty-state"><h2>${isEs ? 'Rango de Fechas Requerido' : 'Date Range Required'}</h2><p class="muted">${msg}</p></div>`;
+    return;
+  }
+
+  if (mode === 'period_performance' && !start) {
+    const msg = isEs
+      ? 'Selecciona una fecha de inicio para el modo Desempeño en período.'
+      : 'Period performance mode requires a start date to establish pre-period ratings.';
+    rankingStatus.textContent = msg;
+    rankingsContent.innerHTML = `<div class="panel glass empty-state"><h2>${isEs ? 'Fecha de Inicio Requerida' : 'Start Date Required'}</h2><p class="muted">${msg}</p></div>`;
+    return;
+  }
 
   if (!isHistorical && start && end && start > end) {
-    rankingStatus.textContent = 'Invalid date range: Start date must be before or on end date.';
-    rankingsContent.innerHTML = '<div class="panel glass empty-state"><h2>Invalid Date Range</h2><p class="muted">Start date cannot be after end date.</p></div>';
+    const msg = isEs
+      ? 'Rango de fechas inválido: La fecha de inicio debe ser anterior o igual a la de fin.'
+      : 'Invalid date range: Start date must be before or on end date.';
+    rankingStatus.textContent = msg;
+    rankingsContent.innerHTML = `<div class="panel glass empty-state"><h2>${isEs ? 'Rango de Fechas Inválido' : 'Invalid Date Range'}</h2><p class="muted">${msg}</p></div>`;
     return;
   }
 
@@ -859,6 +882,8 @@ function computePRLeaderboard() {
         pObj.rawScores[sys] = p.score;
         pObj.matches = Math.max(pObj.matches, p.matches || 0);
         pObj.events = Math.max(pObj.events, p.events || 0);
+        if (p.baselineScore !== undefined && p.baselineScore !== null) pObj.baselineScore = p.baselineScore;
+        if (p.change !== undefined && p.change !== null) pObj.change = p.change;
       });
     }
   });
@@ -907,7 +932,9 @@ function computePRLeaderboard() {
       normalizedScores: normalized,
       weightedContributions: contributions,
       matches: p.matches,
-      events: p.events
+      events: p.events,
+      baselineScore: p.baselineScore,
+      change: p.change
     };
   });
 
@@ -1181,7 +1208,9 @@ function renderCustomPowerRankings() {
     if (typeof valA === 'string') {
       return sortAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
     }
-    return sortAsc ? (valA - valB) : (valB - valA);
+    const numA = (valA !== undefined && valA !== null) ? valA : (sortAsc ? 9999999 : -9999999);
+    const numB = (valB !== undefined && valB !== null) ? valB : (sortAsc ? 9999999 : -9999999);
+    return sortAsc ? (numA - numB) : (numB - numA);
   });
 
   const totalFiltered = list.length;
@@ -1289,6 +1318,9 @@ function renderCustomPowerRankings() {
   }
 
   const budgetBoxHtml = renderFormulaBudgetBox();
+  const isPeriodPerf = modeFilter.value === 'period_performance';
+  const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
+  const prGridCols = isPeriodPerf ? '55px minmax(170px,1.6fr) 95px 85px repeat(4, minmax(85px, 1fr)) 100px;' : '60px minmax(180px,1.8fr) 110px repeat(4, minmax(90px, 1fr)) 110px;';
 
   let html = `
     ${budgetBoxHtml}
@@ -1296,23 +1328,24 @@ function renderCustomPowerRankings() {
     <div class="panel glass ranking-table-panel">
       <div class="pr-table-toolbar">
         <button class="pr-create-pill-btn mono" onclick="createPRFromCurrentRankings()">
-          ${(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es') ? 'CREAR PR' : 'CREATE PR'}
+          ${isEs ? 'CREAR PR' : 'CREATE PR'}
         </button>
       </div>
       <div class="table">
-        <div class="tr head ranking-row" style="grid-template-columns: 60px minmax(180px,1.8fr) 110px repeat(4, minmax(90px, 1fr)) 110px;">
-          <span class="sortable" onclick="changeSort('rank')">${(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es') ? 'PUESTO' : 'RANK'} ${sortCol === 'rank' ? (sortAsc ? '▲' : '▼') : ''}</span>
-          <span class="sortable" onclick="changeSort('playerTag')">${(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es') ? 'JUGADOR' : 'PLAYER'} ${sortCol === 'playerTag' ? (sortAsc ? '▲' : '▼') : ''}</span>
-          <span class="sortable" onclick="changeSort('score')">${(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es') ? 'PUNTAJE' : 'SCORE'} ${sortCol === 'score' ? (sortAsc ? '▲' : '▼') : ''}</span>
+        <div class="tr head ranking-row" style="grid-template-columns: ${prGridCols}">
+          <span class="sortable" onclick="changeSort('rank')">${isEs ? 'PUESTO' : 'RANK'} ${sortCol === 'rank' ? (sortAsc ? '▲' : '▼') : ''}</span>
+          <span class="sortable" onclick="changeSort('playerTag')">${isEs ? 'JUGADOR' : 'PLAYER'} ${sortCol === 'playerTag' ? (sortAsc ? '▲' : '▼') : ''}</span>
+          <span class="sortable" onclick="changeSort('score')">${isEs ? 'PUNTAJE' : 'SCORE'} ${sortCol === 'score' ? (sortAsc ? '▲' : '▼') : ''}</span>
+          ${isPeriodPerf ? `<span class="sortable" onclick="changeSort('change')">${isEs ? 'CAMBIO' : 'CHANGE'} ${sortCol === 'change' ? (sortAsc ? '▲' : '▼') : ''}</span>` : ''}
           <span>GLICKO-2</span>
-          <span>${(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es') ? 'VICTORIAS CALIDAD' : 'QUALITY WINS'}</span>
+          <span>${isEs ? 'VICTORIAS CALIDAD' : 'QUALITY WINS'}</span>
           <span>SOF</span>
-          <span>${(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es') ? 'CONSISTENCIA' : 'CONSISTENCY'}</span>
-          <span>${(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es') ? 'ACCIONES' : 'ACTIONS'}</span>
+          <span>${isEs ? 'CONSISTENCIA' : 'CONSISTENCY'}</span>
+          <span>${isEs ? 'ACCIONES' : 'ACTIONS'}</span>
         </div>
 
         ${visibleList.length ? visibleList.map(p => `
-          <div class="tr ranking-row" style="grid-template-columns: 60px minmax(180px,1.8fr) 110px repeat(4, minmax(90px, 1fr)) 110px; cursor:pointer;" onclick="onPRSelectPlayer('${esc(p.playerId)}')">
+          <div class="tr ranking-row" style="grid-template-columns: ${prGridCols}; cursor:pointer;" onclick="onPRSelectPlayer('${esc(p.playerId)}')">
             <span class="rank-col font-bold ${p.rank && p.rank <= 3 ? 'p' + p.rank : ''}">#${p.rank}</span>
             <div class="player-col">
               <a href="index.html?player=${encodeURIComponent(p.playerId)}" class="player-card-link" onclick="event.stopPropagation();">
@@ -1321,15 +1354,20 @@ function renderCustomPowerRankings() {
               </a>
             </div>
             <span class="score-col mono font-bold">${p.score}</span>
+            ${isPeriodPerf ? `
+              <span class="change-col mono font-bold ${p.change > 0 ? 'win' : (p.change < 0 ? 'loss' : 'muted')}">
+                ${p.change !== undefined && p.change !== null ? (p.change > 0 ? `+${p.change}` : `${p.change}`) : '-'}
+              </span>
+            ` : ''}
             <span class="mono" style="color:${PR_COMPONENTS.glicko2.color};">${Math.round((p.weightedContributions.glicko2||0)*10)/10} <small class="muted">(${Math.round((p.normalizedScores.glicko2||0)*10)/10})</small></span>
             <span class="mono" style="color:${PR_COMPONENTS.quality_wins.color};">${Math.round((p.weightedContributions.quality_wins||0)*10)/10} <small class="muted">(${Math.round((p.normalizedScores.quality_wins||0)*10)/10})</small></span>
             <span class="mono" style="color:${PR_COMPONENTS.sof.color};">${Math.round((p.weightedContributions.sof||0)*10)/10} <small class="muted">(${Math.round((p.normalizedScores.sof||0)*10)/10})</small></span>
             <span class="mono" style="color:${PR_COMPONENTS.loss_quality.color};">${Math.round((p.weightedContributions.loss_quality||0)*10)/10} <small class="muted">(${Math.round((p.normalizedScores.loss_quality||0)*10)/10})</small></span>
             <div class="actions-col" onclick="event.stopPropagation();">
-              <button class="quiet-button diagnostic-btn" onclick="openDiagnosticModal('${esc(p.playerId)}')">${(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es') ? 'Diagnóstico' : 'Diagnostic'}</button>
+              <button class="quiet-button diagnostic-btn" onclick="openDiagnosticModal('${esc(p.playerId)}')">${isEs ? 'Diagnóstico' : 'Diagnostic'}</button>
             </div>
           </div>
-        `).join('') : `<div class="empty-state"><p class="muted">${(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es') ? 'Ningún jugador coincide con el filtro.' : 'No players match the search filter.'}</p></div>`}
+        `).join('') : `<div class="empty-state"><p class="muted">${isEs ? 'Ningún jugador coincide con el filtro.' : 'No players match the search filter.'}</p></div>`}
       </div>
 
       ${totalFiltered > 0 ? `
@@ -1399,13 +1437,18 @@ function renderIndividualSystem(systemKey) {
     if (typeof valA === 'string') {
       return sortAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
     }
-    return sortAsc ? (valA - valB) : (valB - valA);
+    const numA = (valA !== undefined && valA !== null) ? valA : (sortAsc ? 9999999 : -9999999);
+    const numB = (valB !== undefined && valB !== null) ? valB : (sortAsc ? 9999999 : -9999999);
+    return sortAsc ? (numA - numB) : (numB - numA);
   });
 
   const totalFiltered = list.length;
   const visibleList = list.slice(0, visibleCount);
 
   const sysInfo = currentData.algorithm || {};
+  const isPeriodPerf = modeFilter.value === 'period_performance';
+  const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
+  const indGridCols = isPeriodPerf ? '55px minmax(160px,1.8fr) 95px 95px 85px minmax(130px, 1.2fr) 90px;' : '';
 
   let html = `
     <div class="panel glass system-banner">
@@ -1417,16 +1460,17 @@ function renderIndividualSystem(systemKey) {
 
     <div class="panel glass ranking-table-panel">
       <div class="table">
-        <div class="tr head ranking-row">
-          <span class="sortable" onclick="changeSort('rank')">RANK ${sortCol === 'rank' ? (sortAsc ? '▲' : '▼') : ''}</span>
-          <span class="sortable" onclick="changeSort('playerTag')">PLAYER ${sortCol === 'playerTag' ? (sortAsc ? '▲' : '▼') : ''}</span>
-          <span class="sortable" onclick="changeSort('score')">SCORE ${sortCol === 'score' ? (sortAsc ? '▲' : '▼') : ''}</span>
-          <span class="sortable" onclick="changeSort('winRate')">WIN % ${sortCol === 'winRate' ? (sortAsc ? '▲' : '▼') : ''}</span>
-          <span>MATCHES / EVENTS</span>
-          <span>ACTIONS</span>
+        <div class="tr head ranking-row" style="${indGridCols ? `grid-template-columns: ${indGridCols}` : ''}">
+          <span class="sortable" onclick="changeSort('rank')">${isEs ? 'PUESTO' : 'RANK'} ${sortCol === 'rank' ? (sortAsc ? '▲' : '▼') : ''}</span>
+          <span class="sortable" onclick="changeSort('playerTag')">${isEs ? 'JUGADOR' : 'PLAYER'} ${sortCol === 'playerTag' ? (sortAsc ? '▲' : '▼') : ''}</span>
+          <span class="sortable" onclick="changeSort('score')">${isEs ? 'PUNTAJE' : 'SCORE'} ${sortCol === 'score' ? (sortAsc ? '▲' : '▼') : ''}</span>
+          ${isPeriodPerf ? `<span class="sortable" onclick="changeSort('change')">${isEs ? 'CAMBIO' : 'CHANGE'} ${sortCol === 'change' ? (sortAsc ? '▲' : '▼') : ''}</span>` : ''}
+          <span class="sortable" onclick="changeSort('winRate')">${isEs ? '% VICTORIAS' : 'WIN %'} ${sortCol === 'winRate' ? (sortAsc ? '▲' : '▼') : ''}</span>
+          <span>${isEs ? 'PARTIDAS / EVENTOS' : 'MATCHES / EVENTS'}</span>
+          <span>${isEs ? 'ACCIONES' : 'ACTIONS'}</span>
         </div>
         ${visibleList.length ? visibleList.map(p => `
-          <div class="tr ranking-row">
+          <div class="tr ranking-row" style="${indGridCols ? `grid-template-columns: ${indGridCols}` : ''}">
             <span class="rank-col font-bold ${p.rank && p.rank <= 3 ? 'p' + p.rank : ''}">${p.rank ? '#' + p.rank : 'Unranked'}</span>
             <div class="player-col">
               <a href="index.html?player=${encodeURIComponent(p.playerId)}" class="player-card-link">
@@ -1437,13 +1481,18 @@ function renderIndividualSystem(systemKey) {
               </a>
             </div>
             <span class="score-col mono font-bold">${p.isUnranked ? '-' : p.score}</span>
+            ${isPeriodPerf ? `
+              <span class="change-col mono font-bold ${p.change > 0 ? 'win' : (p.change < 0 ? 'loss' : 'muted')}">
+                ${p.change !== undefined && p.change !== null ? (p.change > 0 ? `+${p.change}` : `${p.change}`) : '-'}
+              </span>
+            ` : ''}
             <span class="winrate-col mono">${p.winRate !== undefined ? p.winRate + '%' : '-'}</span>
             <span class="matches-col mono">${p.matches !== undefined ? `${p.matches}${p.events !== undefined ? ` (${p.events} event${p.events === 1 ? '' : 's'})` : ''}` : '-'}</span>
             <div class="actions-col">
-              <button class="quiet-button diagnostic-btn" onclick="openDiagnosticModal('${esc(p.playerId)}')">Diagnostic</button>
+              <button class="quiet-button diagnostic-btn" onclick="openDiagnosticModal('${esc(p.playerId)}')">${isEs ? 'Diagnóstico' : 'Diagnostic'}</button>
             </div>
           </div>
-        `).join('') : '<div class="empty-state"><p class="muted">No players match the search filter.</p></div>'}
+        `).join('') : `<div class="empty-state"><p class="muted">${isEs ? 'Ningún jugador coincide con el filtro.' : 'No players match the search filter.'}</p></div>`}
       </div>
 
       ${totalFiltered > 0 ? `
@@ -1524,7 +1573,7 @@ function renderComparison() {
         if (!playersMap.has(p.playerId)) {
           playersMap.set(p.playerId, { playerId: p.playerId, playerTag: p.playerTag });
         }
-        playersMap.get(p.playerId)[sys] = { rank: p.rank, score: p.score };
+        playersMap.get(p.playerId)[sys] = { rank: p.rank, score: p.score, change: p.change };
       });
     }
   });
@@ -1567,7 +1616,7 @@ function renderComparison() {
                 <b>${esc(p.playerTag)}</b>
               </a>
             </div>
-            <span class="mono">${p.glicko2 ? (p.glicko2.rank ? `#${p.glicko2.rank} (${p.glicko2.score})` : `- (${p.glicko2.score})`) : '-'}</span>
+            <span class="mono">${p.glicko2 ? (p.glicko2.rank ? `#${p.glicko2.rank} (${p.glicko2.score}${p.glicko2.change !== undefined && p.glicko2.change !== null ? (p.glicko2.change >= 0 ? ' +' + p.glicko2.change : ' ' + p.glicko2.change) : ''})` : `- (${p.glicko2.score})`) : '-'}</span>
             <span class="mono">${p.sof ? (p.sof.rank ? `#${p.sof.rank} (${p.sof.score})` : `- (${p.sof.score})`) : '-'}</span>
             <span class="mono">${p.quality_wins ? (p.quality_wins.rank ? `#${p.quality_wins.rank} (${p.quality_wins.score})` : `Unranked (${p.quality_wins.score})`) : '-'}</span>
             <span class="mono">${p.loss_quality ? (p.loss_quality.rank ? `#${p.loss_quality.rank} (${p.loss_quality.score})` : `- (${p.loss_quality.score})`) : '-'}</span>
@@ -1642,7 +1691,8 @@ window.openDiagnosticModal = async function(playerId) {
         <h2>${esc(diag.playerTag)} <span class="muted font-normal">(ID ${esc(playerId)})</span></h2>
         <p class="muted mono">
           Rank: <b>${diag.playerRank ? '#' + diag.playerRank : 'Unranked'}</b> ·
-          Final Score: <b>${diag.finalScore !== null ? diag.finalScore : '-'}</b> ·
+          Final Score: <b>${diag.finalScore !== null ? diag.finalScore : '-'}</b>
+          ${breakdown.change !== undefined && breakdown.change !== null ? ` · Rating Change: <b>${breakdown.change >= 0 ? '+' : ''}${breakdown.change}</b>` : ''} ·
           Game: <b>${esc(getGameName(game))}</b> ·
           System: <b>${esc(algo.name || system)}</b> (${esc(mode)})
         </p>
@@ -1736,6 +1786,7 @@ function formatBreakdown(systemKey, b) {
       <span>Rating Deviation (RD): <b>${b.rd}</b></span> ·
       <span>Volatility (σ): <b>${b.volatility}</b></span><br>
       <span>Conservative Rating (r - 2*RD): <b>${b.conservativeScore}</b></span>
+      ${b.baselineScore !== undefined && b.baselineScore !== null ? `<br><span>Pre-period Baseline: <b>${b.baselineScore}</b></span> · <span>Rating Change: <b>${b.change !== undefined && b.change !== null ? (b.change >= 0 ? '+' : '') + b.change : '-'}</b></span>` : ''}
     `;
   } else if (systemKey === 'sof') {
     return `

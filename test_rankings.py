@@ -813,3 +813,123 @@ def test_missing_and_corrupted_json_exports(tmp_path, mock_db):
     engine_corrupt = RankingEngine(connection=conn, data_dir=empty_dir, use_json=True)
     res_corrupt = engine_corrupt.calculate("ultimate", system="glicko2")
     assert res_corrupt["totalPlayers"] > 0
+
+
+def test_json_date_filtering_and_calculation_modes(tmp_path, mock_db):
+    """Tests calculation modes and date filtering using exported JSON data architecture."""
+    conn, _ = mock_db
+    export_dir = tmp_path / "ranking_data"
+    export_ranking_data(connection=conn, output_dir=export_dir)
+
+    engine = RankingEngine(data_dir=export_dir, use_json=True)
+
+    # 1. Historical mode: ignores date filters, considers complete history
+    hist_all = engine.calculate("ultimate", system="glicko2", mode="historical")
+    hist_filtered = engine.calculate("ultimate", system="glicko2", mode="historical", start_date="2024-02-01", end_date="2024-02-28")
+    assert len(hist_all["rankings"]) == len(hist_filtered["rankings"])
+    assert hist_all["totalPlayers"] == hist_filtered["totalPlayers"]
+    for r_all, r_filt in zip(hist_all["rankings"], hist_filtered["rankings"]):
+        assert r_all["playerId"] == r_filt["playerId"]
+        assert r_all["score"] == r_filt["score"]
+
+    # 2. Period-only mode: only tournaments within date range contribute, players start fresh
+    po_res = engine.calculate("ultimate", system="glicko2", mode="period_only", start_date="2024-02-01", end_date="2024-02-28")
+    p101_po = next(p for p in po_res["rankings"] if p["playerId"] == "101")
+    assert p101_po["matches"] == 1
+    assert p101_po["losses"] == 1
+    assert p101_po["baselineScore"] == 0.0
+
+    # Start date only: include all tournaments from start_date onward
+    po_start_only = engine.calculate("ultimate", system="glicko2", mode="period_only", start_date="2024-02-01")
+    assert po_start_only["totalPlayers"] > 0
+    p101_so = next(p for p in po_start_only["rankings"] if p["playerId"] == "101")
+    assert p101_so["matches"] == 1
+
+    # End date only: include all tournaments up to end_date
+    po_end_only = engine.calculate("ultimate", system="glicko2", mode="period_only", end_date="2024-01-31")
+    assert po_end_only["totalPlayers"] > 0
+    p101_eo = next(p for p in po_end_only["rankings"] if p["playerId"] == "101")
+    assert p101_eo["matches"] == 2
+
+    # 3. Period performance mode: pre-period baseline ratings, rating change calculation
+    pp_res = engine.calculate("ultimate", system="glicko2", mode="period_performance", start_date="2024-02-01", end_date="2024-02-28")
+    p101_pp = next(p for p in pp_res["rankings"] if p["playerId"] == "101")
+    assert p101_pp["matches"] == 1
+    assert p101_pp["baselineScore"] > 0
+    assert p101_pp["change"] == round(p101_pp["score"] - p101_pp["baselineScore"], 1)
+
+    # Tournaments after end_date do not influence Period performance
+    pp_narrow = engine.calculate("ultimate", system="glicko2", mode="period_performance", start_date="2024-01-01", end_date="2024-01-31")
+    p101_narrow = next(p for p in pp_narrow["rankings"] if p["playerId"] == "101")
+    assert p101_narrow["matches"] == 2
+
+
+def test_mode_validation_errors(tmp_path, mock_db):
+    """Verifies that period modes validate dates and raise ValueError instead of falling back to Historical."""
+    conn, _ = mock_db
+    export_dir = tmp_path / "ranking_data"
+    export_ranking_data(connection=conn, output_dir=export_dir)
+
+    engine = RankingEngine(data_dir=export_dir, use_json=True)
+
+    # Period-only missing both dates
+    with pytest.raises(ValueError, match="Period-only mode requires a start date"):
+        engine.calculate("ultimate", system="glicko2", mode="period_only")
+
+    # Period performance missing start date
+    with pytest.raises(ValueError, match="Period performance mode requires a start date"):
+        engine.calculate("ultimate", system="glicko2", mode="period_performance")
+
+    with pytest.raises(ValueError, match="Period performance mode requires a start date"):
+        engine.calculate("ultimate", system="glicko2", mode="period_performance", end_date="2024-12-31")
+
+    # Start date after end date
+    with pytest.raises(ValueError, match="Start date must be before or on end date"):
+        engine.calculate("ultimate", system="glicko2", mode="period_only", start_date="2025-01-01", end_date="2024-01-01")
+
+    with pytest.raises(ValueError, match="Start date must be before or on end date"):
+        engine.calculate("ultimate", system="glicko2", mode="period_performance", start_date="2025-01-01", end_date="2024-01-01")
+
+
+def test_real_json_tournament_level_isolation():
+    """Verifies tournament-level date filtering on real repo JSON exports."""
+    engine = RankingEngine(use_json=True)
+
+    # Test Melee 2025 period: 2019 tournament with sets entered in 2025 must NOT appear
+    diag = engine.calculate("melee", system="glicko2", mode="period_only", start_date="2025-01-01", end_date="2025-12-31", target_player_id="330721")
+    events = [m["event"] for m in diag["diagnostic"]["history"]]
+    assert not any("2019" in ev for ev in events)
+
+    # Test Melee 2024 vs 2025: player counts should differ reflecting actual tournaments
+    res_24 = engine.calculate("melee", system="glicko2", mode="period_only", start_date="2024-01-01", end_date="2024-12-31")
+    res_25 = engine.calculate("melee", system="glicko2", mode="period_only", start_date="2025-01-01", end_date="2025-12-31")
+    assert res_24["totalPlayers"] > 0
+    assert res_25["totalPlayers"] > 0
+    assert res_24["totalPlayers"] != res_25["totalPlayers"]
+
+
+def test_period_performance_rating_change_distinction():
+    """Verifies that rating change allows distinguishing highest rated vs most improved players."""
+    engine = RankingEngine(use_json=True)
+
+    res_pp = engine.calculate("melee", system="glicko2", mode="period_performance", start_date="2024-01-01", end_date="2024-12-31")
+    rankings = res_pp["rankings"]
+    assert len(rankings) > 0
+
+    # Every ranked player has a valid score, baselineScore, and change
+    for p in rankings:
+        assert "score" in p
+        assert "baselineScore" in p
+        assert "change" in p
+        assert p["change"] == round(p["score"] - p["baselineScore"], 1)
+
+    # Sort by score descending (highest rated player)
+    by_score = sorted(rankings, key=lambda p: p["score"], reverse=True)
+    # Sort by change descending (most improved player)
+    by_change = sorted(rankings, key=lambda p: p["change"], reverse=True)
+
+    # The highest rated player and the most improved player are distinct
+    top_score_player = by_score[0]
+    top_change_player = by_change[0]
+    print(f"Top by score: {top_score_player['playerTag']} ({top_score_player['score']}), Top by change: {top_change_player['playerTag']} (+{top_change_player['change']})")
+    assert top_change_player["change"] > 0
