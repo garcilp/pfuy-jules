@@ -530,6 +530,98 @@ class RankingEngine:
 
         return event_placements
 
+    def _build_tournament_date_maps(self, sets, placements):
+        """Builds mappings for resolving tournament dates from JSON data structure."""
+        event_dates = {}
+        tourney_dates = {}
+        for p in placements:
+            eid = text_id(p.get("eventId"))
+            tslug = p.get("tournamentSlug")
+            p_date = p.get("date")
+            if eid and p_date:
+                event_dates[eid] = p_date
+            if tslug and p_date:
+                if tslug not in tourney_dates or p_date < tourney_dates[tslug]:
+                    tourney_dates[tslug] = p_date
+
+        for s in sets:
+            eid = text_id(s.get("eventId"))
+            tslug = s.get("tournamentSlug")
+            s_date = s.get("date")
+            if eid and s_date and eid not in event_dates:
+                event_dates[eid] = s_date
+            if tslug and s_date and tslug not in tourney_dates:
+                tourney_dates[tslug] = s_date
+
+        return event_dates, tourney_dates
+
+    def _get_tournament_date(self, item, event_dates, tourney_dates):
+        eid = text_id(item.get("eventId"))
+        if eid in event_dates:
+            return event_dates[eid]
+        tslug = item.get("tournamentSlug")
+        if tslug in tourney_dates:
+            return tourney_dates[tslug]
+        return item.get("date")
+
+    def _filter_tournament_dataset(self, sets, placements, mode, start_date, end_date):
+        """Filters tournament datasets chronologically according to calculation mode and date ranges."""
+        if mode == "historical":
+            return [], list(sets), list(placements)
+
+        event_dates, tourney_dates = self._build_tournament_date_maps(sets, placements)
+
+        if mode == "period_only":
+            if not start_date and not end_date:
+                raise ValueError("Period-only mode requires a start date, end date, or date range.")
+            if start_date and end_date and start_date > end_date:
+                raise ValueError("Start date must be before or on end date.")
+
+            period_sets = []
+            for s in sets:
+                d = self._get_tournament_date(s, event_dates, tourney_dates)
+                if start_date and d and d < start_date:
+                    continue
+                if end_date and d and d > end_date:
+                    continue
+                period_sets.append(s)
+
+            period_placements = []
+            for p in placements:
+                d = self._get_tournament_date(p, event_dates, tourney_dates)
+                if start_date and d and d < start_date:
+                    continue
+                if end_date and d and d > end_date:
+                    continue
+                period_placements.append(p)
+
+            return [], period_sets, period_placements
+
+        elif mode == "period_performance":
+            if not start_date:
+                raise ValueError("Period performance mode requires a start date.")
+            if start_date and end_date and start_date > end_date:
+                raise ValueError("Start date must be before or on end date.")
+
+            pre_period_sets = []
+            period_sets = []
+            for s in sets:
+                d = self._get_tournament_date(s, event_dates, tourney_dates)
+                if d and d < start_date:
+                    pre_period_sets.append(s)
+                elif not end_date or (d and d <= end_date):
+                    period_sets.append(s)
+
+            period_placements = []
+            for p in placements:
+                d = self._get_tournament_date(p, event_dates, tourney_dates)
+                if d and d >= start_date and (not end_date or d <= end_date):
+                    period_placements.append(p)
+
+            return pre_period_sets, period_sets, period_placements
+        else:
+            raise ValueError(f"Unknown calculation mode: {mode}")
+
     def calculate(self, game_slug, system="glicko2", mode="historical", start_date=None, end_date=None, target_player_id=None, alpha=2.0, weights=None):
         """Calculates rankings for a specific game, system, mode, and date range."""
         if start_date and end_date and start_date > end_date:
@@ -542,18 +634,33 @@ class RankingEngine:
         if target_player_id is not None:
             target_player_id = canonical_id(target_player_id, self.merges)
 
-        valid_sets = self.load_sets_for_game(game_slug)
+        all_sets = self.load_sets_for_game(game_slug)
+        all_placements = self.load_event_placements_for_game(game_slug)
+
+        pre_period_sets, period_sets, period_placements = self._filter_tournament_dataset(
+            all_sets, all_placements, mode, start_date, end_date
+        )
 
         if system == "glicko2":
-            return self._calculate_glicko2(valid_sets, mode, start_date, end_date, target_player_id, game_slug, raw_target_player_id=raw_target_player_id)
+            return self._calculate_glicko2(
+                pre_period_sets, period_sets, mode, start_date, end_date, target_player_id, game_slug, raw_target_player_id=raw_target_player_id
+            )
         elif system == "sof":
-            return self._calculate_sof(valid_sets, mode, start_date, end_date, target_player_id, game_slug, raw_target_player_id=raw_target_player_id)
+            return self._calculate_sof(
+                pre_period_sets, period_sets, period_placements, mode, start_date, end_date, target_player_id, game_slug, raw_target_player_id=raw_target_player_id
+            )
         elif system == "quality_wins":
-            return self._calculate_quality_wins(valid_sets, mode, start_date, end_date, target_player_id, game_slug, raw_target_player_id=raw_target_player_id)
+            return self._calculate_quality_wins(
+                pre_period_sets, period_sets, mode, start_date, end_date, target_player_id, game_slug, raw_target_player_id=raw_target_player_id
+            )
         elif system == "loss_quality":
-            return self._calculate_loss_quality(valid_sets, mode, start_date, end_date, target_player_id, game_slug, raw_target_player_id=raw_target_player_id)
+            return self._calculate_loss_quality(
+                pre_period_sets, period_sets, mode, start_date, end_date, target_player_id, game_slug, raw_target_player_id=raw_target_player_id
+            )
         elif system in ("custom", "power_rankings"):
-            return self._calculate_custom(valid_sets, mode, start_date, end_date, target_player_id, game_slug, weights=weights, raw_target_player_id=raw_target_player_id)
+            return self._calculate_custom(
+                pre_period_sets, period_sets, period_placements, mode, start_date, end_date, target_player_id, game_slug, weights=weights, raw_target_player_id=raw_target_player_id
+            )
         else:
             raise ValueError(f"Unknown ranking system: {system}")
 
@@ -561,14 +668,8 @@ class RankingEngine:
     # Pre-Match Glicko Rating Pre-pass
     # -------------------------------------------------------------------------
 
-    def _compute_pre_match_glicko_ratings(self, sets, mode="historical", start_date=None, end_date=None):
-        """Reconstructs pre-match Glicko-2 ratings for every set in chronological order by event.
-
-        Respects calculation mode:
-        - historical: reconstruct ratings from start of history for all sets.
-        - period_performance: reconstruct ratings up to end_date. No sets after end_date are processed.
-        - period_only: only sets on/after start_date and on/before end_date are processed. Players start with neutral ratings.
-        """
+    def _compute_pre_match_glicko_ratings(self, eval_sets, mode="historical", start_date=None, end_date=None):
+        """Reconstructs pre-match Glicko-2 ratings for every set in chronological order by event."""
         calc = self.glicko_calc
         ratings = {}
 
@@ -578,12 +679,7 @@ class RankingEngine:
             return ratings[pid]
 
         event_sets_map = {}
-        for s in sets:
-            s_date = s["date"]
-            if end_date and s_date and s_date > end_date:
-                continue
-            if mode == "period_only" and start_date and s_date and s_date < start_date:
-                continue
+        for s in eval_sets:
             event_sets_map.setdefault(s["eventId"], []).append(s)
 
         pre_match_ratings = {}
@@ -623,29 +719,19 @@ class RankingEngine:
     # System 1: Glicko-2 Player Skill Ratings
     # -------------------------------------------------------------------------
 
-    def _calculate_glicko2(self, sets, mode, start_date, end_date, target_player_id, game_slug, raw_target_player_id=None):
+    def _calculate_glicko2(self, pre_period_sets, period_sets=None, mode="historical", start_date=None, end_date=None, target_player_id=None, game_slug=None, raw_target_player_id=None):
+        if period_sets is None:
+            period_sets = pre_period_sets
+            pre_period_sets = []
         calc = self.glicko_calc
 
         pre_period_events = {}
+        for s in pre_period_sets:
+            pre_period_events.setdefault(s["eventId"], []).append(s)
+
         period_events = {}
-
-        for s in sets:
-            s_date = s["date"]
-            if end_date and s_date and s_date > end_date:
-                continue
-
-            e_id = s["eventId"]
-            if mode == "period_only":
-                if start_date and s_date and s_date < start_date:
-                    continue
-                period_events.setdefault(e_id, []).append(s)
-            elif mode == "period_performance":
-                if start_date and s_date and s_date < start_date:
-                    pre_period_events.setdefault(e_id, []).append(s)
-                else:
-                    period_events.setdefault(e_id, []).append(s)
-            else:  # historical
-                period_events.setdefault(e_id, []).append(s)
+        for s in period_sets:
+            period_events.setdefault(s["eventId"], []).append(s)
 
         ratings = {}
         stats = {}
@@ -738,19 +824,20 @@ class RankingEngine:
             if stats[pid]["matches"] == 0 and mode != "historical":
                 continue
 
-            score = calc.conservative_score(r["r"], r["rd"])
-            base_score = baseline_ratings.get(pid, 0.0 if mode == "period_only" else calc.conservative_score(calc.r_0, calc.rd_0))
-            change = score - base_score
+            score = round(calc.conservative_score(r["r"], r["rd"]), 1)
+            raw_base = baseline_ratings.get(pid, 0.0 if mode == "period_only" else calc.conservative_score(calc.r_0, calc.rd_0))
+            base_score = round(raw_base, 1)
+            change = round(score - base_score, 1) if mode == "period_performance" else (0.0 if mode == "period_only" else round(score - base_score, 1))
 
             rankings.append({
                 "playerId": pid,
                 "playerTag": self.latest_tags.get(pid, f"Player {pid}"),
-                "score": round(score, 1),
+                "score": score,
                 "rating": round(r["r"], 1),
                 "rd": round(r["rd"], 1),
                 "volatility": round(r["vol"], 4),
-                "baselineScore": round(base_score, 1),
-                "change": round(change, 1),
+                "baselineScore": base_score,
+                "change": change,
                 "matches": stats[pid]["matches"],
                 "wins": stats[pid]["wins"],
                 "losses": stats[pid]["losses"],
@@ -762,7 +849,7 @@ class RankingEngine:
         for idx, item in enumerate(rankings, 1):
             item["rank"] = idx
 
-        total_sets_considered = sum(len(e) for e in period_events.values())
+        total_sets_considered = len(period_sets)
 
         result = {
             "gameSlug": game_slug,
@@ -806,6 +893,8 @@ class RankingEngine:
                 "rd": round(p_r["rd"], 1),
                 "volatility": round(p_r["vol"], 4),
                 "conservativeScore": final_sc,
+                "baselineScore": p_rank.get("baselineScore") if p_rank else (round(base_score, 1) if mode == "period_performance" else None),
+                "change": p_rank.get("change") if p_rank else (round(change, 1) if mode == "period_performance" else None),
                 "matches": p_stat["matches"],
                 "wins": p_stat["wins"],
                 "losses": p_stat["losses"],
@@ -858,7 +947,7 @@ class RankingEngine:
     # System 5: Custom Power Rankings
     # -------------------------------------------------------------------------
 
-    def _calculate_custom(self, sets, mode, start_date, end_date, target_player_id, game_slug, weights=None, raw_target_player_id=None):
+    def _calculate_custom(self, pre_period_sets, period_sets, period_placements, mode, start_date, end_date, target_player_id, game_slug, weights=None, raw_target_player_id=None):
         """Power Rankings: Combines normalized component scores across Glicko-2, SoF, Quality Wins, and Loss Quality."""
         if weights is None:
             weights = {"glicko2": 50, "quality_wins": 25, "sof": 15, "loss_quality": 10}
@@ -882,10 +971,10 @@ class RankingEngine:
         else:
             clean_weights = {"glicko2": 25.0, "quality_wins": 25.0, "sof": 25.0, "loss_quality": 25.0}
 
-        res_g2 = self._calculate_glicko2(sets, mode, start_date, end_date, None, game_slug)
-        res_sof = self._calculate_sof(sets, mode, start_date, end_date, None, game_slug)
-        res_qw = self._calculate_quality_wins(sets, mode, start_date, end_date, None, game_slug)
-        res_lq = self._calculate_loss_quality(sets, mode, start_date, end_date, None, game_slug)
+        res_g2 = self._calculate_glicko2(pre_period_sets, period_sets, mode, start_date, end_date, None, game_slug)
+        res_sof = self._calculate_sof(pre_period_sets, period_sets, period_placements, mode, start_date, end_date, None, game_slug)
+        res_qw = self._calculate_quality_wins(pre_period_sets, period_sets, mode, start_date, end_date, None, game_slug)
+        res_lq = self._calculate_loss_quality(pre_period_sets, period_sets, mode, start_date, end_date, None, game_slug)
 
         sys_results = {
             "glicko2": res_g2,
@@ -939,7 +1028,7 @@ class RankingEngine:
                 weighted_contribs[sys_key] = round(contrib, 2)
                 final_score += contrib
 
-            rankings.append({
+            p_entry = {
                 "playerId": pid,
                 "playerTag": p_info["playerTag"],
                 "score": round(final_score, 1),
@@ -948,7 +1037,13 @@ class RankingEngine:
                 "weights": {k: round(v, 1) for k, v in clean_weights.items()},
                 "matches": p_info["matches"],
                 "events": p_info["events"],
-            })
+            }
+            if mode == "period_performance" and res_g2:
+                g2_p = next((x for x in res_g2.get("rankings", []) if x["playerId"] == pid), None)
+                if g2_p:
+                    p_entry["baselineScore"] = g2_p.get("baselineScore")
+                    p_entry["change"] = g2_p.get("change")
+            rankings.append(p_entry)
 
         rankings.sort(key=lambda x: x["score"], reverse=True)
         for idx, item in enumerate(rankings, 1):
@@ -997,7 +1092,7 @@ class RankingEngine:
                     "endDate": end_date,
                     "finalScore": p_rank["score"] if p_rank else None,
                     "rank": p_rank["rank"] if p_rank else None,
-                    "totalResultsConsidered": len(sets),
+                    "totalResultsConsidered": len(period_sets),
                     "totalResultsIncluded": p_rank["matches"] if p_rank else 0,
                 },
                 "playerId": raw_target_player_id or target_player_id,
@@ -1029,19 +1124,17 @@ class RankingEngine:
     # System 2: Strength of Field (SoF)
     # -------------------------------------------------------------------------
 
-    def _calculate_sof(self, sets, mode, start_date, end_date, target_player_id, game_slug, raw_target_player_id=None):
+    def _calculate_sof(self, pre_period_sets, period_sets=None, period_placements=None, mode="historical", start_date=None, end_date=None, target_player_id=None, game_slug=None, raw_target_player_id=None):
         """Evaluates competitive accomplishments in tournaments against pre-event field strengths."""
-        pre_match_ratings, event_field_strengths = self._compute_pre_match_glicko_ratings(sets, mode=mode, start_date=start_date, end_date=end_date)
-        event_placements = self.load_event_placements_for_game(game_slug)
+        if period_sets is None and period_placements is None:
+            period_sets = pre_period_sets
+            pre_period_sets = []
+            period_placements = self.load_event_placements_for_game(game_slug) if game_slug else []
+        eval_sets = pre_period_sets + period_sets
+        pre_match_ratings, event_field_strengths = self._compute_pre_match_glicko_ratings(eval_sets)
 
         player_events = {}
-        for p in event_placements:
-            p_date = p["date"]
-            if end_date and p_date and p_date > end_date:
-                continue
-            if mode in ("period_only", "period_performance") and start_date and p_date and p_date < start_date:
-                continue
-
+        for p in period_placements:
             pid = p["playerId"]
             e_id = p["eventId"]
             f_strength = event_field_strengths.get(e_id, 1500.0)
@@ -1062,19 +1155,13 @@ class RankingEngine:
                 "placementWeight": round(p_weight, 3),
                 "entrantWeight": round(e_weight, 3),
                 "eventPoints": round(raw_pts, 1),
-                "date": p_date,
+                "date": p.get("date"),
             })
 
         player_matches = {}
         diagnostic_history = {}
 
-        for s in sets:
-            s_date = s["date"]
-            if end_date and s_date and s_date > end_date:
-                continue
-            if mode in ("period_only", "period_performance") and start_date and s_date and s_date < start_date:
-                continue
-
+        for s in period_sets:
             w_id, l_id = s["winnerId"], s["loserId"]
             player_matches.setdefault(w_id, []).append((s, True))
             player_matches.setdefault(l_id, []).append((s, False))
@@ -1177,7 +1264,7 @@ class RankingEngine:
                     "endDate": end_date,
                     "finalScore": p_rank["score"] if p_rank else None,
                     "rank": p_rank["rank"] if p_rank else None,
-                    "totalResultsConsidered": len(event_placements),
+                    "totalResultsConsidered": len(period_placements),
                     "totalResultsIncluded": len(evs),
                 },
                 "playerId": raw_target_player_id or target_player_id,
@@ -1212,7 +1299,7 @@ class RankingEngine:
     # System 3: Quality Wins
     # -------------------------------------------------------------------------
 
-    def _calculate_quality_wins(self, sets, mode, start_date, end_date, target_player_id, game_slug, raw_target_player_id=None):
+    def _calculate_quality_wins(self, pre_period_sets, period_sets=None, mode="historical", start_date=None, end_date=None, target_player_id=None, game_slug=None, raw_target_player_id=None):
         """Quality Wins: Normalized average victory quality adjusted for sample confidence.
 
         Formula:
@@ -1221,7 +1308,11 @@ class RankingEngine:
         Average Quality = Sum(q_i) / eligible_wins
         Adjusted QoW Score = Average Quality * (eligible_wins / (eligible_wins + 5.0)) * 20.0
         """
-        pre_match_ratings, _ = self._compute_pre_match_glicko_ratings(sets, mode=mode, start_date=start_date, end_date=end_date)
+        if period_sets is None:
+            period_sets = pre_period_sets
+            pre_period_sets = []
+        eval_sets = pre_period_sets + period_sets
+        pre_match_ratings, _ = self._compute_pre_match_glicko_ratings(eval_sets)
         calc = self.glicko_calc
         provisional_threshold = 3
         confidence_m = 5.0
@@ -1247,14 +1338,7 @@ class RankingEngine:
             except (ValueError, TypeError):
                 return default
 
-        for s in sets:
-            s_date = s["date"]
-            if end_date and s_date and s_date > end_date:
-                continue
-
-            if mode in ("period_only", "period_performance") and start_date and s_date and s_date < start_date:
-                continue
-
+        for s in period_sets:
             w_id, l_id = s["winnerId"], s["loserId"]
             w_pre = safe_snapshot(pre_match_ratings.get((s["setId"], w_id)))
             l_pre = safe_snapshot(pre_match_ratings.get((s["setId"], l_id)))
@@ -1434,7 +1518,7 @@ class RankingEngine:
                     "endDate": end_date,
                     "finalScore": p_rank["score"] if p_rank else (0.0 if wins > 0 else None),
                     "rank": p_rank["rank"] if p_rank else None,
-                    "totalResultsConsidered": len(sets),
+                    "totalResultsConsidered": len(period_sets),
                     "totalResultsIncluded": matches,
                 },
                 "playerId": raw_target_player_id or target_player_id,
@@ -1469,7 +1553,7 @@ class RankingEngine:
     # System 4: Consistency Ranking (Candidate C)
     # -------------------------------------------------------------------------
 
-    def _calculate_loss_quality(self, sets, mode, start_date, end_date, target_player_id, game_slug, raw_target_player_id=None):
+    def _calculate_loss_quality(self, pre_period_sets, period_sets=None, mode="historical", start_date=None, end_date=None, target_player_id=None, game_slug=None, raw_target_player_id=None):
         """Consistency (Candidate C with Opponent-Sensitive Loss Protection):
         Evaluates player competitive consistency relative to pre-match expectations and opponent quality.
 
@@ -1488,7 +1572,11 @@ class RankingEngine:
         - beta_min = 0.20 (Loss Protection Floor)
         - m_C = 15.0 (Sample Dampener)
         """
-        pre_match_ratings, _ = self._compute_pre_match_glicko_ratings(sets, mode=mode, start_date=start_date, end_date=end_date)
+        if period_sets is None:
+            period_sets = pre_period_sets
+            pre_period_sets = []
+        eval_sets = pre_period_sets + period_sets
+        pre_match_ratings, _ = self._compute_pre_match_glicko_ratings(eval_sets)
         calc = self.glicko_calc
 
         gamma = 0.30
@@ -1499,14 +1587,7 @@ class RankingEngine:
         player_data = {}
         diagnostic_history = {}
 
-        for s in sets:
-            s_date = s["date"]
-            if end_date and s_date and s_date > end_date:
-                continue
-
-            if mode in ("period_only", "period_performance") and start_date and s_date and s_date < start_date:
-                continue
-
+        for s in period_sets:
             w_id, l_id = s["winnerId"], s["loserId"]
             w_pre = pre_match_ratings.get((s["setId"], w_id), calc.initial_rating())
             l_pre = pre_match_ratings.get((s["setId"], l_id), calc.initial_rating())
@@ -1670,7 +1751,7 @@ class RankingEngine:
                     "endDate": end_date,
                     "finalScore": p_rank["score"] if p_rank else None,
                     "rank": p_rank["rank"] if p_rank else None,
-                    "totalResultsConsidered": len(sets),
+                    "totalResultsConsidered": len(period_sets),
                     "totalResultsIncluded": p_rank["matches"] if p_rank else 0,
                 },
                 "playerId": raw_target_player_id or target_player_id,
