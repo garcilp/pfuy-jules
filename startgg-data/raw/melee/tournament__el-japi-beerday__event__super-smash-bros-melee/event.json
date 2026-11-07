@@ -1,0 +1,47 @@
+{
+  "fetchedAt": "2026-11-07T02:25:47.246640+00:00",
+  "sourceUrl": "http://start.gg/tournament/el-japi-beerday/event/super-smash-bros-melee",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/el-japi-beerday/event/super-smash-bros-melee"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1622073,
+        "name": "Super Smash Bros. Melee",
+        "numEntrants": 13,
+        "startAt": 1779570000,
+        "state": "COMPLETED",
+        "tournament": {
+          "id": 910223,
+          "name": "El Japi Beerday",
+          "slug": "tournament/el-japi-beerday",
+          "startAt": 1779570000,
+          "images": [
+            {
+              "url": "https://images.start.gg/images/tournament/910223/image-d4b15122939963a29023815845fca122.png",
+              "type": "profile"
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 4
+    },
+    "actionRecords": []
+  }
+}
