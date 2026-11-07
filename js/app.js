@@ -314,7 +314,7 @@ function render() {
           const entry = window.PRBadges.getPlayerEntryInLatestRanking(player.tag, g.id || g.slug);
           if (entry) {
             badgeHtml = window.PRBadges.renderCompact(entry, {
-              className: 'card-pr-badge',
+              className: 'card-pr-badge pr-badge--compact',
               showGame: false,
               periodText: entry.badgeText,
               nested: true
