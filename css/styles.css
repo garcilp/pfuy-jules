@@ -124,7 +124,23 @@ h1,h2,p{margin:0}.mono{font-family:'JetBrains Mono',monospace}.muted{color:var(-
 .card b{font-size:20px}.card .rec{font-size:28px;font-weight:700;margin-top:8px}
 .card .ini{position:absolute;right:14px;bottom:-18px;font-size:120px;font-weight:700;line-height:1;color:var(--faint)}
 .card .bg{position:absolute;top:0;right:0;height:100%;width:55%;object-fit:contain;object-position:right bottom;opacity:.45;pointer-events:none;-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 52%);mask-image:linear-gradient(to right,transparent 0%,#000 52%)}
-.card .card-pr-badge{position:absolute;right:18px;bottom:18px;z-index:2}
+.card .card-pr-badge{
+  position:absolute;
+  right:16px;
+  bottom:16px;
+  z-index:2;
+  transform:scale(0.85);
+  transform-origin:bottom right;
+  opacity:0.8;
+  transition:opacity 150ms ease, transform 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.card .card-pr-badge:hover,
+.card .card-pr-badge:focus-visible,
+.card .card-pr-badge:focus-within,
+.card .card-pr-badge.touch-active{
+  opacity:1;
+  transform:scale(0.9);
+}
 .usage{margin-bottom:14px}.usage-row{display:flex;align-items:center;gap:10px;margin-bottom:6px}.usage-percent{margin-left:auto}.stock-icon{position:relative;display:inline-flex;align-items:center;justify-content:center;flex:0 0 28px;width:28px;height:28px;border-radius:50%;overflow:hidden;background:transparent;font-weight:700;color:var(--sky)}.stock-icon img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
 .bar{height:8px;border-radius:99px;background:var(--line)}.bar i{display:block;height:100%;border-radius:99px;background:var(--accent)}
 .win{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;margin-bottom:14px}
@@ -407,6 +423,51 @@ a.event-card:hover{color:var(--text);background:var(--faint);border-color:var(--
 .view-sys-btn{margin-top:auto;width:100%;text-align:center}
 
 .ranking-table-panel{padding:16px 20px}
+
+/* Loading Spinner & Skeleton Feedback */
+.pr-loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  gap: 18px;
+  min-height: 240px;
+}
+.pr-spinner {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 3px solid color-mix(in srgb, var(--sky) 20%, transparent);
+  border-top-color: var(--sky);
+  animation: pr-spin 0.8s linear infinite;
+}
+@keyframes pr-spin {
+  to { transform: rotate(360deg); }
+}
+.pr-loading-text {
+  font-size: 14px;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+}
+.pr-skeleton-table {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+}
+.pr-skeleton-row {
+  height: 44px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, var(--faint) 25%, color-mix(in srgb, var(--line) 40%, transparent) 50%, var(--faint) 75%);
+  background-size: 200% 100%;
+  animation: pr-shimmer 1.6s infinite ease-in-out;
+}
+@keyframes pr-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
 .ranking-row{grid-template-columns:60px minmax(180px,1.8fr) 110px 90px 140px 110px;padding:12px 6px}
 .comparison-head,.comparison-row{grid-template-columns:minmax(180px,1.8fr) repeat(4,minmax(110px,1fr)) 100px}
 
@@ -491,9 +552,11 @@ a.event-card:hover{color:var(--text);background:var(--faint);border-color:var(--
 }
 
 .pr-badge:hover,
-.pr-badge:focus-visible {
+.pr-badge:focus-visible,
+.pr-badge:focus-within,
+.pr-badge.touch-active {
   text-decoration: none;
-  z-index: 50;
+  z-index: 99999;
 }
 
 /* Hexagon SVG & Placement Ordinal */
@@ -719,9 +782,18 @@ a.event-card:hover{color:var(--text);background:var(--faint);border-color:var(--
   transition: opacity 180ms ease,
               transform 180ms cubic-bezier(0.16, 1, 0.3, 1),
               visibility 180ms ease;
-  z-index: 1000;
+  z-index: 999999;
   text-align: left;
   cursor: default;
+}
+
+.pr-hover-card.pr-floating-portal {
+  position: fixed;
+  bottom: auto;
+  left: 0;
+  top: 0;
+  margin: 0;
+  z-index: 999999;
 }
 
 /* Hover Card Pointer Arrow */
@@ -729,7 +801,7 @@ a.event-card:hover{color:var(--text);background:var(--faint);border-color:var(--
   content: '';
   position: absolute;
   top: 100%;
-  left: 50%;
+  left: var(--arrow-left, 50%);
   transform: translateX(-50%);
   border-width: 6px;
   border-style: solid;
