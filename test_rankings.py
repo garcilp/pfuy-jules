@@ -13,6 +13,7 @@ from scripts.rankings_calculator import (
     canonical_id,
     identity_merges,
     visibility_exclusions,
+    export_ranking_data,
 )
 import scripts.serve_site as serve_site
 
@@ -732,3 +733,83 @@ def test_power_rankings_linked_redistribution_algorithm_suite():
     assert sum(w_redist.values()) == pytest.approx(100.0)
     disp_redist = get_displayed_integers(w_redist, active)
     assert sum(disp_redist.values()) == 100
+
+
+def test_export_ranking_data(tmp_path, mock_db):
+    """Verifies that export_ranking_data produces valid JSON exports with expected schema."""
+    conn, _ = mock_db
+    export_dir = tmp_path / "ranking_data"
+    manifest = export_ranking_data(connection=conn, output_dir=export_dir)
+
+    assert "games" in manifest
+    assert len(manifest["games"]) == 2  # ultimate and sf6 from mock_db
+    index_file = export_dir / "index.json"
+    assert index_file.is_file()
+
+    with index_file.open(encoding="utf-8") as f:
+        index_data = json.load(f)
+    assert index_data["version"] == manifest["version"]
+    assert len(index_data["games"]) == 2
+
+    # Verify ultimate.json structure
+    ult_file = export_dir / "ultimate.json"
+    assert ult_file.is_file()
+    with ult_file.open(encoding="utf-8") as f:
+        ult_data = json.load(f)
+    assert ult_data["metadata"]["gameSlug"] == "ultimate"
+    assert "sets" in ult_data and len(ult_data["sets"]) == 4  # s1, s2, s3, s5 (s4 was DQ)
+    assert "placements" in ult_data and len(ult_data["placements"]) == 6
+    assert "latestTags" in ult_data
+    assert ult_data["latestTags"]["101"] == "PlayerOne"
+
+
+def test_json_data_parity_with_sqlite(tmp_path, mock_db):
+    """Verifies that RankingEngine reading from JSON exports produces identical results to SQLite."""
+    conn, engine_sqlite = mock_db
+    export_dir = tmp_path / "ranking_data"
+    export_ranking_data(connection=conn, output_dir=export_dir)
+
+    engine_json = RankingEngine(data_dir=export_dir, use_json=True)
+
+    systems = ["glicko2", "sof", "quality_wins", "loss_quality", "custom"]
+    for sys_name in systems:
+        res_sqlite = engine_sqlite.calculate("ultimate", system=sys_name, mode="historical")
+        res_json = engine_json.calculate("ultimate", system=sys_name, mode="historical")
+
+        assert res_json["totalPlayers"] == res_sqlite["totalPlayers"]
+        assert len(res_json["rankings"]) == len(res_sqlite["rankings"])
+
+        for r_j, r_sq in zip(res_json["rankings"], res_sqlite["rankings"]):
+            assert r_j["playerId"] == r_sq["playerId"]
+            assert r_j["score"] == pytest.approx(r_sq["score"], abs=1e-5)
+            assert r_j["rank"] == r_sq["rank"]
+
+        # Diagnostic parity for top player
+        top_pid = res_sqlite["rankings"][0]["playerId"]
+        diag_sqlite = engine_sqlite.calculate("ultimate", system=sys_name, target_player_id=top_pid)
+        diag_json = engine_json.calculate("ultimate", system=sys_name, target_player_id=top_pid)
+
+        assert diag_json["diagnostic"]["context"]["finalScore"] == pytest.approx(
+            diag_sqlite["diagnostic"]["context"]["finalScore"], abs=1e-5
+        )
+        assert diag_json["diagnostic"]["breakdown"] == diag_sqlite["diagnostic"]["breakdown"]
+
+
+def test_missing_and_corrupted_json_exports(tmp_path, mock_db):
+    """Verifies safe fallback and error handling when JSON files are missing or corrupted."""
+    conn, _ = mock_db
+    empty_dir = tmp_path / "empty_data"
+    empty_dir.mkdir()
+
+    # When JSON is missing and DB connection is provided, it falls back to DB query safely
+    engine = RankingEngine(connection=conn, data_dir=empty_dir, use_json=True)
+    res = engine.calculate("ultimate", system="glicko2")
+    assert res["totalPlayers"] > 0
+    assert len(res["rankings"]) > 0
+
+    # When JSON is corrupted with invalid content, it warns and falls back to DB
+    corrupt_file = empty_dir / "ultimate.json"
+    corrupt_file.write_text("NOT_JSON_DATA", encoding="utf-8")
+    engine_corrupt = RankingEngine(connection=conn, data_dir=empty_dir, use_json=True)
+    res_corrupt = engine_corrupt.calculate("ultimate", system="glicko2")
+    assert res_corrupt["totalPlayers"] > 0

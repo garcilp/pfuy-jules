@@ -631,8 +631,13 @@ def run_import(no_export=False, force_export=False):
         print("\nUpdating website static event catalogs (events-index.json & event details)...")
         try:
             from scripts.build_player_profile import write_event_index
+            from scripts.rankings_calculator import export_ranking_data, export_default_rankings
             write_event_index(connection)
             print("Successfully updated website static event catalogs.")
+            print("Updating ranking JSON data exports...")
+            export_ranking_data(connection)
+            export_default_rankings()
+            print("Successfully updated ranking data exports.")
         except Exception as export_error:
             connection.close()
             print(f"ERROR: Import succeeded but failed to update website static event catalogs: {export_error}", file=sys.stderr)

@@ -229,10 +229,11 @@ def rebuild_profiles():
     res = subprocess.run([sys.executable, str(builder), "--all"], cwd=ROOT,
                          capture_output=True, text=True)
     try:
-        from scripts.rankings_calculator import export_default_rankings
+        from scripts.rankings_calculator import export_ranking_data, export_default_rankings
+        export_ranking_data()
         export_default_rankings()
     except Exception as err:
-        print(f"Warning: could not export default rankings: {err}")
+        print(f"Warning: could not export default rankings or ranking data: {err}")
     return res
 
 
@@ -608,6 +609,27 @@ class Handler(SimpleHTTPRequestHandler):
             except Exception as e:
                 self.send_json(500, {"error": f"Error loading ranking: {e}"})
         elif parsed.path == "/api/games":
+            data_index = ROOT / "data" / "rankings" / "data" / "index.json"
+            games_json_file = ROOT / "data" / "games.json"
+            if data_index.is_file():
+                try:
+                    with data_index.open(encoding="utf-8") as f:
+                        catalog = json.load(f)
+                    games_list = [{"slug": g["slug"], "name": g["name"]} for g in catalog.get("games", [])]
+                    self.send_json(200, {"games": games_list})
+                    return
+                except Exception:
+                    pass
+            elif games_json_file.is_file():
+                try:
+                    with games_json_file.open(encoding="utf-8") as f:
+                        catalog = json.load(f)
+                    games_list = [{"slug": g["slug"], "name": g["name"]} for g in catalog.get("games", [])]
+                    self.send_json(200, {"games": games_list})
+                    return
+                except Exception:
+                    pass
+
             try:
                 with sqlite3.connect(DATABASE) as connection:
                     rows = connection.execute("SELECT slug, name FROM videogames ORDER BY name ASC").fetchall()
