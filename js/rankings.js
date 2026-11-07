@@ -549,7 +549,10 @@ async function loadData() {
   rankingStatus.textContent = 'Calculating rankings…';
 
   try {
-    if (system === 'comparison' || system === 'overview' || system === 'custom') {
+    if (system === 'custom') {
+      // Prioritize loading and displaying the Formula Budget box before starting/displaying calculated rankings
+      comparisonData = null;
+      renderCustomPowerRankingsLoading();
       const systems = ['glicko2', 'sof', 'quality_wins', 'loss_quality'];
       const newCompData = {};
       for (const sys of systems) {
@@ -564,11 +567,27 @@ async function loadData() {
       }
       if (requestId !== currentRequestId || signal.aborted) return;
       comparisonData = newCompData;
-      if (system === 'custom') {
-        rankingStatus.textContent = `Displaying Power Rankings for ${getGameName(game)}`;
-      } else {
-        rankingStatus.textContent = `Displaying rankings overview for ${getGameName(game)}`;
+      rankingStatus.textContent = `Displaying Power Rankings for ${getGameName(game)}`;
+      render();
+      return;
+    }
+
+    if (system === 'comparison' || system === 'overview') {
+      const systems = ['glicko2', 'sof', 'quality_wins', 'loss_quality'];
+      const newCompData = {};
+      for (const sys of systems) {
+        const data = await fetchSystemData(game, sys, mode, start, end, signal);
+        if (requestId !== currentRequestId || signal.aborted) return;
+        if (data && data.error) {
+          rankingStatus.textContent = `Error: ${data.error}`;
+          rankingsContent.innerHTML = `<div class="panel glass empty-state"><h2>Calculation Error</h2><p class="muted">${esc(data.error)}</p></div>`;
+          return;
+        }
+        newCompData[sys] = data;
       }
+      if (requestId !== currentRequestId || signal.aborted) return;
+      comparisonData = newCompData;
+      rankingStatus.textContent = `Displaying rankings overview for ${getGameName(game)}`;
       render();
       return;
     }
@@ -1000,17 +1019,146 @@ window.createPRFromCurrentRankings = function() {
 };
 
 function renderInlineMiniBadges(playerTag) {
-  if (!window.PRBadges || !playerTag) return '';
-  const entries = window.PRBadges.getPlayerRankings(playerTag);
-  if (!entries.length) return '';
-  return `<span class="player-mini-badges" onclick="event.stopPropagation();">${entries.slice(0, 3).map(e => window.PRBadges.renderMini(e)).join('')}</span>`;
+  return '';
+}
+
+function renderFormulaBudgetBox() {
+  const displayWeights = getDisplayPRWeights();
+
+  const stackedSegmentsHtml = Object.keys(PR_COMPONENTS).map(sysKey => {
+    const w = displayWeights[sysKey] || 0;
+    const color = PR_COMPONENTS[sysKey].color;
+    return `<div class="pr-stacked-segment" data-sys="${sysKey}" style="width: ${prActiveComponents[sysKey] ? w : 0}%; background-color: ${color};" title="${PR_COMPONENTS[sysKey].name}: ${w}%"></div>`;
+  }).join('');
+
+  const legendHtml = Object.keys(PR_COMPONENTS).map(sysKey => {
+    const w = displayWeights[sysKey] || 0;
+    const color = PR_COMPONENTS[sysKey].color;
+    const isActive = prActiveComponents[sysKey];
+    return `
+      <div class="pr-legend-item ${isActive ? '' : 'muted'}">
+        <span class="pr-legend-swatch" style="background-color: ${isActive ? color : '#666'};"></span>
+        <span><b>${PR_COMPONENTS[sysKey].name}</b>: <span class="pr-legend-text" data-sys="${sysKey}">${isActive ? w + '%' : 'Disabled'}</span></span>
+      </div>
+    `;
+  }).join('');
+
+  const controlsGridHtml = Object.keys(PR_COMPONENTS).map(sysKey => {
+    const meta = PR_COMPONENTS[sysKey];
+    const isActive = prActiveComponents[sysKey];
+    const dispWeight = displayWeights[sysKey] || 0;
+
+    return `
+      <div class="pr-component-card ${isActive ? '' : 'inactive'}" style="border-left: 4px solid ${isActive ? meta.color : '#555'};">
+        <div class="pr-card-head">
+          <label class="pr-card-title check-label">
+            <input type="checkbox" ${isActive ? 'checked' : ''} onchange="onPRToggleComponent('${sysKey}', this.checked)">
+            <span>${meta.name}</span>
+          </label>
+          <span class="pr-card-badge mono" data-sys="${sysKey}" style="color: ${isActive ? meta.color : 'var(--muted)'};">${dispWeight}%</span>
+        </div>
+        <div class="pr-inputs-row">
+          <input type="range" class="pr-slider" data-sys="${sysKey}" min="0" max="100" value="${dispWeight}" ${isActive ? '' : 'disabled'} oninput="onPRWeightInput('${sysKey}', this.value)" onchange="onPRWeightCommit('${sysKey}', this.value)" aria-label="${meta.name} Weight Slider">
+          <input type="number" class="pr-number-input mono" data-sys="${sysKey}" min="0" max="100" value="${dispWeight}" ${isActive ? '' : 'disabled'} oninput="onPRWeightInput('${sysKey}', this.value)" onchange="onPRWeightCommit('${sysKey}', this.value)" aria-label="${meta.name} Weight Input">%
+        </div>
+        <div class="pr-contrib-bar-wrap">
+          <div class="pr-contrib-bar-fill pr-card-contrib-fill" data-sys="${sysKey}" style="width: ${dispWeight}%; background-color: ${isActive ? meta.color : '#555'};"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  return `
+    <div class="panel glass pr-setup-panel">
+      <div class="pr-header">
+        <div>
+          <div class="eyebrow mono">CUSTOM POWER RANKINGS CREATOR</div>
+          <h2 style="margin:4px 0 0; font-size:26px;">Linked Weights &amp; Formula Budget</h2>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+          <button class="quiet-button mono" style="font-size:12px; padding:6px 12px; border:1px solid rgba(255,255,255,0.2); border-radius:6px; cursor:pointer;" onclick="resetToDefaultPRWeights()">${(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es') ? 'Restablecer Valores (55/20/15/10)' : 'Reset to Defaults (55/20/15/10)'}</button>
+          <div class="pr-total-badge mono" id="pr-total-badge">
+            ${(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es') ? 'PESO TOTAL:' : 'TOTAL WEIGHT:'} <b>100%</b>
+          </div>
+        </div>
+      </div>
+
+      <p class="muted" style="margin-bottom:8px; font-size:14px;">
+        Adjust percentage shares to balance component systems. Increasing one component automatically scales down others proportionally to maintain an exact 100% total.
+      </p>
+
+      <p class="mono muted" style="margin-bottom:16px; font-size:12px; color:var(--sky);">
+        💡 Recommended Starting Formula: <b>55% Glicko-2</b> · <b>20% Quality Wins</b> · <b>15% Strength of Field</b> · <b>10% Consistency</b>
+      </p>
+
+      <div class="pr-stacked-container">
+        <div class="pr-stacked-bar" aria-label="Stacked weight configuration visualization">
+          ${stackedSegmentsHtml}
+        </div>
+        <div class="pr-legend">
+          ${legendHtml}
+        </div>
+      </div>
+
+      <div class="pr-controls-grid">
+        ${controlsGridHtml}
+      </div>
+
+      <details class="pr-guide-box">
+        <summary>💡 Formula Distinction: Weight vs. Normalized Score vs. Weighted Contribution</summary>
+        <p>
+          • <b>Weight (%):</b> How important a ranking system is in the custom formula configuration budget.<br>
+          • <b>Normalized Score (0–100):</b> How a particular player performs on that system relative to the eligible player population (scaled from 0 = lowest to 100 = highest in active scope).<br>
+          • <b>Weighted Contribution (pts):</b> <code>(Normalized Score × Weight) / 100</code>. How much that component contributes to the player's final custom score.
+        </p>
+      </details>
+    </div>
+  `;
+}
+
+function renderCustomPowerRankingsLoading() {
+  cleanupObserver();
+  const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
+  const budgetBoxHtml = renderFormulaBudgetBox();
+
+  const loadingHtml = `
+    ${budgetBoxHtml}
+    <div class="panel glass ranking-table-panel">
+      <div class="pr-table-toolbar">
+        <button class="pr-create-pill-btn mono" disabled style="opacity:0.5; cursor:not-allowed;">
+          ${isEs ? 'CREAR PR' : 'CREATE PR'}
+        </button>
+      </div>
+      <div class="pr-loading-container">
+        <div class="pr-spinner"></div>
+        <span class="pr-loading-text mono">${isEs ? 'Calculando Power Rankings…' : 'Calculating Power Rankings…'}</span>
+        <div class="pr-skeleton-table">
+          <div class="pr-skeleton-row"></div>
+          <div class="pr-skeleton-row"></div>
+          <div class="pr-skeleton-row"></div>
+          <div class="pr-skeleton-row"></div>
+          <div class="pr-skeleton-row"></div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  rankingsContent.innerHTML = loadingHtml;
 }
 
 function renderCustomPowerRankings() {
   cleanupObserver();
 
   if (!comparisonData || !Object.keys(comparisonData).length) {
-    rankingsContent.innerHTML = '<div class="panel glass empty-state"><h2>No Power Rankings data</h2></div>';
+    const budgetBoxHtml = renderFormulaBudgetBox();
+    const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
+    rankingsContent.innerHTML = `
+      ${budgetBoxHtml}
+      <div class="panel glass empty-state">
+        <h2>${isEs ? 'Sin datos de Power Rankings' : 'No Power Rankings data'}</h2>
+        <p class="muted">${isEs ? 'No se encontraron resultados para la selección.' : 'No results found for this selection.'}</p>
+      </div>
+    `;
     return;
   }
 
@@ -1140,51 +1288,10 @@ function renderCustomPowerRankings() {
     `;
   }
 
+  const budgetBoxHtml = renderFormulaBudgetBox();
+
   let html = `
-    <div class="panel glass pr-setup-panel">
-      <div class="pr-header">
-        <div>
-          <div class="eyebrow mono">CUSTOM POWER RANKINGS CREATOR</div>
-          <h2 style="margin:4px 0 0; font-size:26px;">Linked Weights &amp; Formula Budget</h2>
-        </div>
-        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-          <button class="quiet-button mono" style="font-size:12px; padding:6px 12px; border:1px solid rgba(255,255,255,0.2); border-radius:6px; cursor:pointer;" onclick="resetToDefaultPRWeights()">${(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es') ? 'Restablecer Valores (55/20/15/10)' : 'Reset to Defaults (55/20/15/10)'}</button>
-          <div class="pr-total-badge mono" id="pr-total-badge">
-            ${(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es') ? 'PESO TOTAL:' : 'TOTAL WEIGHT:'} <b>100%</b>
-          </div>
-        </div>
-      </div>
-
-      <p class="muted" style="margin-bottom:8px; font-size:14px;">
-        Adjust percentage shares to balance component systems. Increasing one component automatically scales down others proportionally to maintain an exact 100% total.
-      </p>
-
-      <p class="mono muted" style="margin-bottom:16px; font-size:12px; color:var(--sky);">
-        💡 Recommended Starting Formula: <b>55% Glicko-2</b> · <b>20% Quality Wins</b> · <b>15% Strength of Field</b> · <b>10% Consistency</b>
-      </p>
-
-      <div class="pr-stacked-container">
-        <div class="pr-stacked-bar" aria-label="Stacked weight configuration visualization">
-          ${stackedSegmentsHtml}
-        </div>
-        <div class="pr-legend">
-          ${legendHtml}
-        </div>
-      </div>
-
-      <div class="pr-controls-grid">
-        ${controlsGridHtml}
-      </div>
-
-      <details class="pr-guide-box">
-        <summary>💡 Formula Distinction: Weight vs. Normalized Score vs. Weighted Contribution</summary>
-        <p>
-          • <b>Weight (%):</b> How important a ranking system is in the custom formula configuration budget.<br>
-          • <b>Normalized Score (0–100):</b> How a particular player performs on that system relative to the eligible player population (scaled from 0 = lowest to 100 = highest in active scope).<br>
-          • <b>Weighted Contribution (pts):</b> <code>(Normalized Score × Weight) / 100</code>. How much that component contributes to the player's final custom score.
-        </p>
-      </details>
-    </div>
+    ${budgetBoxHtml}
 
     <div class="panel glass ranking-table-panel">
       <div class="pr-table-toolbar">
@@ -1328,7 +1435,6 @@ function renderIndividualSystem(systemKey) {
                 ${p.isProvisional ? `<span class="badge warning mono" style="font-size:0.75rem; padding:0.1rem 0.4rem; margin-left:0.4rem;" title="Provisional ranking (< 3 eligible wins)">Provisional</span>` : ''}
                 ${p.isUnranked ? `<span class="badge muted mono" style="font-size:0.75rem; padding:0.1rem 0.4rem; margin-left:0.4rem;" title="No eligible wins recorded">Unranked</span>` : ''}
               </a>
-              ${renderInlineMiniBadges(p.playerTag)}
             </div>
             <span class="score-col mono font-bold">${p.isUnranked ? '-' : p.score}</span>
             <span class="winrate-col mono">${p.winRate !== undefined ? p.winRate + '%' : '-'}</span>
@@ -1460,7 +1566,6 @@ function renderComparison() {
               <a href="index.html?player=${encodeURIComponent(p.playerId)}" class="player-card-link">
                 <b>${esc(p.playerTag)}</b>
               </a>
-              ${renderInlineMiniBadges(p.playerTag)}
             </div>
             <span class="mono">${p.glicko2 ? (p.glicko2.rank ? `#${p.glicko2.rank} (${p.glicko2.score})` : `- (${p.glicko2.score})`) : '-'}</span>
             <span class="mono">${p.sof ? (p.sof.rank ? `#${p.sof.rank} (${p.sof.score})` : `- (${p.sof.score})`) : '-'}</span>

@@ -431,6 +431,42 @@
 .home .tr.rank {
   grid-template-columns: 36px minmax(0, 1fr) auto;
   gap: 12px;
+  align-items: center;
+}
+
+.home .top-player-stocks {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.home .top-player-stocks .stock {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  flex-shrink: 0;
+}
+
+.home .top-player-stocks .stock i {
+  font-style: normal;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.home .top-player-stocks .stock img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .home .win-by {

@@ -414,31 +414,158 @@ function renderOnThisWeek() {
   }).join('');
 }
 
-// 5. Top Players (#1 on each community's ranking snapshot)
+// Helper for rendering character stock icon
+const charSlugAliases = {
+  'simon-belmont': 'simon',
+  'shovel-knight': 'shovelknight',
+  'sheik-zelda': 'sheik',
+  'la-reina': 'reina'
+};
+
+const charStockSlug = name => {
+  const s = slug(name);
+  return charSlugAliases[s] || s;
+};
+
+function renderStockIcon(gameSlug, charName) {
+  const gslug = gameSlug || 'rivals-2';
+  const cslug = charStockSlug(charName);
+  const initial = charName ? charName[0] : '?';
+  return `<span class="stock" title="${esc(charName)}" role="img" aria-label="${esc(charName)}"><i>${esc(initial)}</i><img src="assets/renders/${esc(gslug)}/stocks/${esc(cslug)}.webp" alt="" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='assets/renders/${esc(gslug)}/stocks/other.webp';}else{this.remove();}"></span>`;
+}
+
+// 5. Top Players (#1 on latest published Power Ranking or all-time historical fallback)
 async function renderTopPlayers() {
   const container = $('#top-players');
   if (!container) return;
 
+  let rankingsIndex = null;
+  try {
+    const res = await fetch('data/rankings.json', { cache: 'no-store' });
+    if (res.ok) {
+      rankingsIndex = await res.json();
+    }
+  } catch (e) {
+    // rankingsIndex remains null
+  }
+
   const topPlayers = [];
 
   for (const comm of activeCommunities) {
-    try {
-      const res = await fetch(`data/rankings/${comm.slug}-glicko2-historical.json`);
-      if (res.ok) {
-        const data = await res.json();
-        const top = (data.rankings || [])[0];
-        if (top) {
-          topPlayers.push({
-            game: comm.name,
-            tag: top.playerTag,
-            playerId: top.playerId,
-            score: top.score,
-            matches: top.matches
-          });
+    let topPlayerEntry = null;
+
+    // 1. Check published Power Rankings in rankingsIndex
+    if (rankingsIndex && rankingsIndex.rankings) {
+      // Find matching game key in rankingsIndex (e.g., matching slug or id)
+      const gObj = (rankingsIndex.games || []).find(g => g.slug === comm.slug || g.id === comm.slug);
+      const rankingKey = gObj?.id || (rankingsIndex.rankings[comm.slug] ? comm.slug : Object.keys(rankingsIndex.rankings).find(k => {
+        const item = (rankingsIndex.rankings[k] || [])[0];
+        return item && (item.game?.slug === comm.slug || item.gameSlug === comm.slug);
+      }));
+
+      const list = rankingKey ? (rankingsIndex.rankings[rankingKey] || []) : [];
+      if (list.length > 0) {
+        // Identify the most recent Power Ranking by its actual ranking year, not by publication order or creation date
+        const parseRankingYear = r => {
+          if (r.period?.end) {
+            const yr = parseInt(r.period.end.slice(0, 4), 10);
+            if (!isNaN(yr)) return yr;
+          }
+          if (r.end) {
+            const yr = parseInt(r.end.slice(0, 4), 10);
+            if (!isNaN(yr)) return yr;
+          }
+          if (r.period?.start) {
+            const yr = parseInt(r.period.start.slice(0, 4), 10);
+            if (!isNaN(yr)) return yr;
+          }
+          if (r.start) {
+            const yr = parseInt(r.start.slice(0, 4), 10);
+            if (!isNaN(yr)) return yr;
+          }
+          const m = String(r.id || r.name || '').match(/20\d\d/);
+          if (m) return parseInt(m[0], 10);
+          return 0;
+        };
+
+        const sortedByYear = [...list].sort((a, b) => {
+          const yearDiff = parseRankingYear(b) - parseRankingYear(a);
+          if (yearDiff !== 0) return yearDiff;
+          const endA = a.period?.end || a.end || '';
+          const endB = b.period?.end || b.end || '';
+          return endB.localeCompare(endA);
+        });
+
+        const latestRankingMeta = sortedByYear[0];
+        if (latestRankingMeta && latestRankingMeta.id) {
+          try {
+            const artRes = await fetch(`data/rankings/${encodeURIComponent(latestRankingMeta.id)}.json`);
+            if (artRes.ok) {
+              const art = await artRes.json();
+              const p1 = (art.players || []).find(p => Number(p.placement) === 1) || (art.players || [])[0];
+              if (p1) {
+                topPlayerEntry = {
+                  game: comm.name,
+                  gameSlug: comm.slug,
+                  tag: p1.tag || latestRankingMeta.top || 'Player 1',
+                  playerId: p1.playerId,
+                  mains: Array.isArray(p1.mains) ? p1.mains : []
+                };
+              }
+            }
+          } catch (e) {
+            // Fall through to historical
+          }
         }
       }
-    } catch (e) {
-      // Continue to next community
+    }
+
+    // 2. Historical ranking fallback if no published Power Rankings found
+    if (!topPlayerEntry) {
+      try {
+        const res = await fetch(`data/rankings/${comm.slug}-glicko2-historical.json`);
+        if (res.ok) {
+          const data = await res.json();
+          // Identify the player with the highest number of points in that historical ranking
+          const list = [...(data.rankings || [])].sort((a, b) => (b.score || 0) - (a.score || 0));
+          const top = list[0];
+          if (top) {
+            // Find player mains from profile
+            let mains = [];
+            const profMatch = playerDirectory.find(p => String(p.playerId) === String(top.playerId) || slug(p.tag) === slug(top.playerTag));
+            const pSlug = profMatch?.slug;
+            if (pSlug) {
+              try {
+                const pRes = await fetch(`data/profiles/${encodeURIComponent(pSlug)}.json`);
+                if (pRes.ok) {
+                  const pJson = await pRes.json();
+                  const g = (pJson.games || []).find(x => x.slug === comm.slug || x.id === comm.slug);
+                  if (g && Array.isArray(g.characters) && g.characters.length) {
+                    mains = g.characters
+                      .filter(c => String(c.name || '').toLowerCase() !== 'other')
+                      .slice(0, 2)
+                      .map(c => c.name);
+                  }
+                }
+              } catch (e) {}
+            }
+
+            topPlayerEntry = {
+              game: comm.name,
+              gameSlug: comm.slug,
+              tag: top.playerTag,
+              playerId: top.playerId,
+              mains
+            };
+          }
+        }
+      } catch (e) {
+        // Continue
+      }
+    }
+
+    if (topPlayerEntry) {
+      topPlayers.push(topPlayerEntry);
     }
   }
 
@@ -447,16 +574,24 @@ async function renderTopPlayers() {
     return;
   }
 
-  container.innerHTML = topPlayers.map(p => `
-    <div class="tr rank">
-      <span class="mono gold">#1</span>
-      <span>
-        <a class="opponent-link" href="player.html?player=${encodeURIComponent(p.playerId)}"><b>${esc(p.tag)}</b></a>
-        <small>${esc(p.game)}</small>
-      </span>
-      <span class="mono muted sm0">${Math.round(p.score)} pts</span>
-    </div>
-  `).join('');
+  container.innerHTML = topPlayers.map(p => {
+    const stockIconsHtml = (p.mains && p.mains.length)
+      ? p.mains.map(m => renderStockIcon(p.gameSlug, m)).join('')
+      : '';
+
+    return `
+      <div class="tr rank">
+        <span class="mono gold">#1</span>
+        <span>
+          <a class="opponent-link" href="player.html?player=${encodeURIComponent(p.playerId)}"><b>${esc(p.tag)}</b></a>
+          <small>${esc(p.game)}</small>
+        </span>
+        <div class="top-player-stocks">
+          ${stockIconsHtml}
+        </div>
+      </div>
+    `;
+  }).join('');
 }
 
 // 6. Rivalry of the Week

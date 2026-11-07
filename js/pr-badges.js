@@ -568,9 +568,145 @@
   }
 
   /**
+   * Floating Portal Hover Card Management
+   * Ensures ranking medal hover cards render at document.body level using fixed positioning,
+   * completely avoiding overflow:hidden, transform, backdrop-filter, or stacking context clipping.
+   */
+  let activeFloatingBadge = null;
+  let activeFloatingCard = null;
+  let originalParent = null;
+
+  function positionFloatingCard(badge, card) {
+    if (!badge || !card) return;
+    const rect = badge.getBoundingClientRect();
+    const cardWidth = 260;
+    const cardHeight = card.offsetHeight || 160;
+
+    let left = rect.left + rect.width / 2;
+    let top = rect.top - 12;
+
+    // Boundary protection: horizontal
+    const margin = 16;
+    if (left - cardWidth / 2 < margin) {
+      left = margin + cardWidth / 2;
+    } else if (left + cardWidth / 2 > window.innerWidth - margin) {
+      left = window.innerWidth - margin - cardWidth / 2;
+    }
+
+    card.style.left = `${left}px`;
+    card.style.top = `${top}px`;
+    card.style.transform = `translateX(-50%) translateY(-100%) scale(1)`;
+
+    // Adjust arrow position to point accurately to the badge
+    const badgeCenter = rect.left + rect.width / 2;
+    const arrowOffset = badgeCenter - (left - cardWidth / 2);
+    card.style.setProperty('--arrow-left', `${Math.max(16, Math.min(cardWidth - 16, arrowOffset))}px`);
+  }
+
+  function showHoverCard(badge) {
+    if (!badge) return;
+    const card = badge.querySelector('.pr-hover-card');
+    if (!card) return;
+
+    if (activeFloatingCard && activeFloatingCard !== card) {
+      hideHoverCard();
+    }
+
+    activeFloatingBadge = badge;
+    activeFloatingCard = card;
+    originalParent = card.parentElement;
+
+    card.classList.add('pr-floating-portal');
+    document.body.appendChild(card);
+
+    positionFloatingCard(badge, card);
+    card.style.opacity = '1';
+    card.style.pointerEvents = 'auto';
+    card.style.visibility = 'visible';
+  }
+
+  function hideHoverCard() {
+    if (!activeFloatingCard) return;
+    activeFloatingCard.style.opacity = '';
+    activeFloatingCard.style.pointerEvents = '';
+    activeFloatingCard.style.visibility = '';
+    activeFloatingCard.style.transform = '';
+    activeFloatingCard.style.left = '';
+    activeFloatingCard.style.top = '';
+    activeFloatingCard.classList.remove('pr-floating-portal');
+
+    if (originalParent) {
+      originalParent.appendChild(activeFloatingCard);
+    }
+
+    activeFloatingBadge = null;
+    activeFloatingCard = null;
+    originalParent = null;
+  }
+
+  function updateActiveCardPosition() {
+    if (activeFloatingBadge && activeFloatingCard) {
+      positionFloatingCard(activeFloatingBadge, activeFloatingCard);
+    }
+  }
+
+  /**
    * Attach global event listeners for touch devices and card positioning
    */
   function initHoverCardInteractions() {
+    // Mouseenter / focusin on badge
+    document.addEventListener('mouseenter', function(e) {
+      const badge = e.target.closest && e.target.closest('.pr-badge');
+      if (badge && !window.matchMedia('(hover: none)').matches) {
+        showHoverCard(badge);
+      }
+    }, true);
+
+    document.addEventListener('mouseleave', function(e) {
+      const badge = e.target.closest && e.target.closest('.pr-badge');
+      if (badge && !window.matchMedia('(hover: none)').matches) {
+        // If moving to card, keep open
+        const related = e.relatedTarget;
+        if (related && (related.closest('.pr-hover-card') || related.closest('.pr-badge'))) {
+          return;
+        }
+        hideHoverCard();
+      }
+    }, true);
+
+    document.addEventListener('focusin', function(e) {
+      const badge = e.target.closest && e.target.closest('.pr-badge');
+      if (badge) {
+        showHoverCard(badge);
+      }
+    });
+
+    document.addEventListener('focusout', function(e) {
+      const badge = e.target.closest && e.target.closest('.pr-badge');
+      if (badge) {
+        const related = e.relatedTarget;
+        if (related && (related.closest('.pr-hover-card') || related.closest('.pr-badge'))) {
+          return;
+        }
+        hideHoverCard();
+      }
+    });
+
+    // Handle hover card mouseleave
+    document.addEventListener('mouseleave', function(e) {
+      if (activeFloatingCard && e.target === activeFloatingCard) {
+        const related = e.relatedTarget;
+        if (related && related.closest && related.closest('.pr-badge') === activeFloatingBadge) {
+          return;
+        }
+        hideHoverCard();
+      }
+    }, true);
+
+    // Reposition on scroll or resize
+    window.addEventListener('scroll', updateActiveCardPosition, { passive: true });
+    window.addEventListener('resize', updateActiveCardPosition, { passive: true });
+
     // For touch devices: tapping a badge once opens the hover card, tapping again follows the link
     document.addEventListener('click', function(e) {
       const badge = e.target.closest('.pr-badge');
@@ -578,6 +714,7 @@
       if (!badge) {
         // Click outside closes any active touch cards
         document.querySelectorAll('.pr-badge.touch-active').forEach(b => b.classList.remove('touch-active'));
+        hideHoverCard();
         return;
       }
       if (isTouch) {
@@ -585,6 +722,7 @@
           e.preventDefault();
           document.querySelectorAll('.pr-badge.touch-active').forEach(b => b.classList.remove('touch-active'));
           badge.classList.add('touch-active');
+          showHoverCard(badge);
         }
       }
     });
@@ -593,6 +731,7 @@
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') {
         document.querySelectorAll('.pr-badge.touch-active').forEach(b => b.classList.remove('touch-active'));
+        hideHoverCard();
       }
     });
   }
