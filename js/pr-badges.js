@@ -447,13 +447,17 @@
     const showGame = options.showGame !== false;
     const tag = options.tag || (options.isButton ? 'button' : 'span');
     const isAnchor = options.isAnchor ?? (!options.tag && !options.isButton && !options.nested);
+    const isCompactVariant = extraClass.includes('pr-badge--compact') || options.compactOnlyNumber;
+    const numDigits = String(p.placement ?? '').length;
+    const numDigitsClass = numDigits >= 3 ? ' pr-badge-ord--long' : '';
+    const displayNumStr = isCompactVariant ? String(p.placement ?? '') : ordStr;
 
     if (isAnchor) {
       return `
         <a class="pr-badge pr-badge-compact tier-${tier.key} glass ${extraClass}" href="${escapeHtml(rankingUrl)}" aria-label="${escapeHtml(gameName)} ${escapeHtml(periodStr)}: ${escapeHtml(ordStr)} place" tabindex="0">
           <div class="pr-badge-hex-wrap">
             ${renderHexagonSvg(tier, 48, 3)}
-            <span class="pr-badge-ord">${escapeHtml(ordStr)}</span>
+            <span class="pr-badge-ord${numDigitsClass}">${escapeHtml(displayNumStr)}</span>
           </div>
           <div class="pr-badge-content">
             ${showGame ? `<span class="pr-badge-game">${escapeHtml(gameName)}</span>` : ''}
@@ -468,7 +472,7 @@
       <${tag} class="pr-badge pr-badge-compact tier-${tier.key} glass ${extraClass}" data-ranking-url="${escapeHtml(rankingUrl)}" aria-label="${escapeHtml(gameName)} ${escapeHtml(periodStr)}: ${escapeHtml(ordStr)} place" tabindex="0" onclick="event.stopPropagation(); window.location.href='${escapeHtml(rankingUrl)}'">
         <div class="pr-badge-hex-wrap">
           ${renderHexagonSvg(tier, 48, 3)}
-          <span class="pr-badge-ord">${escapeHtml(ordStr)}</span>
+          <span class="pr-badge-ord${numDigitsClass}">${escapeHtml(displayNumStr)}</span>
         </div>
         <div class="pr-badge-content">
           ${showGame ? `<span class="pr-badge-game">${escapeHtml(gameName)}</span>` : ''}

@@ -705,6 +705,114 @@ a.event-card:hover{color:var(--text);background:var(--faint);border-color:var(--
   font-size: 11px;
 }
 
+/* Compact Style Spec (.pr-badge--compact: Overview Tab Badges) */
+.pr-badge--compact {
+  box-sizing: border-box;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px 6px 6px;
+  border-radius: 999px;
+  background:
+    linear-gradient(
+      135deg,
+      var(--sheen-a),
+      transparent 40%,
+      transparent 70%,
+      var(--sheen-b)
+    ),
+    var(--glass-fill);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: var(--glass-filter, blur(16px));
+  -webkit-backdrop-filter: var(--glass-filter, blur(16px));
+  box-shadow: 0 4px 16px var(--glass-shadow);
+  transform: none;
+}
+
+.pr-badge--compact.tier-gold { --pr-color: var(--gold, #F5C542); }
+.pr-badge--compact.tier-silver { --pr-color: var(--silver, #C9D1DC); }
+.pr-badge--compact.tier-bronze { --pr-color: var(--bronze, #CD7F32); }
+.pr-badge--compact.tier-sky { --pr-color: var(--accent, #9FD6FF); }
+
+.pr-badge--compact .pr-badge-hex-wrap {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+}
+
+.pr-badge--compact .pr-badge-hex-svg {
+  width: 32px;
+  height: 32px;
+  viewBox: 0 0 48 48;
+}
+
+.pr-badge--compact .pr-hex-ring {
+  stroke: var(--pr-color);
+  stroke-width: 3;
+  stroke-linejoin: round;
+}
+
+.pr-badge--compact .pr-hex-bg {
+  fill: color-mix(in srgb, var(--pr-color) 18%, transparent);
+}
+
+.pr-badge--compact .pr-badge-ord {
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  line-height: 1;
+  text-align: center;
+  color: var(--pr-color);
+  text-shadow: none;
+}
+
+.pr-badge--compact .pr-badge-ord.pr-badge-ord--long {
+  font-size: 9px;
+}
+
+.pr-badge--compact .pr-badge-content {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  min-width: 0;
+}
+
+.pr-badge--compact .pr-badge-period {
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--text, #F2F5FA);
+}
+
+.pr-badge--compact:hover {
+  background:
+    linear-gradient(
+      135deg,
+      var(--sheen-a),
+      transparent 40%,
+      transparent 70%,
+      var(--sheen-b)
+    ),
+    rgba(255, 255, 255, .12);
+  transform: none;
+  border-color: var(--glass-border);
+  box-shadow: 0 4px 16px var(--glass-shadow);
+}
+
+.pr-badge--compact:focus-visible {
+  outline: 2px solid var(--accent, #9FD6FF);
+  outline-offset: 2px;
+}
+
+/* When badge sits inside another link or button (e.g. .card), it must not be interactive itself */
+a .pr-badge--compact,
+button .pr-badge--compact {
+  pointer-events: none;
+}
+
 /* --- VARIANT 3: Mini — Inline --- */
 .player-mini-badges {
   display: inline-flex;
