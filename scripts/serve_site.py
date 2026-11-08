@@ -33,6 +33,10 @@ from scripts.rankings_manager import (
     seed_existing_rankings,
     sync_static_rankings,
 )
+from scripts.metadata_generator import (
+    get_page_metadata,
+    inject_html_metadata,
+)
 
 PROFILE_DIR = ROOT / "data" / "profiles"
 EVENT_GROUPS_PATH = PROFILE_DIR / "event_groups.json"
@@ -771,6 +775,34 @@ class Handler(SimpleHTTPRequestHandler):
         elif parsed.path.startswith("/api/"):
             self.send_json(404, {"error": "Not found."})
         else:
+            # Check if this request is for an HTML page or directory index
+            clean_path = parsed.path.strip("/")
+            is_root = clean_path == ""
+            is_html = clean_path.endswith(".html") or is_root
+            if is_html:
+                html_filename = "index.html" if is_root else clean_path
+                target_file = ROOT / html_filename
+                if target_file.is_file():
+                    try:
+                        with target_file.open("r", encoding="utf-8") as f:
+                            content = f.read()
+
+                        host_hdr = self.headers.get("Host", "")
+                        proto_hdr = self.headers.get("X-Forwarded-Proto", "")
+                        meta = get_page_metadata(html_filename, parsed.query, host_hdr, proto_hdr)
+                        injected_html = inject_html_metadata(content, meta)
+
+                        body = injected_html.encode("utf-8")
+                        self.send_response(200)
+                        self.send_header("Content-Type", "text/html; charset=utf-8")
+                        self.send_header("Content-Length", str(len(body)))
+                        self.send_header("Cache-Control", "no-cache")
+                        self.end_headers()
+                        self.wfile.write(body)
+                        return
+                    except Exception as err:
+                        print(f"Error rendering metadata for {self.path}: {err}")
+
             super().do_GET()
 
     def do_POST(self):
