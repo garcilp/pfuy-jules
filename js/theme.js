@@ -126,14 +126,14 @@
     const container = document.createElement('aside');
     container.id = 'theme-selector-widget';
     container.className = 'theme-selector-container';
-    container.setAttribute('aria-label', 'Theme Selector');
+    container.setAttribute('aria-label', (window.i18n && window.i18n.t) ? window.i18n.t('theme.selector') : 'Theme Selector');
 
     const toggleBtn = document.createElement('button');
     toggleBtn.type = 'button';
     toggleBtn.className = 'theme-toggle-btn glass pill';
     toggleBtn.setAttribute('aria-haspopup', 'true');
     toggleBtn.setAttribute('aria-expanded', 'false');
-    toggleBtn.setAttribute('aria-label', 'Theme selector');
+    toggleBtn.setAttribute('aria-label', (window.i18n && window.i18n.t) ? window.i18n.t('theme.selector') : 'Theme selector');
     toggleBtn.innerHTML = `
       <span class="theme-icon" aria-hidden="true">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -141,13 +141,13 @@
           <path d="M12 3a9 9 0 0 1 9 9 9 9 0 0 1-9 9V3z"/>
         </svg>
       </span>
-      <span>Theme</span>
+      <span class="theme-label-text">${(window.i18n && window.i18n.t) ? window.i18n.t('theme.button') : 'Theme'}</span>
     `;
 
     const dropdown = document.createElement('div');
     dropdown.className = 'theme-dropdown glass';
     dropdown.setAttribute('role', 'radiogroup');
-    dropdown.setAttribute('aria-label', 'Choose color theme');
+    dropdown.setAttribute('aria-label', (window.i18n && window.i18n.t) ? window.i18n.t('theme.choose') : 'Choose color theme');
 
     THEMES.forEach((theme) => {
       const isSelected = theme.id === currentThemeId;
@@ -270,6 +270,16 @@
     document.addEventListener('DOMContentLoaded', initThemeSelectorWidget);
   } else {
     initThemeSelectorWidget();
+  }
+
+  if (window.i18n && window.i18n.onChange) {
+    window.i18n.onChange(() => {
+      const w = document.getElementById('theme-selector-widget');
+      if (w) {
+        w.remove();
+        initThemeSelectorWidget();
+      }
+    });
   }
 
   // Expose helper API globally

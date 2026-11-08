@@ -18,6 +18,7 @@
   document.documentElement.dataset.theme=t;
 })();
 </script>
+<script src="js/i18n.js"></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="css/themes.css">
 <link rel="stylesheet" href="css/styles.css">
@@ -39,9 +40,9 @@
   <section class="directory-head">
     <div>
       <nav id="ranking-breadcrumbs" class="ranking-breadcrumbs mono muted" aria-label="Breadcrumb"></nav>
-      <div class="eyebrow mono">COMPETITIVE STANDINGS</div>
-      <h1>Rankings</h1>
-      <p class="muted">Glicko-2, Strength of Field, Quality Wins &amp; Consistency metrics.</p>
+      <div class="eyebrow mono" data-i18n="rankings.competitiveStandings">COMPETITIVE STANDINGS</div>
+      <h1 data-i18n="rankings.title">Rankings</h1>
+      <p class="muted" data-i18n="rankings.standingsDesc">Glicko-2, Strength of Field, Quality Wins &amp; Consistency metrics.</p>
     </div>
   </section>
 
@@ -90,7 +91,7 @@
     </label>
 
     <div class="ranking-presets-row">
-      <span class="mono muted">Presets:</span>
+      <span class="mono muted" data-i18n="rankings.presets">Presets:</span>
       <button class="preset-btn quiet-button" data-preset="all" data-i18n="rankings.preset.all">All time</button>
       <button class="preset-btn quiet-button" data-preset="2025" data-i18n="rankings.preset.2025">2025</button>
       <button class="preset-btn quiet-button" data-preset="2024" data-i18n="rankings.preset.2024">2024</button>
@@ -98,7 +99,7 @@
     </div>
   </section>
 
-  <p id="ranking-status" class="directory-status mono muted" aria-live="polite">Calculating rankings…</p>
+  <p id="ranking-status" class="directory-status mono muted" aria-live="polite" data-i18n="rankings.status.calculating">Calculating rankings…</p>
 
   <!-- Main Content Render Area -->
   <section id="rankings-content" class="rankings-content"></section>
@@ -114,7 +115,6 @@
 </dialog>
 
 <footer class="foot mono muted" data-i18n="badge.rankings">Platfighters.uy · Rankings Engine</footer>
-<script src="js/i18n.js"></script>
 <script src="js/pr-badges.js"></script>
 <script src="js/rankings.js"></script>
 <script src="js/theme.js"></script>

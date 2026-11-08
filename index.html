@@ -18,6 +18,7 @@
   document.documentElement.dataset.theme=t;
 })();
 </script>
+<script src="js/i18n.js"></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="css/themes.css">
 <link rel="stylesheet" href="css/styles.css">
@@ -79,7 +80,7 @@
 
       <section class="panel glass">
         <h2 data-i18n="home.history.title">On this week</h2>
-        <p class="muted sm" id="history-sub-text">Tournaments played this week (<span id="today"></span>) in past years</p>
+        <p class="muted sm" id="history-sub-text" data-i18n="home.history.sub">Tournaments played this week (<span id="today"></span>) in past years</p>
         <div id="history"></div>
       </section>
     </div>
@@ -112,7 +113,6 @@
 </main>
 
 <footer class="foot mono muted"><span data-i18n="footer.source">Source: start.gg API · Served from local cache · Last synced</span> <span id="synced">[TIMESTAMP]</span></footer>
-<script src="js/i18n.js"></script>
 <script src="js/home.js"></script>
 <script src="js/theme.js"></script>
 </body>
