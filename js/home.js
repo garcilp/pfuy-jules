@@ -28,6 +28,26 @@ let activeCommunities = [
   { slug: 'melee', name: 'Melee', abbr: 'M' }
 ];
 
+// Cache for event details to prevent fetching the same tournament JSON multiple times across sections
+const eventDetailsCache = new Map();
+
+async function getTournamentDetail(slug) {
+  if (!slug) return null;
+  if (!eventDetailsCache.has(slug)) {
+    try {
+      const res = await fetch(`data/events/${encodeURIComponent(slug)}.json`);
+      if (res.ok) {
+        eventDetailsCache.set(slug, await res.json());
+      } else {
+        eventDetailsCache.set(slug, null);
+      }
+    } catch (e) {
+      eventDetailsCache.set(slug, null);
+    }
+  }
+  return eventDetailsCache.get(slug);
+}
+
 async function initHome() {
   try {
     const [eventsRes, playersRes] = await Promise.all([
@@ -45,7 +65,7 @@ async function initHome() {
     renderStats();
     renderUpcomingEvents();
     await renderRecentResults();
-    renderOnThisWeek();
+    await renderOnThisWeek();
     await renderTopPlayers();
     await renderRivalry();
     renderNewcomerSteps();
@@ -246,9 +266,6 @@ async function renderRecentResults() {
     return;
   }
 
-  // Cache event details to prevent fetching the same tournament JSON multiple times
-  const eventDetailsCache = new Map();
-
   const resultsWithWinners = await Promise.all(completed.map(async tourney => {
     let winner = '—';
     let winnerId = null;
@@ -256,16 +273,7 @@ async function renderRecentResults() {
 
     if (tourney.tournamentSlug) {
       try {
-        if (!eventDetailsCache.has(tourney.tournamentSlug)) {
-          const res = await fetch(`data/events/${encodeURIComponent(tourney.tournamentSlug)}.json`);
-          if (res.ok) {
-            eventDetailsCache.set(tourney.tournamentSlug, await res.json());
-          } else {
-            eventDetailsCache.set(tourney.tournamentSlug, null);
-          }
-        }
-
-        const detail = eventDetailsCache.get(tourney.tournamentSlug);
+        const detail = await getTournamentDetail(tourney.tournamentSlug);
         if (detail) {
           // Find the matching subEvent for this game
           const sub = (detail.subEvents || []).find(s => {
@@ -326,7 +334,7 @@ async function renderRecentResults() {
 }
 
 // 4. On this week
-function renderOnThisWeek() {
+async function renderOnThisWeek() {
   const container = $('#history');
   const todayLabel = $('#today');
   if (!container) return;
@@ -377,15 +385,17 @@ function renderOnThisWeek() {
         slug: e.tournamentSlug,
         game: e.game,
         events: [],
-        entrants: 0
+        entrants: e.entrants || 0
       });
+    } else {
+      const item = groupedTournaments.get(key);
+      if (e.entrants && e.entrants > item.entrants) {
+        item.entrants = e.entrants;
+      }
     }
     const item = groupedTournaments.get(key);
     if (e.event && !item.events.includes(e.event)) {
       item.events.push(e.event);
-    }
-    if (e.entrants) {
-      item.entrants += e.entrants;
     }
     if (e.game && !item.game) {
       item.game = e.game;
@@ -394,6 +404,20 @@ function renderOnThisWeek() {
 
   const items = [...groupedTournaments.values()];
   items.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+
+  // Fetch actual tournament details to get canonical totalEntrants
+  await Promise.all(items.map(async h => {
+    if (h.slug) {
+      try {
+        const detail = await getTournamentDetail(h.slug);
+        if (detail && typeof detail.totalEntrants === 'number') {
+          h.entrants = detail.totalEntrants;
+        }
+      } catch (e) {
+        // Fallback gracefully
+      }
+    }
+  }));
 
   container.innerHTML = items.map(h => {
     const tourneyUrl = h.slug ? `event.html?tournament=${encodeURIComponent(h.slug)}` : 'events.html';
@@ -923,12 +947,12 @@ function setupSearch() {
 }
 
 if (window.i18n && window.i18n.onChange) {
-  window.i18n.onChange(() => {
+  window.i18n.onChange(async () => {
     renderStats();
     renderUpcomingEvents();
-    renderRecentResults();
-    renderOnThisWeek();
-    renderTopPlayers();
+    await renderRecentResults();
+    await renderOnThisWeek();
+    await renderTopPlayers();
     renderNewcomerSteps();
     renderHubs();
   });
