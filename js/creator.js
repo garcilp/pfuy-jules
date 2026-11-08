@@ -991,19 +991,19 @@ async function getProfileData(playerId, tag) {
 function resolvePlayerPortrait(p) {
   const gslug = draft?.game?.slug || 'ultimate';
   if (p && Array.isArray(p.mains) && p.mains.length) {
-    const cslug = charStockSlug(p.mains[0]);
-    return `assets/renders/${gslug}/portraits/${cslug}.webp`;
+    return charPortraitPath(gslug, p.mains[0]);
   }
   const defaultChar = (gameCharacters[gslug] && gameCharacters[gslug][0]) ? gameCharacters[gslug][0] : 'other';
-  return `assets/renders/${gslug}/portraits/${charStockSlug(defaultChar)}.webp`;
+  return charPortraitPath(gslug, defaultChar);
 }
 
 function getPlayerPictureSrc(p) {
+  const gslug = draft?.game?.slug || 'ultimate';
   const isAdminCreation = isAdmin && requestedMode === 'admin';
   if (isAdminCreation) {
-    return p._preview || p.photo || (p.playerId ? `assets/players/${p.playerId}.png` : '');
+    return p._preview || p.photo || (p.playerId ? `assets/players/${p.playerId}.png` : (p._resolvedPortrait || (p.mains && p.mains.length ? charPortraitPath(gslug, p.mains[0]) : '')));
   }
-  return p._resolvedPortrait || (p.mains && p.mains.length ? `assets/renders/${draft?.game?.slug || 'ultimate'}/portraits/${charStockSlug(p.mains[0])}.webp` : '');
+  return p._resolvedPortrait || (p.mains && p.mains.length ? charPortraitPath(gslug, p.mains[0]) : `assets/renders/${gslug}/portraits/other.webp`);
 }
 
 const rowId = () => draft.id || `${draft.game.id}-${slug(draft.title || 'ranking')}`;
@@ -1188,8 +1188,11 @@ function renderEditor() {
   const p = draft.players[sel] || draft.players[0];
   const n = sel + 1, k = kind(p);
   const isAdminCreation = isAdmin && requestedMode === 'admin';
+  const gslug = draft?.game?.slug || 'ultimate';
   const picSrc = getPlayerPictureSrc(p);
-  const pic = picSrc ? `<img src="${esc(picSrc)}" alt="" onerror="this.remove()">` : '';
+  const genericFallback = `assets/renders/${gslug}/portraits/other.webp`;
+  const portraitFallback = p._resolvedPortrait || (p.mains && p.mains.length ? charPortraitPath(gslug, p.mains[0]) : genericFallback);
+  const pic = picSrc ? `<img src="${esc(picSrc)}" data-portrait="${esc(portraitFallback)}" data-generic="${esc(genericFallback)}" alt="" onerror="if(!this.dataset.triedPortrait && this.dataset.portrait && this.src !== this.dataset.portrait){this.dataset.triedPortrait='1';this.src=this.dataset.portrait;}else if(!this.dataset.triedGeneric && this.src !== this.dataset.generic){this.dataset.triedGeneric='1';this.src=this.dataset.generic;}else{this.remove();}">` : '';
   const sec = (key, title, body) => { const on = p[key] !== undefined;
     return `<div class="sec glass" data-sec="${key}"><div class="sh"><b>${title}</b><span class="sp"></span><button type="button" class="tog${on ? ' on' : ''}" role="switch" aria-checked="${on}" aria-label="${title}" data-act="toggle" data-k="${key}"></button></div>${on ? body : ''}</div>`; };
   const seg = (i, cur) => `<span class="seg glass pill">${[['tournament', 'Tournament'], ['times', 'Times']].map(([v, l]) => `<button type="button" class="${cur === v ? 'on' : ''}" data-act="fmt" data-i="${i}" data-v="${v}">${l}</button>`).join('')}</span>`;

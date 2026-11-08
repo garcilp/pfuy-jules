@@ -609,6 +609,13 @@ class Handler(SimpleHTTPRequestHandler):
                         "players": players,
                         "isArchived": bool(row["is_archived"]),
                     }
+                    if "image_box" in row.keys() and row["image_box"]:
+                        try:
+                            ib = json.loads(row["image_box"])
+                            if isinstance(ib, dict) and ib.get("url"):
+                                data["imageBox"] = ib
+                        except Exception:
+                            pass
                     self.send_json(200, {"ranking": data})
             except Exception as e:
                 self.send_json(500, {"error": f"Error loading ranking: {e}"})
@@ -818,6 +825,16 @@ class Handler(SimpleHTTPRequestHandler):
             published_by = str(ranking_data.get("publishedBy") or "").strip()
             intro = str(ranking_data.get("intro") or "").strip()
             players = ranking_data.get("players")
+            image_box_raw = ranking_data.get("imageBox")
+            image_box_str = None
+            if isinstance(image_box_raw, dict) and image_box_raw.get("url"):
+                sanitized_ib = {
+                    "url": str(image_box_raw["url"]).strip()[:500],
+                    "placement": image_box_raw.get("placement") if image_box_raw.get("placement") in {"beginning", "after_intro", "end"} else "after_intro",
+                    "caption": str(image_box_raw.get("caption") or "").strip()[:300]
+                }
+                if sanitized_ib["url"]:
+                    image_box_str = json.dumps(sanitized_ib, ensure_ascii=False)
 
             if not safe_slug(rid) or not title or not game_slug or not start or not end or not isinstance(players, list):
                 self.send_json(400, {"error": "Missing required ranking fields (id, title, game, period, players)."})
@@ -898,8 +915,8 @@ class Handler(SimpleHTTPRequestHandler):
                         INSERT OR REPLACE INTO official_rankings (
                             id, title, game_slug, game_id, period_start, period_end,
                             status, published_by, intro, players_json,
-                            created_at, updated_at, is_archived
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
+                            created_at, updated_at, is_archived, image_box
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?)
                         """,
                         (
                             rid,
@@ -914,6 +931,7 @@ class Handler(SimpleHTTPRequestHandler):
                             json.dumps(sanitized_players, ensure_ascii=False),
                             created_at,
                             now,
+                            image_box_str,
                         )
                     )
                     connection.commit()
@@ -1385,6 +1403,16 @@ class Handler(SimpleHTTPRequestHandler):
             published_by = str(ranking_data.get("publishedBy") or "").strip()
             intro = str(ranking_data.get("intro") or "").strip()
             players = ranking_data.get("players")
+            image_box_raw = ranking_data.get("imageBox")
+            image_box_str = None
+            if isinstance(image_box_raw, dict) and image_box_raw.get("url"):
+                sanitized_ib = {
+                    "url": str(image_box_raw["url"]).strip()[:500],
+                    "placement": image_box_raw.get("placement") if image_box_raw.get("placement") in {"beginning", "after_intro", "end"} else "after_intro",
+                    "caption": str(image_box_raw.get("caption") or "").strip()[:300]
+                }
+                if sanitized_ib["url"]:
+                    image_box_str = json.dumps(sanitized_ib, ensure_ascii=False)
 
             if not title or not game_slug or not start or not end or not isinstance(players, list):
                 self.send_json(400, {"error": "Missing required ranking fields."})
@@ -1458,7 +1486,8 @@ class Handler(SimpleHTTPRequestHandler):
                         """
                         UPDATE official_rankings SET
                             title = ?, game_slug = ?, game_id = ?, period_start = ?, period_end = ?,
-                            status = ?, published_by = ?, intro = ?, players_json = ?, updated_at = ?
+                            status = ?, published_by = ?, intro = ?, players_json = ?, updated_at = ?,
+                            image_box = ?
                         WHERE id = ?
                         """,
                         (
@@ -1472,6 +1501,7 @@ class Handler(SimpleHTTPRequestHandler):
                             intro[:2000],
                             json.dumps(sanitized_players, ensure_ascii=False),
                             now,
+                            image_box_str,
                             rid,
                         )
                     )

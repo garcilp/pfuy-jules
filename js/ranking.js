@@ -48,16 +48,14 @@ async function fetchProfileData(playerId, tag) {
 
 function resolveCharacterPortraitFallback(p, gslug, profile) {
   if (p && Array.isArray(p.mains) && p.mains.length) {
-    const cslug = charStockSlug(p.mains[0]);
-    return `assets/renders/${gslug}/portraits/${cslug}.webp`;
+    return charPortraitPath(gslug, p.mains[0]);
   }
   if (profile && Array.isArray(profile.games)) {
     const g = profile.games.find(x => x.slug === gslug) || profile.games[0];
     if (g && Array.isArray(g.characters)) {
       const topChar = g.characters.find(c => String(c.name || '').toLowerCase() !== 'other');
       if (topChar && topChar.name) {
-        const cslug = charStockSlug(topChar.name);
-        return `assets/renders/${gslug}/portraits/${cslug}.webp`;
+        return charPortraitPath(gslug, topChar.name);
       }
     }
   }
@@ -65,15 +63,25 @@ function resolveCharacterPortraitFallback(p, gslug, profile) {
 }
 
 const photo = (p, size, gslug = 'ultimate', isRegularUserRanking = false) => {
-  let photoSrc = '';
+  const genericFallback = `assets/renders/${gslug}/portraits/other.webp`;
+  const portraitFallback = p._characterPortrait || (p.mains && p.mains.length ? charPortraitPath(gslug, p.mains[0]) : genericFallback);
+
+  let primarySrc = '';
   if (isRegularUserRanking) {
     // Regular user creation: do not allow custom player photos; use character portrait
-    photoSrc = p._characterPortrait || (p.mains && p.mains.length ? `assets/renders/${gslug}/portraits/${charStockSlug(p.mains[0])}.webp` : `assets/renders/${gslug}/portraits/other.webp`);
+    primarySrc = portraitFallback;
   } else {
-    // Admin creation or official ranking: custom photo or character portrait fallback
-    photoSrc = p.photo || p._characterPortrait || (p.playerId ? `assets/players/${p.playerId}.png` : `assets/players/${slug(p.tag)}.jpg`);
+    // Admin creation or official ranking: prefer explicitly assigned photo, then character portrait
+    primarySrc = p.photo || portraitFallback;
   }
-  return `<div class="photo ${size}"><img src="${esc(photoSrc)}" alt="" onerror="this.remove()"></div>`;
+
+  // Graceful fallback chain:
+  // 1. If primary image fails, attempt portrait fallback (if different from primary)
+  // 2. If portrait fallback fails, attempt generic other.webp fallback
+  // 3. If generic fallback fails or already attempted, remove the image element
+  const onerrorAttr = `if(!this.dataset.triedPortrait && this.dataset.portrait && this.src !== this.dataset.portrait){this.dataset.triedPortrait='1';this.src=this.dataset.portrait;}else if(!this.dataset.triedGeneric && this.src !== this.dataset.generic){this.dataset.triedGeneric='1';this.src=this.dataset.generic;}else{this.remove();}`;
+
+  return `<div class="photo ${size}"><img src="${esc(primarySrc)}" data-portrait="${esc(portraitFallback)}" data-generic="${esc(genericFallback)}" alt="" onerror="${onerrorAttr}"></div>`;
 };
 const stock = (g, name) => {
   const gslug = (g && g.slug) ? g.slug : 'rivals-2';
@@ -223,7 +231,7 @@ async function render(r) {
   const flush = () => { if (run.length) html += `<div class="minlist glass">${run.map(row).join('')}</div>`; run = []; };
 
   const imageBoxHtml = (r.imageBox && r.imageBox.url) ? `
-    <figure class="article-image-box glass">
+    <figure class="article-image-box">
       <img src="${esc(r.imageBox.url)}" alt="${esc(r.imageBox.caption || r.title || '')}" onerror="this.closest('.article-image-box').remove()">
       ${r.imageBox.caption ? `<figcaption class="article-image-caption">${esc(r.imageBox.caption)}</figcaption>` : ''}
     </figure>

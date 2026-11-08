@@ -23,6 +23,22 @@ const charStockSlug = name => {
   return charSlugAliases[s] || s;
 };
 
+const charPortraitAliases = {
+  'simon-belmont': 'simon',
+  'sheik-zelda': 'sheik'
+};
+
+const charPortraitSlug = name => {
+  const s = slug(name);
+  return charPortraitAliases[s] || s;
+};
+
+const charPortraitPath = (gameSlug, charName) => {
+  const gslug = gameSlug || 'ultimate';
+  const cslug = charPortraitSlug(charName);
+  return `assets/renders/${gslug}/portraits/${cslug}.webp`;
+};
+
 // Safe Markdown renderer with XSS protection
 function renderMarkdown(text) {
   if (!text) return '';
