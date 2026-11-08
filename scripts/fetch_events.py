@@ -194,7 +194,7 @@ def get_processed_event_ids(db_path=DATABASE):
     try:
         connection = sqlite3.connect(db_path)
         cursor = connection.cursor()
-        cursor.execute("SELECT event_id FROM import_markers")
+        cursor.execute("SELECT event_id FROM import_markers WHERE standings_imported > 0")
         rows = cursor.fetchall()
         connection.close()
         return {str(row[0]) for row in rows if row[0] is not None}
@@ -501,15 +501,20 @@ def main():
                 except Exception:
                     pass
 
-            if not args.force and event_id and event_id in processed_event_ids:
+            has_local_standings = (output_dir / "standings").is_dir() and any((output_dir / "standings").glob("*.json"))
+
+            if not args.force and event_id and event_id in processed_event_ids and has_local_standings:
                 print(f"Skipping already imported and processed event {event_name or slug} (ID {event_id}): {url}")
                 continue
+            elif event_id and (event_id not in processed_event_ids or not has_local_standings):
+                print(f"Event {event_name or slug} (ID {event_id}) has empty standings; fetching: {url}")
 
             print(f"Fetching {game['name']}: {url}")
             try:
                 event = fetch_event(url, token, output_dir)
                 event_id = str(event["id"])
-                if not args.force and event_id in processed_event_ids:
+                has_local_standings = (output_dir / "standings").is_dir() and any((output_dir / "standings").glob("*.json"))
+                if not args.force and event_id in processed_event_ids and has_local_standings:
                     print(f"  Skipping already imported and processed event {event['name']} (ID {event_id})")
                     continue
 
