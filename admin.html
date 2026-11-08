@@ -103,6 +103,34 @@
           <div class="form-actions"><button class="action-button" type="submit">Merge profiles</button><p id="merge-message" class="form-message mono" role="status"></p></div>
         </form>
       </section>
+
+      <section class="merge-panel" aria-labelledby="bulk-player-merge-heading" style="margin-top: 32px; padding-top: 28px;">
+        <h3 id="bulk-player-merge-heading">Bulk Player Merging</h3>
+        <p class="muted admin-copy">Queue multiple player merge operations (FROM → TO) and execute them together in a single batch. Profiles and rankings will be rebuilt once after all operations complete.</p>
+        <form id="bulk-player-form" class="admin-form merge-form">
+          <label>Merge this player (FROM)<select id="bulk-player-source" required></select></label>
+          <label>Into the profile to keep (TO)<select id="bulk-player-target" required></select></label>
+          <div class="form-actions">
+            <button id="bulk-player-queue-btn" class="action-button" type="submit">+ Queue Merge</button>
+            <button id="bulk-player-cancel-edit-btn" class="quiet-button" type="button" style="display:none;">Cancel Edit</button>
+            <p id="bulk-player-form-message" class="form-message mono" role="status"></p>
+          </div>
+        </form>
+
+        <div id="bulk-player-queue-wrapper" style="margin-top: 20px; max-width: 760px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <span class="mono muted" id="bulk-player-queue-count" style="font-size:13px; font-weight:600;">Queued operations (0)</span>
+            <button id="bulk-player-clear-btn" class="quiet-button" type="button" style="display:none; color:var(--muted); font-size:12px;">Clear Queue</button>
+          </div>
+          <div id="bulk-player-queue-list" class="event-group-list" style="margin-top:0;" aria-live="polite">
+            <p class="muted event-group-empty">No player merges currently queued.</p>
+          </div>
+          <div style="margin-top:16px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+            <button id="bulk-player-execute-btn" class="action-button" type="button" disabled>Execute Batch</button>
+            <p id="bulk-player-message" class="form-message mono" role="status"></p>
+          </div>
+        </div>
+      </section>
     </div>
 
     <!-- SECTION 2: EVENTS -->
@@ -122,6 +150,35 @@
           <div class="form-actions"><button class="action-button" type="submit">Save event grouping</button><p id="event-group-message" class="form-message mono" role="status"></p></div>
         </form>
         <div id="event-group-list" class="event-group-list" aria-live="polite"></div>
+      </section>
+
+      <section class="merge-panel" aria-labelledby="bulk-event-merge-heading" style="margin-top: 0; margin-bottom: 32px; padding-bottom: 28px;">
+        <h3 id="bulk-event-merge-heading">Bulk Event Merging</h3>
+        <p class="muted admin-copy">Queue multiple event merge operations (FROM → TO → NAME) to merge events (such as amateur brackets) into main tournaments with a custom display name, and execute them together in a single batch.</p>
+        <form id="bulk-event-form" class="admin-form merge-form">
+          <label>Source event to merge (FROM)<select id="bulk-event-source" required></select></label>
+          <label>Destination event to keep (TO)<select id="bulk-event-target" required></select></label>
+          <label>Display name in tournament (NAME)<input id="bulk-event-name" type="text" maxlength="80" placeholder="Categoria B" required></label>
+          <div class="form-actions">
+            <button id="bulk-event-queue-btn" class="action-button" type="submit">+ Queue Merge</button>
+            <button id="bulk-event-cancel-edit-btn" class="quiet-button" type="button" style="display:none;">Cancel Edit</button>
+            <p id="bulk-event-form-message" class="form-message mono" role="status"></p>
+          </div>
+        </form>
+
+        <div id="bulk-event-queue-wrapper" style="margin-top: 20px; max-width: 760px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <span class="mono muted" id="bulk-event-queue-count" style="font-size:13px; font-weight:600;">Queued operations (0)</span>
+            <button id="bulk-event-clear-btn" class="quiet-button" type="button" style="display:none; color:var(--muted); font-size:12px;">Clear Queue</button>
+          </div>
+          <div id="bulk-event-queue-list" class="event-group-list" style="margin-top:0;" aria-live="polite">
+            <p class="muted event-group-empty">No event merges currently queued.</p>
+          </div>
+          <div style="margin-top:16px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+            <button id="bulk-event-execute-btn" class="action-button" type="button" disabled>Execute Batch</button>
+            <p id="bulk-event-message" class="form-message mono" role="status"></p>
+          </div>
+        </div>
       </section>
 
       <section class="merge-panel" aria-labelledby="event-exclusion-heading" style="margin-top: 0; margin-bottom: 32px; padding-bottom: 28px;">
