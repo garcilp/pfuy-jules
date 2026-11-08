@@ -11,6 +11,8 @@ from urllib.parse import urlparse
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
+from scripts.summary_tracker import SummaryTracker
+
 RAW_ROOT = PROJECT_ROOT / "startgg-data" / "raw"
 DATABASE = PROJECT_ROOT / "startgg-data" / "platfighters.sqlite3"
 MANIFEST = PROJECT_ROOT / "events.json"
@@ -568,10 +570,14 @@ def run_import(no_export=False, force_export=False):
     except sqlite3.OperationalError:
         pass
 
+    tracker = SummaryTracker("import_startgg_data_summary.txt")
+    tracker._ensure_category("EVENTS")
+
     groups = discover_events()
     if not groups:
         print(f"No event.json files found under {RAW_ROOT}")
         connection.close()
+        tracker.write_summary()
         return
 
     imported = 0
@@ -592,6 +598,9 @@ def run_import(no_export=False, force_export=False):
             print(f"Already imported, skipping event {event_id}: {folder.name}")
             skipped += 1
             continue
+
+        is_new_event = marker is None
+        event_name = (candidate.get("event") or {}).get("name") or folder.name
 
         try:
             with connection:
@@ -615,6 +624,10 @@ def run_import(no_export=False, force_export=False):
                 f"{counts['selections']} character selections"
             )
             imported += 1
+            if is_new_event:
+                tracker.record_new("EVENTS", event_name)
+            else:
+                tracker.record_modified("EVENTS", event_name)
         except (OSError, ValueError, KeyError, sqlite3.Error, json.JSONDecodeError) as error:
             print(f"ERROR importing event {event_id} ({relative_path}): {error}", file=sys.stderr)
             failed += 1
@@ -644,6 +657,7 @@ def run_import(no_export=False, force_export=False):
             raise SystemExit(1)
 
     connection.close()
+    tracker.write_summary()
 
 
 def main():

@@ -8,8 +8,14 @@ import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlsplit
+import sys
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from scripts.summary_tracker import SummaryTracker
+
 DATABASE = PROJECT_ROOT / "startgg-data" / "platfighters.sqlite3"
 PROFILE_DIR = PROJECT_ROOT / "data" / "profiles"
 RAW_EVENT_DIR = PROJECT_ROOT / "startgg-data" / "raw"
@@ -1026,15 +1032,34 @@ def safe_slug(value):
     return re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
 
 
-def write_profile(connection, player_id, display_tag, profile_slug):
+def write_profile(connection, player_id, display_tag, profile_slug, tracker=None):
     profile = profile_for_player(connection, player_id, display_tag, profile_slug)
     output = PROFILE_DIR / f"{profile_slug}.json"
+
+    existed_before = output.is_file()
+    existing_content = None
+    if existed_before:
+        try:
+            with output.open("r", encoding="utf-8") as file:
+                existing_content = file.read()
+        except Exception:
+            existing_content = None
+
+    new_content = json.dumps(profile, indent=2, ensure_ascii=False) + "\n"
+
     with output.open("w", encoding="utf-8") as file:
-        json.dump(profile, file, indent=2, ensure_ascii=False)
-        file.write("\n")
+        file.write(new_content)
     print(f"Wrote {output.name}: {display_tag} (ID {player_id}), "
           f"{len(profile['games'])} games, "
           f"{sum(game['events'] for game in profile['games'])} event entries")
+
+    if tracker is not None:
+        tag_name = profile.get("player", {}).get("tag") or display_tag
+        if not existed_before:
+            tracker.record_new("PLAYERS", tag_name)
+        elif existing_content != new_content:
+            tracker.record_modified("PLAYERS", tag_name)
+
     if not profile["games"]:
         return None
     player = profile["player"]
@@ -1459,6 +1484,9 @@ def main():
     if args.game and not args.all:
         parser.error("--game can only be used with --all")
 
+    tracker = SummaryTracker("build_player_profile_summary.txt")
+    tracker._ensure_category("PLAYERS")
+
     PROFILE_DIR.mkdir(parents=True, exist_ok=True)
     with sqlite3.connect(DATABASE) as connection:
         connection.row_factory = sqlite3.Row
@@ -1511,7 +1539,7 @@ def main():
             for player_id, tag in chosen.items():
                 profile_slug = f"{safe_slug(tag) or 'player'}-{player_id}"
                 try:
-                    entry = write_profile(connection, player_id, tag, profile_slug)
+                    entry = write_profile(connection, player_id, tag, profile_slug, tracker=tracker)
                     if entry:
                         index.append(entry)
                 except ValueError as error:
@@ -1526,7 +1554,9 @@ def main():
             profile_slug = args.slug or safe_slug(args.tag)
             if not profile_slug or not re.fullmatch(r"[a-z0-9-]+", profile_slug):
                 parser.error("--slug must contain only lowercase letters, numbers, and hyphens")
-            write_profile(connection, args.player_id, args.tag, profile_slug)
+            write_profile(connection, args.player_id, args.tag, profile_slug, tracker=tracker)
+
+    tracker.write_summary()
 
     try:
         from scripts.rankings_calculator import export_ranking_data, export_default_rankings
