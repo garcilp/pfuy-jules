@@ -1216,7 +1216,7 @@ function renderImageBoxDetails() {
       <div class="sh">
         <b>${isEs ? 'Imagen del Power Ranking' : 'Power Ranking Picture'}</b>
         <span class="sp"></span>
-        ${hasImg ? `<button type="button" class="btn glass pill" data-act="clear-image-box" style="padding:4px 12px;font-size:12px;">${isEs ? 'Quitar imagen' : 'Remove image'}</button>` : ''}
+        <button type="button" class="btn glass pill image-box-clear-btn" data-act="clear-image-box" style="padding:4px 12px;font-size:12px;${hasImg ? '' : 'display:none;'}">${isEs ? 'Quitar imagen' : 'Remove image'}</button>
       </div>
       <div class="frow" style="gap:16px;">
         <div class="fld" style="flex:2 1 280px;">
@@ -1226,6 +1226,7 @@ function renderImageBoxDetails() {
             <button type="button" class="btn glass pill" data-act="pick-box-image" style="white-space:nowrap;min-height:46px;padding:0 14px;">📁 ${isEs ? 'Subir' : 'Upload'}</button>
             <input type="file" id="imageBoxFileInput" accept="image/png,image/jpeg,image/webp" hidden>
           </div>
+          <div class="note0" style="margin-top:4px;">${isEs ? 'PNG, JPEG o WebP · Máx. 5 MB' : 'PNG, JPEG or WebP · Max 5 MB'}</div>
         </div>
         <div class="fld" style="flex:1 1 240px;">
           ${lab(isEs ? 'UBICACIÓN EN EL ARTÍCULO' : 'PLACEMENT IN ARTICLE')}
@@ -1238,14 +1239,36 @@ function renderImageBoxDetails() {
         ${lab(isEs ? 'EPÍGRAFE / TEXTO DE LA IMAGEN' : 'IMAGE CAPTION')}
         <input class="inp" data-img-bind="caption" value="${esc(imgBox.caption || '')}" placeholder="${isEs ? 'Leyenda opcional bajo la imagen' : 'Optional caption below the image'}">
       </div>
-      ${hasImg ? `
-        <div class="image-box-preview">
-          <img src="${esc(imgBox.url)}" alt="" onerror="this.src='';">
-          <button type="button" class="x glass pill remove-img-box-btn" data-act="clear-image-box" aria-label="Remove image">×</button>
-        </div>
-      ` : ''}
+      <div id="imageBoxPreviewContainer">
+        ${hasImg ? `
+          <div class="image-box-preview">
+            <img src="${esc(imgBox.url)}" alt="" onerror="this.src='';">
+            <button type="button" class="x glass pill remove-img-box-btn" data-act="clear-image-box" aria-label="Remove image">×</button>
+          </div>
+        ` : ''}
+      </div>
     </div>
   `;
+}
+
+function updateImageBoxPreview() {
+  const container = $('#imageBoxPreviewContainer');
+  const clearBtn = $('.image-box-clear-btn');
+  const url = (draft.imageBox?.url || '').trim();
+  if (clearBtn) {
+    clearBtn.style.display = url ? '' : 'none';
+  }
+  if (!container) return;
+  if (url) {
+    container.innerHTML = `
+      <div class="image-box-preview">
+        <img src="${esc(url)}" alt="" onerror="this.src='';">
+        <button type="button" class="x glass pill remove-img-box-btn" data-act="clear-image-box" aria-label="Remove image">×</button>
+      </div>
+    `;
+  } else {
+    container.innerHTML = '';
+  }
 }
 
 function renderSide() {
@@ -1365,11 +1388,11 @@ function onInput(e) {
   } else if (d.imgBind) {
     draft.imageBox = draft.imageBox || { url: '', placement: 'after_intro', caption: '' };
     draft.imageBox[d.imgBind] = t.value;
-    if (!draft.imageBox.url && !draft.imageBox.caption) {
-      draft.imageBox = null;
-    }
     dirty = true;
-    renderDetails();
+    renderSub();
+    if (d.imgBind === 'url') {
+      updateImageBoxPreview();
+    }
     return;
   } else if (d.pbind) {
     const p = draft.players[sel];
@@ -1624,6 +1647,12 @@ async function handleImageBoxUpload(file) {
   if (!file) return;
   const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
 
+  const MAX_FILE_SIZE = 5 * 1024 * 1024;
+  if (file.size > MAX_FILE_SIZE) {
+    alert(isEs ? 'El archivo es demasiado grande. El límite de tamaño es de 5 MB.' : 'File is too large. Maximum file size is 5 MB.');
+    return;
+  }
+
   // Convert to dataUrl or upload if admin
   try {
     const dataUrl = await new Promise((resolve, reject) => {
@@ -1737,7 +1766,10 @@ function onChange(e) {
     draft.imageBox = draft.imageBox || { url: '', placement: 'after_intro', caption: '' };
     draft.imageBox[e.target.dataset.imgBind] = e.target.value;
     dirty = true;
-    renderDetails();
+    renderSub();
+    if (e.target.dataset.imgBind === 'url') {
+      updateImageBoxPreview();
+    }
   }
 }
 
