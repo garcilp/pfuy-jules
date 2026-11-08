@@ -984,16 +984,18 @@ def write_profile(connection, player_id, display_tag, profile_slug):
     if not profile["games"]:
         return None
     player = profile["player"]
-    games_summary = [
-        {
+    games_summary = []
+    for g in profile.get("games", []):
+        g_dates = [r.get("date") for r in g.get("results", []) if r.get("date")]
+        games_summary.append({
             "id": g.get("id"),
             "slug": g.get("slug") or g.get("id"),
             "name": g.get("name"),
             "events": int(g.get("events") or 0),
-        }
-        for g in profile.get("games", [])
-    ]
+            "lastEventDate": max(g_dates) if g_dates else None,
+        })
     total_events = sum(g["events"] for g in games_summary)
+    all_game_dates = [g["lastEventDate"] for g in games_summary if g.get("lastEventDate")]
     return {
         "playerId": str(player_id),
         "tag": player.get("tag") or display_tag,
@@ -1006,6 +1008,7 @@ def write_profile(connection, player_id, display_tag, profile_slug):
         "photo": player.get("photo"),
         "games": games_summary,
         "events": total_events,
+        "lastEventDate": max(all_game_dates) if all_game_dates else None,
     }
 
 
