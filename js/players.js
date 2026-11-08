@@ -39,6 +39,7 @@ function setupInfiniteScroll(totalCount) {
 function resetPagination() {
   visibleCount = batchSize;
   cleanupObserver();
+  window.scrollTo(0, 0);
 }
 
 function getPlayerEventCount(entry, selectedGame) {
@@ -210,8 +211,23 @@ function render() {
     let miniBadgesHtml = '';
     if (window.PRBadges && playerTag) {
       const rList = window.PRBadges.getPlayerRankings(playerTag);
-      if (rList.length) {
-        const sortedBadges = sortMedals(rList);
+      // Only display a medal for a game if the player is ranked in the most recent PR for that game,
+      // and in that case, only display that corresponding medal.
+      const qualifyingEntries = [];
+      const checkedGames = new Set();
+      rList.forEach(entry => {
+        const gameKey = entry.ranking?.game?.id || entry.ranking?.game?.slug || entry.ranking?.gameId;
+        if (!gameKey || checkedGames.has(gameKey)) return;
+        checkedGames.add(gameKey);
+
+        const latestRanking = window.PRBadges.getLatestRankingForGame(gameKey);
+        if (latestRanking && entry.ranking?.id === latestRanking.id) {
+          qualifyingEntries.push(entry);
+        }
+      });
+
+      if (qualifyingEntries.length) {
+        const sortedBadges = sortMedals(qualifyingEntries);
         miniBadgesHtml = `<span class="player-mini-badges" onclick="event.stopPropagation();">${sortedBadges.slice(0, 3).map(e => window.PRBadges.renderMini(e)).join('')}</span>`;
       }
     }
