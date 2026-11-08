@@ -285,7 +285,187 @@
       'admin.editor.save': 'Save player',
       'admin.editor.reset': 'Reset',
       'admin.editor.reload': 'Reload',
-      'admin.editor.delete': 'Delete'
+      'admin.editor.delete': 'Delete',
+      'theme.button': 'Theme',
+      'theme.selector': 'Theme Selector',
+      'theme.choose': 'Choose color theme',
+      'nav.brand': 'Platfighters.uy',
+      'rankings.presets': 'Presets:',
+      'rankings.competitiveStandings': 'COMPETITIVE STANDINGS',
+      'rankings.standingsDesc': 'Glicko-2, Strength of Field, Quality Wins & Consistency metrics.',
+      'player.profileEyebrow': 'PLAYER PROFILE',
+      'player.profileUnavailable': 'Profile unavailable',
+      'player.gamesPlayed': 'Games played',
+      'player.characterUsage': 'Character usage',
+      'player.noCharacters': 'No character selections recorded.',
+      'player.notableWins': 'Notable wins',
+      'player.noNotableWins': 'No notable wins recorded.',
+      'player.placementHistory': 'Placement history',
+      'player.mostPlayedOpponents': 'Most Played Opponents',
+      'player.bestFinishes': 'Best finishes',
+      'player.noFinishes': 'No tournaments recorded for this placement.',
+      'player.noResults': 'No event results recorded.',
+      'player.showMoreEvents': 'Show more events',
+      'player.close': 'Close',
+      'player.resetZoom': 'Reset',
+      'player.stat.eventsEntered': 'EVENTS ENTERED',
+      'player.stat.setRecord': 'SET RECORD',
+      'player.stat.bestPlacing': 'BEST PLACING',
+      'player.stat.upsetWins': 'UPSET WINS',
+      'player.stat.closestUpset': 'CLOSEST UPSET',
+      'player.stat.activeFor': 'ACTIVE FOR',
+      'player.stat.mostPlayedOpponent': 'MOST-PLAYED OPPONENT',
+      'player.stat.setWinRate': '{pct}% set win rate',
+      'player.stat.higherSeeds': 'Higher seeds beaten',
+      'player.stat.noSeededLosses': 'No seeded losses recorded',
+      'player.stat.noPlacement': 'No placement recorded',
+      'player.stat.acrossGames': 'Across {n} game{s}',
+      'player.stat.noSetData': 'No set data',
+      'player.stat.seed': 'Seed {seed}',
+      'player.stat.oneEvent': '1 Event',
+      'player.stat.months': '{n} month{s}',
+      'player.stat.years': '{n} years',
+      'player.stat.since': 'Since {date}',
+      'player.table.event': 'EVENT',
+      'player.table.date': 'DATE',
+      'player.table.seed': 'SEED',
+      'player.table.place': 'PLACE',
+      'player.table.entrants': 'ENTRANTS',
+      'player.table.phase': 'PHASE',
+      'player.table.opponent': 'OPPONENT',
+      'player.table.score': 'SCORE',
+      'player.table.result': 'RESULT',
+      'player.table.sets': '{n} set{s}',
+      'player.table.games': '· {n} games',
+      'events.noEvents': 'No events available',
+      'events.noBracketStandings': 'No bracket standings available for this tournament.',
+      'events.noStandings': 'No standings recorded.',
+      'events.noSelected': 'No tournament selected',
+      'rankings.comparison.title': 'Rankings Overview',
+      'rankings.comparison.desc': 'Side-by-side player ranks and scores across all 4 distinct systems. Each metric measures a different competitive dimension and raw values are presented on their native scales.',
+      'rankings.comparison.noData': 'No comparison data',
+      'rankings.comparison.noMatch': 'No players match the filter.',
+      'rankings.diag.title': 'Player Diagnostic Error',
+      'rankings.diag.loading': 'Loading calculation diagnostic trace…',
+      'rankings.diag.localRequired': 'Detailed calculation diagnostic trace requires local server endpoint (/api/rankings/diagnostic).',
+      'rankings.diag.context': 'Calculation Context & Algorithm Configuration',
+      'rankings.diag.breakdown': 'Representative Breakdown & Intermediate Values',
+      'rankings.diag.events': 'Contributing Tournament Events ({n})',
+      'rankings.diag.trace': 'Step-by-Step Match Trace ({n} sets recorded)',
+      'rankings.diag.dateEvent': 'DATE & EVENT',
+      'rankings.diag.fieldStrength': 'FIELD STRENGTH',
+      'rankings.diag.eventPoints': 'EVENT POINTS',
+      'rankings.diag.unranked': 'Unranked',
+      'rankings.diag.rank': 'Rank: <b>{rank}</b> · Final Score: <b>{score}</b>',
+      'rankings.diag.ratingChange': ' · Rating Change: <b>{change}</b>',
+      'creator.action.import': 'Import',
+      'creator.action.export': 'Export',
+      'creator.action.share': 'Share',
+      'creator.action.exportImage': 'Export Image',
+      'creator.action.publish': 'Publish',
+      'creator.modal.selectWin': 'Select Notable Win',
+      'creator.modal.selectWinSub': 'Select an opponent defeated during this period',
+      'creator.modal.addBlankWin': '+ Add blank win',
+      'creator.modal.selectEvent': 'Select Event Result',
+      'creator.modal.selectEventSub': "Select an event from this player's tournament history",
+      'creator.modal.addBlankResult': '+ Add blank result',
+      'creator.modal.cropTitle': 'Crop Player Picture',
+      'creator.modal.cropSub': 'Drag image to adjust crop position and use the slider to zoom',
+      'creator.modal.zoom': 'ZOOM',
+      'creator.modal.cancel': 'Cancel',
+      'creator.modal.applyPicture': 'Apply Picture',
+      'creator.field.classification': 'CLASSIFICATION',
+      'creator.field.imageUrl': 'IMAGE URL',
+      'creator.field.imagePlacement': 'PLACEMENT IN ARTICLE',
+      'creator.field.imageCaption': 'IMAGE CAPTION',
+      'creator.field.upload': 'Upload',
+      'creator.field.removeImage': 'Remove image',
+      'creator.field.sponsor': 'SPONSOR',
+      'admin.nav.players': 'Players',
+      'admin.nav.events': 'Events',
+      'admin.nav.rankings': 'Rankings',
+      'admin.siteAdmin': 'Site Administration',
+      'admin.siteAdminDesc': 'Manage players, official power rankings, and event groupings on Platfighters.uy.',
+      'admin.sec.playerProfiles': 'Player Profiles & Merges',
+      'admin.sec.playerProfilesDesc': 'Edit player profile fields, toggle game activity visibility, and merge duplicate player identities.',
+      'admin.sec.eventMgmt': 'Event Management',
+      'admin.sec.eventMgmtDesc': 'Group amateur and side brackets into main tournaments, configure event exclusion, and manage tournament metadata.',
+      'admin.sec.groupEvent': 'Group an additional event',
+      'admin.sec.groupEventDesc': 'Attach an event such as an amateur bracket to its main event so participant placements are contiguous.',
+      'admin.sec.bulkEvent': 'Bulk Event Merging',
+      'admin.sec.bulkEventDesc': 'Queue multiple event merge operations (FROM → TO → NAME) to execute together in a single batch.',
+      'admin.sec.excludeEvent': 'Exclude an event',
+      'admin.sec.excludeEventDesc': 'Excluded events are omitted from every player profile, game summary, and ranking calculation.',
+      'admin.sec.socialLinks': 'Community Social Media Links',
+      'admin.sec.socialLinksDesc': 'Configure the WhatsApp, Discord, and Instagram links and visibility for each community game hub.',
+      'admin.sec.officialPR': 'Official Power Rankings',
+      'admin.sec.officialPRDesc': 'Create, edit, archive, or manage official website rankings.',
+      'admin.sec.mergeIdentities': 'Merge player identities',
+      'admin.sec.mergeIdentitiesDesc': 'Combine a duplicate start.gg account into the profile you want to keep. Results and sets will be transferred.',
+      'admin.sec.bulkPlayer': 'Bulk Player Merging',
+      'admin.sec.bulkPlayerDesc': 'Queue multiple player merge operations (FROM → TO) and execute them together in a single batch.',
+      'admin.btn.viewPublic': 'View public profile ↗',
+      'admin.btn.saveGameVis': 'Save game visibility',
+      'admin.btn.profileDetails': 'Profile details',
+      'admin.btn.rawJson': 'Raw JSON',
+      'admin.btn.saveChanges': 'Save changes',
+      'admin.btn.mergeProfiles': 'Merge profiles',
+      'admin.btn.queueMerge': '+ Queue Merge',
+      'admin.btn.cancelEdit': 'Cancel Edit',
+      'admin.btn.clearQueue': 'Clear Queue',
+      'admin.btn.executeBatch': 'Execute Batch',
+      'admin.btn.saveEventGrouping': 'Save event grouping',
+      'admin.btn.saveEventVis': 'Save event visibility',
+      'admin.btn.saveSocialLinks': 'Save social links',
+      'admin.btn.submitNewPR': '+ Submit New PR',
+      'admin.label.displayTag': 'Display tag',
+      'admin.label.sponsor': 'Sponsor / prefix',
+      'admin.label.city': 'City',
+      'admin.label.country': 'Country',
+      'admin.label.locationText': 'Location text (fallback)',
+      'admin.label.startggLink': 'start.gg profile link',
+      'admin.label.aliases': 'Known aliases (comma-separated)',
+      'admin.label.completeData': 'Complete profile data',
+      'admin.label.replacePic': 'Replace picture',
+      'admin.label.picNote': 'PNG, JPEG or WebP · up to 5 MB',
+      'admin.label.mergeThis': 'Merge this player',
+      'admin.label.intoKeep': 'Into the profile to keep',
+      'admin.label.mergeFrom': 'Merge this player (FROM)',
+      'admin.label.mergeTo': 'Into the profile to keep (TO)',
+      'admin.label.mainEvent': 'Main event',
+      'admin.label.additionalEvent': 'Additional event',
+      'admin.label.phaseLabel': 'Phase label',
+      'admin.label.eventUrl': 'Event URL',
+      'admin.label.excludeCheck': 'Exclude this event from all views',
+      'admin.label.queuedOps': 'Queued operations ({n})',
+      'admin.label.noPlayerQueued': 'No player merges currently queued.',
+      'admin.label.noEventQueued': 'No event merges currently queued.',
+      'admin.label.showArchived': 'Show archived rankings',
+      'admin.label.filterGame': 'FILTER BY GAME',
+      'admin.label.allGames': 'All games',
+      'admin.label.searchRankings': 'SEARCH RANKINGS',
+      'admin.table.name': 'Name',
+      'admin.table.game': 'Game',
+      'admin.table.classification': 'Classification',
+      'admin.table.period': 'Period',
+      'admin.table.players': 'Players',
+      'admin.table.actions': 'Actions',
+      'admin.table.loading': 'Loading official rankings...',
+      'admin.footer': 'Platfighters.uy · Local administrator session',
+      'creator.alert.profileNotFound': 'Player profile could not be found.',
+      'creator.alert.alreadyAdded': 'This player is already included in the ranking.',
+      'creator.alert.uploadError': 'Could not upload photo: {err}',
+      'creator.alert.fileTooLarge': 'Selected file is too large (maximum 2 MB).',
+      'creator.alert.shareTooLong': 'This ranking contains too much information for a shareable URL link.\n\nPlease use the "Export" button to download a JSON file to share with others.',
+      'creator.alert.shareCopied': 'Shareable link copied to clipboard!\n\nAnyone opening this link can view your community ranking.\n\n{url}',
+      'creator.alert.addPlayersFirst': 'Add players to your ranking before exporting an image.',
+      'creator.alert.exportImageError': 'An error occurred while generating the ranking image.',
+      'creator.alert.authRequired': 'Publishing requires active administrator credentials.',
+      'creator.alert.fillRequired': 'Please complete all required fields (Ranking title, period start/end, and valid players) before publishing.',
+      'creator.alert.publishedSuccess': 'Official power ranking "{title}" was published successfully!',
+      'creator.alert.publishFailed': 'Could not publish ranking: {err}',
+      'creator.confirm.overwrite': 'You have unsaved changes in the creator. Importing a ranking will overwrite your current form. Continue?',
+      'creator.confirm.publish': 'Publish official ranking "{title}"? This will make it permanently visible in the official rankings directory.'
     },
     es: {
       // Navegación global y común
@@ -569,7 +749,187 @@
       'admin.editor.save': 'Guardar jugador',
       'admin.editor.reset': 'Restablecer',
       'admin.editor.reload': 'Recargar',
-      'admin.editor.delete': 'Eliminar'
+      'admin.editor.delete': 'Eliminar',
+      'theme.button': 'Tema',
+      'theme.selector': 'Selector de Tema',
+      'theme.choose': 'Elegir tema de color',
+      'nav.brand': 'Platfighters.uy',
+      'rankings.presets': 'Preajustes:',
+      'rankings.competitiveStandings': 'TABLAS DE POSICIONES',
+      'rankings.standingsDesc': 'Métricas de Glicko-2, Fuerza de Campo, Victorias de Calidad y Consistencia.',
+      'player.profileEyebrow': 'PERFIL DE JUGADOR',
+      'player.profileUnavailable': 'Perfil no disponible',
+      'player.gamesPlayed': 'Juegos disputados',
+      'player.characterUsage': 'Uso de personajes',
+      'player.noCharacters': 'No hay personajes registrados.',
+      'player.notableWins': 'Victorias destacadas',
+      'player.noNotableWins': 'No hay victorias destacadas registradas.',
+      'player.placementHistory': 'Historial de posiciones',
+      'player.mostPlayedOpponents': 'Rivales más frecuentes',
+      'player.bestFinishes': 'Mejores resultados',
+      'player.noFinishes': 'No hay torneos registrados para este puesto.',
+      'player.noResults': 'No hay resultados registrados en torneos.',
+      'player.showMoreEvents': 'Mostrar más torneos',
+      'player.close': 'Cerrar',
+      'player.resetZoom': 'Restablecer',
+      'player.stat.eventsEntered': 'TORNEOS DISPUTADOS',
+      'player.stat.setRecord': 'HISTORIAL DE SETS',
+      'player.stat.bestPlacing': 'MEJOR PUESTO',
+      'player.stat.upsetWins': 'VICTORIAS UPSET',
+      'player.stat.closestUpset': 'UPSET MÁS CERCANO',
+      'player.stat.activeFor': 'TIEMPO ACTIVO',
+      'player.stat.mostPlayedOpponent': 'RIVAL MÁS FRECUENTE',
+      'player.stat.setWinRate': '{pct}% de victorias en sets',
+      'player.stat.higherSeeds': 'Seeds superiores derrotados',
+      'player.stat.noSeededLosses': 'Sin derrotas con seed registradas',
+      'player.stat.noPlacement': 'Sin puesto registrado',
+      'player.stat.acrossGames': 'En {n} juego{s}',
+      'player.stat.noSetData': 'Sin datos de sets',
+      'player.stat.seed': 'Seed {seed}',
+      'player.stat.oneEvent': '1 Torneo',
+      'player.stat.months': '{n} mes{es}',
+      'player.stat.years': '{n} años',
+      'player.stat.since': 'Desde {date}',
+      'player.table.event': 'TORNEO',
+      'player.table.date': 'FECHA',
+      'player.table.seed': 'SEED',
+      'player.table.place': 'PUESTO',
+      'player.table.entrants': 'PARTICIPANTES',
+      'player.table.phase': 'FASE',
+      'player.table.opponent': 'RIVAL',
+      'player.table.score': 'RESULTADO',
+      'player.table.result': 'ESTADO',
+      'player.table.sets': '{n} set{s}',
+      'player.table.games': '· {n} juegos',
+      'events.noEvents': 'No hay torneos disponibles',
+      'events.noBracketStandings': 'No hay posiciones de brackets registradas para este torneo.',
+      'events.noStandings': 'No hay posiciones registradas.',
+      'events.noSelected': 'Ningún torneo seleccionado',
+      'rankings.comparison.title': 'Resumen de Rankings',
+      'rankings.comparison.desc': 'Puestos y puntajes comparados en los 4 sistemas. Cada métrica evalúa una dimensión competitiva diferente en sus escalas nativas.',
+      'rankings.comparison.noData': 'Sin datos de comparación',
+      'rankings.comparison.noMatch': 'Ningún jugador coincide con el filtro.',
+      'rankings.diag.title': 'Error de Diagnóstico del Jugador',
+      'rankings.diag.loading': 'Cargando traza diagnóstica de cálculo…',
+      'rankings.diag.localRequired': 'La traza diagnóstica de cálculo detallada requiere el endpoint local del servidor (/api/rankings/diagnostic).',
+      'rankings.diag.context': 'Contexto de Cálculo y Configuración del Algoritmo',
+      'rankings.diag.breakdown': 'Desglose Representativo y Valores Intermedios',
+      'rankings.diag.events': 'Torneos Contribuyentes ({n})',
+      'rankings.diag.trace': 'Traza Paso a Paso de Partidas ({n} sets registrados)',
+      'rankings.diag.dateEvent': 'FECHA Y TORNEO',
+      'rankings.diag.fieldStrength': 'FUERZA DE CAMPO',
+      'rankings.diag.eventPoints': 'PUNTOS DE EVENTO',
+      'rankings.diag.unranked': 'Sin clasificar',
+      'rankings.diag.rank': 'Puesto: <b>{rank}</b> · Puntaje Final: <b>{score}</b>',
+      'rankings.diag.ratingChange': ' · Cambio de Rating: <b>{change}</b>',
+      'creator.action.import': 'Importar',
+      'creator.action.export': 'Exportar',
+      'creator.action.share': 'Compartir',
+      'creator.action.exportImage': 'Exportar Imagen',
+      'creator.action.publish': 'Publicar',
+      'creator.modal.selectWin': 'Seleccionar Victoria Destacada',
+      'creator.modal.selectWinSub': 'Selecciona un rival derrotado durante este periodo',
+      'creator.modal.addBlankWin': '+ Agregar victoria vacía',
+      'creator.modal.selectEvent': 'Seleccionar Resultado de Torneo',
+      'creator.modal.selectEventSub': 'Selecciona un torneo del historial de este jugador',
+      'creator.modal.addBlankResult': '+ Agregar resultado vacío',
+      'creator.modal.cropTitle': 'Recortar Foto del Jugador',
+      'creator.modal.cropSub': 'Arrastra la imagen para ajustar el recorte y usa la barra para hacer zoom',
+      'creator.modal.zoom': 'ZOOM',
+      'creator.modal.cancel': 'Cancelar',
+      'creator.modal.applyPicture': 'Aplicar Foto',
+      'creator.field.classification': 'CLASIFICACIÓN',
+      'creator.field.imageUrl': 'URL DE LA IMAGEN',
+      'creator.field.imagePlacement': 'UBICACIÓN EN EL ARTÍCULO',
+      'creator.field.imageCaption': 'EPÍGRAFE / TEXTO DE LA IMAGEN',
+      'creator.field.upload': 'Subir',
+      'creator.field.removeImage': 'Quitar imagen',
+      'creator.field.sponsor': 'SPONSOR',
+      'admin.nav.players': 'Jugadores',
+      'admin.nav.events': 'Torneos',
+      'admin.nav.rankings': 'Rankings',
+      'admin.siteAdmin': 'Administración del Sitio',
+      'admin.siteAdminDesc': 'Gestiona jugadores, power rankings oficiales y agrupaciones de torneos en Platfighters.uy.',
+      'admin.sec.playerProfiles': 'Perfiles de Jugadores y Fusiones',
+      'admin.sec.playerProfilesDesc': 'Edita campos de perfil, visibilidad de actividad por juego y fusiona identidades duplicadas.',
+      'admin.sec.eventMgmt': 'Gestión de Torneos',
+      'admin.sec.eventMgmtDesc': 'Agrupa torneos amateur y secundarios con el evento principal, configura exclusiones y metadatos.',
+      'admin.sec.groupEvent': 'Agrupar un torneo adicional',
+      'admin.sec.groupEventDesc': 'Asocia un evento como un bracket amateur a su torneo principal para que los puestos sean contiguos.',
+      'admin.sec.bulkEvent': 'Fusión Masiva de Torneos',
+      'admin.sec.bulkEventDesc': 'Encola múltiples operaciones de fusión de torneos (ORIGEN → DESTINO → NOMBRE) para ejecutarlas en lote.',
+      'admin.sec.excludeEvent': 'Excluir un torneo',
+      'admin.sec.excludeEventDesc': 'Los torneos excluidos se omiten de todos los perfiles de jugadores, resúmenes y cálculos de ranking.',
+      'admin.sec.socialLinks': 'Enlaces a Redes de la Comunidad',
+      'admin.sec.socialLinksDesc': 'Configura los enlaces y visibilidad de WhatsApp, Discord e Instagram para cada juego.',
+      'admin.sec.officialPR': 'Power Rankings Oficiales',
+      'admin.sec.officialPRDesc': 'Crea, edita, archiva o administra los power rankings oficiales del sitio.',
+      'admin.sec.mergeIdentities': 'Fusionar identidades de jugador',
+      'admin.sec.mergeIdentitiesDesc': 'Combina una cuenta duplicada de start.gg en el perfil que deseas conservar. Los resultados y sets se transferirán.',
+      'admin.sec.bulkPlayer': 'Fusión Masiva de Jugadores',
+      'admin.sec.bulkPlayerDesc': 'Encola múltiples operaciones de fusión de jugadores (ORIGEN → DESTINO) para ejecutarlas en lote.',
+      'admin.btn.viewPublic': 'Ver perfil público ↗',
+      'admin.btn.saveGameVis': 'Guardar visibilidad de juegos',
+      'admin.btn.profileDetails': 'Detalles del perfil',
+      'admin.btn.rawJson': 'JSON sin formato',
+      'admin.btn.saveChanges': 'Guardar cambios',
+      'admin.btn.mergeProfiles': 'Fusionar perfiles',
+      'admin.btn.queueMerge': '+ Encolar Fusión',
+      'admin.btn.cancelEdit': 'Cancelar Edición',
+      'admin.btn.clearQueue': 'Vaciar Cola',
+      'admin.btn.executeBatch': 'Ejecutar Lote',
+      'admin.btn.saveEventGrouping': 'Guardar agrupación de torneo',
+      'admin.btn.saveEventVis': 'Guardar visibilidad de torneo',
+      'admin.btn.saveSocialLinks': 'Guardar enlaces sociales',
+      'admin.btn.submitNewPR': '+ Publicar Nuevo PR',
+      'admin.label.displayTag': 'Tag visible',
+      'admin.label.sponsor': 'Sponsor / prefijo',
+      'admin.label.city': 'Ciudad',
+      'admin.label.country': 'País',
+      'admin.label.locationText': 'Texto de ubicación',
+      'admin.label.startggLink': 'Enlace de perfil start.gg',
+      'admin.label.aliases': 'Alias conocidos (separados por coma)',
+      'admin.label.completeData': 'Datos completos del perfil',
+      'admin.label.replacePic': 'Cambiar imagen',
+      'admin.label.picNote': 'PNG, JPEG o WebP · hasta 5 MB',
+      'admin.label.mergeThis': 'Fusionar este jugador',
+      'admin.label.intoKeep': 'En el perfil a conservar',
+      'admin.label.mergeFrom': 'Fusionar este jugador (ORIGEN)',
+      'admin.label.mergeTo': 'En el perfil a conservar (DESTINO)',
+      'admin.label.mainEvent': 'Torneo principal',
+      'admin.label.additionalEvent': 'Torneo adicional',
+      'admin.label.phaseLabel': 'Etiqueta de fase',
+      'admin.label.eventUrl': 'URL del torneo',
+      'admin.label.excludeCheck': 'Excluir este torneo de todas las vistas',
+      'admin.label.queuedOps': 'Operaciones en cola ({n})',
+      'admin.label.noPlayerQueued': 'No hay fusiones de jugadores en cola.',
+      'admin.label.noEventQueued': 'No hay fusiones de torneos en cola.',
+      'admin.label.showArchived': 'Mostrar rankings archivados',
+      'admin.label.filterGame': 'FILTRAR POR JUEGO',
+      'admin.label.allGames': 'Todos los juegos',
+      'admin.label.searchRankings': 'BUSCAR RANKINGS',
+      'admin.table.name': 'Nombre',
+      'admin.table.game': 'Juego',
+      'admin.table.classification': 'Clasificación',
+      'admin.table.period': 'Periodo',
+      'admin.table.players': 'Jugadores',
+      'admin.table.actions': 'Acciones',
+      'admin.table.loading': 'Cargando rankings oficiales...',
+      'admin.footer': 'Platfighters.uy · Sesión de administrador local',
+      'creator.alert.profileNotFound': 'No se pudo encontrar el perfil del jugador.',
+      'creator.alert.alreadyAdded': 'Este jugador ya está incluido en el ranking.',
+      'creator.alert.uploadError': 'No se pudo subir la foto: {err}',
+      'creator.alert.fileTooLarge': 'El archivo seleccionado es demasiado grande (máximo 2 MB).',
+      'creator.alert.shareTooLong': 'Este ranking contiene demasiada información para un enlace compartible.\n\nPor favor, usa el botón "Exportar" para descargar un archivo JSON y compartirlo con otros.',
+      'creator.alert.shareCopied': '¡Enlace compartible copiado al portapapeles!\n\nCualquier persona que abra este enlace podrá ver tu ranking comunitario.\n\n{url}',
+      'creator.alert.addPlayersFirst': 'Agrega jugadores a tu ranking antes de exportar una imagen.',
+      'creator.alert.exportImageError': 'Ocurrió un error al generar la imagen del ranking.',
+      'creator.alert.authRequired': 'Publicar requiere credenciales de administrador activas.',
+      'creator.alert.fillRequired': 'Por favor completa todos los campos requeridos (Título del ranking, inicio/fin del periodo y jugadores válidos) antes de publicar.',
+      'creator.alert.publishedSuccess': '¡El power ranking oficial "{title}" fue publicado con éxito!',
+      'creator.alert.publishFailed': 'No se pudo publicar el ranking: {err}',
+      'creator.confirm.overwrite': 'Tienes cambios sin guardar en el creador. Importar un ranking sobrescribirá tu formulario actual. ¿Deseas continuar?',
+      'creator.confirm.publish': '¿Publicar el ranking oficial "{title}"? Esto lo hará permanentemente visible en el directorio de rankings oficiales.'
     }
   };
 
@@ -580,6 +940,10 @@
       currentLang = saved;
     }
   } catch (e) {}
+
+  if (typeof document !== 'undefined' && document.documentElement) {
+    document.documentElement.lang = currentLang;
+  }
 
   const listeners = [];
 
@@ -595,11 +959,10 @@
     return str;
   }
 
-  function applyTranslations(root = document) {
-    if (!root) return;
-    document.documentElement.lang = currentLang;
+  function translateElement(el) {
+    if (!el || el.nodeType !== 1) return;
 
-    root.querySelectorAll('[data-i18n]').forEach(el => {
+    if (el.hasAttribute('data-i18n')) {
       const key = el.getAttribute('data-i18n');
       if (key) {
         if (el.hasAttribute('data-i18n-html')) {
@@ -608,34 +971,56 @@
           el.textContent = t(key);
         }
       }
-    });
+    }
 
-    root.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    if (el.hasAttribute('data-i18n-placeholder')) {
       const key = el.getAttribute('data-i18n-placeholder');
       if (key) {
         el.setAttribute('placeholder', t(key));
       }
-    });
+    }
 
-    root.querySelectorAll('[data-i18n-title]').forEach(el => {
+    if (el.hasAttribute('data-i18n-title')) {
       const key = el.getAttribute('data-i18n-title');
       if (key) {
         el.setAttribute('title', t(key));
       }
-    });
+    }
 
-    root.querySelectorAll('[data-i18n-aria]').forEach(el => {
+    if (el.hasAttribute('data-i18n-aria')) {
       const key = el.getAttribute('data-i18n-aria');
       if (key) {
         el.setAttribute('aria-label', t(key));
       }
-    });
+    }
 
-    // Update state of all lang toggle buttons on the page
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-      const btnLang = btn.getAttribute('data-lang');
-      btn.classList.toggle('on', btnLang === currentLang);
+    if (el.classList && el.classList.contains('lang-btn')) {
+      const btnLang = el.getAttribute('data-lang');
+      el.classList.toggle('on', btnLang === currentLang);
+    }
+  }
+
+  function translateSubtree(root) {
+    if (!root || root.nodeType !== 1) return;
+    translateElement(root);
+
+    root.querySelectorAll('[data-i18n], [data-i18n-placeholder], [data-i18n-title], [data-i18n-aria], .lang-btn').forEach(el => {
+      translateElement(el);
     });
+  }
+
+  function applyTranslations(root = document) {
+    if (!root) return;
+    if (document.documentElement) {
+      document.documentElement.lang = currentLang;
+    }
+
+    if (root.nodeType === 9) { // Document
+      if (root.body) translateSubtree(root.body);
+      else if (root.documentElement) translateSubtree(root.documentElement);
+    } else {
+      translateSubtree(root);
+    }
   }
 
   function setLang(lang) {
@@ -675,11 +1060,42 @@
     }
   });
 
-  // Apply on DOM load
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => applyTranslations());
+  // Early DOM translation: observe elements as they are parsed and attached to the DOM
+  // This guarantees that if Spanish is selected, elements are translated synchronously
+  // before the browser performs its initial layout/paint.
+  if (typeof MutationObserver !== 'undefined' && document.documentElement) {
+    const parserObserver = new MutationObserver(mutations => {
+      for (let i = 0; i < mutations.length; i++) {
+        const addedNodes = mutations[i].addedNodes;
+        for (let j = 0; j < addedNodes.length; j++) {
+          const node = addedNodes[j];
+          if (node.nodeType === 1) {
+            translateSubtree(node);
+          }
+        }
+      }
+    });
+
+    parserObserver.observe(document.documentElement, {
+      childList: true,
+      subtree: true
+    });
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        parserObserver.disconnect();
+        applyTranslations();
+      }, { once: true });
+    } else {
+      parserObserver.disconnect();
+      applyTranslations();
+    }
   } else {
-    applyTranslations();
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => applyTranslations());
+    } else {
+      applyTranslations();
+    }
   }
 
   window.i18n = {

@@ -18,6 +18,7 @@
   document.documentElement.dataset.theme=t;
 })();
 </script>
+<script src="js/i18n.js"></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="css/themes.css">
 <link rel="stylesheet" href="css/styles.css">
@@ -42,91 +43,91 @@
   <section id="admin-editor" class="panel glass admin-panel" hidden>
     <div class="editor-heading">
       <div>
-        <h2>Site Administration</h2>
-        <p class="muted admin-copy">Manage players, official power rankings, and event groupings on Platfighters.uy.</p>
+        <h2 data-i18n="admin.siteAdmin">Site Administration</h2>
+        <p class="muted admin-copy" data-i18n="admin.siteAdminDesc">Manage players, official power rankings, and event groupings on Platfighters.uy.</p>
       </div>
       <button id="signout" class="quiet-button" type="button" data-i18n="admin.editor.signout">Sign out</button>
     </div>
 
     <nav class="admin-section-nav editor-tabs" role="tablist" aria-label="Admin sections" style="margin-bottom:28px; border-bottom:1px solid var(--line); padding-bottom:12px;">
-      <button id="subtab-players" class="ranking-tab active" type="button" role="tab" aria-selected="true" data-admin-sub="players">Players</button>
-      <button id="subtab-events" class="ranking-tab" type="button" role="tab" aria-selected="false" data-admin-sub="events">Events</button>
-      <button id="subtab-rankings" class="ranking-tab" type="button" role="tab" aria-selected="false" data-admin-sub="rankings">Rankings</button>
+      <button id="subtab-players" class="ranking-tab active" type="button" role="tab" aria-selected="true" data-admin-sub="players" data-i18n="admin.nav.players">Players</button>
+      <button id="subtab-events" class="ranking-tab" type="button" role="tab" aria-selected="false" data-admin-sub="events" data-i18n="admin.nav.events">Events</button>
+      <button id="subtab-rankings" class="ranking-tab" type="button" role="tab" aria-selected="false" data-admin-sub="rankings" data-i18n="admin.nav.rankings">Rankings</button>
     </nav>
 
     <!-- SECTION 1: PLAYERS -->
     <div id="admin-section-players" class="admin-subsection" role="tabpanel" aria-labelledby="subtab-players">
       <div style="margin-bottom: 24px;">
-        <h3 style="margin:0 0 4px 0;">Player Profiles & Merges</h3>
-        <p class="muted admin-copy" style="margin:0;">Edit player profile fields, toggle game activity visibility, and merge duplicate player identities.</p>
+        <h3 style="margin:0 0 4px 0;" data-i18n="admin.sec.playerProfiles">Player Profiles & Merges</h3>
+        <p class="muted admin-copy" style="margin:0;" data-i18n="admin.sec.playerProfilesDesc">Edit player profile fields, toggle game activity visibility, and merge duplicate player identities.</p>
       </div>
 
       <form id="profile-form" class="admin-form" style="margin-bottom: 32px; padding-bottom: 28px;">
         <div style="display:flex; gap:12px; align-items:flex-end;">
           <label style="flex:1;"><span data-i18n="admin.editor.profile">Player profile</span><select id="profile-select" required></select></label>
-          <a id="view-public-profile-btn" href="#" target="_blank" rel="noopener noreferrer" class="quiet-button" style="display:inline-flex; align-items:center; justify-content:center; text-decoration:none; white-space:nowrap; height:48px; box-sizing:border-box;">View public profile ↗</a>
+          <a id="view-public-profile-btn" href="#" target="_blank" rel="noopener noreferrer" class="quiet-button" style="display:inline-flex; align-items:center; justify-content:center; text-decoration:none; white-space:nowrap; height:48px; box-sizing:border-box;" data-i18n="admin.btn.viewPublic">View public profile ↗</a>
         </div>
         <fieldset id="player-game-exclusions" class="visibility-fieldset">
           <legend data-i18n="admin.editor.gameVis">Game visibility</legend>
           <p class="muted admin-copy" data-i18n="admin.editor.gameVisDesc">Check games to hide this player’s activity from those games across the site.</p>
           <div id="player-game-options" class="visibility-options"></div>
-          <div class="form-actions"><button id="save-game-exclusions" class="quiet-button" type="button">Save game visibility</button><p id="game-exclusion-message" class="form-message mono" role="status"></p></div>
+          <div class="form-actions"><button id="save-game-exclusions" class="quiet-button" type="button" data-i18n="admin.btn.saveGameVis">Save game visibility</button><p id="game-exclusion-message" class="form-message mono" role="status"></p></div>
         </fieldset>
         <div class="editor-tabs" role="tablist" aria-label="Editor mode">
-          <button id="tab-visual" class="ranking-tab active" type="button" role="tab" aria-selected="true">Profile details</button>
-          <button id="tab-raw" class="ranking-tab" type="button" role="tab" aria-selected="false">Raw JSON</button>
+          <button id="tab-visual" class="ranking-tab active" type="button" role="tab" aria-selected="true" data-i18n="admin.btn.profileDetails">Profile details</button>
+          <button id="tab-raw" class="ranking-tab" type="button" role="tab" aria-selected="false" data-i18n="admin.btn.rawJson">Raw JSON</button>
         </div>
         <div id="panel-visual">
           <div class="form-grid">
-            <label>Display tag<input id="player-tag" type="text" maxlength="80" placeholder="e.g. Mitsu" required></label>
-            <label>Sponsor / prefix<input id="player-sponsor" type="text" maxlength="100" placeholder="e.g. NSG"></label>
-            <label>City<input id="player-city" type="text" maxlength="120" placeholder="e.g. Montevideo"></label>
-            <label>Country<input id="player-country" type="text" maxlength="120" placeholder="e.g. Uruguay"></label>
-            <label>Location text (fallback)<input id="player-location" type="text" maxlength="120" placeholder="e.g. Montevideo, Uruguay"></label>
-            <label>start.gg profile link<input id="player-startgg" type="url" placeholder="https://start.gg/user/..."></label>
+            <label><span data-i18n="admin.label.displayTag">Display tag</span><input id="player-tag" type="text" maxlength="80" placeholder="e.g. Mitsu" required></label>
+            <label><span data-i18n="admin.label.sponsor">Sponsor / prefix</span><input id="player-sponsor" type="text" maxlength="100" placeholder="e.g. NSG"></label>
+            <label><span data-i18n="admin.label.city">City</span><input id="player-city" type="text" maxlength="120" placeholder="e.g. Montevideo"></label>
+            <label><span data-i18n="admin.label.country">Country</span><input id="player-country" type="text" maxlength="120" placeholder="e.g. Uruguay"></label>
+            <label><span data-i18n="admin.label.locationText">Location text (fallback)</span><input id="player-location" type="text" maxlength="120" placeholder="e.g. Montevideo, Uruguay"></label>
+            <label><span data-i18n="admin.label.startggLink">start.gg profile link</span><input id="player-startgg" type="url" placeholder="https://start.gg/user/..."></label>
           </div>
-          <label style="margin-top:14px;">Known aliases (comma-separated)<input id="player-aliases" type="text" placeholder="e.g. Tag1, Tag2"></label>
+          <label style="margin-top:14px;"><span data-i18n="admin.label.aliases">Known aliases (comma-separated)</span><input id="player-aliases" type="text" placeholder="e.g. Tag1, Tag2"></label>
         </div>
         <div id="panel-raw" hidden>
-          <label>Complete profile data<textarea id="profile-json" class="profile-json" spellcheck="false"></textarea></label>
+          <label><span data-i18n="admin.label.completeData"><span data-i18n="admin.label.completeData">Complete profile data</span></span><textarea id="profile-json" class="profile-json" spellcheck="false"></textarea></label>
         </div>
-        <div class="photo-row"><label class="upload-control">Replace picture<input id="profile-photo-file" type="file" accept="image/png,image/jpeg,image/webp"></label><span id="photo-name" class="mono muted">PNG, JPEG or WebP · up to 5 MB</span><img id="photo-preview" class="photo-preview" alt="Selected player picture preview" hidden></div>
-        <div class="form-actions"><button class="action-button" type="submit">Save changes</button><p id="save-message" class="form-message mono" role="status"></p></div>
+        <div class="photo-row"><label class="upload-control"><span data-i18n="admin.label.replacePic">Replace picture</span><input id="profile-photo-file" type="file" accept="image/png,image/jpeg,image/webp"></label><span id="photo-name" class="mono muted"><span data-i18n="admin.label.picNote"><span data-i18n="admin.label.picNote">PNG, JPEG or WebP · up to 5 MB</span></span></span><img id="photo-preview" class="photo-preview" alt="Selected player picture preview" hidden></div>
+        <div class="form-actions"><button class="action-button" type="submit" data-i18n="admin.btn.saveChanges">Save changes</button><p id="save-message" class="form-message mono" role="status"></p></div>
       </form>
 
       <section class="merge-panel" aria-labelledby="merge-heading" style="margin-top: 0;">
-        <h3 id="merge-heading">Merge player identities</h3>
-        <p class="muted admin-copy">Combine a duplicate start.gg account into the profile you want to keep. Tournament history and statistics will be rebuilt together.</p>
+        <h3 id="merge-heading" data-i18n="admin.sec.mergeIdentities">Merge player identities</h3>
+        <p class="muted admin-copy" data-i18n="admin.sec.mergeIdentitiesDesc">Combine a duplicate start.gg account into the profile you want to keep. Results and sets will be transferred.</p>
         <form id="merge-form" class="admin-form merge-form">
-          <label>Merge this player<select id="merge-source" required></select></label>
-          <label>Into the profile to keep<select id="merge-target" required></select></label>
-          <div class="form-actions"><button class="action-button" type="submit">Merge profiles</button><p id="merge-message" class="form-message mono" role="status"></p></div>
+          <label><span data-i18n="admin.label.mergeThis">Merge this player</span><select id="merge-source" required></select></label>
+          <label><span data-i18n="admin.label.intoKeep">Into the profile to keep</span><select id="merge-target" required></select></label>
+          <div class="form-actions"><button class="action-button" type="submit" data-i18n="admin.btn.mergeProfiles">Merge profiles</button><p id="merge-message" class="form-message mono" role="status"></p></div>
         </form>
       </section>
 
       <section class="merge-panel" aria-labelledby="bulk-player-merge-heading" style="margin-top: 32px; padding-top: 28px;">
-        <h3 id="bulk-player-merge-heading">Bulk Player Merging</h3>
-        <p class="muted admin-copy">Queue multiple player merge operations (FROM → TO) and execute them together in a single batch. Profiles and rankings will be rebuilt once after all operations complete.</p>
+        <h3 id="bulk-player-merge-heading" data-i18n="admin.sec.bulkPlayer">Bulk Player Merging</h3>
+        <p class="muted admin-copy" data-i18n="admin.sec.bulkPlayerDesc">Queue multiple player merge operations (FROM → TO) and execute them together in a single batch.</p>
         <form id="bulk-player-form" class="admin-form merge-form">
-          <label>Merge this player (FROM)<select id="bulk-player-source" required></select></label>
-          <label>Into the profile to keep (TO)<select id="bulk-player-target" required></select></label>
+          <label><span data-i18n="admin.label.mergeFrom">Merge this player (FROM)</span><select id="bulk-player-source" required></select></label>
+          <label><span data-i18n="admin.label.mergeTo">Into the profile to keep (TO)</span><select id="bulk-player-target" required></select></label>
           <div class="form-actions">
-            <button id="bulk-player-queue-btn" class="action-button" type="submit">+ Queue Merge</button>
-            <button id="bulk-player-cancel-edit-btn" class="quiet-button" type="button" style="display:none;">Cancel Edit</button>
+            <button id="bulk-player-queue-btn" class="action-button" type="submit" data-i18n="admin.btn.queueMerge">+ Queue Merge</button>
+            <button id="bulk-player-cancel-edit-btn" class="quiet-button" type="button" style="display:none;" data-i18n="admin.btn.cancelEdit">Cancel Edit</button>
             <p id="bulk-player-form-message" class="form-message mono" role="status"></p>
           </div>
         </form>
 
         <div id="bulk-player-queue-wrapper" style="margin-top: 20px; max-width: 760px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <span class="mono muted" id="bulk-player-queue-count" style="font-size:13px; font-weight:600;">Queued operations (0)</span>
-            <button id="bulk-player-clear-btn" class="quiet-button" type="button" style="display:none; color:var(--muted); font-size:12px;">Clear Queue</button>
+            <span class="mono muted" id="bulk-player-queue-count" style="font-size:13px; font-weight:600;" data-i18n="admin.label.queuedOps">Queued operations (0)</span>
+            <button id="bulk-player-clear-btn" class="quiet-button" type="button" style="display:none; color:var(--muted); font-size:12px;" data-i18n="admin.btn.clearQueue">Clear Queue</button>
           </div>
           <div id="bulk-player-queue-list" class="event-group-list" style="margin-top:0;" aria-live="polite">
-            <p class="muted event-group-empty">No player merges currently queued.</p>
+            <p class="muted event-group-empty" data-i18n="admin.label.noPlayerQueued">No player merges currently queued.</p>
           </div>
           <div style="margin-top:16px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
-            <button id="bulk-player-execute-btn" class="action-button" type="button" disabled>Execute Batch</button>
+            <button id="bulk-player-execute-btn" class="action-button" type="button" disabled data-i18n="admin.btn.executeBatch">Execute Batch</button>
             <p id="bulk-player-message" class="form-message mono" role="status"></p>
           </div>
         </div>
@@ -136,68 +137,68 @@
     <!-- SECTION 2: EVENTS -->
     <div id="admin-section-events" class="admin-subsection" role="tabpanel" aria-labelledby="subtab-events" hidden>
       <div style="margin-bottom: 24px;">
-        <h3 style="margin:0 0 4px 0;">Event Management</h3>
-        <p class="muted admin-copy" style="margin:0;">Group amateur and side brackets into main tournaments, configure global event exclusions, and manage community links.</p>
+        <h3 style="margin:0 0 4px 0;" data-i18n="admin.sec.eventMgmt">Event Management</h3>
+        <p class="muted admin-copy" style="margin:0;" data-i18n="admin.sec.eventMgmtDesc">Group amateur and side brackets into main tournaments, configure global event exclusions, and manage community links.</p>
       </div>
 
       <section class="merge-panel" aria-labelledby="event-group-heading" style="margin-top: 0; margin-bottom: 32px; padding-bottom: 28px;">
-        <h3 id="event-group-heading">Group an additional event</h3>
-        <p class="muted admin-copy">Attach an event such as an amateur bracket to its main event. Select events from currently imported tournaments. Sets from the added event will appear under the main event with your phase label.</p>
+        <h3 id="event-group-heading" data-i18n="admin.sec.groupEvent">Group an additional event</h3>
+        <p class="muted admin-copy" data-i18n="admin.sec.groupEventDesc">Attach an event such as an amateur bracket to its main event so participant placements are contiguous.</p>
         <form id="event-group-form" class="admin-form merge-form">
-          <label>Main event<select id="event-parent-url" required></select></label>
-          <label>Additional event<select id="event-child-url" required></select></label>
-          <label>Phase label<input id="event-phase-label" type="text" maxlength="80" placeholder="Categoria B" required></label>
-          <div class="form-actions"><button class="action-button" type="submit">Save event grouping</button><p id="event-group-message" class="form-message mono" role="status"></p></div>
+          <label><span data-i18n="admin.label.mainEvent">Main event</span><select id="event-parent-url" required></select></label>
+          <label><span data-i18n="admin.label.additionalEvent">Additional event</span><select id="event-child-url" required></select></label>
+          <label><span data-i18n="admin.label.phaseLabel">Phase label</span><input id="event-phase-label" type="text" maxlength="80" placeholder="Categoria B" required></label>
+          <div class="form-actions"><button class="action-button" type="submit" data-i18n="admin.btn.saveEventGrouping">Save event grouping</button><p id="event-group-message" class="form-message mono" role="status"></p></div>
         </form>
         <div id="event-group-list" class="event-group-list" aria-live="polite"></div>
       </section>
 
       <section class="merge-panel" aria-labelledby="bulk-event-merge-heading" style="margin-top: 0; margin-bottom: 32px; padding-bottom: 28px;">
-        <h3 id="bulk-event-merge-heading">Bulk Event Merging</h3>
-        <p class="muted admin-copy">Queue multiple event merge operations (FROM → TO → NAME) to merge events (such as amateur brackets) into main tournaments with a custom display name, and execute them together in a single batch.</p>
+        <h3 id="bulk-event-merge-heading" data-i18n="admin.sec.bulkEvent">Bulk Event Merging</h3>
+        <p class="muted admin-copy" data-i18n="admin.sec.bulkEventDesc">Queue multiple event merge operations (FROM → TO → NAME) to execute together in a single batch.</p>
         <form id="bulk-event-form" class="admin-form merge-form">
-          <label>Source event to merge (FROM)<select id="bulk-event-source" required></select></label>
-          <label>Destination event to keep (TO)<select id="bulk-event-target" required></select></label>
-          <label>Display name in tournament (NAME)<input id="bulk-event-name" type="text" maxlength="80" placeholder="Categoria B" required></label>
+          <label><span data-i18n="admin.label.mergeFrom">Source event to merge (FROM)</span><select id="bulk-event-source" required></select></label>
+          <label><span data-i18n="admin.label.mergeTo">Destination event to keep (TO)</span><select id="bulk-event-target" required></select></label>
+          <label><span data-i18n="admin.label.displayTag">Display name in tournament (NAME)</span><input id="bulk-event-name" type="text" maxlength="80" placeholder="Categoria B" required></label>
           <div class="form-actions">
-            <button id="bulk-event-queue-btn" class="action-button" type="submit">+ Queue Merge</button>
-            <button id="bulk-event-cancel-edit-btn" class="quiet-button" type="button" style="display:none;">Cancel Edit</button>
+            <button id="bulk-event-queue-btn" class="action-button" type="submit" data-i18n="admin.btn.queueMerge">+ Queue Merge</button>
+            <button id="bulk-event-cancel-edit-btn" class="quiet-button" type="button" style="display:none;" data-i18n="admin.btn.cancelEdit">Cancel Edit</button>
             <p id="bulk-event-form-message" class="form-message mono" role="status"></p>
           </div>
         </form>
 
         <div id="bulk-event-queue-wrapper" style="margin-top: 20px; max-width: 760px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <span class="mono muted" id="bulk-event-queue-count" style="font-size:13px; font-weight:600;">Queued operations (0)</span>
-            <button id="bulk-event-clear-btn" class="quiet-button" type="button" style="display:none; color:var(--muted); font-size:12px;">Clear Queue</button>
+            <span class="mono muted" id="bulk-event-queue-count" style="font-size:13px; font-weight:600;" data-i18n="admin.label.queuedOps">Queued operations (0)</span>
+            <button id="bulk-event-clear-btn" class="quiet-button" type="button" style="display:none; color:var(--muted); font-size:12px;" data-i18n="admin.btn.clearQueue">Clear Queue</button>
           </div>
           <div id="bulk-event-queue-list" class="event-group-list" style="margin-top:0;" aria-live="polite">
-            <p class="muted event-group-empty">No event merges currently queued.</p>
+            <p class="muted event-group-empty" data-i18n="admin.label.noEventQueued">No event merges currently queued.</p>
           </div>
           <div style="margin-top:16px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
-            <button id="bulk-event-execute-btn" class="action-button" type="button" disabled>Execute Batch</button>
+            <button id="bulk-event-execute-btn" class="action-button" type="button" disabled data-i18n="admin.btn.executeBatch">Execute Batch</button>
             <p id="bulk-event-message" class="form-message mono" role="status"></p>
           </div>
         </div>
       </section>
 
       <section class="merge-panel" aria-labelledby="event-exclusion-heading" style="margin-top: 0; margin-bottom: 32px; padding-bottom: 28px;">
-        <h3 id="event-exclusion-heading">Exclude an event</h3>
-        <p class="muted admin-copy">Excluded events are omitted from every player profile, game statistic, result list, and player-directory filter.</p>
+        <h3 id="event-exclusion-heading" data-i18n="admin.sec.excludeEvent">Exclude an event</h3>
+        <p class="muted admin-copy" data-i18n="admin.sec.excludeEventDesc">Excluded events are omitted from every player profile, game summary, and ranking calculation.</p>
         <form id="event-exclusion-form" class="admin-form merge-form">
-          <label>Event URL<input id="event-exclusion-url" type="url" placeholder="https://start.gg/tournament/.../event/..." required></label>
-          <label class="check-label"><input id="event-excluded" type="checkbox"> Exclude this event from all views</label>
-          <div class="form-actions"><button class="action-button" type="submit">Save event visibility</button><p id="event-exclusion-message" class="form-message mono" role="status"></p></div>
+          <label><span data-i18n="admin.label.eventUrl">Event URL</span><input id="event-exclusion-url" type="url" placeholder="https://start.gg/tournament/.../event/..." required></label>
+          <label class="check-label"><input id="event-excluded" type="checkbox"> <span data-i18n="admin.label.excludeCheck">Exclude this event from all views</span></label>
+          <div class="form-actions"><button class="action-button" type="submit" data-i18n="admin.btn.saveEventVis">Save event visibility</button><p id="event-exclusion-message" class="form-message mono" role="status"></p></div>
         </form>
         <div id="event-exclusion-list" class="event-exclusion-list" aria-live="polite"></div>
       </section>
 
       <section class="merge-panel" aria-labelledby="socials-heading" style="margin-top: 0;">
-        <h3 id="socials-heading">Community Social Media Links</h3>
-        <p class="muted admin-copy">Configure the WhatsApp, Discord, and Instagram links and visibility for each community hub on the homepage.</p>
+        <h3 id="socials-heading" data-i18n="admin.sec.socialLinks">Community Social Media Links</h3>
+        <p class="muted admin-copy" data-i18n="admin.sec.socialLinksDesc">Configure the WhatsApp, Discord, and Instagram links and visibility for each community game hub.</p>
         <form id="community-socials-form" class="admin-form">
           <div id="community-socials-fields"></div>
-          <div class="form-actions"><button class="action-button" type="submit">Save social links</button><p id="socials-message" class="form-message mono" role="status"></p></div>
+          <div class="form-actions"><button class="action-button" type="submit" data-i18n="admin.btn.saveSocialLinks">Save social links</button><p id="socials-message" class="form-message mono" role="status"></p></div>
         </form>
       </section>
     </div>
@@ -207,25 +208,25 @@
       <section class="merge-panel" aria-labelledby="rankings-heading" style="margin-top: 0;">
         <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px; margin-bottom:16px;">
           <div>
-            <h3 id="rankings-heading" style="margin:0 0 4px 0;">Official Power Rankings</h3>
-            <p class="muted admin-copy" style="margin:0;">Create, edit, archive, or manage official website rankings.</p>
+            <h3 id="rankings-heading" style="margin:0 0 4px 0;" data-i18n="admin.sec.officialPR">Official Power Rankings</h3>
+            <p class="muted admin-copy" style="margin:0;" data-i18n="admin.sec.officialPRDesc">Create, edit, archive, or manage official website rankings.</p>
           </div>
-          <a href="ranking-creator.html?mode=admin" class="action-button" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px;">+ Submit New PR</a>
+          <a href="ranking-creator.html?mode=admin" class="action-button" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px;" data-i18n="admin.btn.submitNewPR">+ Submit New PR</a>
         </div>
 
         <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:16px; align-items:center;">
           <label style="margin:0; flex:1 1 200px;">
-            <span style="font-size:12px; display:block; margin-bottom:4px; font-weight:700;">FILTER BY GAME</span>
+            <span style="font-size:12px; display:block; margin-bottom:4px; font-weight:700;" data-i18n="admin.label.filterGame">FILTER BY GAME</span>
             <select id="ranking-game-filter" class="inp" style="width:100%;">
-              <option value="all">All games</option>
+              <option value="all" data-i18n="admin.label.allGames">All games</option>
             </select>
           </label>
           <label style="margin:0; flex:2 1 260px;">
-            <span style="font-size:12px; display:block; margin-bottom:4px; font-weight:700;">SEARCH RANKINGS</span>
+            <span style="font-size:12px; display:block; margin-bottom:4px; font-weight:700;" data-i18n="admin.label.searchRankings">SEARCH RANKINGS</span>
             <input type="search" id="ranking-search" class="inp" placeholder="Search by ranking name..." style="width:100%;">
           </label>
           <label class="check-label" style="align-self:flex-end; margin-bottom:10px; cursor:pointer;">
-            <input type="checkbox" id="ranking-show-archived"> Show archived rankings
+            <input type="checkbox" id="ranking-show-archived"> <span data-i18n="admin.label.showArchived">Show archived rankings</span>
           </label>
         </div>
 
@@ -233,16 +234,16 @@
           <table id="rankings-table" style="width:100%; border-collapse:collapse; text-align:left; font-size:14px;">
             <thead>
               <tr style="border-bottom:1px solid var(--line); background:rgba(255,255,255,0.03);">
-                <th style="padding:10px 14px;">Name</th>
-                <th style="padding:10px 14px;">Game</th>
-                <th style="padding:10px 14px;">Classification</th>
-                <th style="padding:10px 14px;">Period</th>
-                <th style="padding:10px 14px; text-align:center;">Players</th>
-                <th style="padding:10px 14px; text-align:right;">Actions</th>
+                <th style="padding:10px 14px;" data-i18n="admin.table.name">Name</th>
+                <th style="padding:10px 14px;" data-i18n="admin.table.game">Game</th>
+                <th style="padding:10px 14px;" data-i18n="admin.table.classification">Classification</th>
+                <th style="padding:10px 14px;" data-i18n="admin.table.period">Period</th>
+                <th style="padding:10px 14px; text-align:center;" data-i18n="admin.table.players">Players</th>
+                <th style="padding:10px 14px; text-align:right;" data-i18n="admin.table.actions">Actions</th>
               </tr>
             </thead>
             <tbody id="rankings-table-body">
-              <tr><td colspan="6" style="padding:20px; text-align:center;" class="muted">Loading official rankings...</td></tr>
+              <tr><td colspan="6" style="padding:20px; text-align:center;" class="muted" data-i18n="admin.table.loading">Loading official rankings...</td></tr>
             </tbody>
           </table>
         </div>
@@ -251,8 +252,7 @@
     </div>
   </section>
 </main>
-<footer class="foot mono muted">Platfighters.uy · Local administrator session</footer>
-<script src="js/i18n.js"></script>
+<footer class="foot mono muted" data-i18n="admin.footer"><span data-i18n="admin.footer">Platfighters.uy · Local administrator session</span></footer>
 <script src="js/admin.js"></script>
 <script src="js/theme.js"></script>
 </body>

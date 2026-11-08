@@ -18,6 +18,7 @@
   document.documentElement.dataset.theme=t;
 })();
 </script>
+<script src="js/i18n.js"></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="css/themes.css">
 <link rel="stylesheet" href="css/styles.css">
@@ -38,24 +39,24 @@
 <main class="page">
   <section class="head-panel glass">
     <div class="head-text">
-      <div class="crumb">Rankings › <span id="crumbGame">Rivals 2</span> › New ranking</div>
-      <div class="title-row"><h1>New power ranking</h1><span class="tagpill">DRAFT</span></div>
+      <div class="crumb"><span data-i18n="creator.crumb.rankings">Rankings</span> › <span id="crumbGame">Rivals 2</span> › <span data-i18n="creator.crumb.new">New ranking</span></div>
+      <div class="title-row"><h1 data-i18n="creator.title">New power ranking</h1><span class="tagpill" data-i18n="creator.draft">DRAFT</span></div>
       <div id="sub" class="muted" style="font-size:14px"></div>
     </div>
     <div class="actions">
       <div class="action-group-preview">
-        <button type="button" id="previewBtn" class="btn glass pill" data-act="preview">Preview</button>
+        <button type="button" id="previewBtn" class="btn glass pill" data-act="preview" data-i18n="creator.preview">Preview</button>
       </div>
       <div class="action-group-io">
-        <button type="button" id="importBtn" class="btn glass pill" data-act="import">Import</button>
-        <button type="button" id="exportBtn" class="btn glass pill" data-act="export">Export</button>
+        <button type="button" id="importBtn" class="btn glass pill" data-act="import" data-i18n="creator.action.import">Import</button>
+        <button type="button" id="exportBtn" class="btn glass pill" data-act="export" data-i18n="creator.action.export">Export</button>
       </div>
       <div class="action-group-share">
-        <button type="button" id="shareBtn" class="btn glass pill" data-act="share">Share</button>
-        <button type="button" id="exportImgBtn" class="btn glass pill" data-act="export-image">Export Image</button>
+        <button type="button" id="shareBtn" class="btn glass pill" data-act="share" data-i18n="creator.action.share">Share</button>
+        <button type="button" id="exportImgBtn" class="btn glass pill" data-act="export-image" data-i18n="creator.action.exportImage">Export Image</button>
       </div>
       <div id="adminActionGroup" class="action-group-admin" hidden>
-        <button type="button" id="publishBtn" class="btn primary pill" data-act="publish">Publish</button>
+        <button type="button" id="publishBtn" class="btn primary pill" data-act="publish" data-i18n="creator.publish">Publish</button>
       </div>
       <input type="file" id="importFileInput" accept=".json,application/json" hidden>
     </div>
@@ -72,13 +73,13 @@
   <dialog id="player-select-modal" class="player-select-modal glass">
     <div class="modal-header">
       <div>
-        <h2 id="playerModalTitle">Select Player</h2>
-        <div id="playerModalSub" class="sub muted">Search and select a player from the directory</div>
+        <h2 id="playerModalTitle" data-i18n="creator.modal.title">Select Player</h2>
+        <div id="playerModalSub" class="sub muted" data-i18n="creator.modal.sub">Search and select a player from the directory</div>
       </div>
       <button type="button" class="x glass pill" id="closePlayerModalBtn" aria-label="Close">×</button>
     </div>
     <div class="player-search-bar">
-      <input type="search" id="playerSearchInput" class="inp" placeholder="Search by gamer tag, ID, or alias..." autocomplete="off">
+      <input type="search" id="playerSearchInput" class="inp" placeholder="Search by gamer tag, ID, or alias..." data-i18n-placeholder="creator.modal.searchPlaceholder" autocomplete="off">
     </div>
     <div id="playerSelectList" class="player-select-list"></div>
   </dialog>
@@ -86,36 +87,36 @@
   <dialog id="win-select-modal" class="player-select-modal glass">
     <div class="modal-header">
       <div>
-        <h2 id="winModalTitle">Select Notable Win</h2>
-        <div id="winModalSub" class="sub muted">Select an opponent defeated during this period</div>
+        <h2 id="winModalTitle" data-i18n="creator.modal.selectWin">Select Notable Win</h2>
+        <div id="winModalSub" class="sub muted" data-i18n="creator.modal.selectWinSub">Select an opponent defeated during this period</div>
       </div>
       <button type="button" class="x glass pill" id="closeWinModalBtn" aria-label="Close">×</button>
     </div>
     <div id="winSelectList" class="player-select-list"></div>
     <div style="margin-top:14px;display:flex;justify-content:flex-end;">
-      <button type="button" class="btn glass pill" id="addBlankWinBtn">+ Add blank win</button>
+      <button type="button" class="btn glass pill" id="addBlankWinBtn" data-i18n="creator.modal.addBlankWin">+ Add blank win</button>
     </div>
   </dialog>
 
   <dialog id="event-select-modal" class="player-select-modal glass">
     <div class="modal-header">
       <div>
-        <h2 id="eventModalTitle">Select Event Result</h2>
-        <div id="eventModalSub" class="sub muted">Select an event from this player's tournament history</div>
+        <h2 id="eventModalTitle" data-i18n="creator.modal.selectEvent">Select Event Result</h2>
+        <div id="eventModalSub" class="sub muted" data-i18n="creator.modal.selectEventSub">Select an event from this player's tournament history</div>
       </div>
       <button type="button" class="x glass pill" id="closeEventModalBtn" aria-label="Close">×</button>
     </div>
     <div id="eventSelectList" class="player-select-list"></div>
     <div style="margin-top:14px;display:flex;justify-content:flex-end;">
-      <button type="button" class="btn glass pill" id="addBlankResultBtn">+ Add blank result</button>
+      <button type="button" class="btn glass pill" id="addBlankResultBtn" data-i18n="creator.modal.addBlankResult">+ Add blank result</button>
     </div>
   </dialog>
 
   <dialog id="crop-modal" class="player-select-modal glass crop-modal">
     <div class="modal-header">
       <div>
-        <h2 id="cropModalTitle">Crop Player Picture</h2>
-        <div id="cropModalSub" class="sub muted">Drag image to adjust crop position and use the slider to zoom</div>
+        <h2 id="cropModalTitle" data-i18n="creator.modal.cropTitle">Crop Player Picture</h2>
+        <div id="cropModalSub" class="sub muted" data-i18n="creator.modal.cropSub">Drag image to adjust crop position and use the slider to zoom</div>
       </div>
       <button type="button" class="x glass pill" id="closeCropModalBtn" aria-label="Close">×</button>
     </div>
@@ -125,20 +126,19 @@
       </div>
       <div class="crop-controls">
         <div class="crop-control-group">
-          <label for="cropZoomSlider" class="sub mono" id="cropZoomLabel">ZOOM</label>
+          <label for="cropZoomSlider" class="sub mono" id="cropZoomLabel" data-i18n="creator.modal.zoom">ZOOM</label>
           <input type="range" id="cropZoomSlider" min="1" max="3" step="0.01" value="1" class="crop-zoom-slider">
         </div>
       </div>
     </div>
     <div class="crop-modal-footer">
-      <button type="button" class="btn glass pill" id="cancelCropBtn">Cancel</button>
-      <button type="button" class="btn glass pill crop-apply-btn" id="applyCropBtn">Apply Picture</button>
+      <button type="button" class="btn glass pill" id="cancelCropBtn" data-i18n="creator.modal.cancel">Cancel</button>
+      <button type="button" class="btn glass pill crop-apply-btn" id="applyCropBtn" data-i18n="creator.modal.applyPicture">Apply Picture</button>
     </div>
   </dialog>
 </main>
 
 <footer class="foot mono muted" data-i18n="footer.creator">Platfighters.uy · Community Rankings</footer>
-<script src="js/i18n.js"></script>
 <script src="js/common.js"></script>
 <script src="js/export.js"></script>
 <script src="js/creator.js"></script>
