@@ -463,6 +463,33 @@ class Handler(SimpleHTTPRequestHandler):
                 self.send_json(404, {"error": f"Profile file '{slug}.json' not found."})
             except json.JSONDecodeError as err:
                 self.send_json(500, {"error": f"The profile file '{slug}.json' contains invalid JSON: {err}"})
+        elif parsed.path == "/api/player-profile-lookup":
+            player_id = parse_qs(parsed.query).get("playerId", [""])[0].strip()
+            if not player_id.isdigit():
+                self.send_json(400, {"error": "Invalid playerId."})
+                return
+            # Search for profile file matching player_id
+            target_slug = None
+            for p in PROFILE_DIR.glob(f"*-{player_id}.json"):
+                if p.name not in NON_PROFILE_NAMES:
+                    target_slug = p.stem
+                    break
+            if not target_slug:
+                for p in PROFILE_DIR.glob("*.json"):
+                    if p.name in NON_PROFILE_NAMES:
+                        continue
+                    try:
+                        with p.open(encoding="utf-8") as stream:
+                            data = json.load(stream)
+                            if str(data.get("player", {}).get("startggPlayerId") or "") == player_id:
+                                target_slug = p.stem
+                                break
+                    except Exception:
+                        continue
+            if target_slug:
+                self.send_json(200, {"playerId": player_id, "slug": target_slug})
+            else:
+                self.send_json(404, {"error": "Profile not found."})
         elif parsed.path == "/api/admin/merges":
             if not self.require_admin():
                 return
@@ -1280,6 +1307,61 @@ class Handler(SimpleHTTPRequestHandler):
                 return
             refresh_index()
             self.send_json(200, {"exclusions": config})
+        elif parsed.path in ("/api/admin/bulk-exclude-players", "/api/admin/exclusions/bulk"):
+            if not self.require_admin():
+                return
+            player_ids = body.get("playerIds")
+            if not isinstance(player_ids, list) or not player_ids:
+                self.send_json(400, {"error": "No players provided for bulk exclusion."})
+                return
+
+            # Clean and validate player IDs
+            clean_ids = []
+            for pid in player_ids:
+                pid_str = str(pid).strip()
+                if not pid_str.isdigit():
+                    self.send_json(400, {"error": f"Invalid player ID: {pid}"})
+                    return
+                clean_ids.append(pid_str)
+
+            merges = identity_merges()
+            all_canonical_ids = set()
+            for pid in clean_ids:
+                all_canonical_ids.add(canonical_id(pid, merges))
+
+            config = visibility_exclusions()
+            previous = json.loads(json.dumps(config))
+
+            with sqlite3.connect(DATABASE) as connection:
+                completed = []
+                # Get all known games in the database as fallback for players with 0 event history
+                all_known_games = sorted({row[0] for row in connection.execute("SELECT slug FROM videogames")})
+                for cid in sorted(all_canonical_ids):
+                    identity_ids = {cid}
+                    identity_ids.update(source for source in merges if canonical_id(source, merges) == cid)
+                    available_games = sorted({row[0] for row in connection.execute(
+                        f"SELECT DISTINCT e.videogame_slug FROM participants p "
+                        "JOIN entrant_participants ep ON ep.participant_id=p.id "
+                        "JOIN entrants en ON en.id=ep.entrant_id JOIN events e ON e.id=en.event_id "
+                        f"WHERE p.player_id IN ({','.join('?' for _ in identity_ids)})",
+                        sorted(identity_ids),
+                    )})
+                    games_to_exclude = available_games if available_games else all_known_games
+                    config["playerGames"][cid] = games_to_exclude
+                    completed.append({"playerId": cid, "games": games_to_exclude})
+
+            atomic_json(EXCLUSIONS_PATH, config)
+            result = rebuild_profiles()
+            if result.returncode:
+                atomic_json(EXCLUSIONS_PATH, previous)
+                self.send_json(500, {"error": "Could not rebuild profiles after bulk exclusion. " + (result.stderr[-1000:] or result.stdout[-1000:])})
+                return
+            refresh_index()
+            self.send_json(200, {
+                "completed": completed,
+                "exclusions": config,
+                "count": len(completed),
+            })
         else:
             self.send_json(404, {"error": "Not found."})
 

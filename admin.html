@@ -132,6 +132,33 @@
           </div>
         </div>
       </section>
+
+      <section class="merge-panel" aria-labelledby="bulk-exclude-heading" style="margin-top: 32px; padding-top: 28px;">
+        <h3 id="bulk-exclude-heading" data-i18n="admin.sec.bulkExclude">Bulk Player Exclusion</h3>
+        <p class="muted admin-copy" data-i18n="admin.sec.bulkExcludeDesc">Queue multiple players to exclude from ranking calculations and the player index across all games.</p>
+        <form id="bulk-exclude-form" class="admin-form merge-form">
+          <label><span data-i18n="admin.label.excludePlayer">Select player to exclude</span><select id="bulk-exclude-player" required></select></label>
+          <div class="form-actions">
+            <button id="bulk-exclude-queue-btn" class="action-button" type="submit" data-i18n="admin.btn.queueExclusion">+ Queue Exclusion</button>
+            <button id="bulk-exclude-cancel-edit-btn" class="quiet-button" type="button" style="display:none;" data-i18n="admin.btn.cancelEdit">Cancel Edit</button>
+            <p id="bulk-exclude-form-message" class="form-message mono" role="status"></p>
+          </div>
+        </form>
+
+        <div id="bulk-exclude-queue-wrapper" style="margin-top: 20px; max-width: 760px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <span class="mono muted" id="bulk-exclude-queue-count" style="font-size:13px; font-weight:600;" data-i18n="admin.label.queuedExclusions">Queued exclusions (0)</span>
+            <button id="bulk-exclude-clear-btn" class="quiet-button" type="button" style="display:none; color:var(--muted); font-size:12px;" data-i18n="admin.btn.clearQueue">Clear Queue</button>
+          </div>
+          <div id="bulk-exclude-queue-list" class="event-group-list" style="margin-top:0;" aria-live="polite">
+            <p class="muted event-group-empty" data-i18n="admin.label.noExclusionsQueued">No player exclusions currently queued.</p>
+          </div>
+          <div style="margin-top:16px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+            <button id="bulk-exclude-execute-btn" class="action-button" type="button" disabled data-i18n="admin.btn.executeExclusions">Execute Batch</button>
+            <p id="bulk-exclude-message" class="form-message mono" role="status"></p>
+          </div>
+        </div>
+      </section>
     </div>
 
     <!-- SECTION 2: EVENTS -->

@@ -215,6 +215,18 @@ async function loadProfiles(selected = '') {
       if (bulkSource.options.length > 1) bulkSource.selectedIndex = 1;
       if (bulkTarget.options.length) bulkTarget.selectedIndex = 0;
     }
+
+    const bulkExcludeSelect = $('#bulk-exclude-player');
+    if (bulkExcludeSelect) {
+      const excludeOptions = profiles.filter(p => p.playerId).map(p => {
+        const eventCount = p.events ?? (p.games || []).reduce((sum, g) => sum + (g.events || 0), 0);
+        const eventLabel = `${eventCount} event${eventCount === 1 ? '' : 's'}`;
+        const country = (p.country && String(p.country).trim()) ? String(p.country).trim() : 'Uruguay';
+        return `<option value="${esc(p.playerId)}">${esc(p.tag)} · ${esc(eventLabel)} · ${esc(country)} (ID: ${esc(p.playerId)})</option>`;
+      }).join('');
+      bulkExcludeSelect.innerHTML = excludeOptions;
+      if (bulkExcludeSelect.options.length) bulkExcludeSelect.selectedIndex = 0;
+    }
     if (Object.keys(merges).length) {
       $('#merge-message').textContent = `${Object.keys(merges).length} merged identity${Object.keys(merges).length === 1 ? '' : 'ies'} saved.`;
     }
@@ -655,6 +667,172 @@ $('#bulk-player-execute-btn')?.addEventListener('click', async () => {
 
     resetBulkPlayerEditMode();
     renderBulkPlayerQueue();
+    await loadProfiles();
+  } catch (err) {
+    message.textContent = `Batch execution failed: ${err.message}`;
+    if (executeBtn) executeBtn.disabled = false;
+  }
+});
+
+// BULK PLAYER EXCLUSION
+let bulkExcludeQueue = [];
+let editingExcludeIndex = -1;
+
+function renderBulkExcludeQueue() {
+  const list = $('#bulk-exclude-queue-list');
+  const countEl = $('#bulk-exclude-queue-count');
+  const clearBtn = $('#bulk-exclude-clear-btn');
+  const executeBtn = $('#bulk-exclude-execute-btn');
+  if (!list) return;
+
+  if (countEl) countEl.textContent = `Queued exclusions (${bulkExcludeQueue.length})`;
+
+  if (!bulkExcludeQueue.length) {
+    list.innerHTML = '<p class="muted event-group-empty">No player exclusions currently queued.</p>';
+    if (clearBtn) clearBtn.style.display = 'none';
+    if (executeBtn) {
+      executeBtn.disabled = true;
+      executeBtn.textContent = 'Execute Batch';
+    }
+    return;
+  }
+
+  if (clearBtn) clearBtn.style.display = 'inline-block';
+  if (executeBtn) {
+    executeBtn.disabled = false;
+    executeBtn.textContent = `Execute Batch (${bulkExcludeQueue.length})`;
+  }
+
+  list.innerHTML = bulkExcludeQueue.map((item, idx) => `
+    <div class="event-group-item" style="${item.error ? 'border-color: rgba(239, 68, 68, 0.5); background: rgba(239, 68, 68, 0.05);' : ''}">
+      <span>
+        <b>${esc(item.label)}</b>
+        <small>Player ID: ${esc(item.playerId)}</small>
+        ${item.error ? `<small style="color:#f87171; margin-top:4px; font-weight:600;">⚠ ${esc(item.error)}</small>` : ''}
+      </span>
+      <div style="display:flex; gap:8px; align-items:center; flex-shrink:0;">
+        <button class="quiet-button" type="button" data-edit-bulk-exclude="${idx}">Edit</button>
+        <button class="quiet-button" type="button" data-remove-bulk-exclude="${idx}" style="color:#f87171;">Remove</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function resetBulkExcludeEditMode() {
+  editingExcludeIndex = -1;
+  const queueBtn = $('#bulk-exclude-queue-btn');
+  const cancelBtn = $('#bulk-exclude-cancel-edit-btn');
+  const msg = $('#bulk-exclude-form-message');
+  if (queueBtn) queueBtn.textContent = '+ Queue Exclusion';
+  if (cancelBtn) cancelBtn.style.display = 'none';
+  if (msg) msg.textContent = '';
+}
+
+$('#bulk-exclude-form')?.addEventListener('submit', event => {
+  event.preventDefault();
+  const select = $('#bulk-exclude-player');
+  const msg = $('#bulk-exclude-form-message');
+  const playerId = select.value;
+
+  if (!playerId) {
+    if (msg) msg.textContent = 'Select a player to exclude.';
+    return;
+  }
+
+  const isDuplicate = bulkExcludeQueue.some((item, i) =>
+    (editingExcludeIndex === -1 || i !== editingExcludeIndex) && item.playerId === playerId
+  );
+  if (isDuplicate) {
+    if (msg) msg.textContent = 'This player is already in the exclusion queue.';
+    return;
+  }
+
+  const label = select.selectedOptions[0]?.textContent || playerId;
+
+  if (editingExcludeIndex >= 0) {
+    bulkExcludeQueue[editingExcludeIndex] = {
+      ...bulkExcludeQueue[editingExcludeIndex],
+      playerId,
+      label,
+      error: undefined
+    };
+    resetBulkExcludeEditMode();
+  } else {
+    bulkExcludeQueue.push({
+      id: Date.now() + Math.random(),
+      playerId,
+      label
+    });
+    if (msg) msg.textContent = '';
+  }
+
+  renderBulkExcludeQueue();
+});
+
+$('#bulk-exclude-cancel-edit-btn')?.addEventListener('click', () => {
+  resetBulkExcludeEditMode();
+});
+
+$('#bulk-exclude-clear-btn')?.addEventListener('click', () => {
+  if (!confirm('Clear all queued player exclusion operations?')) return;
+  bulkExcludeQueue = [];
+  resetBulkExcludeEditMode();
+  renderBulkExcludeQueue();
+  $('#bulk-exclude-message').textContent = 'Queue cleared.';
+});
+
+$('#bulk-exclude-queue-list')?.addEventListener('click', event => {
+  const editBtn = event.target.closest('[data-edit-bulk-exclude]');
+  const removeBtn = event.target.closest('[data-remove-bulk-exclude]');
+
+  if (editBtn) {
+    const idx = parseInt(editBtn.dataset.editBulkExclude, 10);
+    const item = bulkExcludeQueue[idx];
+    if (!item) return;
+
+    editingExcludeIndex = idx;
+    const select = $('#bulk-exclude-player');
+    if (select) select.value = item.playerId;
+
+    const queueBtn = $('#bulk-exclude-queue-btn');
+    const cancelBtn = $('#bulk-exclude-cancel-edit-btn');
+    if (queueBtn) queueBtn.textContent = 'Save Changes';
+    if (cancelBtn) cancelBtn.style.display = 'inline-block';
+    $('#bulk-exclude-form-message').textContent = `Editing queued exclusion #${idx + 1}`;
+    select?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    return;
+  }
+
+  if (removeBtn) {
+    const idx = parseInt(removeBtn.dataset.removeBulkExclude, 10);
+    if (editingExcludeIndex === idx) {
+      resetBulkExcludeEditMode();
+    } else if (editingExcludeIndex > idx) {
+      editingExcludeIndex--;
+    }
+    bulkExcludeQueue.splice(idx, 1);
+    renderBulkExcludeQueue();
+    return;
+  }
+});
+
+$('#bulk-exclude-execute-btn')?.addEventListener('click', async () => {
+  if (!bulkExcludeQueue.length) return;
+  const message = $('#bulk-exclude-message');
+  if (!confirm(`Execute batch exclusion of ${bulkExcludeQueue.length} player(s) across all games? Profiles and rankings will be rebuilt once.`)) return;
+
+  message.textContent = 'Executing batch player exclusions and rebuilding profiles…';
+  const executeBtn = $('#bulk-exclude-execute-btn');
+  if (executeBtn) executeBtn.disabled = true;
+
+  try {
+    const playerIds = bulkExcludeQueue.map(item => item.playerId);
+    const res = await api('/api/admin/bulk-exclude-players', { method: 'POST', body: JSON.stringify({ playerIds }) });
+
+    message.textContent = `Batch executed successfully: ${res.count || playerIds.length} player(s) excluded across all games.`;
+    bulkExcludeQueue = [];
+    resetBulkExcludeEditMode();
+    renderBulkExcludeQueue();
     await loadProfiles();
   } catch (err) {
     message.textContent = `Batch execution failed: ${err.message}`;
