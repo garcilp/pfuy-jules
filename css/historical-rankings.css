@@ -624,20 +624,24 @@
 
 /* Article image box */
 .article-image-box {
+  margin: 0;
+  padding: 0;
   width: 100%;
-  border-radius: 28px;
-  overflow: hidden;
-  padding: 16px;
+  background: none;
+  border: none;
+  box-shadow: none;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   align-items: center;
 }
 .article-image-box img {
-  width: 100%;
+  max-width: 100%;
+  width: auto;
+  height: auto;
   max-height: 540px;
   object-fit: contain;
-  border-radius: 20px;
+  border-radius: 16px;
   display: block;
 }
 .article-image-caption {

@@ -25,7 +25,8 @@ CREATE TABLE IF NOT EXISTS official_rankings (
     players_json TEXT NOT NULL,
     created_at INTEGER NOT NULL,
     updated_at INTEGER NOT NULL,
-    is_archived INTEGER NOT NULL DEFAULT 0
+    is_archived INTEGER NOT NULL DEFAULT 0,
+    image_box TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_official_rankings_game ON official_rankings(game_slug, is_archived);
 """
@@ -39,6 +40,12 @@ def init_db(con: sqlite3.Connection = None):
         close_con = True
     try:
         con.executescript(SCHEMA_SQL)
+        # Check and migrate image_box column if missing in existing table
+        cur = con.cursor()
+        cur.execute("PRAGMA table_info(official_rankings)")
+        cols = [r[1] for r in cur.fetchall()]
+        if "image_box" not in cols:
+            con.execute("ALTER TABLE official_rankings ADD COLUMN image_box TEXT")
         con.commit()
     finally:
         if close_con:
@@ -95,6 +102,8 @@ def seed_existing_rankings(con: sqlite3.Connection = None):
                         status = full_ranking.get("status", item.get("status", "seasonal"))
                         published_by = full_ranking.get("publishedBy", "")
                         intro = full_ranking.get("intro", "")
+                        img_box_val = full_ranking.get("imageBox")
+                        image_box_str = json.dumps(img_box_val, ensure_ascii=False) if (img_box_val and isinstance(img_box_val, dict) and img_box_val.get("url")) else None
                     except Exception:
                         players = []
                         title = item.get("name", rid)
@@ -103,6 +112,7 @@ def seed_existing_rankings(con: sqlite3.Connection = None):
                         status = item.get("status", "seasonal")
                         published_by = ""
                         intro = ""
+                        image_box_str = None
                 else:
                     players = []
                     top_player = item.get("top")
@@ -117,14 +127,15 @@ def seed_existing_rankings(con: sqlite3.Connection = None):
                     status = item.get("status", "seasonal")
                     published_by = ""
                     intro = ""
+                    image_box_str = None
 
                 cur.execute(
                     """
                     INSERT OR REPLACE INTO official_rankings (
                         id, title, game_slug, game_id, period_start, period_end,
                         status, published_by, intro, players_json,
-                        created_at, updated_at, is_archived
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
+                        created_at, updated_at, is_archived, image_box
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?)
                     """,
                     (
                         rid,
@@ -139,6 +150,7 @@ def seed_existing_rankings(con: sqlite3.Connection = None):
                         json.dumps(players, ensure_ascii=False),
                         now,
                         now,
+                        image_box_str,
                     ),
                 )
         con.commit()
@@ -223,6 +235,14 @@ def sync_static_rankings(con: sqlite3.Connection = None):
                 "createdAt": row["created_at"],
                 "updatedAt": row["updated_at"],
             }
+
+            if "image_box" in row.keys() and row["image_box"]:
+                try:
+                    ib = json.loads(row["image_box"])
+                    if isinstance(ib, dict) and ib.get("url"):
+                        full_obj["imageBox"] = ib
+                except Exception:
+                    pass
 
             if not is_archived:
                 active_rankings.append(full_obj)
