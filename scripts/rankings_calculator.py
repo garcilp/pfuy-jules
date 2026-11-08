@@ -14,8 +14,14 @@ import os
 from pathlib import Path
 from urllib.parse import urlsplit
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+import sys
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from scripts.summary_tracker import SummaryTracker
+
 DATABASE = PROJECT_ROOT / "startgg-data" / "platfighters.sqlite3"
 PROFILE_DIR = PROJECT_ROOT / "data" / "profiles"
 RANKINGS_DIR = PROJECT_ROOT / "data" / "rankings"
@@ -1787,7 +1793,7 @@ class RankingEngine:
 # Pre-generation & Cache Export
 # -----------------------------------------------------------------------------
 
-def export_ranking_data(connection=None, output_dir=None):
+def export_ranking_data(connection=None, output_dir=None, tracker=None):
     out_dir = Path(output_dir) if output_dir else RANKING_DATA_DIR
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -1847,9 +1853,37 @@ def export_ranking_data(connection=None, output_dir=None):
             }
 
             out_file = out_dir / f"{slug}.json"
+            existed_before = out_file.is_file()
+            existing_data = None
+            if existed_before:
+                try:
+                    with out_file.open("r", encoding="utf-8") as f:
+                        existing_data = json.load(f)
+                except Exception:
+                    existing_data = None
+
+            new_content = json.dumps(game_data, indent=2, ensure_ascii=False) + "\n"
             with out_file.open("w", encoding="utf-8") as f:
-                json.dump(game_data, f, indent=2, ensure_ascii=False)
-                f.write("\n")
+                f.write(new_content)
+
+            if tracker is not None:
+                record_name = f"{g['name']} (Ranking Data)"
+                if not existed_before:
+                    tracker.record_new("RANKINGS", record_name)
+                elif existing_data is not None:
+                    # Compare underlying data excluding volatile exportedAt timestamp
+                    old_meta = existing_data.get("metadata", {}).copy()
+                    new_meta = game_data.get("metadata", {}).copy()
+                    old_meta.pop("exportedAt", None)
+                    new_meta.pop("exportedAt", None)
+                    data_changed = (
+                        old_meta != new_meta
+                        or existing_data.get("latestTags") != game_data.get("latestTags")
+                        or existing_data.get("sets") != game_data.get("sets")
+                        or existing_data.get("placements") != game_data.get("placements")
+                    )
+                    if data_changed:
+                        tracker.record_modified("RANKINGS", record_name)
 
             manifest_games.append({
                 "slug": slug,
@@ -1877,13 +1911,26 @@ def export_ranking_data(connection=None, output_dir=None):
             connection.close()
 
 
-def export_default_rankings():
+def export_default_rankings(tracker=None):
     """Generates default ranking JSON files under data/rankings/ for static serving."""
     RANKINGS_DIR.mkdir(parents=True, exist_ok=True)
     engine = RankingEngine()
 
     games = ["ultimate", "rivals-of-aether", "melee", "rivals-2", "project-plus"]
     systems = ["glicko2", "sof", "quality_wins", "loss_quality"]
+    system_display_names = {
+        "glicko2": "Glicko-2",
+        "sof": "Strength of Field",
+        "quality_wins": "Quality Wins",
+        "loss_quality": "Consistency",
+    }
+    game_display_names = {
+        "ultimate": "Super Smash Bros. Ultimate",
+        "rivals-of-aether": "Rivals of Aether",
+        "melee": "Super Smash Bros. Melee",
+        "rivals-2": "Rivals 2",
+        "project-plus": "Project+",
+    }
 
     count = 0
     for game in games:
@@ -1891,9 +1938,29 @@ def export_default_rankings():
             try:
                 data = engine.calculate(game_slug=game, system=system, mode="historical")
                 out_file = RANKINGS_DIR / f"{game}-{system}-historical.json"
+
+                existed_before = out_file.is_file()
+                existing_content = None
+                if existed_before:
+                    try:
+                        with out_file.open("r", encoding="utf-8") as f:
+                            existing_content = f.read()
+                    except Exception:
+                        existing_content = None
+
+                new_content = json.dumps(data, indent=2, ensure_ascii=False) + "\n"
                 with out_file.open("w", encoding="utf-8") as f:
-                    json.dump(data, f, indent=2, ensure_ascii=False)
-                    f.write("\n")
+                    f.write(new_content)
+
+                if tracker is not None:
+                    g_name = game_display_names.get(game, game)
+                    s_name = system_display_names.get(system, system)
+                    record_name = f"{g_name} - {s_name} (Historical)"
+                    if not existed_before:
+                        tracker.record_new("RANKINGS", record_name)
+                    elif existing_content != new_content:
+                        tracker.record_modified("RANKINGS", record_name)
+
                 count += 1
             except Exception as err:
                 print(f"Warning: could not export default rankings for {game} {system}: {err}")
@@ -1914,10 +1981,14 @@ def main():
 
     args = parser.parse_args()
 
+    tracker = SummaryTracker("rankings_calculator_summary.txt")
+    tracker._ensure_category("RANKINGS")
+
     if args.export_data or args.export_all:
-        export_ranking_data()
+        export_ranking_data(tracker=tracker)
         if args.export_all:
-            export_default_rankings()
+            export_default_rankings(tracker=tracker)
+        tracker.write_summary()
         return
 
     engine = RankingEngine()
@@ -1932,6 +2003,8 @@ def main():
 
     print(json.dumps(result, indent=2, ensure_ascii=False)[:2000])
     print(f"\n... Total ranked players: {result['totalPlayers']}")
+
+    tracker.write_summary()
 
 
 if __name__ == "__main__":

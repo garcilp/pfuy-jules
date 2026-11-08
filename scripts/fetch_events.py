@@ -9,8 +9,14 @@ from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
 import sqlite3
+import sys
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from scripts.summary_tracker import SummaryTracker
+
 MANIFEST = PROJECT_ROOT / "events.json"
 RAW_DIR = PROJECT_ROOT / "startgg-data" / "raw"
 DATABASE = PROJECT_ROOT / "startgg-data" / "platfighters.sqlite3"
@@ -268,6 +274,16 @@ def graphql_request(operation_name, query, variables, token):
 def save_raw(output_dir, folder, filename, source_url, operation_name, variables, payload):
     target_dir = output_dir / folder if folder else output_dir
     target_dir.mkdir(parents=True, exist_ok=True)
+    target = target_dir / filename
+
+    old_response = None
+    if target.is_file():
+        try:
+            with target.open(encoding="utf-8-sig") as f:
+                old_response = json.load(f).get("response")
+        except Exception:
+            old_response = None
+
     saved = {
         "fetchedAt": datetime.now(timezone.utc).isoformat(),
         "sourceUrl": source_url,
@@ -275,12 +291,18 @@ def save_raw(output_dir, folder, filename, source_url, operation_name, variables
         "variables": variables,
         "response": payload,
     }
-    target = target_dir / filename
     temporary = target.with_suffix(target.suffix + ".tmp")
     with temporary.open("w", encoding="utf-8") as file:
         json.dump(saved, file, indent=2, ensure_ascii=False)
         file.write("\n")
     temporary.replace(target)
+
+    # Return change status: 'new' if file didn't exist before, 'modified' if response changed, 'unchanged' otherwise
+    if old_response is None:
+        return "new"
+    elif old_response != payload:
+        return "modified"
+    return "unchanged"
 
 
 def fetch_event(url, token, output_dir):
@@ -413,6 +435,9 @@ def main():
     with MANIFEST.open(encoding="utf-8") as file:
         config = json.load(file)
 
+    tracker = SummaryTracker("fetch_events_summary.txt")
+    tracker._ensure_category("EVENTS")
+
     failures = 0
     if args.images_only:
         tournaments = {}
@@ -426,15 +451,18 @@ def main():
 
         for tournament_slug, (game, url, output_dir) in tournaments.items():
             print(f"Fetching {game['name']} tournament image: {tournament_slug}", flush=True)
+            existed_before = (output_dir / "event.json").is_file()
             try:
                 event = fetch_event(url, token, output_dir)
                 images = ((event.get("tournament") or {}).get("images") or [])
                 print(f"  Saved {len(images)} profile image(s)", flush=True)
+                # Images only don't create or modify main events
             except Exception as error:
                 failures += 1
                 print(f"  ERROR: {error}", flush=True)
         if failures:
             raise SystemExit(f"Finished with {failures} tournament image request(s) that failed.")
+        tracker.write_summary()
         return
 
     processed_event_ids = get_processed_event_ids()
@@ -448,6 +476,20 @@ def main():
             event_id = None
             event_name = None
             event_file = output_dir / "event.json"
+            event_existed = event_file.is_file()
+            # Capture snapshot of files in output_dir before fetching
+            pre_existing_files = set()
+            pre_file_contents = {}
+            if output_dir.is_dir():
+                for p in output_dir.rglob("*.json"):
+                    rel = p.relative_to(output_dir)
+                    pre_existing_files.add(rel)
+                    try:
+                        with p.open(encoding="utf-8-sig") as f:
+                            pre_file_contents[rel] = json.load(f).get("response")
+                    except Exception:
+                        pass
+
             if event_file.is_file():
                 try:
                     with event_file.open(encoding="utf-8-sig") as file:
@@ -479,12 +521,40 @@ def main():
                     f"  Saved {event['name']} (ID {event['id']}): "
                     f"{entrants} entrants, {standings} standings, {sets} sets, {seeds} phase seeds"
                 )
+
+                # Determine if new or modified
+                record_label = event.get("name") or slug
+                if not event_existed:
+                    tracker.record_new("EVENTS", record_label)
+                else:
+                    # Check if any file content changed or new files were added
+                    post_files = list(output_dir.rglob("*.json"))
+                    has_changes = False
+                    for p in post_files:
+                        rel = p.relative_to(output_dir)
+                        if rel not in pre_existing_files:
+                            has_changes = True
+                            break
+                        try:
+                            with p.open(encoding="utf-8-sig") as f:
+                                post_resp = json.load(f).get("response")
+                            if post_resp != pre_file_contents.get(rel):
+                                has_changes = True
+                                break
+                        except Exception:
+                            has_changes = True
+                            break
+                    if has_changes:
+                        tracker.record_modified("EVENTS", record_label)
+
             except Exception as error:
                 failures += 1
                 print(f"  ERROR: {error}")
 
     if failures:
         raise SystemExit(f"Finished with {failures} event(s) that could not be fully fetched.")
+
+    tracker.write_summary()
 
 
 if __name__ == "__main__":
