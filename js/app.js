@@ -102,13 +102,27 @@ async function loadProfile() {
       }
     }
     const entry = entries.find(item => String(item.playerId) === canonicalId);
-    if (!entry) throw new Error(`No profile is available for start.gg player ID ${profileId}.`);
     if (canonicalId !== profileId) {
       const canonicalUrl = new URL(location.href);
       canonicalUrl.searchParams.set('player', canonicalId);
       history.replaceState(null, '', canonicalUrl);
     }
-    profileUrl = `data/profiles/${encodeURIComponent(entry.slug)}.json`;
+    if (entry) {
+      profileUrl = `data/profiles/${encodeURIComponent(entry.slug)}.json`;
+    } else {
+      // Excluded players are not in index.json, look up profile slug via API
+      try {
+        const lookupRes = await fetch(`/api/player-profile-lookup?playerId=${encodeURIComponent(canonicalId)}`);
+        if (lookupRes.ok) {
+          const lookup = await lookupRes.json();
+          profileUrl = `data/profiles/${encodeURIComponent(lookup.slug)}.json`;
+        } else {
+          throw new Error(`No profile is available for start.gg player ID ${profileId}.`);
+        }
+      } catch (e) {
+        throw new Error(`No profile is available for start.gg player ID ${profileId}.`);
+      }
+    }
   }
   const response = await fetch(profileUrl, { cache: 'no-store' });
   if (!response.ok) throw new Error(`Could not load profile (${response.status})`);
