@@ -1,16 +1,17 @@
 {
   "player": {
-    "tag": "Galletas con Membrillo",
+    "tag": "Galletas con membrillo",
     "photo": "assets/players/5275840.png",
     "sponsor": "",
     "city": "",
     "country": "Uruguay",
     "location": "Uruguay",
-    "activeSince": "2026-03-21",
+    "activeSince": "2026-02-28",
     "startgg": "https://www.start.gg/user/f2e02ad6",
     "startggPlayerId": "5275840",
     "aliases": [
-      "Galletas con Membrillo"
+      "Galletas con Membrillo",
+      "Galletas con membrillo"
     ]
   },
   "games": [
@@ -19,6 +20,16 @@
       "slug": "ultimate",
       "name": "Ultimate",
       "headToHead": [
+        {
+          "opponent": "elcusquerman",
+          "sets": 4,
+          "wins": 0
+        },
+        {
+          "opponent": "manone",
+          "sets": 2,
+          "wins": 2
+        },
         {
           "opponent": "TowasPato",
           "sets": 2,
@@ -30,7 +41,22 @@
           "wins": 2
         },
         {
-          "opponent": "elcusquerman",
+          "opponent": "Pa.King",
+          "sets": 1,
+          "wins": 1
+        },
+        {
+          "opponent": "Bits",
+          "sets": 1,
+          "wins": 0
+        },
+        {
+          "opponent": "Dieguix2004",
+          "sets": 1,
+          "wins": 1
+        },
+        {
+          "opponent": "Sr.Mango",
           "sets": 1,
           "wins": 0
         },
@@ -63,28 +89,137 @@
           "opponent": "Gerix",
           "sets": 1,
           "wins": 1
+        },
+        {
+          "opponent": "Misheon",
+          "sets": 1,
+          "wins": 1
+        },
+        {
+          "opponent": "Azrad",
+          "sets": 1,
+          "wins": 0
+        },
+        {
+          "opponent": "Freakazoiid",
+          "sets": 1,
+          "wins": 0
         }
       ],
-      "events": 1,
-      "wins": 7,
-      "losses": 4,
-      "upsets": 0,
-      "bestPlace": 25,
-      "bestEvent": "Mashito GO! #2 · Smash Ultimate singles",
-      "avgPlace": 25.0,
-      "avgSeed": 26,
+      "events": 3,
+      "wins": 12,
+      "losses": 11,
+      "upsets": 1,
+      "bestPlace": 17,
+      "bestEvent": "Mashito? GO! #8 · Smash Ultimate singles",
+      "avgPlace": 22.3,
+      "avgSeed": 27,
       "characters": [
         {
           "name": "Ness",
-          "usage": 96.0
+          "usage": 94.2
         },
         {
           "name": "Sora",
-          "usage": 4.0
+          "usage": 3.8
+        },
+        {
+          "name": "Ganondorf",
+          "usage": 1.9
         }
       ],
       "notableWins": [],
       "results": [
+        {
+          "event": "Mashito? GO! #8 · Smash Ultimate singles",
+          "eventKey": "tournament/mashito-go-8/event/smash-ultimate-singles",
+          "date": "2026-10-17",
+          "seed": 23,
+          "place": 17,
+          "entrants": 31,
+          "sets": [
+            {
+              "eventKey": "tournament/mashito-go-8/event/smash-ultimate-singles",
+              "event": "Mashito? GO! #8 · Smash Ultimate singles",
+              "phase": "Pools",
+              "round": "Winners Round 1",
+              "opponent": "Azrad",
+              "score": "0–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": 23,
+              "opponentSeed": 10,
+              "isUpset": false,
+              "startedAt": 1792259004,
+              "phaseOrder": 1,
+              "roundOrder": 1
+            },
+            {
+              "eventKey": "tournament/mashito-go-8/event/smash-ultimate-singles",
+              "event": "Mashito? GO! #8 · Smash Ultimate singles",
+              "phase": "Pools",
+              "round": "Losers Round 1",
+              "opponent": "Misheon",
+              "score": "2–0",
+              "outcome": "win",
+              "opponentExcluded": false,
+              "ownSeed": 23,
+              "opponentSeed": 26,
+              "isUpset": false,
+              "startedAt": 1792260110,
+              "phaseOrder": 1,
+              "roundOrder": -3
+            },
+            {
+              "eventKey": "tournament/mashito-go-8/event/smash-ultimate-singles",
+              "event": "Mashito? GO! #8 · Smash Ultimate singles",
+              "phase": "Bracket",
+              "round": "Winners Round 1",
+              "opponent": "Freakazoiid",
+              "score": "0–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": 23,
+              "opponentSeed": 10,
+              "isUpset": false,
+              "startedAt": 1792262239,
+              "phaseOrder": 2,
+              "roundOrder": 1
+            },
+            {
+              "eventKey": "tournament/mashito-go-8/event/smash-ultimate-singles",
+              "event": "Mashito? GO! #8 · Smash Ultimate singles",
+              "phase": "Bracket",
+              "round": "Losers Round 1",
+              "opponent": "elcusquerman",
+              "score": "0–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": 23,
+              "opponentSeed": 13,
+              "isUpset": false,
+              "startedAt": 1792264520,
+              "phaseOrder": 2,
+              "roundOrder": -4
+            }
+          ],
+          "characterCounts": {
+            "Ness": 8
+          },
+          "sourceEvents": [
+            {
+              "eventKey": "tournament/mashito-go-8/event/smash-ultimate-singles",
+              "event": "Mashito? GO! #8 · Smash Ultimate singles",
+              "date": "2026-10-17",
+              "seed": 23,
+              "place": 17,
+              "entrants": 31,
+              "characterCounts": {
+                "Ness": 8
+              }
+            }
+          ]
+        },
         {
           "event": "Mashito GO! #2 · Smash Ultimate singles",
           "eventKey": "tournament/mashito-go-2/event/smash-ultimate-singles",
@@ -295,6 +430,164 @@
               "entrants": 16,
               "characterCounts": {
                 "Ness": 18,
+                "Sora": 1
+              }
+            }
+          ]
+        },
+        {
+          "event": "Mashito? GO · Smash Ultimate singles",
+          "eventKey": "tournament/mashito-go/event/smash-ultimate-singles",
+          "date": "2026-02-28",
+          "seed": 33,
+          "place": 25,
+          "entrants": 36,
+          "sets": [
+            {
+              "eventKey": "tournament/mashito-go/event/smash-ultimate-singles",
+              "event": "Mashito? GO · Smash Ultimate singles",
+              "phase": "Pools",
+              "round": "Winners Round 1",
+              "opponent": "manone",
+              "score": "2–0",
+              "outcome": "win",
+              "opponentExcluded": false,
+              "ownSeed": 33,
+              "opponentSeed": 32,
+              "isUpset": true,
+              "startedAt": 1772302779,
+              "phaseOrder": 1,
+              "roundOrder": 1
+            },
+            {
+              "eventKey": "tournament/mashito-go/event/smash-ultimate-singles",
+              "event": "Mashito? GO · Smash Ultimate singles",
+              "phase": "Pools",
+              "round": "Winners Quarter-Final",
+              "opponent": "Sr.Mango",
+              "score": "0–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": 33,
+              "opponentSeed": 1,
+              "isUpset": false,
+              "startedAt": 1772303536,
+              "phaseOrder": 1,
+              "roundOrder": 2
+            },
+            {
+              "eventKey": "tournament/mashito-go/event/smash-ultimate-singles",
+              "event": "Mashito? GO · Smash Ultimate singles",
+              "phase": "Pools",
+              "round": "Losers Round 2",
+              "opponent": "Bits",
+              "score": "1–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": 33,
+              "opponentSeed": 17,
+              "isUpset": false,
+              "startedAt": 1772304768,
+              "phaseOrder": 1,
+              "roundOrder": -5
+            },
+            {
+              "eventKey": "tournament/mashito-go/event/smash-ultimate-singles",
+              "event": "Mashito? GO · Smash Ultimate singles",
+              "phase": "Bracket B",
+              "round": "Winners Quarter-Final",
+              "opponent": "elcusquerman",
+              "score": "0–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1772310484,
+              "phaseOrder": 3,
+              "roundOrder": 2
+            },
+            {
+              "eventKey": "tournament/mashito-go/event/smash-ultimate-singles",
+              "event": "Mashito? GO · Smash Ultimate singles",
+              "phase": "Bracket B",
+              "round": "Losers Round 2",
+              "opponent": "Dieguix2004",
+              "score": "2–0",
+              "outcome": "win",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1772311325,
+              "phaseOrder": 3,
+              "roundOrder": -5
+            },
+            {
+              "eventKey": "tournament/mashito-go/event/smash-ultimate-singles",
+              "event": "Mashito? GO · Smash Ultimate singles",
+              "phase": "Bracket B",
+              "round": "Losers Quarter-Final",
+              "opponent": "Pa.King",
+              "score": "2–1",
+              "outcome": "win",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1772312491,
+              "phaseOrder": 3,
+              "roundOrder": -6
+            },
+            {
+              "eventKey": "tournament/mashito-go/event/smash-ultimate-singles",
+              "event": "Mashito? GO · Smash Ultimate singles",
+              "phase": "Bracket B",
+              "round": "Losers Semi-Final",
+              "opponent": "manone",
+              "score": "2–0",
+              "outcome": "win",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1772314199,
+              "phaseOrder": 3,
+              "roundOrder": -7
+            },
+            {
+              "eventKey": "tournament/mashito-go/event/smash-ultimate-singles",
+              "event": "Mashito? GO · Smash Ultimate singles",
+              "phase": "Bracket B",
+              "round": "Losers Final",
+              "opponent": "elcusquerman",
+              "score": "1–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1772315296,
+              "phaseOrder": 3,
+              "roundOrder": -8
+            }
+          ],
+          "characterCounts": {
+            "Ganondorf": 1,
+            "Ness": 17,
+            "Sora": 1
+          },
+          "sourceEvents": [
+            {
+              "eventKey": "tournament/mashito-go/event/smash-ultimate-singles",
+              "event": "Mashito? GO · Smash Ultimate singles",
+              "date": "2026-02-28",
+              "seed": 33,
+              "place": 25,
+              "entrants": 36,
+              "characterCounts": {
+                "Ganondorf": 1,
+                "Ness": 17,
                 "Sora": 1
               }
             }

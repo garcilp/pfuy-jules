@@ -6,8 +6,8 @@
     "city": "",
     "country": "Uruguay",
     "location": "Uruguay",
-    "activeSince": "2026-08-29",
-    "startgg": "",
+    "activeSince": "2023-03-25",
+    "startgg": "https://www.start.gg/user/556a3a14",
     "startggPlayerId": "5351992",
     "aliases": [
       "k0reh"
@@ -28,20 +28,39 @@
           "opponent": "RoLo",
           "sets": 1,
           "wins": 0
+        },
+        {
+          "opponent": "Tintokill",
+          "sets": 1,
+          "wins": 0
+        },
+        {
+          "opponent": "sp",
+          "sets": 1,
+          "wins": 0
+        },
+        {
+          "opponent": "Lucho",
+          "sets": 1,
+          "wins": 0
         }
       ],
-      "events": 1,
+      "events": 3,
       "wins": 0,
-      "losses": 2,
+      "losses": 5,
       "upsets": 0,
       "bestPlace": 33,
-      "bestEvent": "Mashito GO! #6 · Smash Ultimate singles",
+      "bestEvent": "2 times",
       "avgPlace": 33.0,
-      "avgSeed": 39,
+      "avgSeed": 40,
       "characters": [
         {
           "name": "Pac-Man",
-          "usage": 100.0
+          "usage": 81.8
+        },
+        {
+          "name": "Kirby",
+          "usage": 18.2
         }
       ],
       "notableWins": [],
@@ -100,6 +119,82 @@
               "entrants": 45,
               "characterCounts": {
                 "Pac-Man": 4
+              }
+            }
+          ]
+        },
+        {
+          "event": "Koopa Series · Singles",
+          "eventKey": "tournament/koopa-series/event/singles",
+          "date": "2023-03-25",
+          "seed": 42,
+          "place": 33,
+          "entrants": 49,
+          "sets": [
+            {
+              "eventKey": "tournament/koopa-series/event/singles",
+              "event": "Koopa Series · Singles",
+              "phase": "Bracket",
+              "round": "Winners Round 1",
+              "opponent": "Lucho",
+              "score": "0–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": 42,
+              "opponentSeed": 23,
+              "isUpset": false,
+              "startedAt": 1679776478,
+              "phaseOrder": 1,
+              "roundOrder": 1
+            },
+            {
+              "eventKey": "tournament/koopa-series/event/singles",
+              "event": "Koopa Series · Singles",
+              "phase": "Bracket",
+              "round": "Losers Round 2",
+              "opponent": "sp",
+              "score": "0–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": 42,
+              "opponentSeed": 36,
+              "isUpset": false,
+              "startedAt": 1679777798,
+              "phaseOrder": 1,
+              "roundOrder": -4
+            },
+            {
+              "eventKey": "tournament/koopa-series/event/singles",
+              "event": "Koopa Series · Singles",
+              "phase": "Amateur Bracket",
+              "round": "Round 2",
+              "opponent": "Tintokill",
+              "score": "1–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1679780970,
+              "phaseOrder": 2,
+              "roundOrder": 2
+            }
+          ],
+          "characterCounts": {
+            "Kirby": 2,
+            "Pac-Man": 5
+          },
+          "sourceEvents": [
+            {
+              "eventKey": "tournament/koopa-series/event/singles",
+              "event": "Koopa Series · Singles",
+              "date": "2023-03-25",
+              "seed": 42,
+              "place": 33,
+              "entrants": 49,
+              "characterCounts": {
+                "Kirby": 2,
+                "Pac-Man": 5
               }
             }
           ]

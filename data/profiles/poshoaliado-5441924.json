@@ -50,14 +50,14 @@
           "wins": 1
         }
       ],
-      "events": 2,
+      "events": 1,
       "wins": 2,
       "losses": 4,
       "upsets": 0,
-      "bestPlace": 16,
-      "bestEvent": "Ultimo Smashdown · Categoria B",
-      "avgPlace": 24.5,
-      "avgSeed": 24,
+      "bestPlace": 33,
+      "bestEvent": "Ultimo Smashdown · Smash Ultimate singles",
+      "avgPlace": 33.0,
+      "avgSeed": 40,
       "characters": [
         {
           "name": "Piranha Plant",
@@ -113,39 +113,11 @@
               "startedAt": 1781978785,
               "phaseOrder": 1,
               "roundOrder": -4
-            }
-          ],
-          "characterCounts": {
-            "Hero": 2,
-            "Piranha Plant": 2
-          },
-          "sourceEvents": [
-            {
-              "eventKey": "tournament/ultimo-smashdown/event/smash-ultimate-singles",
-              "event": "Ultimo Smashdown · Smash Ultimate singles",
-              "date": "2026-06-20",
-              "seed": 40,
-              "place": 33,
-              "entrants": 45,
-              "characterCounts": {
-                "Hero": 2,
-                "Piranha Plant": 2
-              }
-            }
-          ]
-        },
-        {
-          "event": "Ultimo Smashdown · Categoria B",
-          "eventKey": "tournament/ultimo-smashdown/event/categoria-b",
-          "date": "2026-06-20",
-          "seed": 9,
-          "place": 16,
-          "entrants": 11,
-          "sets": [
+            },
             {
               "eventKey": "tournament/ultimo-smashdown/event/categoria-b",
               "event": "Ultimo Smashdown · Categoria B",
-              "phase": "Bracket",
+              "phase": "Categoria B",
               "round": "Winners Round 1",
               "opponent": "ruru",
               "score": "2–1",
@@ -161,7 +133,7 @@
             {
               "eventKey": "tournament/ultimo-smashdown/event/categoria-b",
               "event": "Ultimo Smashdown · Categoria B",
-              "phase": "Bracket",
+              "phase": "Categoria B",
               "round": "Winners Quarter-Final",
               "opponent": "Bits",
               "score": "0–2",
@@ -177,7 +149,7 @@
             {
               "eventKey": "tournament/ultimo-smashdown/event/categoria-b",
               "event": "Ultimo Smashdown · Categoria B",
-              "phase": "Bracket",
+              "phase": "Categoria B",
               "round": "Losers Round 1",
               "opponent": "Agualdemar",
               "score": "2–0",
@@ -193,7 +165,7 @@
             {
               "eventKey": "tournament/ultimo-smashdown/event/categoria-b",
               "event": "Ultimo Smashdown · Categoria B",
-              "phase": "Bracket",
+              "phase": "Categoria B",
               "round": "Losers Quarter-Final",
               "opponent": "SFAN",
               "score": "0–2",
@@ -208,16 +180,29 @@
             }
           ],
           "characterCounts": {
-            "Ganondorf": 2,
-            "Piranha Plant": 7
+            "Hero": 2,
+            "Piranha Plant": 9,
+            "Ganondorf": 2
           },
           "sourceEvents": [
+            {
+              "eventKey": "tournament/ultimo-smashdown/event/smash-ultimate-singles",
+              "event": "Ultimo Smashdown · Smash Ultimate singles",
+              "date": "2026-06-20",
+              "seed": 40,
+              "place": 33,
+              "entrants": 45,
+              "characterCounts": {
+                "Hero": 2,
+                "Piranha Plant": 2
+              }
+            },
             {
               "eventKey": "tournament/ultimo-smashdown/event/categoria-b",
               "event": "Ultimo Smashdown · Categoria B",
               "date": "2026-06-20",
               "seed": 9,
-              "place": 16,
+              "place": 50,
               "entrants": 11,
               "characterCounts": {
                 "Ganondorf": 2,

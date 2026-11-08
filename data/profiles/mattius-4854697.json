@@ -6,7 +6,7 @@
     "city": "Montevideo",
     "country": "Uruguay",
     "location": "Montevideo, Uruguay",
-    "activeSince": "2025-08-23",
+    "activeSince": "2024-03-16",
     "startgg": "https://www.start.gg/user/2ce399ff",
     "startggPlayerId": "4854697",
     "aliases": [
@@ -19,6 +19,26 @@
       "slug": "ultimate",
       "name": "Ultimate",
       "headToHead": [
+        {
+          "opponent": "Dieguix2004",
+          "sets": 1,
+          "wins": 0
+        },
+        {
+          "opponent": "elcusquerman",
+          "sets": 1,
+          "wins": 0
+        },
+        {
+          "opponent": "BenjiGG",
+          "sets": 1,
+          "wins": 0
+        },
+        {
+          "opponent": "El Hombre Playa",
+          "sets": 1,
+          "wins": 0
+        },
         {
           "opponent": "Ituab",
           "sets": 1,
@@ -40,18 +60,26 @@
           "wins": 0
         }
       ],
-      "events": 1,
+      "events": 2,
       "wins": 0,
-      "losses": 4,
+      "losses": 8,
       "upsets": 0,
       "bestPlace": 33,
-      "bestEvent": "Ultimate Smashdown #32 · Ultimate Singles",
+      "bestEvent": "2 times",
       "avgPlace": 33.0,
       "avgSeed": 38,
       "characters": [
         {
           "name": "Kazuya",
-          "usage": 100.0
+          "usage": 50.0
+        },
+        {
+          "name": "Fox",
+          "usage": 25.0
+        },
+        {
+          "name": "Mario",
+          "usage": 25.0
         }
       ],
       "notableWins": [],
@@ -142,6 +170,98 @@
               "entrants": 48,
               "characterCounts": {
                 "Kazuya": 8
+              }
+            }
+          ]
+        },
+        {
+          "event": "Ultimate Smashdown #20 · Ultimate Singles",
+          "eventKey": "tournament/ultimate-smashdown-20/event/ultimate-singles",
+          "date": "2024-03-16",
+          "seed": 37,
+          "place": 33,
+          "entrants": 42,
+          "sets": [
+            {
+              "eventKey": "tournament/ultimate-smashdown-20/event/ultimate-singles",
+              "event": "Ultimate Smashdown #20 · Ultimate Singles",
+              "phase": "Pools",
+              "round": "Winners Round 1",
+              "opponent": "El Hombre Playa",
+              "score": "0–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": 37,
+              "opponentSeed": 28,
+              "isUpset": false,
+              "startedAt": 1710607164,
+              "phaseOrder": 1,
+              "roundOrder": 1
+            },
+            {
+              "eventKey": "tournament/ultimate-smashdown-20/event/ultimate-singles",
+              "event": "Ultimate Smashdown #20 · Ultimate Singles",
+              "phase": "Pools",
+              "round": "Losers Round 1",
+              "opponent": "BenjiGG",
+              "score": "0–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": 37,
+              "opponentSeed": 13,
+              "isUpset": false,
+              "startedAt": 1710607863,
+              "phaseOrder": 1,
+              "roundOrder": -4
+            },
+            {
+              "eventKey": "tournament/ultimate-smashdown-20/event/ultimate-singles",
+              "event": "Ultimate Smashdown #20 · Ultimate Singles",
+              "phase": "Bracket B",
+              "round": "Winners Round 2",
+              "opponent": "elcusquerman",
+              "score": "0–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1710614103,
+              "phaseOrder": 4,
+              "roundOrder": 2
+            },
+            {
+              "eventKey": "tournament/ultimate-smashdown-20/event/ultimate-singles",
+              "event": "Ultimate Smashdown #20 · Ultimate Singles",
+              "phase": "Bracket B",
+              "round": "Losers Round 3",
+              "opponent": "Dieguix2004",
+              "score": "0–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1710617768,
+              "phaseOrder": 4,
+              "roundOrder": -6
+            }
+          ],
+          "characterCounts": {
+            "Fox": 4,
+            "Mario": 4
+          },
+          "sourceEvents": [
+            {
+              "eventKey": "tournament/ultimate-smashdown-20/event/ultimate-singles",
+              "event": "Ultimate Smashdown #20 · Ultimate Singles",
+              "date": "2024-03-16",
+              "seed": 37,
+              "place": 33,
+              "entrants": 42,
+              "characterCounts": {
+                "Fox": 4,
+                "Mario": 4
               }
             }
           ]

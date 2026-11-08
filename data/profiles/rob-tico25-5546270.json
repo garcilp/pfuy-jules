@@ -10,6 +10,7 @@
     "startgg": "https://www.start.gg/user/55d0962c",
     "startggPlayerId": "5546270",
     "aliases": [
+      "Robotico25",
       "Robótico25"
     ]
   },
@@ -45,6 +46,41 @@
           "wins": 0
         },
         {
+          "opponent": "Vodokex",
+          "sets": 1,
+          "wins": 0
+        },
+        {
+          "opponent": "RoLo",
+          "sets": 1,
+          "wins": 0
+        },
+        {
+          "opponent": "JoaquinYn",
+          "sets": 1,
+          "wins": 0
+        },
+        {
+          "opponent": "Dieguix2004",
+          "sets": 1,
+          "wins": 1
+        },
+        {
+          "opponent": "elcusquerman",
+          "sets": 1,
+          "wins": 0
+        },
+        {
+          "opponent": "YATTA",
+          "sets": 1,
+          "wins": 1
+        },
+        {
+          "opponent": "Choyer",
+          "sets": 1,
+          "wins": 1
+        },
+        {
           "opponent": "Ituab",
           "sets": 1,
           "wins": 0
@@ -60,14 +96,14 @@
           "wins": 1
         }
       ],
-      "events": 3,
-      "wins": 4,
-      "losses": 6,
+      "events": 4,
+      "wins": 7,
+      "losses": 10,
       "upsets": 1,
-      "bestPlace": 7,
-      "bestEvent": "Mashito? GO! #8 · Falsa B",
-      "avgPlace": 19.0,
-      "avgSeed": 22,
+      "bestPlace": 17,
+      "bestEvent": "Mashito? GO! #7 · Ultimate Singles",
+      "avgPlace": 22.3,
+      "avgSeed": 29,
       "characters": [
         {
           "name": "King K. Rool",
@@ -75,11 +111,15 @@
         },
         {
           "name": "Pyra & Mythra",
-          "usage": 8.3
+          "usage": 7.5
         },
         {
-          "name": "Dark Samus",
-          "usage": 4.2
+          "name": "Terry",
+          "usage": 2.5
+        },
+        {
+          "name": "Other",
+          "usage": 2.5
         }
       ],
       "notableWins": [],
@@ -123,39 +163,11 @@
               "startedAt": 1792260722,
               "phaseOrder": 1,
               "roundOrder": -3
-            }
-          ],
-          "characterCounts": {
-            "Dark Samus": 1,
-            "King K. Rool": 4
-          },
-          "sourceEvents": [
-            {
-              "eventKey": "tournament/mashito-go-8/event/smash-ultimate-singles",
-              "event": "Mashito? GO! #8 · Smash Ultimate singles",
-              "date": "2026-10-17",
-              "seed": 24,
-              "place": 25,
-              "entrants": 31,
-              "characterCounts": {
-                "Dark Samus": 1,
-                "King K. Rool": 4
-              }
-            }
-          ]
-        },
-        {
-          "event": "Mashito? GO! #8 · Falsa B",
-          "eventKey": "tournament/mashito-go-8/event/falsa-b",
-          "date": "2026-10-17",
-          "seed": 1,
-          "place": 7,
-          "entrants": 6,
-          "sets": [
+            },
             {
               "eventKey": "tournament/mashito-go-8/event/falsa-b",
               "event": "Mashito? GO! #8 · Falsa B",
-              "phase": "Bracket",
+              "phase": "Categoria B",
               "round": "Winners Semi-Final",
               "opponent": "RenzoUTE",
               "score": "2–0",
@@ -171,7 +183,7 @@
             {
               "eventKey": "tournament/mashito-go-8/event/falsa-b",
               "event": "Mashito? GO! #8 · Falsa B",
-              "phase": "Bracket",
+              "phase": "Categoria B",
               "round": "Winners Final",
               "opponent": "xXN4ch0Xx",
               "score": "2–0",
@@ -187,7 +199,7 @@
             {
               "eventKey": "tournament/mashito-go-8/event/falsa-b",
               "event": "Mashito? GO! #8 · Falsa B",
-              "phase": "Bracket",
+              "phase": "Categoria B",
               "round": "Grand Final",
               "opponent": "xXN4ch0Xx",
               "score": "2–1",
@@ -202,18 +214,184 @@
             }
           ],
           "characterCounts": {
-            "King K. Rool": 7
+            "Dark Samus": 1,
+            "King K. Rool": 11
           },
           "sourceEvents": [
+            {
+              "eventKey": "tournament/mashito-go-8/event/smash-ultimate-singles",
+              "event": "Mashito? GO! #8 · Smash Ultimate singles",
+              "date": "2026-10-17",
+              "seed": 24,
+              "place": 25,
+              "entrants": 31,
+              "characterCounts": {
+                "Dark Samus": 1,
+                "King K. Rool": 4
+              }
+            },
             {
               "eventKey": "tournament/mashito-go-8/event/falsa-b",
               "event": "Mashito? GO! #8 · Falsa B",
               "date": "2026-10-17",
               "seed": 1,
-              "place": 7,
+              "place": 32,
               "entrants": 6,
               "characterCounts": {
                 "King K. Rool": 7
+              }
+            }
+          ]
+        },
+        {
+          "event": "Mashito? GO! #7 · Ultimate Singles",
+          "eventKey": "tournament/mashito-go-7/event/ultimate-singles",
+          "date": "2026-09-19",
+          "seed": 21,
+          "place": 17,
+          "entrants": 27,
+          "sets": [
+            {
+              "eventKey": "tournament/mashito-go-7/event/ultimate-singles",
+              "event": "Mashito? GO! #7 · Ultimate Singles",
+              "phase": "Pools",
+              "round": "Winners Quarter-Final",
+              "opponent": "Vodokex",
+              "score": "0–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": 21,
+              "opponentSeed": 5,
+              "isUpset": false,
+              "startedAt": 1789838409,
+              "phaseOrder": 1,
+              "roundOrder": 2
+            },
+            {
+              "eventKey": "tournament/mashito-go-7/event/ultimate-singles",
+              "event": "Mashito? GO! #7 · Ultimate Singles",
+              "phase": "Pools",
+              "round": "Losers Round 2",
+              "opponent": "RoLo",
+              "score": "1–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": 21,
+              "opponentSeed": 16,
+              "isUpset": false,
+              "startedAt": 1789839467,
+              "phaseOrder": 1,
+              "roundOrder": -4
+            },
+            {
+              "eventKey": "tournament/mashito-go-7/event/falsa-b",
+              "event": "Mashito? GO! #7 · Falsa B",
+              "phase": "Categoria B",
+              "round": "Winners Quarter-Final",
+              "opponent": "Choyer",
+              "score": "2–0",
+              "outcome": "win",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1789841173,
+              "phaseOrder": 1,
+              "roundOrder": 1
+            },
+            {
+              "eventKey": "tournament/mashito-go-7/event/falsa-b",
+              "event": "Mashito? GO! #7 · Falsa B",
+              "phase": "Categoria B",
+              "round": "Winners Semi-Final",
+              "opponent": "elcusquerman",
+              "score": "1–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1789841916,
+              "phaseOrder": 1,
+              "roundOrder": 2
+            },
+            {
+              "eventKey": "tournament/mashito-go-7/event/falsa-b",
+              "event": "Mashito? GO! #7 · Falsa B",
+              "phase": "Categoria B",
+              "round": "Losers Quarter-Final",
+              "opponent": "YATTA",
+              "score": "2–0",
+              "outcome": "win",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1789843692,
+              "phaseOrder": 1,
+              "roundOrder": -4
+            },
+            {
+              "eventKey": "tournament/mashito-go-7/event/falsa-b",
+              "event": "Mashito? GO! #7 · Falsa B",
+              "phase": "Categoria B",
+              "round": "Losers Semi-Final",
+              "opponent": "Dieguix2004",
+              "score": "2–0",
+              "outcome": "win",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1789844134,
+              "phaseOrder": 1,
+              "roundOrder": -5
+            },
+            {
+              "eventKey": "tournament/mashito-go-7/event/falsa-b",
+              "event": "Mashito? GO! #7 · Falsa B",
+              "phase": "Categoria B",
+              "round": "Losers Final",
+              "opponent": "JoaquinYn",
+              "score": "0–2",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": null,
+              "opponentSeed": null,
+              "isUpset": false,
+              "startedAt": 1789844763,
+              "phaseOrder": 1,
+              "roundOrder": -6
+            }
+          ],
+          "characterCounts": {
+            "King K. Rool": 14,
+            "Terry": 1,
+            "Pyra & Mythra": 1
+          },
+          "sourceEvents": [
+            {
+              "eventKey": "tournament/mashito-go-7/event/ultimate-singles",
+              "event": "Mashito? GO! #7 · Ultimate Singles",
+              "date": "2026-09-19",
+              "seed": 21,
+              "place": 17,
+              "entrants": 27,
+              "characterCounts": {
+                "King K. Rool": 4,
+                "Terry": 1
+              }
+            },
+            {
+              "eventKey": "tournament/mashito-go-7/event/falsa-b",
+              "event": "Mashito? GO! #7 · Falsa B",
+              "date": "2026-09-19",
+              "seed": 4,
+              "place": 30,
+              "entrants": 7,
+              "characterCounts": {
+                "King K. Rool": 10,
+                "Pyra & Mythra": 1
               }
             }
           ]
