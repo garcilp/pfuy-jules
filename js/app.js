@@ -288,13 +288,94 @@ function render() {
       : `<div class="${tileClass}">${contents}</div>`;
   }).join('') + characterFeatureTile;
 
-  // PR Badges for Player (Game tab rankings table)
-  let prBadgesHtml = '';
-  if (window.PRBadges && sel) {
-    // Game tab: Table of all rankings for this game
-    const gameRankings = window.PRBadges.getPlayerRankingsForGame(player.tag, sel.id || sel.slug);
-    if (gameRankings.length > 0) {
-      prBadgesHtml = window.PRBadges.renderGameRankingsTable(gameRankings, sel.name);
+  // Power rankings history box for Game tab
+  let prHistoryHtml = '';
+  if (sel) {
+    let rankingList = Array.isArray(sel.rankings) ? [...sel.rankings] : [];
+    // Fallback: if sel.rankings is not explicitly in profile data, check PRBadges cache
+    if (!rankingList.length && window.PRBadges && window.PRBadges.getPlayerRankingsForGame) {
+      const cached = window.PRBadges.getPlayerRankingsForGame(player.tag, sel.id || sel.slug);
+      if (cached && cached.length) {
+        rankingList = cached.map(entry => {
+          const r = entry.ranking;
+          const p = entry.playerEntry;
+          const periodStr = r._periodFormatted || (r.period?.start || r.start || '2025').slice(0, 4);
+          const endStr = r.period?.end || r.end || r.period?.start || r.start || '';
+          const res = {
+            id: r.id,
+            name: r.title || r.name || 'Power Rankings',
+            period: periodStr,
+            end: endStr,
+            placement: p.placement
+          };
+          if (p.points !== undefined && p.points !== null) {
+            res.points = p.points;
+          }
+          return res;
+        });
+      }
+    }
+
+    if (rankingList.length > 0) {
+      // Sort by end date, newest first
+      rankingList.sort((a, b) => String(b.end || '').localeCompare(String(a.end || '')));
+
+      const hasMoreThanThree = rankingList.length > 3;
+      const rowsHtml = rankingList.map((item, idx) => {
+        const placeNum = Number(item.placement);
+        const ordStr = ord(placeNum);
+        let prColorVar = 'var(--accent, #9FD6FF)';
+        if (placeNum === 1) prColorVar = 'var(--gold, #F5C542)';
+        else if (placeNum === 2) prColorVar = 'var(--silver, #C9D1DC)';
+        else if (placeNum === 3) prColorVar = 'var(--bronze, #CD7F32)';
+
+        let fontSize = '15px';
+        if (ordStr.length >= 5) fontSize = '12px';
+        else if (ordStr.length === 4) fontSize = '13px';
+
+        const hexSvg = `
+          <div class="pr-history-hex" aria-hidden="true">
+            <svg viewBox="0 0 48 48" focusable="false" style="--pr-color: ${prColorVar}">
+              <polygon points="24,3 43,13.5 43,34.5 24,45 5,34.5 5,13.5"></polygon>
+              <text x="24" y="24" font-size="${fontSize}">${esc(ordStr)}</text>
+            </svg>
+          </div>
+        `;
+
+        const nameHtml = `<span class="pr-history-name">${esc(item.name || 'Power Rankings')}</span>`;
+        const metaHtml = `<span class="pr-history-meta">${esc(sel.name)} · ${esc(item.period || '')}</span>`;
+        const infoHtml = `<div class="pr-history-info">${nameHtml}${metaHtml}</div>`;
+
+        let pointsHtml = '';
+        if (item.points !== undefined && item.points !== null && !isNaN(Number(item.points))) {
+          const formattedPoints = Number(item.points).toLocaleString('en-US');
+          pointsHtml = `<span class="pr-history-points">${esc(formattedPoints)} pts</span>`;
+        }
+
+        const linkTitle = item.name || 'Power Rankings';
+        const linkHtml = `<a class="pr-history-link" href="ranking.html?id=${encodeURIComponent(item.id)}" aria-label="Read ranking: ${esc(linkTitle)}">Read ranking</a>`;
+
+        const isHidden = hasMoreThanThree && idx >= 3;
+        const hiddenAttr = isHidden ? ' hidden' : '';
+        const extraClass = isHidden ? ' pr-history-row-extra' : '';
+
+        return `<div class="pr-history-row${extraClass}" style="--pr-color: ${prColorVar}"${hiddenAttr}>${hexSvg}${infoHtml}${pointsHtml}${linkHtml}</div>`;
+      }).join('');
+
+      let toggleButtonHtml = '';
+      if (hasMoreThanThree) {
+        toggleButtonHtml = `<button class="quiet-button load-more-results pr-history-toggle" type="button" aria-expanded="false" aria-controls="pr-history-extra-rows">Show all results</button>`;
+      }
+
+      prHistoryHtml = `
+        <div class="panel glass pr-history-box" id="pr-history-box">
+          <h2>Power rankings</h2>
+          <div class="pr-history-rows" id="pr-history-extra-rows">
+            ${rowsHtml}
+          </div>
+          ${toggleButtonHtml}
+        </div>
+      `;
     }
   }
 
@@ -327,7 +408,7 @@ function render() {
         <span class="rec">${g.wins}–${g.losses}</span><span class="muted">${bestLabel}</span>${badgeHtml}</a>`;
       }).join('') + `</div>`;
   } else {
-    middle = prBadgesHtml + `<div class="row2">
+    middle = prHistoryHtml + `<div class="row2">
       <div class="panel glass"><h2>Character usage</h2>${(sel.characters || []).map(c =>
         `<div class="usage"><div class="usage-row"><span class="stock-icon"><span>${esc(c.name[0])}</span><img src="assets/renders/${esc(sel.slug)}/stocks/${slug(c.name)}.webp" alt="" onload="this.previousElementSibling.remove()" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='assets/renders/${esc(sel.slug)}/stocks/other.webp'}else{this.parentElement.remove()}"></span><span>${esc(c.name)}</span><span class="mono usage-percent">${Number(c.usage).toFixed(1)}%</span></div><div class="bar"><i style="width:${Number(c.usage) || 0}%"></i></div></div>`).join('') || '<p class="muted">No character selections recorded.</p>'}</div>
       <div class="panel glass"><h2>Notable wins</h2>${notableWins.map(x => {
@@ -500,10 +581,24 @@ function render() {
     `</div>${rows.length < allRows.length ? '<button class="quiet-button load-more-results" type="button">Show more events</button>' : ''}</div>`;
   $('#main').innerHTML = `<div class="tiles">${tiles}</div>${middle}${bestPlacementHistory}${opponentHistory}${results}`;
   fitStatValues();
-  $('#main').querySelector('.load-more-results')?.addEventListener('click', () => {
+  $('#main').querySelector('.load-more-results:not(.pr-history-toggle)')?.addEventListener('click', () => {
     resultPage += 1;
     render();
   });
+  const prToggleBtn = $('#main .pr-history-toggle');
+  if (prToggleBtn) {
+    prToggleBtn.addEventListener('click', () => {
+      const isExpanded = prToggleBtn.getAttribute('aria-expanded') === 'true';
+      const newExpanded = !isExpanded;
+      prToggleBtn.setAttribute('aria-expanded', String(newExpanded));
+      prToggleBtn.textContent = newExpanded ? 'Show fewer' : 'Show all results';
+      const extraRows = $('#main').querySelectorAll('.pr-history-row-extra');
+      extraRows.forEach(row => {
+        row.hidden = !newExpanded;
+      });
+      prToggleBtn.focus();
+    });
+  }
   $('#main').querySelector('.opponent-tile-button')?.addEventListener('click', () => {
     isOpponentListOpen = !isOpponentListOpen;
     if (!isOpponentListOpen) selectedOpponent = null;

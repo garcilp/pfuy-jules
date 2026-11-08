@@ -8,37 +8,328 @@
     "startgg": "https://start.gg/"
   },
   "games": [
-    { "id": "r2", "slug": "rivals-2", "name": "Rivals 2", "headToHead": [{ "opponent": "NovaKite", "sets": 9, "wins": 5 }, { "opponent": "Brickwall", "sets": 8, "wins": 5 }], "events": 31, "wins": 84, "losses": 46,
-      "bestPlace": 1, "bestEvent": "Basement Brawl 14", "avgPlace": 8, "avgSeed": 12,
-      "characters": [{ "name": "Orcane", "usage": 74.2 }, { "name": "Maypul", "usage": 17.7 }, { "name": "Kragg", "usage": 8.1 }],
-      "notableWins": [{ "opponent": "NovaKite", "count": 2, "event": "Fall Open", "date": "2026-09-20", "score": "3–1" }, { "opponent": "Brickwall", "count": 1, "event": "Basement Brawl 14", "date": "2026-10-11", "score": "3–2" }],
+    {
+      "id": "r2",
+      "slug": "rivals-2",
+      "name": "Rivals 2",
+      "headToHead": [
+        {
+          "opponent": "NovaKite",
+          "sets": 9,
+          "wins": 5
+        },
+        {
+          "opponent": "Brickwall",
+          "sets": 8,
+          "wins": 5
+        }
+      ],
+      "events": 31,
+      "wins": 84,
+      "losses": 46,
+      "bestPlace": 1,
+      "bestEvent": "Basement Brawl 14",
+      "avgPlace": 8,
+      "avgSeed": 12,
+      "characters": [
+        {
+          "name": "Orcane",
+          "usage": 74.2
+        },
+        {
+          "name": "Maypul",
+          "usage": 17.7
+        },
+        {
+          "name": "Kragg",
+          "usage": 8.1
+        }
+      ],
+      "notableWins": [
+        {
+          "opponent": "NovaKite",
+          "count": 2,
+          "event": "Fall Open",
+          "date": "2026-09-20",
+          "score": "3\u20131"
+        },
+        {
+          "opponent": "Brickwall",
+          "count": 1,
+          "event": "Basement Brawl 14",
+          "date": "2026-10-11",
+          "score": "3\u20132"
+        }
+      ],
       "results": [
-        { "event": "Basement Brawl 14", "date": "2026-10-11", "seed": 6, "place": 1, "entrants": 64 },
-        { "event": "Weekly Ledge Check #88", "date": "2026-10-04", "seed": 3, "place": 2, "entrants": 28 },
-        { "event": "Fall Open", "date": "2026-09-20", "seed": 18, "place": 9, "entrants": 212 },
-        { "event": "Wavedash Weekly 31", "date": "2026-08-30", "seed": 5, "place": 3, "entrants": 36 } ] },
-    { "id": "ult", "slug": "ultimate", "name": "Ultimate", "headToHead": [{ "opponent": "Pyrrhic", "sets": 4, "wins": 1 }, { "opponent": "Brickwall", "sets": 3, "wins": 1 }], "events": 12, "wins": 21, "losses": 17,
-      "bestPlace": 3, "bestEvent": "Smash Night Weekly", "avgPlace": 10, "avgSeed": 14,
-      "characters": [{ "name": "Cloud", "usage": 67.6 }, { "name": "Pikachu", "usage": 32.4 }],
-      "notableWins": [{ "opponent": "Pyrrhic", "count": 1, "event": "Smash Night Weekly", "date": "2026-08-23", "score": "3–0" }],
+        {
+          "event": "Basement Brawl 14",
+          "date": "2026-10-11",
+          "seed": 6,
+          "place": 1,
+          "entrants": 64
+        },
+        {
+          "event": "Weekly Ledge Check #88",
+          "date": "2026-10-04",
+          "seed": 3,
+          "place": 2,
+          "entrants": 28
+        },
+        {
+          "event": "Fall Open",
+          "date": "2026-09-20",
+          "seed": 18,
+          "place": 9,
+          "entrants": 212
+        },
+        {
+          "event": "Wavedash Weekly 31",
+          "date": "2026-08-30",
+          "seed": 5,
+          "place": 3,
+          "entrants": 36
+        }
+      ],
+      "rankings": [
+        {
+          "id": "r2-power-ranking-2025",
+          "name": "Power Ranking 2025",
+          "period": "2025",
+          "end": "2025-12-31",
+          "placement": 3,
+          "points": 96.19
+        }
+      ]
+    },
+    {
+      "id": "ult",
+      "slug": "ultimate",
+      "name": "Ultimate",
+      "headToHead": [
+        {
+          "opponent": "Pyrrhic",
+          "sets": 4,
+          "wins": 1
+        },
+        {
+          "opponent": "Brickwall",
+          "sets": 3,
+          "wins": 1
+        }
+      ],
+      "events": 12,
+      "wins": 21,
+      "losses": 17,
+      "bestPlace": 3,
+      "bestEvent": "Smash Night Weekly",
+      "avgPlace": 10,
+      "avgSeed": 14,
+      "characters": [
+        {
+          "name": "Cloud",
+          "usage": 67.6
+        },
+        {
+          "name": "Pikachu",
+          "usage": 32.4
+        }
+      ],
+      "notableWins": [
+        {
+          "opponent": "Pyrrhic",
+          "count": 1,
+          "event": "Smash Night Weekly",
+          "date": "2026-08-23",
+          "score": "3\u20130"
+        }
+      ],
       "results": [
-        { "event": "Stagelist Saturday", "date": "2026-09-06", "seed": 7, "place": 5, "entrants": 41 },
-        { "event": "Smash Night Weekly", "date": "2026-08-23", "seed": 9, "place": 3, "entrants": 33 },
-        { "event": "Rooftop Rumble 9", "date": "2026-07-26", "seed": 11, "place": 7, "entrants": 58 } ] },
-    { "id": "pplus", "slug": "project-plus", "name": "Project+", "headToHead": [{ "opponent": "Brickwall", "sets": 4, "wins": 2 }], "events": 4, "wins": 7, "losses": 5,
-      "bestPlace": 3, "bestEvent": "Cabin Fever 5", "avgPlace": 4, "avgSeed": 6,
-      "characters": [{ "name": "Squirtle", "usage": 80.0 }, { "name": "Falco", "usage": 20.0 }],
-      "notableWins": [{ "opponent": "Brickwall", "count": 1, "event": "Cabin Fever 5", "date": "2026-07-12", "score": "3–2" }],
+        {
+          "event": "Stagelist Saturday",
+          "date": "2026-09-06",
+          "seed": 7,
+          "place": 5,
+          "entrants": 41
+        },
+        {
+          "event": "Smash Night Weekly",
+          "date": "2026-08-23",
+          "seed": 9,
+          "place": 3,
+          "entrants": 33
+        },
+        {
+          "event": "Rooftop Rumble 9",
+          "date": "2026-07-26",
+          "seed": 11,
+          "place": 7,
+          "entrants": 58
+        }
+      ]
+    },
+    {
+      "id": "pplus",
+      "slug": "project-plus",
+      "name": "Project+",
+      "headToHead": [
+        {
+          "opponent": "Brickwall",
+          "sets": 4,
+          "wins": 2
+        }
+      ],
+      "events": 4,
+      "wins": 7,
+      "losses": 5,
+      "bestPlace": 3,
+      "bestEvent": "Cabin Fever 5",
+      "avgPlace": 4,
+      "avgSeed": 6,
+      "characters": [
+        {
+          "name": "Squirtle",
+          "usage": 80.0
+        },
+        {
+          "name": "Falco",
+          "usage": 20.0
+        }
+      ],
+      "notableWins": [
+        {
+          "opponent": "Brickwall",
+          "count": 1,
+          "event": "Cabin Fever 5",
+          "date": "2026-07-12",
+          "score": "3\u20132"
+        }
+      ],
       "results": [
-        { "event": "Cabin Fever 5", "date": "2026-07-12", "seed": 4, "place": 3, "entrants": 22 },
-        { "event": "Legacy Locals", "date": "2026-06-14", "seed": 6, "place": 4, "entrants": 18 } ] },
-    { "id": "roa", "slug": "rivals-of-aether", "name": "Rivals of Aether", "headToHead": [{ "opponent": "Pyrrhic", "sets": 6, "wins": 2 }, { "opponent": "NovaKite", "sets": 3, "wins": 2 }], "events": 9, "wins": 18, "losses": 14,
-      "bestPlace": 2, "bestEvent": "Aether Cup 6", "avgPlace": 6, "avgSeed": 9,
-      "characters": [{ "name": "Orcane", "usage": 81.0 }, { "name": "Forsburn", "usage": 19.0 }],
-      "notableWins": [{ "opponent": "Pyrrhic", "count": 1, "event": "Aether Cup 6", "date": "2026-05-02", "score": "3–2" }],
+        {
+          "event": "Cabin Fever 5",
+          "date": "2026-07-12",
+          "seed": 4,
+          "place": 3,
+          "entrants": 22
+        },
+        {
+          "event": "Legacy Locals",
+          "date": "2026-06-14",
+          "seed": 6,
+          "place": 4,
+          "entrants": 18
+        }
+      ],
+      "rankings": [
+        {
+          "id": "pplus-power-ranking-2026-1",
+          "name": "Power Ranking 2026.1",
+          "period": "2026.1",
+          "end": "2026-06-30",
+          "placement": 2
+        }
+      ]
+    },
+    {
+      "id": "roa",
+      "slug": "rivals-of-aether",
+      "name": "Rivals of Aether",
+      "headToHead": [
+        {
+          "opponent": "Pyrrhic",
+          "sets": 6,
+          "wins": 2
+        },
+        {
+          "opponent": "NovaKite",
+          "sets": 3,
+          "wins": 2
+        }
+      ],
+      "events": 9,
+      "wins": 18,
+      "losses": 14,
+      "bestPlace": 2,
+      "bestEvent": "Aether Cup 6",
+      "avgPlace": 6,
+      "avgSeed": 9,
+      "characters": [
+        {
+          "name": "Orcane",
+          "usage": 81.0
+        },
+        {
+          "name": "Forsburn",
+          "usage": 19.0
+        }
+      ],
+      "notableWins": [
+        {
+          "opponent": "Pyrrhic",
+          "count": 1,
+          "event": "Aether Cup 6",
+          "date": "2026-05-02",
+          "score": "3\u20132"
+        }
+      ],
       "results": [
-        { "event": "Aether Cup 6", "date": "2026-05-02", "seed": 5, "place": 2, "entrants": 40 },
-        { "event": "Clash of Elements 3", "date": "2026-04-18", "seed": 8, "place": 5, "entrants": 52 },
-        { "event": "Hollow Hills Weekly", "date": "2026-03-21", "seed": 10, "place": 9, "entrants": 27 } ] }
+        {
+          "event": "Aether Cup 6",
+          "date": "2026-05-02",
+          "seed": 5,
+          "place": 2,
+          "entrants": 40
+        },
+        {
+          "event": "Clash of Elements 3",
+          "date": "2026-04-18",
+          "seed": 8,
+          "place": 5,
+          "entrants": 52
+        },
+        {
+          "event": "Hollow Hills Weekly",
+          "date": "2026-03-21",
+          "seed": 10,
+          "place": 9,
+          "entrants": 27
+        }
+      ],
+      "rankings": [
+        {
+          "id": "roa-power-ranking-2025",
+          "name": "Power Ranking 2025",
+          "period": "2025",
+          "end": "2025-12-31",
+          "placement": 1,
+          "points": 97.79
+        },
+        {
+          "id": "roa-power-ranking-2024",
+          "name": "Power Ranking 2024",
+          "period": "2024",
+          "end": "2024-12-31",
+          "placement": 1,
+          "points": 100.0
+        },
+        {
+          "id": "roa-power-ranking-2023",
+          "name": "Power Ranking 2023",
+          "period": "2023",
+          "end": "2023-12-31",
+          "placement": 2,
+          "points": 97.35
+        },
+        {
+          "id": "roa-power-ranking-2022",
+          "name": "Power Ranking 2022",
+          "period": "2022",
+          "end": "2022-12-31",
+          "placement": 4,
+          "points": 91.2
+        }
+      ]
+    }
   ]
 }
