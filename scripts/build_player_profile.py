@@ -962,6 +962,60 @@ def profile_for_player(connection, player_id, display_tag, profile_slug):
             if g_slug in additive_counts:
                 game["events"] = additive_counts[g_slug]
 
+    # Attach rankings history for each game
+    rankings_index_file = PROJECT_ROOT / "data" / "rankings.json"
+    if rankings_index_file.exists():
+        try:
+            with open(rankings_index_file, "r", encoding="utf-8") as f:
+                rankings_list = json.load(f)
+            official_rankings = []
+            for r_item in rankings_list:
+                r_id = r_item.get("id")
+                r_file = PROJECT_ROOT / "data" / "rankings" / f"{r_id}.json"
+                if r_file.exists():
+                    try:
+                        with open(r_file, "r", encoding="utf-8") as rf:
+                            official_rankings.append(json.load(rf))
+                    except Exception:
+                        pass
+
+            display_tag_lower = (display_tag or "").strip().lower()
+            for game in profile["games"]:
+                game_slug = game.get("slug") or game.get("id")
+                game_rankings = []
+                for ranking in official_rankings:
+                    r_game = ranking.get("game")
+                    if r_game not in {game_slug, game.get("id")}:
+                        continue
+                    r_id = ranking.get("id")
+                    r_name = ranking.get("name")
+                    r_period = ranking.get("period")
+                    r_end = ranking.get("end")
+                    for p in ranking.get("players", []):
+                        p_tag = (p.get("tag") or p.get("player") or "").strip().lower()
+                        p_id = str(p.get("playerId") or p.get("id") or "")
+                        matches_player = False
+                        if p_id and (p_id == str(player_id) or p_id in [str(x) for x in player_ids]):
+                            matches_player = True
+                        elif display_tag_lower and p_tag == display_tag_lower:
+                            matches_player = True
+                        if matches_player:
+                            entry = {
+                                "id": r_id,
+                                "name": r_name,
+                                "period": r_period,
+                                "end": r_end,
+                                "placement": p.get("placement") or p.get("rank"),
+                            }
+                            if "points" in p and p["points"] is not None:
+                                entry["points"] = p["points"]
+                            game_rankings.append(entry)
+                            break
+                game_rankings.sort(key=lambda r: str(r.get("end") or ""), reverse=True)
+                game["rankings"] = game_rankings
+        except Exception:
+            pass
+
     visible_dates = [result["date"] for game in profile["games"]
                      for result in game.get("results", []) if result.get("date")]
     profile["player"]["activeSince"] = min(visible_dates) if visible_dates else None
