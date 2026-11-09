@@ -228,10 +228,11 @@ function render() {
 
       if (qualifyingEntries.length) {
         const sortedBadges = sortMedals(qualifyingEntries);
-        miniBadgesHtml = `<span class="player-mini-badges" onclick="event.stopPropagation();">${sortedBadges.slice(0, 3).map(e => window.PRBadges.renderMini(e)).join('')}</span>`;
+        miniBadgesHtml = `<span class="player-mini-badges">${sortedBadges.slice(0, 3).map(e => window.PRBadges.renderMini(e)).join('')}</span>`;
       }
     }
-    return `<div class="player-card glass" role="link" tabindex="0" onclick="if(!event.target.closest('.pr-badge')){window.location.href='index.html?player=${encodeURIComponent(entry.playerId)}'}" onkeydown="if((event.key==='Enter'||event.key===' ')&&!event.target.closest('.pr-badge')){event.preventDefault();window.location.href='index.html?player=${encodeURIComponent(entry.playerId)}'}">
+    return `<div class="player-card glass">
+      <a class="player-card-target" href="index.html?player=${encodeURIComponent(entry.playerId)}" aria-label="${esc(playerTag)}"></a>
       <span class="player-avatar"><img src="${esc(picture)}" alt="" loading="lazy"></span>
       <span class="player-card-copy">${p.sponsor ? `<span class="mono muted player-sponsor">${esc(p.sponsor)}</span>` : ''}<span class="player-tag-row"><b>${esc(playerTag)}</b>${miniBadgesHtml}</span><span class="muted">${esc(location || games.map(g => g.name).join(' · ') || (isEs ? 'Jugador' : 'Player'))}</span></span>
       <span class="player-card-meta"><b>${events}</b><span class="mono muted">${eventLabel}</span></span>
@@ -241,7 +242,7 @@ function render() {
   list.querySelectorAll('.player-avatar img').forEach(image => image.addEventListener('error', () => {
     const avatar = image.parentElement;
     image.remove();
-    avatar.textContent = (avatar.closest('.player-card')?.querySelector('.player-card-copy>b')?.textContent || '?')[0];
+    avatar.textContent = (avatar.closest('.player-card')?.querySelector('.player-tag-row b')?.textContent || '?')[0];
   }, { once: true }));
 
   let sentinel = $('#scroll-sentinel');
