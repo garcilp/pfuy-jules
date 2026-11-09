@@ -13,11 +13,28 @@ import math
 import os
 from pathlib import Path
 import random
+import re
 import secrets
 from typing import Any, Dict, List, Optional, Tuple
 from zoneinfo import ZoneInfo
 
 MONTEVIDEO_TZ = ZoneInfo("America/Montevideo")
+
+CHAR_PORTRAIT_ALIASES = {
+    "simon-belmont": "simon",
+    "sheik-zelda": "sheik",
+}
+
+
+def slugify(text: str) -> str:
+    """Generate a clean slug for character portraits."""
+    return re.sub(r"[^a-z0-9]+", "-", str(text or "").lower()).strip("-")
+
+
+def char_portrait_slug(name: str) -> str:
+    """Map character name to filename slug taking aliases into account."""
+    s = slugify(name)
+    return CHAR_PORTRAIT_ALIASES.get(s, s)
 
 
 def get_current_week_of(dt: Optional[datetime] = None) -> str:
@@ -105,6 +122,115 @@ def resolve_player_photo(
     if target_file.is_file():
         return cleaned
 
+    return fallback
+
+
+def get_top_head_to_head_game(games_breakdown: List[Dict[str, Any]]) -> Optional[str]:
+    """Determine the game with the highest number of head-to-head sets between the two featured players.
+
+    Uses deterministic tie-breaking (alphabetical game slug ascending) if multiple games tie.
+    """
+    if not games_breakdown:
+        return None
+
+    # Sort key: (-sets, gameSlug)
+    best = min(
+        games_breakdown,
+        key=lambda g: (-int(g.get("sets", 0)), str(g.get("gameSlug", ""))),
+    )
+    return best.get("gameSlug")
+
+
+def resolve_character_portrait(
+    game_slug: str, char_name: str, repo_root: Path
+) -> Optional[str]:
+    """Resolve character portrait path if valid and existing on disk.
+
+    Follows assets/renders/{gameSlug}/portraits/{charSlug}.webp convention.
+    Ensures path does not escape repository root and exists as a regular file.
+    """
+    if not game_slug or not char_name:
+        return None
+
+    c_slug = char_portrait_slug(char_name)
+    if not c_slug:
+        return None
+
+    rel_path = f"assets/renders/{game_slug}/portraits/{c_slug}.webp"
+    target_file = (repo_root / rel_path).resolve()
+    try:
+        target_file.relative_to(repo_root.resolve())
+    except ValueError:
+        return None
+
+    if target_file.is_file():
+        return rel_path
+
+    return None
+
+
+def resolve_player_image(
+    profile: Dict[str, Any],
+    top_game_slug: Optional[str],
+    repo_root: Path,
+) -> str:
+    """Resolve player image following desired priority:
+
+    1. Uploaded profile photo (if explicitly configured and exists on disk).
+    2. Most-played character in the top head-to-head game.
+    3. Website logo ('assets/logo.jpg').
+    """
+    fallback = "assets/logo.jpg"
+
+    # Priority 1: Explicitly uploaded profile photo
+    photo = resolve_player_photo(profile.get("photo"), repo_root)
+    if photo != fallback:
+        return photo
+
+    # Priority 2: Most-played character in the game where the pair played the most sets
+    if top_game_slug:
+        player_slug = profile.get("slug")
+        player_id = profile.get("playerId")
+
+        # Try to locate player profile JSON file
+        profile_file = None
+        if player_slug:
+            candidate = repo_root / "data" / "profiles" / f"{player_slug}.json"
+            if candidate.is_file():
+                profile_file = candidate
+
+        if not profile_file and player_id:
+            candidate = repo_root / "data" / "profiles" / f"{player_id}.json"
+            if candidate.is_file():
+                profile_file = candidate
+
+        # If still not found by direct name, search in data/profiles/ by playerId suffix
+        if not profile_file and player_id:
+            matches = list((repo_root / "data" / "profiles").glob(f"*-{player_id}.json"))
+            if matches and matches[0].is_file():
+                profile_file = matches[0]
+
+        if profile_file and profile_file.is_file():
+            try:
+                with profile_file.open("r", encoding="utf-8") as f:
+                    full_profile = json.load(f)
+                games = full_profile.get("games", [])
+                for g in games:
+                    if g.get("slug") == top_game_slug or g.get("id") == top_game_slug:
+                        chars = g.get("characters", [])
+                        # Chars are already ranked by usage in profile build
+                        # If tie-breaking needed, preserve existing order or deterministic sort
+                        for c in chars:
+                            c_name = c.get("name")
+                            if not c_name or c_name == "Other":
+                                continue
+                            portrait = resolve_character_portrait(top_game_slug, c_name, repo_root)
+                            if portrait:
+                                return portrait
+            except Exception:
+                pass
+
+    # Priority 3: Fall back to website logo
     return fallback
 
 
@@ -378,9 +504,6 @@ def update_rivalry_of_the_week(
     p1_profile = profiles[p1_id]
     p2_profile = profiles[p2_id]
 
-    p1_photo = resolve_player_photo(p1_profile.get("photo"), repo_root)
-    p2_photo = resolve_player_photo(p2_profile.get("photo"), repo_root)
-
     # 7. Build match statistics and breakdown
     selected_game_dict = pair_game_sets[selected_pair]
 
@@ -420,6 +543,10 @@ def update_rivalry_of_the_week(
 
     last_encounter_date = max(all_dates) if all_dates else None
 
+    top_h2h_game = get_top_head_to_head_game(games_breakdown)
+    p1_image = resolve_player_image(p1_profile, top_h2h_game, repo_root)
+    p2_image = resolve_player_image(p2_profile, top_h2h_game, repo_root)
+
     # 8. Create published data object
     rivalry_data = {
         "weekOf": current_week_of,
@@ -428,13 +555,13 @@ def update_rivalry_of_the_week(
                 "playerId": p1_id,
                 "tag": p1_profile.get("tag", p1_id),
                 "slug": p1_profile.get("slug", p1_id),
-                "photo": p1_photo,
+                "photo": p1_image,
             },
             {
                 "playerId": p2_id,
                 "tag": p2_profile.get("tag", p2_id),
                 "slug": p2_profile.get("slug", p2_id),
-                "photo": p2_photo,
+                "photo": p2_image,
             },
         ],
         "overall": {
