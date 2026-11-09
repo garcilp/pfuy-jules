@@ -24,8 +24,13 @@
       "headToHead": [
         {
           "opponent": "Smeag",
-          "sets": 2,
+          "sets": 3,
           "wins": 1
+        },
+        {
+          "opponent": "Mingudai",
+          "sets": 2,
+          "wins": 0
         },
         {
           "opponent": "Pollo",
@@ -48,11 +53,6 @@
           "wins": 1
         },
         {
-          "opponent": "Mingudai",
-          "sets": 1,
-          "wins": 0
-        },
-        {
           "opponent": "Sagat",
           "sets": 1,
           "wins": 0
@@ -73,6 +73,11 @@
           "wins": 1
         },
         {
+          "opponent": "Rivels T.R.D",
+          "sets": 1,
+          "wins": 1
+        },
+        {
           "opponent": "Casipeta",
           "sets": 1,
           "wins": 0
@@ -84,29 +89,29 @@
         }
       ],
       "events": 7,
-      "wins": 4,
-      "losses": 12,
+      "wins": 5,
+      "losses": 14,
       "upsets": 1,
       "bestPlace": 9,
-      "bestEvent": "3 times",
-      "avgPlace": 11.0,
-      "avgSeed": 11,
+      "bestEvent": "4 times",
+      "avgPlace": 10.7,
+      "avgSeed": 12,
       "characters": [
         {
           "name": "Marth",
-          "usage": 70.0
+          "usage": 72.5
         },
         {
           "name": "Captain Falcon",
-          "usage": 22.5
+          "usage": 21.6
         },
         {
           "name": "Ness",
-          "usage": 2.5
+          "usage": 2.0
         },
         {
           "name": "Other",
-          "usage": 5.0
+          "usage": 3.9
         }
       ],
       "notableWins": [],
@@ -115,10 +120,58 @@
           "event": "Montevideo Melee Monthly 2026 #11 · Super Smash Bros. Melee",
           "eventKey": "tournament/montevideo-melee-monthly-2026-11/event/super-smash-bros-melee",
           "date": "2026-11-07",
-          "seed": 1,
-          "place": null,
+          "seed": 12,
+          "place": 9,
           "entrants": 13,
           "sets": [
+            {
+              "eventKey": "tournament/montevideo-melee-monthly-2026-11/event/super-smash-bros-melee",
+              "event": "Montevideo Melee Monthly 2026 #11 · Super Smash Bros. Melee",
+              "phase": "Bracket",
+              "round": "Winners Round 1",
+              "opponent": "Mingudai",
+              "score": "1–3",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": 12,
+              "opponentSeed": 5,
+              "isUpset": false,
+              "startedAt": 1794082542,
+              "phaseOrder": 1,
+              "roundOrder": 1
+            },
+            {
+              "eventKey": "tournament/montevideo-melee-monthly-2026-11/event/super-smash-bros-melee",
+              "event": "Montevideo Melee Monthly 2026 #11 · Super Smash Bros. Melee",
+              "phase": "Bracket",
+              "round": "Losers Round 1",
+              "opponent": "Rivels T.R.D",
+              "score": "3–0",
+              "outcome": "win",
+              "opponentExcluded": false,
+              "ownSeed": 12,
+              "opponentSeed": 13,
+              "isUpset": false,
+              "startedAt": 1794084321,
+              "phaseOrder": 1,
+              "roundOrder": -3
+            },
+            {
+              "eventKey": "tournament/montevideo-melee-monthly-2026-11/event/super-smash-bros-melee",
+              "event": "Montevideo Melee Monthly 2026 #11 · Super Smash Bros. Melee",
+              "phase": "Bracket",
+              "round": "Losers Round 2",
+              "opponent": "Smeag",
+              "score": "1–3",
+              "outcome": "loss",
+              "opponentExcluded": false,
+              "ownSeed": 12,
+              "opponentSeed": 7,
+              "isUpset": false,
+              "startedAt": 1794086121,
+              "phaseOrder": 1,
+              "roundOrder": -4
+            },
             {
               "eventKey": "tournament/montevideo-melee-monthly-2026-11/event/super-smash-bros-melee",
               "event": "Montevideo Melee Monthly 2026 #11 · Super Smash Bros. Melee",
@@ -128,7 +181,7 @@
               "score": "",
               "outcome": "unknown",
               "opponentExcluded": false,
-              "ownSeed": 1,
+              "ownSeed": 12,
               "opponentSeed": null,
               "isUpset": false,
               "startedAt": null,
@@ -136,16 +189,22 @@
               "roundOrder": 2
             }
           ],
-          "characterCounts": {},
+          "characterCounts": {
+            "Captain Falcon": 2,
+            "Marth": 9
+          },
           "sourceEvents": [
             {
               "eventKey": "tournament/montevideo-melee-monthly-2026-11/event/super-smash-bros-melee",
               "event": "Montevideo Melee Monthly 2026 #11 · Super Smash Bros. Melee",
               "date": "2026-11-07",
-              "seed": 1,
-              "place": null,
+              "seed": 12,
+              "place": 9,
               "entrants": 13,
-              "characterCounts": {}
+              "characterCounts": {
+                "Captain Falcon": 2,
+                "Marth": 9
+              }
             }
           ]
         },
@@ -586,8 +645,8 @@
         },
         {
           "opponent": "Sol!d",
-          "sets": 3,
-          "wins": 0
+          "sets": 4,
+          "wins": 1
         },
         {
           "opponent": "byfriend",
@@ -611,6 +670,11 @@
         },
         {
           "opponent": "Pollo",
+          "sets": 2,
+          "wins": 2
+        },
+        {
+          "opponent": "Pladson",
           "sets": 2,
           "wins": 2
         },
@@ -653,35 +717,52 @@
           "opponent": "EmilioLoco28",
           "sets": 1,
           "wins": 1
+        },
+        {
+          "opponent": "EpicDVD",
+          "sets": 1,
+          "wins": 1
         }
       ],
       "events": 8,
-      "wins": 25,
+      "wins": 29,
       "losses": 10,
-      "upsets": 6,
+      "upsets": 7,
       "bestPlace": 1,
-      "bestEvent": "2 times",
-      "avgPlace": 3.3,
+      "bestEvent": "3 times",
+      "avgPlace": 3.0,
       "avgSeed": 4,
       "characters": [
         {
           "name": "Squirtle",
-          "usage": 69.4
+          "usage": 71.0
         },
         {
           "name": "Roy",
-          "usage": 25.8
+          "usage": 24.6
         },
         {
           "name": "Ivysaur",
-          "usage": 4.0
+          "usage": 3.6
         },
         {
           "name": "Other",
-          "usage": 0.8
+          "usage": 0.7
         }
       ],
       "notableWins": [
+        {
+          "opponent": "Sol!d",
+          "seed": 1,
+          "ownSeed": 2,
+          "upsetFactor": 2.0,
+          "score": "3–1",
+          "phase": "Bracket",
+          "round": "Winners Final",
+          "event": "Montevideo Melee Monthly 2026 #11 · Project +",
+          "date": "2026-11-07",
+          "count": 1
+        },
         {
           "opponent": "Mingudai",
           "seed": 1,
@@ -700,10 +781,74 @@
           "event": "Montevideo Melee Monthly 2026 #11 · Project +",
           "eventKey": "tournament/montevideo-melee-monthly-2026-11/event/project",
           "date": "2026-11-07",
-          "seed": 1,
-          "place": null,
+          "seed": 2,
+          "place": 1,
           "entrants": 12,
           "sets": [
+            {
+              "eventKey": "tournament/montevideo-melee-monthly-2026-11/event/project",
+              "event": "Montevideo Melee Monthly 2026 #11 · Project +",
+              "phase": "Bracket",
+              "round": "Winners Quarter-Final",
+              "opponent": "EpicDVD",
+              "score": "2–0",
+              "outcome": "win",
+              "opponentExcluded": false,
+              "ownSeed": 2,
+              "opponentSeed": 7,
+              "isUpset": false,
+              "startedAt": 1794095509,
+              "phaseOrder": 1,
+              "roundOrder": 2
+            },
+            {
+              "eventKey": "tournament/montevideo-melee-monthly-2026-11/event/project",
+              "event": "Montevideo Melee Monthly 2026 #11 · Project +",
+              "phase": "Bracket",
+              "round": "Winners Semi-Final",
+              "opponent": "Pladson",
+              "score": "3–1",
+              "outcome": "win",
+              "opponentExcluded": false,
+              "ownSeed": 2,
+              "opponentSeed": 6,
+              "isUpset": false,
+              "startedAt": 1794096670,
+              "phaseOrder": 1,
+              "roundOrder": 3
+            },
+            {
+              "eventKey": "tournament/montevideo-melee-monthly-2026-11/event/project",
+              "event": "Montevideo Melee Monthly 2026 #11 · Project +",
+              "phase": "Bracket",
+              "round": "Winners Final",
+              "opponent": "Sol!d",
+              "score": "3–1",
+              "outcome": "win",
+              "opponentExcluded": false,
+              "ownSeed": 2,
+              "opponentSeed": 1,
+              "isUpset": true,
+              "startedAt": 1794098186,
+              "phaseOrder": 1,
+              "roundOrder": 4
+            },
+            {
+              "eventKey": "tournament/montevideo-melee-monthly-2026-11/event/project",
+              "event": "Montevideo Melee Monthly 2026 #11 · Project +",
+              "phase": "Bracket",
+              "round": "Grand Final",
+              "opponent": "Pladson",
+              "score": "3–1",
+              "outcome": "win",
+              "opponentExcluded": false,
+              "ownSeed": 2,
+              "opponentSeed": 6,
+              "isUpset": false,
+              "startedAt": 1794104274,
+              "phaseOrder": 1,
+              "roundOrder": 5
+            },
             {
               "eventKey": "tournament/montevideo-melee-monthly-2026-11/event/project",
               "event": "Montevideo Melee Monthly 2026 #11 · Project +",
@@ -713,7 +858,7 @@
               "score": "",
               "outcome": "unknown",
               "opponentExcluded": false,
-              "ownSeed": 1,
+              "ownSeed": 2,
               "opponentSeed": null,
               "isUpset": false,
               "startedAt": null,
@@ -721,16 +866,22 @@
               "roundOrder": 2
             }
           ],
-          "characterCounts": {},
+          "characterCounts": {
+            "Roy": 2,
+            "Squirtle": 12
+          },
           "sourceEvents": [
             {
               "eventKey": "tournament/montevideo-melee-monthly-2026-11/event/project",
               "event": "Montevideo Melee Monthly 2026 #11 · Project +",
               "date": "2026-11-07",
-              "seed": 1,
-              "place": null,
+              "seed": 2,
+              "place": 1,
               "entrants": 12,
-              "characterCounts": {}
+              "characterCounts": {
+                "Roy": 2,
+                "Squirtle": 12
+              }
             }
           ]
         },

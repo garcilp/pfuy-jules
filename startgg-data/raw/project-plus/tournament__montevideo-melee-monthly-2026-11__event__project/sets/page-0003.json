@@ -1,0 +1,545 @@
+{
+  "fetchedAt": "2026-11-09T00:01:18.496129+00:00",
+  "sourceUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2026-11/event/project",
+  "operationName": "EventSets",
+  "variables": {
+    "eventId": 1742613,
+    "page": 3,
+    "perPage": 10
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1742613,
+        "name": "Project +",
+        "sets": {
+          "pageInfo": {
+            "total": 22
+          },
+          "nodes": [
+            {
+              "id": 109872206,
+              "state": 3,
+              "winnerId": 25110442,
+              "round": 1,
+              "fullRoundText": "Winners Round 1",
+              "displayScore": "EpicDVD 3 - francokiwi 2",
+              "lPlacement": 9,
+              "wPlacement": 9,
+              "identifier": "C",
+              "startAt": null,
+              "startedAt": null,
+              "completedAt": 1794094242,
+              "createdAt": 1794072709,
+              "updatedAt": 1794094243,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 3511405,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2026-11/events/project/brackets/2440269/3511405",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 2440269,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "109872206-0",
+                  "entrant": {
+                    "id": 25110442,
+                    "name": "EpicDVD",
+                    "participants": [
+                      {
+                        "id": 22945873,
+                        "gamerTag": "EpicDVD",
+                        "player": {
+                          "id": 3990957
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_42424591_sets_109872206",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "109872206-1",
+                  "entrant": {
+                    "id": 25116579,
+                    "name": "francokiwi",
+                    "participants": [
+                      {
+                        "id": 22951162,
+                        "gamerTag": "francokiwi",
+                        "player": {
+                          "id": 1154899
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_42432687_sets_109872206",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 2,
+                        "displayValue": "2"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 42214368,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 25110442,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 63415987,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1614,
+                      "entrant": {
+                        "id": 25110442
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1614,
+                        "name": "Marth"
+                      }
+                    },
+                    {
+                      "id": 63415988,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1600,
+                      "entrant": {
+                        "id": 25116579
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1600,
+                        "name": "Fox"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 42214369,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 25116579,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 63415989,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1614,
+                      "entrant": {
+                        "id": 25110442
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1614,
+                        "name": "Marth"
+                      }
+                    },
+                    {
+                      "id": 63415990,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1600,
+                      "entrant": {
+                        "id": 25116579
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1600,
+                        "name": "Fox"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 42214370,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 25116579,
+                  "entrant1Score": 0,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 63415991,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1614,
+                      "entrant": {
+                        "id": 25110442
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1614,
+                        "name": "Marth"
+                      }
+                    },
+                    {
+                      "id": 63415992,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1600,
+                      "entrant": {
+                        "id": 25116579
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1600,
+                        "name": "Fox"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 42214372,
+                  "orderNum": 4,
+                  "state": 3,
+                  "winnerId": 25110442,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 63415993,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1614,
+                      "entrant": {
+                        "id": 25110442
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1614,
+                        "name": "Marth"
+                      }
+                    },
+                    {
+                      "id": 63415994,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1600,
+                      "entrant": {
+                        "id": 25116579
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1600,
+                        "name": "Fox"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 42214373,
+                  "orderNum": 5,
+                  "state": 3,
+                  "winnerId": 25110442,
+                  "entrant1Score": null,
+                  "entrant2Score": 0,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 63415995,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1614,
+                      "entrant": {
+                        "id": 25110442
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1614,
+                        "name": "Marth"
+                      }
+                    },
+                    {
+                      "id": 63415996,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1600,
+                      "entrant": {
+                        "id": 25116579
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1600,
+                        "name": "Fox"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 109872208,
+              "state": 3,
+              "winnerId": 25122293,
+              "round": 1,
+              "fullRoundText": "Winners Round 1",
+              "displayScore": "Pladson 3 - EmilioLoco28 0",
+              "lPlacement": 9,
+              "wPlacement": 9,
+              "identifier": "D",
+              "startAt": null,
+              "startedAt": 1794091898,
+              "completedAt": 1794092874,
+              "createdAt": 1794072709,
+              "updatedAt": 1794092874,
+              "totalGames": 5,
+              "setGamesType": 1,
+              "hasPlaceholder": false,
+              "vodUrl": null,
+              "station": null,
+              "stream": null,
+              "phaseGroup": {
+                "id": 3511405,
+                "displayIdentifier": "1",
+                "bracketType": "DOUBLE_ELIMINATION",
+                "bracketUrl": "https://www.start.gg/tournament/montevideo-melee-monthly-2026-11/events/project/brackets/2440269/3511405",
+                "firstRoundTime": null,
+                "startAt": null,
+                "numRounds": null,
+                "phase": {
+                  "id": 2440269,
+                  "name": "Bracket",
+                  "phaseOrder": 1,
+                  "bracketType": "DOUBLE_ELIMINATION",
+                  "isExhibition": false
+                }
+              },
+              "slots": [
+                {
+                  "id": "109872208-0",
+                  "entrant": {
+                    "id": 25122293,
+                    "name": "Pladson",
+                    "participants": [
+                      {
+                        "id": 22955988,
+                        "gamerTag": "Pladson",
+                        "player": {
+                          "id": 330339
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_42439419_sets_109872208",
+                    "placement": 1,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 3,
+                        "displayValue": "3"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "109872208-1",
+                  "entrant": {
+                    "id": 25193011,
+                    "name": "EmilioLoco28",
+                    "participants": [
+                      {
+                        "id": 23017006,
+                        "gamerTag": "EmilioLoco28",
+                        "player": {
+                          "id": 362971
+                        }
+                      }
+                    ]
+                  },
+                  "standing": {
+                    "id": "placeholder_standing_seeds_42541542_sets_109872208",
+                    "placement": 2,
+                    "stats": {
+                      "score": {
+                        "label": "Score",
+                        "value": 0,
+                        "displayValue": "0"
+                      }
+                    }
+                  }
+                }
+              ],
+              "games": [
+                {
+                  "id": 42213117,
+                  "orderNum": 1,
+                  "state": 3,
+                  "winnerId": 25122293,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 63413852,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1590,
+                      "entrant": {
+                        "id": 25122293
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1590,
+                        "name": "Link"
+                      }
+                    },
+                    {
+                      "id": 63413853,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1623,
+                      "entrant": {
+                        "id": 25193011
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1623,
+                        "name": "Sonic"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 42213118,
+                  "orderNum": 2,
+                  "state": 3,
+                  "winnerId": 25122293,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 63413854,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1590,
+                      "entrant": {
+                        "id": 25122293
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1590,
+                        "name": "Link"
+                      }
+                    },
+                    {
+                      "id": 63413855,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1627,
+                      "entrant": {
+                        "id": 25193011
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1627,
+                        "name": "Knuckles"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 42213119,
+                  "orderNum": 3,
+                  "state": 3,
+                  "winnerId": 25122293,
+                  "entrant1Score": null,
+                  "entrant2Score": null,
+                  "stage": null,
+                  "selections": [
+                    {
+                      "id": 63413856,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1590,
+                      "entrant": {
+                        "id": 25122293
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1590,
+                        "name": "Link"
+                      }
+                    },
+                    {
+                      "id": 63413857,
+                      "orderNum": null,
+                      "selectionType": "CHARACTER",
+                      "selectionValue": 1627,
+                      "entrant": {
+                        "id": 25193011
+                      },
+                      "participant": null,
+                      "character": {
+                        "id": 1627,
+                        "name": "Knuckles"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 127
+    },
+    "actionRecords": []
+  }
+}
