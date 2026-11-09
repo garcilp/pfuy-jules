@@ -250,6 +250,8 @@ function renderEventSelects(events = []) {
   const childSelect = $('#event-child-url');
   const bulkSourceSelect = $('#bulk-event-source');
   const bulkTargetSelect = $('#bulk-event-target');
+  const vodEventSelect = $('#vod-event-select');
+
   if (events.length) {
     const options = '<option value="" disabled selected>Select an event…</option>' +
       events.map(e => `<option value="${esc(e.sourceUrl)}">${esc(e.tournamentName)} · ${esc(e.eventName)} (${esc(e.gameName)})</option>`).join('');
@@ -257,12 +259,24 @@ function renderEventSelects(events = []) {
     if (childSelect) childSelect.innerHTML = options;
     if (bulkSourceSelect) bulkSourceSelect.innerHTML = options;
     if (bulkTargetSelect) bulkTargetSelect.innerHTML = options;
+
+    if (vodEventSelect) {
+      const prevVal = vodEventSelect.value;
+      const vodOptions = '<option value="" disabled selected>Select an event…</option>' +
+        events.map(e => `<option value="${esc(e.id)}" data-vod-url="${esc(e.vodPlaylistUrl || '')}" data-vod-count="${e.vodCount || 0}">${esc(e.tournamentName)} · ${esc(e.eventName)} (${esc(e.gameName)})</option>`).join('');
+      vodEventSelect.innerHTML = vodOptions;
+      if (prevVal && events.some(e => String(e.id) === String(prevVal))) {
+        vodEventSelect.value = prevVal;
+      }
+      updateVodFormState();
+    }
   } else {
     const empty = '<option value="" disabled selected>No imported events available</option>';
     if (parentSelect) parentSelect.innerHTML = empty;
     if (childSelect) childSelect.innerHTML = empty;
     if (bulkSourceSelect) bulkSourceSelect.innerHTML = empty;
     if (bulkTargetSelect) bulkTargetSelect.innerHTML = empty;
+    if (vodEventSelect) vodEventSelect.innerHTML = empty;
   }
 }
 
@@ -1307,6 +1321,426 @@ $('#community-socials-form')?.addEventListener('submit', async (e) => {
     message.textContent = err.message || 'Error saving socials.';
   }
 });
+
+// ==================== YOUTUBE VOD MANAGEMENT ====================
+
+let currentVodData = null; // { event, entrants, opponentMap, matchesByPair, vods }
+let hasUnsavedVodChanges = false;
+
+function updateVodFormState() {
+  const select = $('#vod-event-select');
+  const actionBtn = $('#vod-action-btn');
+  const playlistInput = $('#vod-playlist-url');
+  if (!select || !actionBtn || !playlistInput) return;
+
+  const selectedOpt = select.selectedOptions[0];
+  if (!selectedOpt || !selectedOpt.value) {
+    actionBtn.disabled = true;
+    actionBtn.textContent = 'Load VODs';
+    playlistInput.value = '';
+    return;
+  }
+
+  actionBtn.disabled = false;
+  const vodUrl = selectedOpt.getAttribute('data-vod-url') || '';
+  const vodCount = parseInt(selectedOpt.getAttribute('data-vod-count') || '0', 10);
+  playlistInput.value = vodUrl;
+
+  if (vodCount > 0) {
+    actionBtn.textContent = 'Manage VODs';
+  } else {
+    actionBtn.textContent = 'Load VODs';
+  }
+}
+
+$('#vod-event-select')?.addEventListener('change', () => {
+  updateVodFormState();
+});
+
+$('#event-vod-form')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const select = $('#vod-event-select');
+  const input = $('#vod-playlist-url');
+  const msg = $('#vod-form-message');
+  if (!select || !select.value) {
+    msg.textContent = 'Please select an event.';
+    return;
+  }
+  msg.textContent = 'Saving playlist URL…';
+  try {
+    await api('/api/admin/event-vod-playlist', {
+      method: 'POST',
+      body: JSON.stringify({
+        eventId: select.value,
+        playlistUrl: input.value.trim()
+      })
+    });
+    msg.textContent = 'Playlist URL saved.';
+    const opt = select.selectedOptions[0];
+    if (opt) opt.setAttribute('data-vod-url', input.value.trim());
+  } catch (err) {
+    msg.textContent = `Error: ${err.message}`;
+  }
+});
+
+$('#vod-action-btn')?.addEventListener('click', async () => {
+  const select = $('#vod-event-select');
+  const msg = $('#vod-form-message');
+  if (!select || !select.value) {
+    msg.textContent = 'Please select an event first.';
+    return;
+  }
+  const eventId = select.value;
+  await openVodModal(eventId);
+});
+
+async function openVodModal(eventId) {
+  const modal = $('#vod-modal');
+  const title = $('#vod-modal-title');
+  const subtitle = $('#vod-modal-subtitle');
+  const tbody = $('#vod-table-body');
+  const saveMsg = $('#vod-save-message');
+  if (!modal) return;
+
+  hasUnsavedVodChanges = false;
+  if (saveMsg) saveMsg.textContent = '';
+  if (title) title.textContent = 'Manage Event VODs';
+  if (subtitle) subtitle.textContent = 'Loading event data…';
+  if (tbody) tbody.innerHTML = '<tr><td colspan="5" style="padding: 24px; text-align: center;" class="muted mono">Loading videos…</td></tr>';
+
+  modal.showModal();
+
+  try {
+    const data = await api(`/api/admin/event-vod-info?eventId=${encodeURIComponent(eventId)}`);
+    currentVodData = data;
+    if (subtitle) {
+      subtitle.textContent = `${data.event.tournamentName} · ${data.event.name} (${data.event.gameName})`;
+    }
+
+    if (!data.vods || !data.vods.length) {
+      const playlistUrl = $('#vod-playlist-url')?.value.trim() || data.event.vodPlaylistUrl;
+      if (playlistUrl) {
+        if (tbody) tbody.innerHTML = '<tr><td colspan="5" style="padding: 24px; text-align: center;" class="muted mono">Syncing playlist from YouTube…</td></tr>';
+        await syncVodPlaylist(eventId, playlistUrl);
+        return;
+      }
+    }
+
+    renderVodTable();
+  } catch (err) {
+    if (tbody) tbody.innerHTML = `<tr><td colspan="5" style="padding: 24px; text-align: center; color: #f87171;" class="mono">Failed to load VOD data: ${esc(err.message)}</td></tr>`;
+  }
+}
+
+async function syncVodPlaylist(eventId, playlistUrl = '') {
+  const saveMsg = $('#vod-save-message');
+  const syncBtn = $('#vod-sync-btn');
+  if (saveMsg) saveMsg.textContent = 'Syncing playlist from YouTube…';
+  if (syncBtn) syncBtn.disabled = true;
+
+  try {
+    const res = await api('/api/admin/sync-event-vods', {
+      method: 'POST',
+      body: JSON.stringify({
+        eventId,
+        playlistUrl: playlistUrl || undefined
+      })
+    });
+    if (saveMsg) saveMsg.textContent = `Synced: ${res.added} added, ${res.updated} updated (total ${res.total} in playlist).`;
+
+    const data = await api(`/api/admin/event-vod-info?eventId=${encodeURIComponent(eventId)}`);
+    currentVodData = data;
+    const opt = $(`#vod-event-select option[value="${esc(eventId)}"]`);
+    if (opt) opt.setAttribute('data-vod-count', data.vods.length);
+    updateVodFormState();
+    renderVodTable();
+  } catch (err) {
+    if (saveMsg) saveMsg.textContent = `Sync failed: ${err.message}`;
+    renderVodTable();
+  } finally {
+    if (syncBtn) syncBtn.disabled = false;
+  }
+}
+
+$('#vod-sync-btn')?.addEventListener('click', async () => {
+  if (!currentVodData || !currentVodData.event) return;
+  if (hasUnsavedVodChanges) {
+    if (!confirm('You have unsaved changes. Syncing will refresh video metadata but may overwrite unsaved UI selections. Proceed?')) {
+      return;
+    }
+  }
+  const playlistUrl = $('#vod-playlist-url')?.value.trim() || currentVodData.event.vodPlaylistUrl;
+  await syncVodPlaylist(currentVodData.event.id, playlistUrl);
+});
+
+function renderVodTable() {
+  const tbody = $('#vod-table-body');
+  const counter = $('#vod-counter');
+  const showIgnored = $('#vod-filter-show-ignored')?.checked ?? true;
+  if (!tbody || !currentVodData) return;
+
+  const { entrants, opponentMap, matchesByPair, vods } = currentVodData;
+  if (!vods || !vods.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="padding: 24px; text-align: center;" class="muted mono">No videos found. Check the playlist URL and click "Sync Playlist".</td></tr>';
+    if (counter) counter.textContent = '0/0 mapped';
+    return;
+  }
+
+  const totalVideos = vods.length;
+  const mappedCount = vods.filter(v => v.status === 'complete' && v.matchId).length;
+  const ignoredCount = vods.filter(v => v.status === 'ignored').length;
+  if (counter) {
+    counter.textContent = `${mappedCount}/${totalVideos} mapped${ignoredCount ? ` (${ignoredCount} ignored)` : ''}`;
+  }
+
+  const entrantOptionsHtml = '<option value="">Select Player 1…</option>' +
+    entrants.map(e => `<option value="${esc(e.id)}">${esc(e.gamerTag || e.name)}</option>`).join('');
+
+  tbody.innerHTML = vods.map((vod, idx) => {
+    const isIgnored = vod.status === 'ignored';
+    const isUnavailable = vod.availability === 'unavailable';
+    const isComplete = vod.status === 'complete';
+
+    if (isIgnored && !showIgnored) {
+      return '';
+    }
+
+    const videoWatchUrl = vod.youtubeVideoId ? `https://www.youtube.com/watch?v=${encodeURIComponent(vod.youtubeVideoId)}` : null;
+    const thumbSrc = vod.youtubeThumbnailUrl || 'assets/logo.jpg';
+
+    const p1 = vod.p1EntrantId || '';
+    const p2 = vod.p2EntrantId || '';
+    const matchId = vod.matchId || '';
+
+    let p2OptionsHtml = '<option value="">Select Player 2…</option>';
+    if (p1 && opponentMap[p1]) {
+      const oppList = opponentMap[p1].map(oppId => {
+        const opp = entrants.find(e => e.id === oppId);
+        return opp ? { id: oppId, name: opp.gamerTag || opp.name } : { id: oppId, name: oppId };
+      }).sort((a, b) => a.name.localeCompare(b.name));
+      p2OptionsHtml += oppList.map(o => `<option value="${esc(o.id)}">${esc(o.name)}</option>`).join('');
+    }
+
+    let matchOptionsHtml = '<option value="">Select Match…</option>';
+    if (p1 && p2) {
+      const pairKey = [p1, p2].sort().join('_');
+      const matches = matchesByPair[pairKey] || [];
+      matchOptionsHtml += matches.map(m => `<option value="${esc(m.id)}">${esc(m.label)}</option>`).join('');
+    }
+
+    let statusBadge = '<span class="mono muted" style="font-size:11px; padding:2px 6px; border-radius:4px; background:rgba(255,255,255,0.06);">PENDING</span>';
+    if (isIgnored) {
+      statusBadge = '<span class="mono" style="font-size:11px; padding:2px 6px; border-radius:4px; background:rgba(239,68,68,0.15); color:#f87171;">IGNORED</span>';
+    } else if (isComplete && matchId) {
+      statusBadge = '<span class="mono" style="font-size:11px; padding:2px 6px; border-radius:4px; background:rgba(34,197,94,0.15); color:#4ade80;">COMPLETE</span>';
+    }
+
+    const availBadge = isUnavailable
+      ? '<span class="mono" style="font-size:11px; padding:2px 6px; border-radius:4px; background:rgba(234,179,8,0.15); color:#facc15; margin-left:4px;">UNAVAILABLE</span>'
+      : '';
+
+    return `
+      <tr data-vod-index="${idx}" style="border-bottom: 1px solid var(--line); ${isIgnored ? 'opacity: 0.6; background: rgba(0,0,0,0.1);' : ''}">
+        <td style="padding: 10px 12px; vertical-align: middle;">
+          <div style="display: flex; gap: 10px; align-items: center;">
+            ${videoWatchUrl ? `
+              <a href="${esc(videoWatchUrl)}" target="_blank" rel="noopener noreferrer" style="flex-shrink: 0; display: block; border-radius: 6px; overflow: hidden; width: 64px; height: 36px; background: #000;">
+                <img src="${esc(thumbSrc)}" alt="" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+              </a>
+            ` : `
+              <div style="flex-shrink: 0; width: 64px; height: 36px; border-radius: 6px; background: #1e293b; display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--muted);">No Video</div>
+            `}
+            <div style="min-width: 0;">
+              ${videoWatchUrl ? `
+                <a href="${esc(videoWatchUrl)}" target="_blank" rel="noopener noreferrer" style="color: var(--text); font-weight: 500; text-decoration: none; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 13px;" title="${esc(vod.youtubeTitle)}">
+                  ${esc(vod.youtubeTitle)}
+                </a>
+              ` : `
+                <span style="font-weight: 500; font-size: 13px;" title="${esc(vod.youtubeTitle)}">${esc(vod.youtubeTitle)}</span>
+              `}
+              <div style="margin-top: 4px; display: flex; gap: 6px; align-items: center;">
+                ${statusBadge}
+                ${availBadge}
+              </div>
+            </div>
+          </div>
+        </td>
+
+        <td style="padding: 10px 12px; vertical-align: middle;">
+          <select class="inp vod-p1-select" style="width: 100%; font-size: 12px;" ${isIgnored ? 'disabled' : ''}>
+            ${entrantOptionsHtml}
+          </select>
+        </td>
+
+        <td style="padding: 10px 12px; vertical-align: middle;">
+          <select class="inp vod-p2-select" style="width: 100%; font-size: 12px;" ${(!p1 || isIgnored) ? 'disabled' : ''}>
+            ${p2OptionsHtml}
+          </select>
+        </td>
+
+        <td style="padding: 10px 12px; vertical-align: middle;">
+          <select class="inp vod-match-select" style="width: 100%; font-size: 12px;" ${(!p1 || !p2 || isIgnored) ? 'disabled' : ''}>
+            ${matchOptionsHtml}
+          </select>
+        </td>
+
+        <td style="padding: 10px 12px; vertical-align: middle; text-align: center;">
+          <input type="checkbox" class="vod-ignore-check" ${isIgnored ? 'checked' : ''} title="Ignore / Hide video">
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  vods.forEach((vod, idx) => {
+    const row = tbody.querySelector(`tr[data-vod-index="${idx}"]`);
+    if (!row) return;
+    const p1Select = row.querySelector('.vod-p1-select');
+    const p2Select = row.querySelector('.vod-p2-select');
+    const matchSelect = row.querySelector('.vod-match-select');
+
+    if (p1Select && vod.p1EntrantId) p1Select.value = vod.p1EntrantId;
+    if (p2Select && vod.p2EntrantId) p2Select.value = vod.p2EntrantId;
+    if (matchSelect && vod.matchId) matchSelect.value = vod.matchId;
+  });
+}
+
+$('#vod-filter-show-ignored')?.addEventListener('change', () => {
+  renderVodTable();
+});
+
+$('#vod-table-body')?.addEventListener('change', (e) => {
+  const row = e.target.closest('tr[data-vod-index]');
+  if (!row || !currentVodData) return;
+  const idx = parseInt(row.getAttribute('data-vod-index'), 10);
+  const vod = currentVodData.vods[idx];
+  if (!vod) return;
+
+  hasUnsavedVodChanges = true;
+  const { entrants, opponentMap, matchesByPair } = currentVodData;
+
+  const p1Select = row.querySelector('.vod-p1-select');
+  const p2Select = row.querySelector('.vod-p2-select');
+  const matchSelect = row.querySelector('.vod-match-select');
+  const ignoreCheck = row.querySelector('.vod-ignore-check');
+
+  if (e.target === ignoreCheck) {
+    const isIgnored = ignoreCheck.checked;
+    vod.status = isIgnored ? 'ignored' : (vod.matchId ? 'complete' : 'pending');
+    p1Select.disabled = isIgnored;
+    p2Select.disabled = isIgnored || !vod.p1EntrantId;
+    matchSelect.disabled = isIgnored || !vod.p1EntrantId || !vod.p2EntrantId;
+    renderVodTable();
+    return;
+  }
+
+  if (e.target === p1Select) {
+    const newP1 = p1Select.value;
+    vod.p1EntrantId = newP1 || null;
+    vod.p2EntrantId = null;
+    vod.matchId = null;
+    vod.status = 'pending';
+
+    if (newP1 && opponentMap[newP1]) {
+      const oppList = opponentMap[newP1].map(oppId => {
+        const opp = entrants.find(ent => ent.id === oppId);
+        return opp ? { id: oppId, name: opp.gamerTag || opp.name } : { id: oppId, name: oppId };
+      }).sort((a, b) => a.name.localeCompare(b.name));
+      p2Select.innerHTML = '<option value="">Select Player 2…</option>' +
+        oppList.map(o => `<option value="${esc(o.id)}">${esc(o.name)}</option>`).join('');
+      p2Select.disabled = false;
+    } else {
+      p2Select.innerHTML = '<option value="">Select Player 2…</option>';
+      p2Select.disabled = true;
+    }
+    matchSelect.innerHTML = '<option value="">Select Match…</option>';
+    matchSelect.disabled = true;
+  } else if (e.target === p2Select) {
+    const newP2 = p2Select.value;
+    vod.p2EntrantId = newP2 || null;
+    vod.matchId = null;
+    vod.status = 'pending';
+
+    if (vod.p1EntrantId && newP2) {
+      const pairKey = [vod.p1EntrantId, newP2].sort().join('_');
+      const matches = matchesByPair[pairKey] || [];
+      matchSelect.innerHTML = '<option value="">Select Match…</option>' +
+        matches.map(m => `<option value="${esc(m.id)}">${esc(m.label)}</option>`).join('');
+      matchSelect.disabled = false;
+      if (matches.length === 1) {
+        matchSelect.value = matches[0].id;
+        vod.matchId = matches[0].id;
+        vod.status = 'complete';
+      }
+    } else {
+      matchSelect.innerHTML = '<option value="">Select Match…</option>';
+      matchSelect.disabled = true;
+    }
+  } else if (e.target === matchSelect) {
+    const newMatch = matchSelect.value;
+    vod.matchId = newMatch || null;
+    vod.status = newMatch ? 'complete' : 'pending';
+  }
+
+  const totalVideos = currentVodData.vods.length;
+  const mappedCount = currentVodData.vods.filter(v => v.status === 'complete' && v.matchId).length;
+  const ignoredCount = currentVodData.vods.filter(v => v.status === 'ignored').length;
+  const counter = $('#vod-counter');
+  if (counter) {
+    counter.textContent = `${mappedCount}/${totalVideos} mapped${ignoredCount ? ` (${ignoredCount} ignored)` : ''}`;
+  }
+});
+
+$('#vod-save-btn')?.addEventListener('click', async () => {
+  if (!currentVodData || !currentVodData.event) return;
+  const saveMsg = $('#vod-save-message');
+  const saveBtn = $('#vod-save-btn');
+  if (saveMsg) saveMsg.textContent = 'Saving VOD associations…';
+  if (saveBtn) saveBtn.disabled = true;
+
+  try {
+    const payload = {
+      eventId: currentVodData.event.id,
+      vods: currentVodData.vods.map(v => ({
+        id: v.id,
+        matchId: v.status === 'complete' ? (v.matchId || null) : (v.matchId || null),
+        status: v.status,
+        p1EntrantId: v.p1EntrantId || undefined,
+        p2EntrantId: v.p2EntrantId || undefined,
+      }))
+    };
+
+    const res = await api('/api/admin/save-event-vods', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+
+    hasUnsavedVodChanges = false;
+    if (saveMsg) saveMsg.textContent = `Saved ${res.saved} VOD associations. Static event and profile data refreshed.`;
+    const opt = $(`#vod-event-select option[value="${esc(currentVodData.event.id)}"]`);
+    if (opt) opt.setAttribute('data-vod-count', currentVodData.vods.length);
+    updateVodFormState();
+    renderVodTable();
+  } catch (err) {
+    if (saveMsg) saveMsg.textContent = `Save failed: ${err.message}`;
+  } finally {
+    if (saveBtn) saveBtn.disabled = false;
+  }
+});
+
+function closeVodModal() {
+  const modal = $('#vod-modal');
+  if (!modal) return;
+  if (hasUnsavedVodChanges) {
+    if (!confirm('You have unsaved VOD changes. Are you sure you want to discard them?')) {
+      return;
+    }
+  }
+  hasUnsavedVodChanges = false;
+  modal.close();
+}
+
+$('#vod-modal-close')?.addEventListener('click', closeVodModal);
+$('#vod-cancel-btn')?.addEventListener('click', closeVodModal);
 
 $('#signout').addEventListener('click', async () => {
   try { await api('/api/admin/logout', { method: 'POST', body: '{}' }); } finally { showEditor(false); }

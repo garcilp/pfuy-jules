@@ -579,11 +579,37 @@ function render() {
         const outcome = ['win', 'loss'].includes(set.outcome) ? set.outcome : 'unknown';
         const isPools = set.phase && /\bpools\b/i.test(set.phase);
         const roundHtml = (!isPools && set.round) ? `<small>${esc(set.round)}</small>` : '';
+
+        let vodHtml = '';
+        if (set.vods && set.vods.length > 0) {
+          const eyeSvg = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:middle;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+          if (set.vods.length === 1) {
+            const v = set.vods[0];
+            vodHtml = `<a href="${esc(v.url)}" target="_blank" rel="noopener noreferrer" class="set-vod-link" title="${esc(v.title || 'Watch VOD')}" aria-label="${esc(v.title || 'Watch VOD')}" style="display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:50%; background:rgba(56,189,248,0.12); color:var(--sky); border:1px solid rgba(56,189,248,0.25); text-decoration:none; margin-left:6px; flex-shrink:0;">${eyeSvg}</a>`;
+          } else {
+            // Multiple VODs: dropdown/popover button
+            const vodItems = set.vods.map((v, vIdx) => `<li><a href="${esc(v.url)}" target="_blank" rel="noopener noreferrer" style="display:block; padding:6px 10px; color:var(--text); text-decoration:none; font-size:12px; border-radius:6px;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">${v.title ? esc(v.title) : `Video ${vIdx + 1}`} ↗</a></li>`).join('');
+            vodHtml = `
+              <span class="set-vod-multi" style="position:relative; display:inline-block; margin-left:6px; flex-shrink:0;">
+                <button type="button" class="set-vod-link" title="${set.vods.length} VODs available" aria-label="${set.vods.length} VODs available" style="display:inline-flex; align-items:center; justify-content:center; gap:2px; height:26px; padding:0 8px; border-radius:13px; background:rgba(56,189,248,0.12); color:var(--sky); border:1px solid rgba(56,189,248,0.25); cursor:pointer;" onclick="const m=this.nextElementSibling; const isOpen=m.style.display==='block'; document.querySelectorAll('.vod-multi-menu').forEach(el=>el.style.display='none'); if(!isOpen) m.style.display='block'; event.stopPropagation();">
+                  ${eyeSvg}<span style="font-size:11px; font-weight:600; margin-left:2px;">${set.vods.length}</span>
+                </button>
+                <ul class="vod-multi-menu" style="display:none; position:absolute; right:0; top:100%; margin-top:4px; z-index:100; min-width:200px; padding:6px; border-radius:10px; background:#0f172a; border:1px solid var(--line); box-shadow:0 10px 25px rgba(0,0,0,0.5); list-style:none;">
+                  ${vodItems}
+                </ul>
+              </span>
+            `;
+          }
+        }
+
         return `<div class="set-row">
           <span class="set-phase"><b>${esc(set.phase || 'Phase not recorded')}</b>${roundHtml}</span>
           <span class="set-opponent">${linkifyOpponent(set.opponent || 'Unknown')}</span>
           <span class="set-score">${esc(set.score || '—')}</span>
-          <span class="set-result ${outcome}">${outcome === 'unknown' ? 'RESULT UNKNOWN' : outcome.toUpperCase()}</span>
+          <span class="set-result ${outcome}" style="display:inline-flex; align-items:center; justify-content:flex-end;">
+            <span>${outcome === 'unknown' ? 'RESULT UNKNOWN' : outcome.toUpperCase()}</span>
+            ${vodHtml}
+          </span>
         </div>`;
       }).join('') : '<p class="set-empty muted">No set details were recorded for this event.</p>';
       return `<div class="result-entry">

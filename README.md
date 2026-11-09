@@ -15,6 +15,19 @@ For the password-protected player editor, run:
 
 If `PLATFIGHTERS_ADMIN_PASSWORD` is not set, the server securely prompts you to choose a password twice and keeps it only in memory for that run. There is no preset password. Open `http://localhost:8000/admin.html` to sign in. The editor can update the complete profile JSON, merge player identities, group an additional event under a primary event with a custom phase label, exclude an event site-wide, and exclude games for individual players; the start.gg player ID is fixed. This editor server binds to this computer only; use a TLS-enabled host and proper authentication before exposing any admin functions publicly. The static `python -m http.server` command does not provide admin editing.
 
+## YouTube VOD Management
+
+To import and synchronize YouTube tournament playlists with tournament matches:
+
+1. Obtain a YouTube Data API v3 key from Google Cloud Console.
+2. Set it in your terminal as `YOUTUBE_API_KEY`:
+   ```bash
+   export YOUTUBE_API_KEY="your-api-key"
+   ```
+3. In `admin.html` under the **Events** tab, select an event in the **YouTube VOD Playlists** section, enter the playlist URL, and click **Load VODs** or **Manage VODs**.
+4. In the VOD Management dialog, map videos to tournament matches by selecting Player 1, Player 2 (dynamically filtered to actual opponents), and the Match. You can also mark non-match videos as Ignored.
+5. Click **Save VODs** to persist associations and automatically update static event and player JSON files.
+
 ## Download start.gg event data
 
 1. Create an API token in your start.gg account settings.

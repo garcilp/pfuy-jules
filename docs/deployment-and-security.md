@@ -63,11 +63,25 @@ The following files and folders should **never** be made publicly downloadable o
   - Test suites and test scripts.
 - `torneos*.txt` & local batch text files.
 - `admin.html` and `js/admin.js` (if choosing a pure static deployment model without backend administration).
-- `.env` or any script containing API tokens like `STARTGG_API_TOKEN`.
+- `.env` or any script containing API tokens like `STARTGG_API_TOKEN` or `YOUTUBE_API_KEY`.
 
 ---
 
-## 2. Admin Password Security: How It Works & How to Protect It
+## 2. YouTube API Configuration
+
+For YouTube playlist import and synchronization in the admin panel:
+
+- Set `YOUTUBE_API_KEY` in your environment or `.env`:
+  ```bash
+  export YOUTUBE_API_KEY="your-youtube-data-api-v3-key"
+  ```
+- The API key is kept strictly server-side inside `scripts/youtube_vod.py` and `scripts/serve_site.py`.
+- It is never exposed in client-side HTML/JS, generated JSON, or public API responses.
+- The YouTube Data API v3 (`playlistItems` endpoint) is used to retrieve video IDs, titles, and thumbnails from configured playlists.
+
+---
+
+## 3. Admin Password Security: How It Works & How to Protect It
 
 ### How Authentication Works in the Codebase
 
@@ -82,7 +96,7 @@ The following files and folders should **never** be made publicly downloadable o
 
 ---
 
-## 3. Recommended Deployment Architectures
+## 4. Recommended Deployment Architectures
 
 ### Architecture A: Static Public Site + Local/Private Admin (Recommended)
 

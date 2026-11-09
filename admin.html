@@ -177,6 +177,21 @@
         <p class="muted admin-copy" style="margin:0;" data-i18n="admin.sec.eventMgmtDesc">Group amateur and side brackets into main tournaments, configure global event exclusions, and manage community links.</p>
       </div>
 
+      <!-- VOD Playlist Configuration Panel -->
+      <section class="merge-panel" aria-labelledby="vod-playlist-heading" style="margin-top: 0; margin-bottom: 32px; padding-bottom: 28px;">
+        <h3 id="vod-playlist-heading">YouTube VOD Playlists</h3>
+        <p class="muted admin-copy">Associate a YouTube playlist with an event to map match videos to tournament sets.</p>
+        <form id="event-vod-form" class="admin-form merge-form">
+          <label><span>Event</span><select id="vod-event-select" required></select></label>
+          <label><span>VOD Playlist URL</span><input id="vod-playlist-url" type="url" placeholder="https://www.youtube.com/playlist?list=..." autocomplete="off"></label>
+          <div class="form-actions" style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+            <button id="vod-action-btn" class="action-button" type="button">Load VODs</button>
+            <button id="vod-save-url-btn" class="quiet-button" type="submit" style="display:none;">Save Playlist URL</button>
+            <p id="vod-form-message" class="form-message mono" role="status"></p>
+          </div>
+        </form>
+      </section>
+
       <section class="merge-panel" aria-labelledby="event-group-heading" style="margin-top: 0; margin-bottom: 32px; padding-bottom: 28px;">
         <h3 id="event-group-heading" data-i18n="admin.sec.groupEvent">Group an additional event</h3>
         <p class="muted admin-copy" data-i18n="admin.sec.groupEventDesc">Attach an event such as an amateur bracket to its main event so participant placements are contiguous.</p>
@@ -288,6 +303,60 @@
     </div>
   </section>
 </main>
+
+<!-- VOD Management Modal Dialog -->
+<dialog id="vod-modal" class="diagnostic-modal" style="max-width: 1100px; width: 95vw;">
+  <div class="modal-header">
+    <div>
+      <h2 id="vod-modal-title" style="margin: 0; font-size: 20px;">Manage Event VODs</h2>
+      <p id="vod-modal-subtitle" class="muted mono" style="margin: 4px 0 0 0; font-size: 13px;">Event Name</p>
+    </div>
+    <button type="button" id="vod-modal-close" class="quiet-button" style="font-size: 22px; line-height: 1; padding: 4px 8px;" aria-label="Close">✕</button>
+  </div>
+  <div class="modal-body" style="display: flex; flex-direction: column; gap: 16px;">
+    <!-- Controls bar -->
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding: 12px 16px; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--line);">
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <span id="vod-counter" class="mono" style="font-size: 14px; font-weight: 600;">0/0 mapped</span>
+        <label style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px; margin: 0; cursor: pointer;">
+          <input type="checkbox" id="vod-filter-show-ignored" checked>
+          <span>Show ignored videos</span>
+        </label>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <button id="vod-sync-btn" type="button" class="btn glass pill" style="font-size: 13px; padding: 6px 14px;">🔄 Sync Playlist</button>
+      </div>
+    </div>
+
+    <!-- Table of videos -->
+    <div style="overflow-x: auto; max-height: 60vh; border-radius: 12px; border: 1px solid var(--line);">
+      <table id="vod-table" style="width: 100%; border-collapse: collapse; font-size: 13px; text-align: left;">
+        <thead>
+          <tr style="border-bottom: 1px solid var(--line); background: rgba(255,255,255,0.05); position: sticky; top: 0; z-index: 2;">
+            <th style="padding: 10px 12px; width: 35%;">Video</th>
+            <th style="padding: 10px 12px; width: 18%;">Player 1</th>
+            <th style="padding: 10px 12px; width: 18%;">Player 2</th>
+            <th style="padding: 10px 12px; width: 21%;">Match</th>
+            <th style="padding: 10px 12px; width: 8%; text-align: center;">Ignore</th>
+          </tr>
+        </thead>
+        <tbody id="vod-table-body">
+          <tr><td colspan="5" style="padding: 24px; text-align: center;" class="muted mono">Loading videos…</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Footer actions -->
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding-top: 8px;">
+      <p id="vod-save-message" class="form-message mono" role="status" style="margin: 0;"></p>
+      <div style="display: flex; gap: 12px;">
+        <button id="vod-cancel-btn" type="button" class="quiet-button">Cancel</button>
+        <button id="vod-save-btn" type="button" class="action-button">Save VODs</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+
 <footer class="foot mono muted" data-i18n="admin.footer"><span data-i18n="admin.footer">Platfighters.uy · Local administrator session</span></footer>
 <script src="js/admin.js"></script>
 <script src="js/theme.js"></script>
