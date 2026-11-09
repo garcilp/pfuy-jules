@@ -250,11 +250,14 @@
     });
 
     // Keyboard navigation & Escape key handling
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && sheet.classList.contains('open')) {
-        toggleMenuSheet(false);
-      }
-    });
+    document.addEventListener('keydown', handleDocumentKeyDown);
+  }
+
+  function handleDocumentKeyDown(e) {
+    const sheet = document.getElementById('mobile-menu-sheet');
+    if (e.key === 'Escape' && sheet && sheet.classList.contains('open')) {
+      toggleMenuSheet(false);
+    }
   }
 
   function toggleMenuSheet(force) {
@@ -407,10 +410,57 @@
     }[tag] || tag));
   }
 
-  // Auto-init on DOMContentLoaded
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initMobileChrome);
+  function teardownMobileChrome() {
+    document.body.classList.remove('mobile-scroll-locked');
+    document.removeEventListener('keydown', handleDocumentKeyDown);
+
+    const topActions = document.querySelectorAll('.mobile-top-actions');
+    topActions.forEach(el => el.remove());
+
+    const bottomNav = document.getElementById('mobile-bottom-nav');
+    if (bottomNav) bottomNav.remove();
+
+    const sheet = document.getElementById('mobile-menu-sheet');
+    if (sheet) sheet.remove();
+
+    const drawer = document.getElementById('mobile-search-drawer');
+    if (drawer) drawer.remove();
+  }
+
+  const mobileQuery = window.matchMedia ? window.matchMedia('(max-width: 640px)') : null;
+
+  function isMobileViewport() {
+    return mobileQuery ? mobileQuery.matches : (window.innerWidth <= 640);
+  }
+
+  function handleViewportChange() {
+    if (isMobileViewport()) {
+      initMobileChrome();
+    } else {
+      teardownMobileChrome();
+    }
+  }
+
+  if (mobileQuery) {
+    if (typeof mobileQuery.addEventListener === 'function') {
+      mobileQuery.addEventListener('change', handleViewportChange);
+    } else if (typeof mobileQuery.addListener === 'function') {
+      mobileQuery.addListener(handleViewportChange);
+    }
   } else {
-    initMobileChrome();
+    window.addEventListener('resize', handleViewportChange);
+  }
+
+  function initOnReady() {
+    if (isMobileViewport()) {
+      initMobileChrome();
+    }
+  }
+
+  // Auto-init on DOMContentLoaded only if in mobile viewport
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initOnReady);
+  } else {
+    initOnReady();
   }
 })();

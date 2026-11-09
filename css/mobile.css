@@ -3,6 +3,15 @@
    Desktop layout (> 640px) is strictly preserved.
 */
 
+@media (min-width: 641px) {
+  .mobile-top-actions,
+  .mobile-bottom-bar,
+  .mobile-menu-sheet,
+  .mobile-search-drawer {
+    display: none !important;
+  }
+}
+
 @media (max-width: 640px) {
   /* ==========================================================================
      Global Mobile Base & Chrome
