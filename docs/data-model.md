@@ -24,6 +24,8 @@ The importer creates these tables:
     set_game_selections (id, set_game_id, videogame_slug, character_id, entrant_id,
                          participant_id, selection_order, selection_type, selection_value)
     import_markers      (event_id, source_path, content_sha256, imported_at, row counts)
+    event_vods          (id, event_id, match_id, youtube_video_id, youtube_playlist_item_id,
+                         youtube_title, youtube_thumbnail_url, status, availability, timestamps)
 
 Public player profile metadata is fetched separately with `python scripts/fetch_player_profiles.py`. It stores start.gg player prefixes, linked user profile slugs, and public city/country values in `data/profiles/startgg_metadata.json`, keyed by start.gg player ID. Profile generation uses these fields when available, defaults a missing country to Uruguay, and admin-saved overrides take precedence. Full profile edits made in the admin panel are stored as per-player overrides so they persist across profile rebuilds.
 
@@ -40,5 +42,13 @@ The admin visibility controls store global event exclusions and per-player game 
 The `import_markers` row stores a SHA-256 digest of all JSON files in the selected event folder. If the digest is unchanged, the importer skips that event. If raw files change, it re-imports the event with upserts so IDs do not duplicate. The importer also picks the most complete raw folder when multiple paths contain the same start.gg event ID.
 
 The current saved snapshots contain tournament slugs from their URLs, but not tournament IDs or display names. `fetch_events.py` now requests those fields; after refreshing event snapshots, re-importing fills the available tournament metadata.
+
+## YouTube VODs
+
+Tournament events can link to YouTube playlists via `events.vod_playlist_url`. Individual video items from the playlist are stored in `event_vods` and associated with matches in `sets` by administrators via the admin panel.
+
+Video availability (`available`, `unavailable`, `unknown`) is tracked separately from association status (`pending`, `complete`, `ignored`). Multiple VODs can be mapped to the same match. Completed VODs are compiled directly into static event JSON files (`data/events/<slug>.json`) and player profile results JSON files (`data/profiles/<slug>.json`), ensuring public pages require no runtime database queries.
+
+To import or synchronize YouTube playlists, set `YOUTUBE_API_KEY` on the server environment.
 
 Before launch, check start.gg's developer terms on caching/storing data and attribution.

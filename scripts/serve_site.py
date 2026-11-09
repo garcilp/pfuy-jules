@@ -37,6 +37,14 @@ from scripts.metadata_generator import (
     get_page_metadata,
     inject_html_metadata,
 )
+from scripts.import_startgg_data import migrate_vod_schema
+from scripts.youtube_vod import (
+    extract_playlist_id,
+    fetch_playlist_videos,
+    is_valid_playlist_url,
+    YouTubeAPIError,
+    YouTubeConfigError,
+)
 
 PROFILE_DIR = ROOT / "data" / "profiles"
 EVENT_GROUPS_PATH = PROFILE_DIR / "event_groups.json"
@@ -521,8 +529,11 @@ class Handler(SimpleHTTPRequestHandler):
                 return
             try:
                 with sqlite3.connect(DATABASE) as connection:
+                    migrate_vod_schema(connection)
                     rows = connection.execute(
-                        "SELECT e.source_url, t.name, e.name, v.name, t.start_at "
+                        "SELECT e.id, e.source_url, t.name, e.name, v.name, t.start_at, "
+                        "e.vod_playlist_url, "
+                        "(SELECT COUNT(*) FROM event_vods ev WHERE ev.event_id = e.id) AS vod_count "
                         "FROM events e "
                         "JOIN tournaments t ON e.tournament_slug = t.slug "
                         "JOIN videogames v ON e.videogame_slug = v.slug "
@@ -530,17 +541,160 @@ class Handler(SimpleHTTPRequestHandler):
                     ).fetchall()
                 events = [
                     {
-                        "sourceUrl": row[0],
-                        "tournamentName": row[1],
-                        "eventName": row[2],
-                        "gameName": row[3],
-                        "startAt": row[4],
+                        "id": str(row[0]),
+                        "sourceUrl": row[1],
+                        "tournamentName": row[2],
+                        "eventName": row[3],
+                        "gameName": row[4],
+                        "startAt": row[5],
+                        "vodPlaylistUrl": row[6] or "",
+                        "vodCount": row[7] or 0,
                     }
                     for row in rows
                 ]
                 self.send_json(200, {"events": events})
             except sqlite3.Error as error:
                 self.send_json(500, {"error": f"Could not load imported events: {error}"})
+        elif parsed.path == "/api/admin/event-vod-info":
+            if not self.require_admin():
+                return
+            qs = parse_qs(parsed.query)
+            event_id = qs.get("eventId", [None])[0]
+            if not event_id:
+                self.send_json(400, {"error": "Missing eventId query parameter."})
+                return
+            try:
+                with sqlite3.connect(DATABASE) as connection:
+                    connection.row_factory = sqlite3.Row
+                    migrate_vod_schema(connection)
+
+                    # 1. Event metadata
+                    ev_row = connection.execute(
+                        "SELECT e.id, e.name, e.source_url, e.vod_playlist_url, t.name as tournament_name, v.name as game_name "
+                        "FROM events e "
+                        "JOIN tournaments t ON t.slug=e.tournament_slug "
+                        "JOIN videogames v ON v.slug=e.videogame_slug "
+                        "WHERE e.id=?", (str(event_id),)
+                    ).fetchone()
+                    if not ev_row:
+                        self.send_json(404, {"error": f"Event not found with ID {event_id}"})
+                        return
+
+                    # 2. Entrants
+                    entrants_rows = connection.execute(
+                        "SELECT en.id, en.name, p.player_id, p.gamer_tag "
+                        "FROM entrants en "
+                        "LEFT JOIN entrant_participants ep ON ep.entrant_id=en.id "
+                        "LEFT JOIN participants p ON p.id=ep.participant_id "
+                        "WHERE en.event_id=? ORDER BY en.name COLLATE NOCASE ASC", (str(event_id),)
+                    ).fetchall()
+                    entrants = []
+                    seen_entrants = set()
+                    for er in entrants_rows:
+                        eid_str = str(er["id"])
+                        if eid_str not in seen_entrants:
+                            seen_entrants.add(eid_str)
+                            entrants.append({
+                                "id": eid_str,
+                                "name": er["name"] or er["gamer_tag"] or "Unknown",
+                                "gamerTag": er["gamer_tag"] or er["name"] or "Unknown",
+                                "playerId": str(er["player_id"]) if er["player_id"] is not None else None,
+                            })
+
+                    # 3. Sets & Opponent pairings & Matches
+                    set_rows = connection.execute(
+                        "SELECT s.id, s.display_score, s.round, s.full_round_text, s.identifier, "
+                        "s.winner_entrant_id, ph.name as phase_name, "
+                        "se1.entrant_id as e1, se2.entrant_id as e2 "
+                        "FROM sets s "
+                        "LEFT JOIN phase_groups pg ON pg.id=s.phase_group_id "
+                        "LEFT JOIN phases ph ON ph.id=pg.phase_id "
+                        "JOIN set_entrants se1 ON se1.set_id=s.id AND se1.slot_order=0 "
+                        "JOIN set_entrants se2 ON se2.set_id=s.id AND se2.slot_order=1 "
+                        "WHERE s.event_id=?", (str(event_id),)
+                    ).fetchall()
+
+                    opponent_map = defaultdict(set)
+                    matches_by_pair = defaultdict(list)
+                    set_to_entrants = {}
+
+                    for sr in set_rows:
+                        sid = str(sr["id"])
+                        e1 = str(sr["e1"])
+                        e2 = str(sr["e2"])
+                        if e1 and e2 and e1 != e2:
+                            opponent_map[e1].add(e2)
+                            opponent_map[e2].add(e1)
+                            pair_key = "_".join(sorted([e1, e2]))
+                            set_to_entrants[sid] = (e1, e2)
+
+                            phase_str = sr["phase_name"] or "Bracket"
+                            round_str = sr["full_round_text"] or (f"Round {sr['round']}" if sr["round"] is not None else "")
+                            ident_str = f"Match {sr['identifier']}" if sr["identifier"] else ""
+                            label_parts = [p for p in (phase_str, round_str, ident_str) if p]
+                            match_label = " – ".join(label_parts) if label_parts else f"Match {sid}"
+                            if sr["display_score"]:
+                                match_label += f" ({sr['display_score']})"
+
+                            matches_by_pair[pair_key].append({
+                                "id": sid,
+                                "phase": phase_str,
+                                "round": round_str,
+                                "identifier": sr["identifier"] or "",
+                                "displayScore": sr["display_score"] or "",
+                                "winnerEntrantId": str(sr["winner_entrant_id"]) if sr["winner_entrant_id"] is not None else None,
+                                "label": match_label,
+                            })
+
+                    # 4. Current VOD records for this event
+                    vod_rows = connection.execute(
+                        "SELECT id, event_id, match_id, youtube_video_id, youtube_playlist_item_id, "
+                        "youtube_title, youtube_thumbnail_url, status, availability, created_at, updated_at "
+                        "FROM event_vods WHERE event_id=? ORDER BY id ASC", (str(event_id),)
+                    ).fetchall()
+
+                    vods = []
+                    for vr in vod_rows:
+                        mid = str(vr["match_id"]) if vr["match_id"] is not None else None
+                        p1_id = None
+                        p2_id = None
+                        if mid and mid in set_to_entrants:
+                            p1_id, p2_id = set_to_entrants[mid]
+
+                        vods.append({
+                            "id": vr["id"],
+                            "eventId": str(vr["event_id"]),
+                            "matchId": mid,
+                            "youtubeVideoId": vr["youtube_video_id"],
+                            "youtubePlaylistItemId": vr["youtube_playlist_item_id"],
+                            "youtubeTitle": vr["youtube_title"],
+                            "youtubeThumbnailUrl": vr["youtube_thumbnail_url"],
+                            "status": vr["status"],
+                            "availability": vr["availability"] if "availability" in vr.keys() else "available",
+                            "p1EntrantId": p1_id,
+                            "p2EntrantId": p2_id,
+                            "createdAt": vr["created_at"],
+                            "updatedAt": vr["updated_at"],
+                        })
+
+                serializable_opponents = {k: sorted(list(v)) for k, v in opponent_map.items()}
+                self.send_json(200, {
+                    "event": {
+                        "id": str(ev_row["id"]),
+                        "name": ev_row["name"],
+                        "tournamentName": ev_row["tournament_name"],
+                        "gameName": ev_row["game_name"],
+                        "sourceUrl": ev_row["source_url"],
+                        "vodPlaylistUrl": ev_row["vod_playlist_url"] or "",
+                        "vodCount": len(vods),
+                    },
+                    "entrants": entrants,
+                    "opponentMap": serializable_opponents,
+                    "matchesByPair": dict(matches_by_pair),
+                    "vods": vods,
+                })
+            except Exception as err:
+                self.send_json(500, {"error": f"Failed to load VOD info: {err}"})
         elif parsed.path == "/api/admin/exclusions":
             if not self.require_admin():
                 return
@@ -1061,6 +1215,225 @@ class Handler(SimpleHTTPRequestHandler):
                 return
             atomic_json(COMMUNITY_SOCIALS_PATH, socials)
             self.send_json(200, {"socials": socials})
+        elif parsed.path == "/api/admin/event-vod-playlist":
+            event_id = str(body.get("eventId", "")).strip()
+            playlist_url = str(body.get("playlistUrl", "")).strip()
+            if not event_id:
+                self.send_json(400, {"error": "Missing eventId."})
+                return
+            if playlist_url and not is_valid_playlist_url(playlist_url):
+                self.send_json(400, {"error": "Please enter a valid YouTube playlist URL or ID."})
+                return
+
+            try:
+                with sqlite3.connect(DATABASE) as connection:
+                    migrate_vod_schema(connection)
+                    ev = connection.execute("SELECT id FROM events WHERE id=?", (event_id,)).fetchone()
+                    if not ev:
+                        self.send_json(404, {"error": f"Event not found with ID {event_id}"})
+                        return
+                    connection.execute(
+                        "UPDATE events SET vod_playlist_url=? WHERE id=?",
+                        (playlist_url if playlist_url else None, event_id)
+                    )
+                    connection.commit()
+                self.send_json(200, {"success": True, "eventId": event_id, "playlistUrl": playlist_url})
+            except Exception as err:
+                self.send_json(500, {"error": f"Database error updating playlist URL: {err}"})
+        elif parsed.path == "/api/admin/sync-event-vods":
+            event_id = str(body.get("eventId", "")).strip()
+            playlist_url = str(body.get("playlistUrl", "")).strip()
+            if not event_id:
+                self.send_json(400, {"error": "Missing eventId."})
+                return
+
+            try:
+                with sqlite3.connect(DATABASE) as connection:
+                    connection.row_factory = sqlite3.Row
+                    migrate_vod_schema(connection)
+                    ev = connection.execute("SELECT id, vod_playlist_url FROM events WHERE id=?", (event_id,)).fetchone()
+                    if not ev:
+                        self.send_json(404, {"error": f"Event not found with ID {event_id}"})
+                        return
+
+                    target_url = playlist_url or ev["vod_playlist_url"]
+                    if not target_url or not is_valid_playlist_url(target_url):
+                        self.send_json(400, {"error": "A valid YouTube playlist URL is required to sync VODs."})
+                        return
+
+                    if playlist_url and playlist_url != ev["vod_playlist_url"]:
+                        connection.execute("UPDATE events SET vod_playlist_url=? WHERE id=?", (playlist_url, event_id))
+                        connection.commit()
+
+                # Fetch playlist videos from YouTube Data API (outside DB transaction)
+                try:
+                    fetched_videos = fetch_playlist_videos(target_url)
+                except YouTubeConfigError as err:
+                    self.send_json(400, {"error": str(err)})
+                    return
+                except (YouTubeAPIError, ValueError) as err:
+                    self.send_json(502, {"error": f"YouTube API error: {err}"})
+                    return
+
+                # Synchronize into database non-destructively
+                now_ts = int(time.time())
+                added_count = 0
+                updated_count = 0
+                active_video_ids = set()
+
+                with sqlite3.connect(DATABASE) as connection:
+                    connection.row_factory = sqlite3.Row
+                    migrate_vod_schema(connection)
+
+                    existing_rows = connection.execute(
+                        "SELECT id, youtube_video_id, youtube_playlist_item_id, youtube_title, "
+                        "youtube_thumbnail_url, status, availability, match_id "
+                        "FROM event_vods WHERE event_id=?", (event_id,)
+                    ).fetchall()
+
+                    existing_by_video_id = {}
+                    existing_by_item_id = {}
+                    for row in existing_rows:
+                        if row["youtube_video_id"]:
+                            existing_by_video_id[row["youtube_video_id"]] = row
+                        if row["youtube_playlist_item_id"]:
+                            existing_by_item_id[row["youtube_playlist_item_id"]] = row
+
+                    for v in fetched_videos:
+                        vid = v["youtube_video_id"]
+                        item_id = v["youtube_playlist_item_id"]
+                        title = v["youtube_title"]
+                        thumb = v["youtube_thumbnail_url"]
+                        avail = v["availability"]
+                        if vid:
+                            active_video_ids.add(vid)
+
+                        existing = None
+                        if vid and vid in existing_by_video_id:
+                            existing = existing_by_video_id[vid]
+                        elif item_id and item_id in existing_by_item_id:
+                            existing = existing_by_item_id[item_id]
+
+                        if existing:
+                            connection.execute(
+                                "UPDATE event_vods SET "
+                                "youtube_video_id=COALESCE(?, youtube_video_id), "
+                                "youtube_playlist_item_id=COALESCE(?, youtube_playlist_item_id), "
+                                "youtube_title=?, "
+                                "youtube_thumbnail_url=COALESCE(?, youtube_thumbnail_url), "
+                                "availability=?, "
+                                "updated_at=? "
+                                "WHERE id=?",
+                                (vid, item_id, title, thumb, avail, now_ts, existing["id"])
+                            )
+                            updated_count += 1
+                        else:
+                            connection.execute(
+                                "INSERT INTO event_vods (event_id, match_id, youtube_video_id, "
+                                "youtube_playlist_item_id, youtube_title, youtube_thumbnail_url, "
+                                "status, availability, created_at, updated_at) "
+                                "VALUES (?, NULL, ?, ?, ?, ?, 'pending', ?, ?, ?)",
+                                (event_id, vid, item_id, title, thumb, avail, now_ts, now_ts)
+                            )
+                            added_count += 1
+
+                    connection.commit()
+
+                self.send_json(200, {
+                    "success": True,
+                    "eventId": event_id,
+                    "added": added_count,
+                    "updated": updated_count,
+                    "total": len(fetched_videos),
+                })
+            except Exception as err:
+                self.send_json(500, {"error": f"Failed to sync playlist: {err}"})
+        elif parsed.path == "/api/admin/save-event-vods":
+            event_id = str(body.get("eventId", "")).strip()
+            vods_input = body.get("vods", [])
+            if not event_id:
+                self.send_json(400, {"error": "Missing eventId."})
+                return
+            if not isinstance(vods_input, list):
+                self.send_json(400, {"error": "vods must be a list of VOD associations."})
+                return
+
+            now_ts = int(time.time())
+            try:
+                with sqlite3.connect(DATABASE) as connection:
+                    connection.row_factory = sqlite3.Row
+                    migrate_vod_schema(connection)
+
+                    ev = connection.execute("SELECT id FROM events WHERE id=?", (event_id,)).fetchone()
+                    if not ev:
+                        self.send_json(404, {"error": f"Event not found with ID {event_id}"})
+                        return
+
+                    valid_sets = connection.execute(
+                        "SELECT s.id, se1.entrant_id as e1, se2.entrant_id as e2 "
+                        "FROM sets s "
+                        "JOIN set_entrants se1 ON se1.set_id=s.id AND se1.slot_order=0 "
+                        "JOIN set_entrants se2 ON se2.set_id=s.id AND se2.slot_order=1 "
+                        "WHERE s.event_id=?", (event_id,)
+                    ).fetchall()
+                    valid_set_map = {str(s["id"]): (str(s["e1"]), str(s["e2"])) for s in valid_sets}
+
+                    current_vods = connection.execute(
+                        "SELECT id FROM event_vods WHERE event_id=?", (event_id,)
+                    ).fetchall()
+                    current_vod_ids = {r["id"] for r in current_vods}
+
+                    updates_to_run = []
+                    for v in vods_input:
+                        vod_id = v.get("id")
+                        if vod_id not in current_vod_ids:
+                            self.send_json(400, {"error": f"VOD record {vod_id} does not belong to event {event_id}."})
+                            return
+
+                        status = str(v.get("status", "pending")).lower()
+                        if status not in ("pending", "complete", "ignored"):
+                            self.send_json(400, {"error": f"Invalid status '{status}' for VOD {vod_id}."})
+                            return
+
+                        raw_match_id = v.get("matchId")
+                        match_id = str(raw_match_id).strip() if raw_match_id is not None and str(raw_match_id).strip() else None
+
+                        if status == "complete":
+                            if not match_id:
+                                self.send_json(400, {"error": f"VOD {vod_id} is marked complete but has no associated match."})
+                                return
+                            if match_id not in valid_set_map:
+                                self.send_json(400, {"error": f"Match {match_id} does not exist in event {event_id}."})
+                                return
+
+                            p1 = v.get("p1EntrantId")
+                            p2 = v.get("p2EntrantId")
+                            set_e1, set_e2 = valid_set_map[match_id]
+                            if p1 and str(p1) not in (set_e1, set_e2):
+                                self.send_json(400, {"error": f"Player 1 is not a participant in match {match_id}."})
+                                return
+                            if p2 and str(p2) not in (set_e1, set_e2):
+                                self.send_json(400, {"error": f"Player 2 is not a participant in match {match_id}."})
+                                return
+                        elif status == "ignored":
+                            pass
+
+                        updates_to_run.append((match_id, status, now_ts, vod_id))
+
+                    for match_id, status, updated_at, vod_id in updates_to_run:
+                        connection.execute(
+                            "UPDATE event_vods SET match_id=?, status=?, updated_at=? WHERE id=?",
+                            (match_id, status, updated_at, vod_id)
+                        )
+                    connection.commit()
+
+                    # Trigger static write for this event detail
+                    from scripts.build_player_profile import write_event_details
+                    write_event_details(connection)
+
+                self.send_json(200, {"success": True, "saved": len(updates_to_run)})
+            except Exception as err:
+                self.send_json(500, {"error": f"Failed to save VOD associations: {err}"})
         elif parsed.path == "/api/admin/merge":
             source, target = str(body.get("sourceId", "")), str(body.get("targetId", ""))
             profiles = {entry["playerId"] for entry in profile_entries() if entry["playerId"]}

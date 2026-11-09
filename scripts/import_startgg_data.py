@@ -39,7 +39,8 @@ CREATE TABLE IF NOT EXISTS events (
     name TEXT NOT NULL,
     num_entrants INTEGER,
     source_url TEXT,
-    is_temporary INTEGER DEFAULT 0
+    is_temporary INTEGER DEFAULT 0,
+    vod_playlist_url TEXT DEFAULT NULL
 );
 CREATE TABLE IF NOT EXISTS players (
     id TEXT PRIMARY KEY
@@ -167,6 +168,20 @@ CREATE TABLE IF NOT EXISTS import_markers (
     games_imported INTEGER NOT NULL,
     selections_imported INTEGER NOT NULL
 );
+CREATE TABLE IF NOT EXISTS event_vods (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    event_id TEXT NOT NULL REFERENCES events(id),
+    match_id TEXT REFERENCES sets(id),
+    youtube_video_id TEXT,
+    youtube_playlist_item_id TEXT,
+    youtube_title TEXT NOT NULL,
+    youtube_thumbnail_url TEXT,
+    status TEXT NOT NULL DEFAULT 'pending',
+    availability TEXT NOT NULL DEFAULT 'available',
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    UNIQUE(event_id, youtube_video_id)
+);
 CREATE INDEX IF NOT EXISTS idx_events_tournament ON events(tournament_slug);
 CREATE INDEX IF NOT EXISTS idx_events_game ON events(videogame_slug);
 CREATE INDEX IF NOT EXISTS idx_entrants_event ON entrants(event_id);
@@ -179,7 +194,41 @@ CREATE INDEX IF NOT EXISTS idx_set_entrants_entrant ON set_entrants(entrant_id);
 CREATE INDEX IF NOT EXISTS idx_entrant_participants_part ON entrant_participants(participant_id);
 CREATE INDEX IF NOT EXISTS idx_set_games_set ON set_games(set_id);
 CREATE INDEX IF NOT EXISTS idx_event_standings_entrant ON event_standings(entrant_id);
+CREATE INDEX IF NOT EXISTS idx_event_vods_event ON event_vods(event_id);
+CREATE INDEX IF NOT EXISTS idx_event_vods_match ON event_vods(match_id);
 """
+
+
+def migrate_vod_schema(connection):
+    """Ensure vod_playlist_url column and event_vods table exist in SQLite database."""
+    # 1. Add vod_playlist_url to events if missing
+    columns = [col[1] for col in connection.execute("PRAGMA table_info(events)").fetchall()]
+    if "vod_playlist_url" not in columns:
+        connection.execute("ALTER TABLE events ADD COLUMN vod_playlist_url TEXT DEFAULT NULL")
+
+    # 2. Create event_vods table if missing
+    connection.execute("""
+        CREATE TABLE IF NOT EXISTS event_vods (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            event_id TEXT NOT NULL REFERENCES events(id),
+            match_id TEXT REFERENCES sets(id),
+            youtube_video_id TEXT,
+            youtube_playlist_item_id TEXT,
+            youtube_title TEXT NOT NULL,
+            youtube_thumbnail_url TEXT,
+            status TEXT NOT NULL DEFAULT 'pending',
+            availability TEXT NOT NULL DEFAULT 'available',
+            created_at INTEGER NOT NULL,
+            updated_at INTEGER NOT NULL,
+            UNIQUE(event_id, youtube_video_id)
+        )
+    """)
+    vod_cols = [col[1] for col in connection.execute("PRAGMA table_info(event_vods)").fetchall()]
+    if "availability" not in vod_cols:
+        connection.execute("ALTER TABLE event_vods ADD COLUMN availability TEXT NOT NULL DEFAULT 'available'")
+    connection.execute("CREATE INDEX IF NOT EXISTS idx_event_vods_event ON event_vods(event_id)")
+    connection.execute("CREATE INDEX IF NOT EXISTS idx_event_vods_match ON event_vods(match_id)")
+    connection.commit()
 
 
 def text_id(value):
@@ -570,6 +619,8 @@ def run_import(no_export=False, force_export=False):
     except sqlite3.OperationalError:
         pass
 
+    migrate_vod_schema(connection)
+
     tracker = SummaryTracker("import_startgg_data_summary.txt")
     tracker._ensure_category("EVENTS")
 
@@ -643,9 +694,10 @@ def run_import(no_export=False, force_export=False):
     if should_export:
         print("\nUpdating website static event catalogs (events-index.json & event details)...")
         try:
-            from scripts.build_player_profile import write_event_index
+            from scripts.build_player_profile import write_event_index, write_event_details
             from scripts.rankings_calculator import export_ranking_data, export_default_rankings
             write_event_index(connection)
+            write_event_details(connection)
             print("Successfully updated website static event catalogs.")
             print("Updating ranking JSON data exports...")
             export_ranking_data(connection)

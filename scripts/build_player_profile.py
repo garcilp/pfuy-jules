@@ -622,7 +622,8 @@ def profile_for_player(connection, player_id, display_tag, profile_slug):
                 if own_won:
                     h2h["wins"] += 1
             included_set_ids.append(text_id(set_row["id"]))
-            event_sets.append({
+            set_entry = {
+                "setId": text_id(set_row["id"]),
                 "eventKey": current_event_key,
                 "event": event_label,
                 "phase": phase_override or set_row["phase_name"] or "Phase not recorded",
@@ -637,7 +638,27 @@ def profile_for_player(connection, player_id, display_tag, profile_slug):
                 "startedAt": set_row["started_at"] or set_row["start_at"] or set_row["completed_at"],
                 "phaseOrder": set_row["phase_order"],
                 "roundOrder": set_row["round"],
-            })
+            }
+            try:
+                vod_rows = connection.execute(
+                    "SELECT youtube_video_id, youtube_title, youtube_thumbnail_url "
+                    "FROM event_vods WHERE match_id=? AND status='complete'",
+                    (text_id(set_row["id"]),)
+                ).fetchall()
+                if vod_rows:
+                    set_entry["vods"] = [
+                        {
+                            "videoId": vr["youtube_video_id"],
+                            "url": f"https://www.youtube.com/watch?v={vr['youtube_video_id']}" if vr["youtube_video_id"] else None,
+                            "title": vr["youtube_title"],
+                            "thumbnail": vr["youtube_thumbnail_url"],
+                        }
+                        for vr in vod_rows
+                        if vr["youtube_video_id"]
+                    ]
+            except Exception:
+                pass
+            event_sets.append(set_entry)
         if not event_sets:
             continue
         group["entrant_ids"].update(own_entrants)
@@ -1369,6 +1390,67 @@ def write_event_details(connection):
         ).fetchone()
         total_entrants = tot_row[0] if tot_row and tot_row[0] else sum(se["entrants"] for se in sub_events if not se["isAmateur"])
 
+        # Query completed VOD associations for this tournament's events
+        vod_rows = connection.execute(
+            "SELECT ev.id, ev.event_id, ev.match_id, ev.youtube_video_id, ev.youtube_title, "
+            "ev.youtube_thumbnail_url, s.full_round_text, s.round, s.display_score, "
+            "ph.name as phase_name, v.name as game_name, v.slug as game_slug "
+            "FROM event_vods ev "
+            "JOIN sets s ON s.id=ev.match_id "
+            "JOIN events e ON e.id=ev.event_id "
+            "JOIN videogames v ON v.slug=e.videogame_slug "
+            "LEFT JOIN phase_groups pg ON pg.id=s.phase_group_id "
+            "LEFT JOIN phases ph ON ph.id=pg.phase_id "
+            "WHERE e.tournament_slug=? AND ev.status='complete' "
+            "ORDER BY ev.id ASC", (t_slug,)
+        ).fetchall()
+
+        completed_vods = []
+        for vr in vod_rows:
+            set_id = text_id(vr["match_id"])
+            vid = vr["youtube_video_id"]
+            if not vid:
+                continue
+
+            # Query the entrants for this match
+            p_rows = connection.execute(
+                "SELECT se.slot_order, en.id as entrant_id, en.name as entrant_name, "
+                "p.player_id, p.gamer_tag "
+                "FROM set_entrants se "
+                "JOIN entrants en ON en.id=se.entrant_id "
+                "LEFT JOIN entrant_participants ep ON ep.entrant_id=en.id "
+                "LEFT JOIN participants p ON p.id=ep.participant_id "
+                "WHERE se.set_id=? "
+                "ORDER BY se.slot_order ASC", (set_id,)
+            ).fetchall()
+
+            players = []
+            for pr in p_rows:
+                p_key = canonical_id(text_id(pr["player_id"]), merges) if pr["player_id"] is not None else None
+                tag = latest_tags.get(p_key) or pr["gamer_tag"] or pr["entrant_name"] or "Unknown"
+                players.append({"tag": tag, "playerId": p_key})
+
+            p1_tag = players[0]["tag"] if len(players) > 0 else "Unknown"
+            p2_tag = players[1]["tag"] if len(players) > 1 else "Unknown"
+
+            phase_label = vr["phase_name"] or "Bracket"
+            round_label = vr["full_round_text"] or (f"Round {vr['round']}" if vr["round"] is not None else "")
+
+            completed_vods.append({
+                "matchId": set_id,
+                "videoId": vid,
+                "url": f"https://www.youtube.com/watch?v={vid}",
+                "title": vr["youtube_title"],
+                "thumbnail": vr["youtube_thumbnail_url"],
+                "game": vr["game_name"],
+                "gameSlug": vr["game_slug"],
+                "phase": phase_label,
+                "round": round_label,
+                "displayScore": vr["display_score"] or "",
+                "player1": players[0] if len(players) > 0 else {"tag": p1_tag, "playerId": None},
+                "player2": players[1] if len(players) > 1 else {"tag": p2_tag, "playerId": None},
+            })
+
         t_data = {
             "tournamentSlug": t_slug,
             "tournament": t_name,
@@ -1379,6 +1461,8 @@ def write_event_details(connection):
             "games": games_list,
             "subEvents": sub_events,
         }
+        if completed_vods:
+            t_data["vods"] = completed_vods
 
         out_path = events_dir / f"{t_slug}.json"
         with out_path.open("w", encoding="utf-8") as file:
