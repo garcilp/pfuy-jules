@@ -93,3 +93,18 @@ Refresh public start.gg profile metadata (player prefix/sponsor, profile link, c
     python scripts/fetch_player_profiles.py
 
 This requires `STARTGG_API_TOKEN` and saves `data/profiles/startgg_metadata.json`. Generated profiles use the saved values when available; values saved through the admin editor take precedence.
+
+## Mobile layout
+
+The mobile layout activates automatically at `@media (max-width: 640px)` across the site (`index.html`, `player.html`, `rankings.html`, `ranking.html`, `players.html`, and `events.html`). The desktop layout above 640px is completely preserved.
+
+- **Viewport configuration**: Uses `<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">`.
+- **Global chrome**:
+  - **Top bar**: 60px glass pill with logo, wordmark with accent `.uy`, search button, and menu button (inline stroke SVG icons). Desktop navigation links and top-bar language toggles are hidden on mobile.
+  - **Bottom bar**: Fixed floating glass pill (`Home`, `Players`, `Events`, `Rankings`) positioned at `calc(12px + env(safe-area-inset-bottom))` with 48px min-height tap targets and active highlighting. The page content includes bottom padding (`calc(96px + env(safe-area-inset-bottom))`) to prevent occlusion.
+  - **Menu sheet**: Accessible modal drawer under top bar featuring BROWSE, COMMUNITY HUBS, THEME selector (Automatic + 8 themes), and LANGUAGE (EN/ES) switcher with focus trapping, background scroll locking, and Escape key handling.
+  - **Mobile search**: Quick search button focusing hero search on the homepage and revealing a slide-down glass search drawer with instant player/event lookup on other pages.
+- **Reusable patterns**:
+  - Horizontal strips (`.hs`): 44px minimum tap targets, smooth horizontal touch/keyboard scroll with negative side bleed, hidden scrollbars. Used for game tabs, game switchers, upcoming events, and ranking article player jump links.
+  - Stat tiles: 2-column grid layout with 16px padding, 20px radius, 11px monospace labels, 26px bold values with word wrapping, and 12px muted sub-lines.
+  - Data tables: Automatically transform to stacked key-value rows on mobile viewports with dividers, avoiding horizontal scrollbars.
