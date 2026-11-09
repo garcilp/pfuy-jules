@@ -105,5 +105,80 @@ class TestStaticDateFiltering(unittest.TestCase):
         self.assertIn("history", diag)
         self.assertGreater(len(diag["history"]), 0)
 
+    def test_diagnostic_all_systems_and_parity_with_python(self):
+        """Verifies diagnostic calculations across all 5 systems and validates parity with Python reference engine."""
+        from scripts.rankings_calculator import RankingEngine
+
+        engine = RankingEngine(use_json=True)
+        player_id = "557903"
+        game = "ultimate"
+        systems = ["glicko2", "sof", "quality_wins", "loss_quality", "custom"]
+
+        weights = {"glicko2": 55, "quality_wins": 20, "sof": 15, "loss_quality": 10}
+
+        for sys in systems:
+            # 1. Run Python calculation
+            py_res = engine.calculate(
+                game_slug=game,
+                system=sys,
+                mode="historical",
+                target_player_id=player_id,
+                weights=weights if sys == "custom" else None
+            )
+            self.assertIn("diagnostic", py_res, f"Python missing diagnostic for {sys}")
+            py_diag = py_res["diagnostic"]
+
+            # 2. Run JS calculation
+            js_res = self.run_js_calc(
+                game=game,
+                system=sys,
+                mode="historical",
+                player_id=player_id,
+                weights=weights if sys == "custom" else None
+            )
+            self.assertIn("diagnostic", js_res, f"JS missing diagnostic for {sys}")
+            js_diag = js_res["diagnostic"]
+
+            # Verify context, finalScore and rank match
+            self.assertEqual(js_diag["playerId"], py_diag["playerId"])
+            self.assertEqual(js_diag["playerRank"], py_diag["playerRank"])
+            self.assertEqual(js_diag["finalScore"], py_diag["finalScore"])
+
+            # Verify breakdown parity
+            py_breakdown = py_diag.get("breakdown", {})
+            js_breakdown = js_diag.get("breakdown", {})
+            for key in py_breakdown:
+                self.assertIn(key, js_breakdown)
+                self.assertEqual(js_breakdown[key], py_breakdown[key], f"Mismatch for {sys} breakdown {key}")
+
+            # Verify history length parity
+            self.assertEqual(len(js_diag.get("history", [])), len(py_diag.get("history", [])))
+            self.assertEqual(len(js_diag.get("events", [])), len(py_diag.get("events", [])))
+
+    def test_diagnostic_date_filtering(self):
+        """Verifies that diagnostic traces strictly obey date filters including custom and empty ranges."""
+        from scripts.rankings_calculator import RankingEngine
+        engine = RankingEngine(use_json=True)
+
+        player_id = "557903"
+        game = "ultimate"
+
+        # 1. 2024 range
+        js_2024 = self.run_js_calc(game, "glicko2", "period_only", "2024-01-01", "2024-12-31", player_id=player_id)
+        self.assertIn("diagnostic", js_2024)
+        diag_2024 = js_2024["diagnostic"]
+        self.assertEqual(diag_2024["summary"]["startDate"], "2024-01-01")
+        self.assertEqual(diag_2024["summary"]["endDate"], "2024-12-31")
+        for match in diag_2024.get("history", []):
+            if match.get("date"):
+                self.assertTrue("2024-01-01" <= match["date"] <= "2024-12-31")
+
+        # 2. Empty range (e.g. 2015)
+        js_empty = self.run_js_calc(game, "glicko2", "period_only", "2015-01-01", "2015-12-31", player_id=player_id)
+        self.assertIn("diagnostic", js_empty)
+        diag_empty = js_empty["diagnostic"]
+        self.assertEqual(diag_empty["totalMatches"], 0)
+        self.assertEqual(len(diag_empty.get("history", [])), 0)
+
 if __name__ == "__main__":
     unittest.main()

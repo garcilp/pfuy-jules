@@ -1650,7 +1650,7 @@ function renderComparison() {
             <span class="mono">${p.quality_wins ? (p.quality_wins.rank ? `#${p.quality_wins.rank} (${p.quality_wins.score})` : `Unranked (${p.quality_wins.score})`) : '-'}</span>
             <span class="mono">${p.loss_quality ? (p.loss_quality.rank ? `#${p.loss_quality.rank} (${p.loss_quality.score})` : `- (${p.loss_quality.score})`) : '-'}</span>
             <div>
-              <button class="quiet-button diagnostic-btn" onclick="openDiagnosticModal('${esc(p.playerId)}')">Diagnostic</button>
+              <button class="quiet-button diagnostic-btn" onclick="openDiagnosticModal('${esc(p.playerId)}')">${(window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es') ? 'Diagnóstico' : 'Diagnostic'}</button>
             </div>
           </div>
         `).join('') : '<div class="empty-state"><p class="muted">No players match the filter.</p></div>'}
@@ -1678,7 +1678,8 @@ window.openDiagnosticModal = async function(playerId) {
   const start = isHistorical ? '' : startDateInput.value;
   const end = isHistorical ? '' : endDateInput.value;
 
-  modalPlayerInfo.innerHTML = '<p class="muted">Loading calculation diagnostic trace…</p>';
+  const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
+  modalPlayerInfo.innerHTML = `<p class="muted">${isEs ? 'Cargando traza diagnóstica de cálculo…' : 'Loading calculation diagnostic trace…'}</p>`;
   modalBody.innerHTML = '';
   diagnosticModal.showModal();
 
@@ -1692,14 +1693,14 @@ window.openDiagnosticModal = async function(playerId) {
       diagData = engine.calculate(system, mode, start || null, end || null, playerId, prWeights);
     }
   } catch (err) {
-    modalPlayerInfo.innerHTML = `<h2>Player Diagnostic Error</h2>`;
+    modalPlayerInfo.innerHTML = `<h2>${isEs ? 'Error de Diagnóstico del Jugador' : 'Player Diagnostic Error'}</h2>`;
     modalBody.innerHTML = `<p class="muted">${esc(err.message)}</p>`;
     return;
   }
 
   if (!diagData || !diagData.diagnostic) {
-    modalPlayerInfo.innerHTML = `<h2>Player ID ${esc(playerId)}</h2>`;
-    modalBody.innerHTML = '<p class="muted">No diagnostic trace available for this player and selection.</p>';
+    modalPlayerInfo.innerHTML = `<h2>${isEs ? 'Jugador' : 'Player'} ID ${esc(playerId)}</h2>`;
+    modalBody.innerHTML = `<p class="muted">${isEs ? 'No hay traza diagnóstica disponible para este jugador y selección.' : 'No diagnostic trace available for this player and selection.'}</p>`;
     return;
   }
 
