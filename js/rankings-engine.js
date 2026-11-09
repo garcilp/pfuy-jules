@@ -1056,12 +1056,14 @@
 
         const breakdownDict = {
           totalQualityWins: pyRound(unadjQ, 4),
+          unadjustedTotalQuality: pyRound(unadjQ, 4),
           wins: wins,
           eligibleWins: wins,
           losses: losses,
           matches: matches,
           avgOpponentQuality: pyRound(avgQ, 4),
           confidenceFactor: pyRound(confF, 4),
+          adjustedQualityWins: pyRound(adjSc, 4),
           avgOpponentWinRating: wins > 0 ? pyRound(pData.winOpponentRatingsSum / wins, 1) : null,
           adjustedScore: pyRound(adjSc, 1),
           rawScore: pyRound(adjSc, 4),
@@ -1294,6 +1296,7 @@
         const breakdownDict = {
           finalScore: pRank ? pRank.score : null,
           rawScore: pRank ? pRank.rawScore : null,
+          rawConsistencyScore: pRank ? pRank.rawScore : null,
           totalPoints: pyRound(pData.totalPoints, 3),
           winCreditsTotal: pyRound(pData.winCredits, 3),
           lossPenaltiesTotal: pyRound(pData.lossPenalties, 3),
