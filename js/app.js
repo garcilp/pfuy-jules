@@ -177,6 +177,10 @@ function render() {
      ${player.startgg ? `<a class="profile-startgg" href="${esc(player.startgg)}" target="_blank" rel="noopener">View on start.gg</a>` : ''}`;
   fitPlayerName();
 
+  if (player && player.tag) {
+    document.title = `${player.tag} · Platfighters.uy`;
+  }
+
   const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
   const overviewLabel = isEs ? 'Resumen' : 'Overview';
   $('#tabs').innerHTML = [{ id: 'overview', label: overviewLabel, count: '' },
