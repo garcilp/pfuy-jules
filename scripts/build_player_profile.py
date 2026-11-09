@@ -1649,5 +1649,11 @@ def main():
     except Exception as err:
         print(f"Warning: could not export default rankings or ranking data: {err}")
 
+    try:
+        from scripts.build_rivalry import update_rivalry_of_the_week
+        update_rivalry_of_the_week(force=False)
+    except Exception as err:
+        print(f"Warning: could not update rivalry of the week: {err}")
+
 if __name__ == "__main__":
     main()

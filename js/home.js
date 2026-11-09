@@ -624,76 +624,67 @@ async function renderRivalry() {
   if (!container) return;
 
   try {
-    // Load real head-to-head records dynamically from player profile data
-    const [resB, resA] = await Promise.all([
-      fetch('data/profiles/iguana-264244.json'),
-      fetch('data/profiles/sol-d-330371.json')
-    ]);
-    if (!resB.ok) {
-      container.closest('.panel')?.remove();
-      return;
-    }
-    const profileB = await resB.json();
-    const profileA = resA.ok ? await resA.json() : null;
-
-    const tagA = profileA?.player?.tag || 'Sol!d';
-    const tagB = profileB?.player?.tag || 'Iguana';
-    const idA = profileA?.player?.startggPlayerId || '330371';
-    const idB = profileB?.player?.startggPlayerId || '264244';
-
-    const gamesList = [];
-
-    (profileB.games || []).forEach(g => {
-      const match = (g.headToHead || []).find(h => {
-        const opp = (h.opponent || '').toLowerCase();
-        return opp === 'sol!d' || opp === tagA.toLowerCase();
-      });
-      if (match && match.sets > 0) {
-        const winsB = match.wins || 0;
-        const winsA = Math.max(0, match.sets - winsB);
-        gamesList.push({
-          name: g.name || g.id,
-          winsA,
-          winsB,
-          sets: match.sets
-        });
-      }
-    });
-
-    if (!gamesList.length) {
-      container.closest('.panel')?.remove();
+    const res = await fetch('data/rivalry.json', { cache: 'no-store' });
+    if (!res.ok) {
+      container.style.display = 'none';
       return;
     }
 
-    const totalA = gamesList.reduce((acc, g) => acc + g.winsA, 0);
-    const totalB = gamesList.reduce((acc, g) => acc + g.winsB, 0);
-    const totalSets = totalA + totalB;
+    const data = await res.json();
+    if (!data || !Array.isArray(data.players) || data.players.length < 2 || !data.overall) {
+      container.style.display = 'none';
+      return;
+    }
 
+    const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
+    const [p1, p2] = data.players;
+    const score = data.overall.score || [0, 0];
+    const totalSets = data.overall.totalSets ?? (score[0] + score[1]);
+    const distinctGames = data.overall.distinctGames ?? (data.games?.length || 1);
+    const lastDate = data.overall.lastEncounterDate;
+    const weekOfFmt = fmt(data.weekOf);
+    const lastEncounterFmt = lastDate ? fmt(lastDate) : null;
+
+    const gamesList = Array.isArray(data.games) ? data.games : [];
+
+    container.style.display = '';
     container.innerHTML = `
       <div class="head mono muted sm0">
-        <span>FEATURED RIVALRY</span>
-        <span>ALL-TIME HEAD-TO-HEAD</span>
+        <span>${isEs ? 'RIVALIDAD DE LA SEMANA' : 'FEATURED RIVALRY'}</span>
+        <span>${isEs ? `SEMANA DEL ${esc(weekOfFmt)}` : `WEEK OF ${esc(weekOfFmt)}`}</span>
       </div>
       <div class="rival">
-        <b><a class="opponent-link" href="player.html?player=${encodeURIComponent(idA)}">${esc(tagA)}</a></b>
-        <span class="rec">${totalA}–${totalB}</span>
-        <b><a class="opponent-link" href="player.html?player=${encodeURIComponent(idB)}">${esc(tagB)}</a></b>
-      </div>
-      <p class="muted sm" style="text-align:center">${totalSets} sets across ${gamesList.length} game${gamesList.length === 1 ? '' : 's'}</p>
-      ${gamesList.map(g => `
-        <div class="rg">
-          <span>${esc(g.name)}</span>
-          <span class="mono muted">${g.winsA}–${g.winsB} (${g.sets} sets)</span>
+        <div class="rival-player">
+          <img class="rival-player-photo" src="${esc(p1.photo || 'assets/logo.jpg')}" alt="${esc(p1.tag)}" onerror="this.onerror=null;this.src='assets/logo.jpg';">
+          <b><a class="opponent-link" href="player.html?player=${encodeURIComponent(p1.playerId)}">${esc(p1.tag)}</a></b>
         </div>
-      `).join('')}
-      <div style="margin-top:12px;text-align:center;">
-        <a class="link" href="player.html?player=${encodeURIComponent(idA)}">${isEs ? `Ver perfil de ${esc(tagA)}` : `View ${esc(tagA)} profile`}</a> ·
-        <a class="link" href="player.html?player=${encodeURIComponent(idB)}">${isEs ? `Ver perfil de ${esc(tagB)}` : `View ${esc(tagB)} profile`}</a>
+        <span class="rec">${score[0]}–${score[1]}</span>
+        <div class="rival-player">
+          <img class="rival-player-photo" src="${esc(p2.photo || 'assets/logo.jpg')}" alt="${esc(p2.tag)}" onerror="this.onerror=null;this.src='assets/logo.jpg';">
+          <b><a class="opponent-link" href="player.html?player=${encodeURIComponent(p2.playerId)}">${esc(p2.tag)}</a></b>
+        </div>
+      </div>
+      <p class="muted sm" style="text-align:center;margin:6px 0 10px;">
+        ${totalSets} ${isEs ? 'sets en' : 'sets across'} ${distinctGames} ${distinctGames === 1 ? (isEs ? 'juego' : 'game') : (isEs ? 'juegos' : 'games')}
+        ${lastEncounterFmt ? ` · ${isEs ? 'Último encuentro' : 'Last match'}: ${esc(lastEncounterFmt)}` : ''}
+      </p>
+      ${gamesList.map(g => {
+        const gScore = g.score || [0, 0];
+        return `
+          <div class="rg">
+            <span>${esc(g.gameName || g.gameId || 'Game')}</span>
+            <span class="mono muted">${gScore[0]}–${gScore[1]} (${g.sets} sets)</span>
+          </div>
+        `;
+      }).join('')}
+      <div style="margin-top:14px;text-align:center;">
+        <a class="link" href="player.html?player=${encodeURIComponent(p1.playerId)}">${isEs ? `Ver perfil de ${esc(p1.tag)}` : `View ${esc(p1.tag)} profile`}</a> ·
+        <a class="link" href="player.html?player=${encodeURIComponent(p2.playerId)}">${isEs ? `Ver perfil de ${esc(p2.tag)}` : `View ${esc(p2.tag)} profile`}</a>
       </div>
     `;
   } catch (err) {
-    console.warn('Could not render dynamic rivalry:', err);
-    container.closest('.panel')?.remove();
+    console.warn('Could not render rivalry of the week:', err);
+    container.style.display = 'none';
   }
 }
 
@@ -953,6 +944,7 @@ if (window.i18n && window.i18n.onChange) {
     await renderRecentResults();
     await renderOnThisWeek();
     await renderTopPlayers();
+    await renderRivalry();
     renderNewcomerSteps();
     renderHubs();
   });

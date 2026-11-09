@@ -487,17 +487,35 @@
 .home .rival {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
-  gap: 8px;
+  gap: 12px;
   align-items: center;
   text-align: center;
-  margin: 14px 0 4px;
+  margin: 16px 0 8px;
+}
+
+.home .rival-player {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.home .rival-player-photo {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--faint);
+  border: 1px solid var(--line);
 }
 
 .home .rival b {
-  font-size: 18px;
+  font-size: 17px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  max-width: 100%;
 }
 
 .home .rival .rec {
@@ -505,6 +523,7 @@
   font-weight: 700;
   line-height: 1;
   color: var(--sky);
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .home .rg {
