@@ -256,12 +256,26 @@ async function addPlayerFromDirectory(playerId) {
   sel = draft.players.length - 1;
   dirty = true;
   closePlayerModal();
-  renderAll();
 
-  // Resolve character portrait for regular creator mode
+  // Load crew (sponsor) and up to 3 most-played characters automatically from profile
+  const gslug = draft.game?.slug || 'ultimate';
+  try {
+    const prof = await getProfileData(player.playerId, player.tag);
+    if (prof) {
+      if (!newEntry.sponsor && prof.player && prof.player.sponsor) {
+        newEntry.sponsor = prof.player.sponsor;
+      }
+      const topMains = getTopCharactersFromProfile(prof, gslug, 3);
+      if (topMains.length > 0) {
+        newEntry.mains = topMains;
+      }
+    }
+  } catch (err) {
+    console.warn('Could not enrich added player from profile:', player.tag, err);
+  }
+
   newEntry._resolvedPortrait = resolvePlayerPortrait(newEntry);
-  renderEditor();
-  renderSide();
+  renderAll();
 }
 
 let playerEventResults = [];
@@ -1042,6 +1056,16 @@ async function getProfileData(playerId, tag) {
   return null;
 }
 
+function getTopCharactersFromProfile(prof, gslug, limit = 3) {
+  if (!prof || !Array.isArray(prof.games)) return [];
+  const curGame = prof.games.find(g => g.slug === gslug || g.id === gslug) || prof.games[0];
+  if (!curGame || !Array.isArray(curGame.characters)) return [];
+  return curGame.characters
+    .filter(c => c && c.name && String(c.name).trim().toLowerCase() !== 'other')
+    .slice(0, limit)
+    .map(c => c.name);
+}
+
 function resolvePlayerPortrait(p) {
   const gslug = draft?.game?.slug || 'ultimate';
   if (p && Array.isArray(p.mains) && p.mains.length) {
@@ -1115,7 +1139,7 @@ async function populateFromSnapshot(count) {
     return playerObj;
   });
 
-  // Automatically populate most-used character for each player from profile data
+  // Automatically populate most-used characters for each player from profile data
   const gslug = draft.game?.slug || prSnapshot.game?.slug || 'ultimate';
 
   const enrichPromises = draft.players.map(async (p) => {
@@ -1126,14 +1150,9 @@ async function populateFromSnapshot(count) {
           p.sponsor = prof.player.sponsor;
         }
         if (!p.mains || !p.mains.length) {
-          const gamesArr = prof.games || [];
-          const curGame = gamesArr.find(g => g.slug === gslug || g.id === gslug) || gamesArr[0];
-          if (curGame && Array.isArray(curGame.characters) && curGame.characters.length > 0) {
-            const specificChar = curGame.characters.find(c => c && c.name && c.name !== 'Other');
-            const topChar = specificChar || curGame.characters[0];
-            if (topChar && topChar.name) {
-              p.mains = [topChar.name];
-            }
+          const topMains = getTopCharactersFromProfile(prof, gslug, 3);
+          if (topMains.length > 0) {
+            p.mains = topMains;
           }
         }
       }
