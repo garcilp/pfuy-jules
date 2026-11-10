@@ -1156,35 +1156,83 @@ def get_most_played_character(connection, event_id, entrant_id):
 
 
 def get_phase_standings(connection, phase_id, event_id, game_slug, merges, latest_tags):
-    sets = connection.execute(
-        "SELECT s.id, s.full_round_text, s.round, s.winner_entrant_id "
-        "FROM sets s JOIN phase_groups pg ON pg.id = s.phase_group_id "
-        "WHERE pg.phase_id = ?",
-        (phase_id,),
-    ).fetchall()
+    phase_row = connection.execute(
+        "SELECT bracket_type FROM phases WHERE id = ?", (phase_id,)
+    ).fetchone()
+    is_single_elim = phase_row and phase_row["bracket_type"] == "SINGLE_ELIMINATION"
 
-    placements_map = {}
-    for st in sets:
-        w = text_id(st["winner_entrant_id"]) if st["winner_entrant_id"] is not None else None
-        entrants = connection.execute(
-            "SELECT entrant_id FROM set_entrants WHERE set_id = ?", (st["id"],)
+    if is_single_elim:
+        sets = connection.execute(
+            "SELECT s.id, s.full_round_text, s.round, s.winner_entrant_id, s.w_placement, s.l_placement "
+            "FROM sets s JOIN phase_groups pg ON pg.id = s.phase_group_id "
+            "WHERE pg.phase_id = ? "
+            "ORDER BY s.round DESC",
+            (phase_id,),
         ).fetchall()
-        e_ids = [text_id(e[0]) for e in entrants if e[0] is not None]
-        loser = next((e for e in e_ids if e != w), None)
-        if not w or not loser:
-            continue
-        round_text = (st["full_round_text"] or "").casefold()
-        if "grand final" in round_text:
-            placements_map[w] = 1
-            placements_map[loser] = 2
-        elif "losers final" in round_text or "loser's final" in round_text:
-            placements_map[loser] = 3
-        elif "losers semi" in round_text or "loser's semi" in round_text:
-            placements_map[loser] = 4
-        elif "losers quarter" in round_text or "loser's quarter" in round_text:
-            placements_map[loser] = 5
-        elif "losers round 3" in round_text or "loser's round 3" in round_text:
-            placements_map[loser] = 7
+        placements_map = {}
+        has_3rd_place_match = any(
+            "3rd place" in (st["full_round_text"] or "").casefold() or "bronze" in (st["full_round_text"] or "").casefold()
+            for st in sets
+        )
+        for st in sets:
+            w = text_id(st["winner_entrant_id"]) if st["winner_entrant_id"] is not None else None
+            entrants = connection.execute(
+                "SELECT entrant_id FROM set_entrants WHERE set_id = ?", (st["id"],)
+            ).fetchall()
+            e_ids = [text_id(e[0]) for e in entrants if e[0] is not None]
+            loser = next((e for e in e_ids if e != w), None)
+            if not w or not loser:
+                continue
+
+            round_text = (st["full_round_text"] or "").casefold()
+            wp = st["w_placement"]
+            lp = st["l_placement"]
+
+            if "3rd place" in round_text or "bronze" in round_text:
+                placements_map[w] = wp if wp is not None else 3
+                placements_map[loser] = lp if lp is not None else 4
+            elif ("final" in round_text and "semi" not in round_text and "quarter" not in round_text) or wp == 1:
+                placements_map[w] = wp if wp is not None else 1
+                if loser not in placements_map:
+                    placements_map[loser] = lp if lp is not None else 2
+            elif "semi" in round_text:
+                if not has_3rd_place_match and loser not in placements_map:
+                    placements_map[loser] = lp if lp is not None else 3
+            else:
+                if loser not in placements_map:
+                    if lp is not None:
+                        placements_map[loser] = lp
+                    elif "quarter" in round_text:
+                        placements_map[loser] = 5
+    else:
+        sets = connection.execute(
+            "SELECT s.id, s.full_round_text, s.round, s.winner_entrant_id "
+            "FROM sets s JOIN phase_groups pg ON pg.id = s.phase_group_id "
+            "WHERE pg.phase_id = ?",
+            (phase_id,),
+        ).fetchall()
+        placements_map = {}
+        for st in sets:
+            w = text_id(st["winner_entrant_id"]) if st["winner_entrant_id"] is not None else None
+            entrants = connection.execute(
+                "SELECT entrant_id FROM set_entrants WHERE set_id = ?", (st["id"],)
+            ).fetchall()
+            e_ids = [text_id(e[0]) for e in entrants if e[0] is not None]
+            loser = next((e for e in e_ids if e != w), None)
+            if not w or not loser:
+                continue
+            round_text = (st["full_round_text"] or "").casefold()
+            if "grand final" in round_text:
+                placements_map[w] = 1
+                placements_map[loser] = 2
+            elif "losers final" in round_text or "loser's final" in round_text:
+                placements_map[loser] = 3
+            elif "losers semi" in round_text or "loser's semi" in round_text:
+                placements_map[loser] = 4
+            elif "losers quarter" in round_text or "loser's quarter" in round_text:
+                placements_map[loser] = 5
+            elif "losers round 3" in round_text or "loser's round 3" in round_text:
+                placements_map[loser] = 7
 
     standings = []
     for entrant_id, place in sorted(placements_map.items(), key=lambda x: x[1]):
@@ -1391,19 +1439,23 @@ def write_event_details(connection):
         total_entrants = tot_row[0] if tot_row and tot_row[0] else sum(se["entrants"] for se in sub_events if not se["isAmateur"])
 
         # Query completed VOD associations for this tournament's events
-        vod_rows = connection.execute(
-            "SELECT ev.id, ev.event_id, ev.match_id, ev.youtube_video_id, ev.youtube_title, "
-            "ev.youtube_thumbnail_url, s.full_round_text, s.round, s.display_score, "
-            "ph.name as phase_name, v.name as game_name, v.slug as game_slug "
-            "FROM event_vods ev "
-            "JOIN sets s ON s.id=ev.match_id "
-            "JOIN events e ON e.id=ev.event_id "
-            "JOIN videogames v ON v.slug=e.videogame_slug "
-            "LEFT JOIN phase_groups pg ON pg.id=s.phase_group_id "
-            "LEFT JOIN phases ph ON ph.id=pg.phase_id "
-            "WHERE e.tournament_slug=? AND ev.status='complete' "
-            "ORDER BY ev.id ASC", (t_slug,)
-        ).fetchall()
+        vod_rows = []
+        try:
+            vod_rows = connection.execute(
+                "SELECT ev.id, ev.event_id, ev.match_id, ev.youtube_video_id, ev.youtube_title, "
+                "ev.youtube_thumbnail_url, s.full_round_text, s.round, s.display_score, "
+                "ph.name as phase_name, v.name as game_name, v.slug as game_slug "
+                "FROM event_vods ev "
+                "JOIN sets s ON s.id=ev.match_id "
+                "JOIN events e ON e.id=ev.event_id "
+                "JOIN videogames v ON v.slug=e.videogame_slug "
+                "LEFT JOIN phase_groups pg ON pg.id=s.phase_group_id "
+                "LEFT JOIN phases ph ON ph.id=pg.phase_id "
+                "WHERE e.tournament_slug=? AND ev.status='complete' "
+                "ORDER BY ev.id ASC", (t_slug,)
+            ).fetchall()
+        except Exception:
+            vod_rows = []
 
         completed_vods = []
         for vr in vod_rows:
