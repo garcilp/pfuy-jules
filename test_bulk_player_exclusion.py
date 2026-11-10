@@ -161,6 +161,46 @@ class TestBulkPlayerExclusion(unittest.TestCase):
             p_data = json.load(f)
         self.assertEqual(p_data["player"]["startggPlayerId"], player_id)
 
+    def test_excluded_player_retains_games_and_opponent_player_ids_in_sets(self):
+        """
+        Test that when a player is excluded from a game:
+        - Their profile JSON file still has their games, results, and sets
+        - Opponents' sets against them include opponentPlayerId and opponentExcluded: True
+        - The excluded player does NOT appear in index.json
+        """
+        # Konkreto (1012772) is excluded from ultimate in exclusions.json
+        from scripts.build_player_profile import write_profile
+        with sqlite3.connect(DATABASE) as conn:
+            conn.row_factory = sqlite3.Row
+            entry = write_profile(conn, "1012772", "Konkreto", "konkreto-1012772")
+            # Should not be returned for index.json inclusion if all games are excluded
+            self.assertIsNone(entry)
+
+            # But their profile file exists and has games populated!
+            konkreto_path = PROJECT_ROOT / "data" / "profiles" / "konkreto-1012772.json"
+            self.assertTrue(konkreto_path.exists())
+            with open(konkreto_path, "r", encoding="utf-8") as f:
+                konkreto_profile = json.load(f)
+            self.assertEqual(len(konkreto_profile["games"]), 1)
+            self.assertEqual(konkreto_profile["games"][0]["slug"], "ultimate")
+            self.assertTrue(len(konkreto_profile["games"][0]["results"]) > 0)
+
+            # Build Marroll (795083) who played Konkreto in ultimate
+            write_profile(conn, "795083", "Marroll", "marroll-795083")
+            marroll_path = PROJECT_ROOT / "data" / "profiles" / "marroll-795083.json"
+            with open(marroll_path, "r", encoding="utf-8") as f:
+                marroll_profile = json.load(f)
+            ultimate_game = next(g for g in marroll_profile["games"] if g["slug"] == "ultimate")
+            konkreto_sets = [
+                s for r in ultimate_game["results"]
+                for s in r["sets"]
+                if "Konkreto" in s["opponent"]
+            ]
+            self.assertTrue(len(konkreto_sets) > 0)
+            for s in konkreto_sets:
+                self.assertEqual(s.get("opponentPlayerId"), "1012772")
+                self.assertTrue(s.get("opponentExcluded"))
+
     def test_cross_game_exclusion_excludes_all_games(self):
         """
         7. Excluding a player who has participated in multiple games excludes them across all those games.
