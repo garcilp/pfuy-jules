@@ -144,7 +144,7 @@ function renderBracketCard(sub, tournament) {
     ? sub.standings.map(st => {
         const isTop3 = st.placement <= 3;
         const playerHtml = st.playerId
-          ? `<a class="standing-tag opponent-link" href="index.html?player=${encodeURIComponent(st.playerId)}">${esc(st.tag)}</a>`
+          ? `<a class="standing-tag opponent-link" href="player.html?player=${encodeURIComponent(st.playerId)}">${esc(st.tag)}</a>`
           : `<span class="standing-tag">${esc(st.tag)}</span>`;
 
         let stockIconHtml = '<span class="stock-icon stock-placeholder"></span>';

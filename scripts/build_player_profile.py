@@ -598,6 +598,9 @@ def profile_for_player(connection, player_id, display_tag, profile_slug):
                 tag for entrant_id in opponent_ids
                 for tag in (names_by_entrant.get(entrant_id) or [opponent_names[entrant_id]])
             )) or "Unknown"
+            opponent_pid_display = ", ".join(dict.fromkeys(
+                opp_id for opp_id in opponent_canonical_ids if opp_id
+            )) or None
             is_opponent_excluded = bool(
                 game_slug and any(
                     game_slug in exclusions.get("playerGames", {}).get(opp_id, [])
@@ -629,6 +632,7 @@ def profile_for_player(connection, player_id, display_tag, profile_slug):
                 "phase": phase_override or set_row["phase_name"] or "Phase not recorded",
                 "round": set_row["full_round_text"] or (f"Round {set_row['round']}" if set_row["round"] is not None else ""),
                 "opponent": opponent_display,
+                "opponentPlayerId": opponent_pid_display,
                 "score": score,
                 "outcome": outcome,
                 "opponentExcluded": is_opponent_excluded,
@@ -978,10 +982,6 @@ def profile_for_player(connection, player_id, display_tag, profile_slug):
         game["notableWins"] = [{key: value for key, value in item.items()
                                  if key not in {"phaseOrder", "roundOrder", "priority"}}
                                 for item in aggregated_notable_wins[:4]]
-    profile["games"] = [game for game in profile["games"]
-                        if game.get("id") not in player_excluded_games
-                        and game.get("slug") not in player_excluded_games]
-
     if len(player_ids) > 1:
         additive_counts = count_events_per_identity(connection, player_ids, exclusions, event_links, amateur_cfg)
         for game in profile["games"]:
@@ -1081,11 +1081,17 @@ def write_profile(connection, player_id, display_tag, profile_slug, tracker=None
         elif existing_content != new_content:
             tracker.record_modified("PLAYERS", tag_name)
 
-    if not profile["games"]:
+    exclusions = visibility_exclusions()
+    player_excluded_games = set(exclusions.get("playerGames", {}).get(text_id(player_id), []))
+    visible_games = [g for g in profile.get("games", [])
+                     if g.get("id") not in player_excluded_games
+                     and g.get("slug") not in player_excluded_games]
+
+    if not visible_games:
         return None
     player = profile["player"]
     games_summary = []
-    for g in profile.get("games", []):
+    for g in visible_games:
         g_dates = [r.get("date") for r in g.get("results", []) if r.get("date")]
         games_summary.append({
             "id": g.get("id"),

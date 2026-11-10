@@ -68,17 +68,20 @@ async function loadPlayerDirectory() {
   }
 }
 
-function linkifyOpponent(nameStr) {
+function linkifyOpponent(nameStr, opponentPlayerId) {
   if (!nameStr || nameStr === '—' || nameStr === 'Unknown') return esc(nameStr || '—');
   const parts = String(nameStr).split(/\s*([,/])\s*/);
+  const idParts = opponentPlayerId ? String(opponentPlayerId).split(/\s*,\s*/) : [];
+  let nameIndex = 0;
   return parts.map((part, i) => {
     if (i % 2 === 1) return esc(part); // separator
     const trimmed = part.trim();
     if (!trimmed) return '';
     const norm = trimmed.replace(/\s+/g, ' ').toLowerCase();
-    const pid = playerTagToIdMap.get(norm);
+    const pid = idParts[nameIndex] || (idParts.length === 1 && parts.filter((_, idx) => idx % 2 === 0).length === 1 ? idParts[0] : null) || playerTagToIdMap.get(norm);
+    nameIndex++;
     if (pid) {
-      return `<a class="opponent-link" href="index.html?player=${encodeURIComponent(pid)}">${esc(trimmed)}</a>`;
+      return `<a class="opponent-link" href="player.html?player=${encodeURIComponent(pid)}">${esc(trimmed)}</a>`;
     }
     return esc(trimmed);
   }).join(' ');
@@ -217,7 +220,7 @@ function render() {
       : 'No seeded losses recorded';
     const upsetStat = upsetCount > 0
       ? ['UPSET WINS', upsetCount, 'Higher seeds beaten']
-      : ['CLOSEST UPSET', linkifyOpponent(closestLoss?.opponent), closestLossDetail];
+      : ['CLOSEST UPSET', linkifyOpponent(closestLoss?.opponent, closestLoss?.opponentPlayerId), closestLossDetail];
     stats.push(['BEST PLACING', ord(bestPlace), bestEvent], upsetStat);
   } else {
     const tournamentDates = games.flatMap(game => (game.results || []).map(result => result.date))
@@ -442,7 +445,7 @@ function render() {
         const metaHtml = count > 1
           ? `${count} times <span aria-hidden="true">·</span> Latest: ${tourneyAndDate}`
           : tourneyAndDate;
-        return `<div class="win"><span class="win-main"><b class="win-opponent">${linkifyOpponent(x.opponent)}</b><small class="win-meta">${metaHtml}</small></span><span class="mono muted win-detail">${esc(x.score || x.detail?.split(' · ')[0] || '—')}</span></div>`;
+        return `<div class="win"><span class="win-main"><b class="win-opponent">${linkifyOpponent(x.opponent, x.opponentPlayerId)}</b><small class="win-meta">${metaHtml}</small></span><span class="mono muted win-detail">${esc(x.score || x.detail?.split(' · ')[0] || '—')}</span></div>`;
       }).join('') || '<p class="muted">No notable wins recorded.</p>'}</div>
     </div>
     <div class="panel glass">
@@ -538,7 +541,7 @@ function render() {
             const roundHtml = (!isPools && set.round) ? `<small>${esc(set.round)}</small>` : '';
             return `<div class="set-row">
               <span class="set-phase"><b>${esc(set.phase || 'Phase not recorded')}</b>${roundHtml}</span>
-              <span class="set-opponent">${linkifyOpponent(set.opponent || 'Unknown')}</span>
+              <span class="set-opponent">${linkifyOpponent(set.opponent || 'Unknown', set.opponentPlayerId)}</span>
               <span class="set-score">${esc(set.score || '—')}</span>
               <span class="set-result ${outcome}">${outcome === 'unknown' ? 'RESULT UNKNOWN' : outcome.toUpperCase()}</span>
             </div>`;
@@ -604,7 +607,7 @@ function render() {
 
         return `<div class="set-row">
           <span class="set-phase"><b>${esc(set.phase || 'Phase not recorded')}</b>${roundHtml}</span>
-          <span class="set-opponent">${linkifyOpponent(set.opponent || 'Unknown')}</span>
+          <span class="set-opponent">${linkifyOpponent(set.opponent || 'Unknown', set.opponentPlayerId)}</span>
           <span class="set-score">${esc(set.score || '—')}</span>
           <span class="set-result ${outcome}" style="display:inline-flex; align-items:center; justify-content:flex-end;">
             <span>${outcome === 'unknown' ? 'RESULT UNKNOWN' : outcome.toUpperCase()}</span>
