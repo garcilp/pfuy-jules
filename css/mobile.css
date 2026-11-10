@@ -1242,4 +1242,135 @@
     font-size: 16px !important;
     font-weight: 600 !important;
   }
+
+  /* ==========================================================================
+     Diagnostic Window Mobile (Bottom Sheet)
+     ========================================================================== */
+  .diagnostic-modal {
+    position: fixed !important;
+    inset: auto 0 0 0 !important;
+    top: auto !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 92vh !important;
+    max-height: 92vh !important;
+    margin: 0 !important;
+    padding: 0 16px 20px !important;
+    border-radius: 28px 28px 0 0 !important;
+    border-bottom: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-top: 1px solid var(--glass-border, rgba(255,255,255,.15)) !important;
+    background: rgba(16,24,50,.85) !important;
+    transform: translateY(0);
+    animation: diagSlideUp 0.15s ease-out;
+  }
+
+  @keyframes diagSlideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  .diag-drag-handle {
+    display: block !important;
+    width: 40px !important;
+    height: 5px !important;
+    background: rgba(255,255,255,.2) !important;
+    border-radius: 999px !important;
+    margin: 8px auto 12px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .diag-close-btn {
+    top: 12px !important;
+    right: 16px !important;
+  }
+
+  .diag-header {
+    padding-right: 48px !important;
+    margin-bottom: 14px !important;
+  }
+
+  .diag-player-avatar {
+    width: 52px !important;
+    height: 52px !important;
+    border-radius: 14px !important;
+    font-size: 20px !important;
+  }
+
+  .diag-player-meta h2 {
+    font-size: 26px !important;
+  }
+
+  .diag-chips-row {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+    margin-bottom: 12px !important;
+  }
+  .diag-chips-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .diag-tabs-bar {
+    width: 100% !important;
+    margin-bottom: 14px !important;
+  }
+  .diag-tab {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    padding: 0 4px !important;
+    font-size: 13px !important;
+  }
+
+  /* Summary Tab Mobile Grid */
+  .diag-glance-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+
+  .diag-where-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .diag-moments-grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  /* Sets Tab Mobile Views */
+  .diag-sets-toolbar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+  .diag-filter-chips {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+    width: 100%;
+  }
+  .diag-filter-chips::-webkit-scrollbar {
+    display: none;
+  }
+  .diag-sort-wrap {
+    width: 100%;
+  }
+  .diag-sort-select {
+    width: 100% !important;
+  }
+
+  .diag-table-head-row,
+  .diag-set-row-desktop {
+    display: none !important;
+  }
+
+  .diag-set-card-mobile {
+    display: flex !important;
+  }
 }

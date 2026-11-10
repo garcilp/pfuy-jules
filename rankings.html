@@ -116,12 +116,20 @@
 </main>
 
 <!-- Diagnostic / Player Detail Modal -->
-<dialog id="diagnostic-modal" class="diagnostic-modal glass">
-  <div class="modal-header">
-    <div id="modal-player-info" class="modal-player-info"></div>
-    <button id="modal-close-btn" class="quiet-button close-btn" aria-label="Close modal">✕</button>
+<dialog id="diagnostic-modal" class="diagnostic-modal glass" role="dialog" aria-modal="true" aria-labelledby="diag-player-tag">
+  <div class="diag-drag-handle" aria-hidden="true"></div>
+  <button id="modal-close-btn" class="diag-close-btn" aria-label="Close">✕</button>
+  <div id="diag-header" class="diag-header">
+    <!-- Populated dynamically: player head, chips, rank & score badges, decided sentence -->
   </div>
-  <div id="modal-body" class="modal-body"></div>
+  <div id="diag-tabs" class="diag-tabs-bar" role="tablist" aria-label="Diagnostic views">
+    <button id="diag-tab-summary" class="diag-tab active" role="tab" aria-selected="true" aria-controls="diag-panel-summary" tabindex="0">Summary</button>
+    <button id="diag-tab-sets" class="diag-tab" role="tab" aria-selected="false" aria-controls="diag-panel-sets" tabindex="-1">Sets</button>
+    <button id="diag-tab-method" class="diag-tab" role="tab" aria-selected="false" aria-controls="diag-panel-method" tabindex="-1">Method</button>
+  </div>
+  <div id="diag-body" class="diag-body" role="tabpanel" tabindex="0">
+    <!-- Tab content rendered dynamically based on active tab -->
+  </div>
 </dialog>
 
 <footer class="foot mono muted" data-i18n="badge.rankings">Platfighters.uy · Rankings Engine</footer>
