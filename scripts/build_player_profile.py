@@ -1655,5 +1655,13 @@ def main():
     except Exception as err:
         print(f"Warning: could not update rivalry of the week: {err}")
 
+    if args.all:
+        try:
+            from scripts.generate_tiermaker_badges import run_pipeline as run_tiermaker_pipeline
+            tiermaker_stats = run_tiermaker_pipeline(clean_obsolete=True)
+            print(f"Tiermaker: {tiermaker_stats['generated']} generated, {tiermaker_stats['updated']} updated, {tiermaker_stats['unchanged']} unchanged.")
+        except Exception as err:
+            print(f"Warning: could not generate Tiermaker badges: {err}")
+
 if __name__ == "__main__":
     main()

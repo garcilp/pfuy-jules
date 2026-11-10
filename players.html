@@ -50,14 +50,82 @@
         <label class="game-filter-wrap"><span class="sr-only">Sort players</span><select id="player-sort" class="game-filter glass" aria-label="Sort players"><option value="tag" data-i18n="players.sort.tag">Tag (A–Z)</option><option value="events" data-i18n="players.sort.events">Most played events</option><option value="recent" data-i18n="players.sort.recent">Most recently entered</option></select></label>
         <label class="game-filter-wrap"><span class="sr-only">Player list display</span><select id="player-view" class="game-filter glass" aria-label="Player list display"><option value="condensed" selected data-i18n="players.view.condensed">Condensed list</option><option value="cards" data-i18n="players.view.cards">Cards</option></select></label>
       </div>
+      <div class="tiermaker-entry-row">
+        <button type="button" id="open-tiermaker-btn" class="pill-btn gold-pill" data-i18n="players.createTierlist">Create Tierlist</button>
+      </div>
     </div>
   </section>
   <p id="directory-status" class="directory-status mono muted" aria-live="polite" data-i18n="players.loading">Loading player profiles…</p>
   <section id="player-list" class="player-list" aria-label="Player list"></section>
+
+  <!-- Tiermaker Interface Container -->
+  <section id="tiermaker-view" class="tiermaker-view" style="display:none;" aria-label="Tiermaker">
+    <div class="tiermaker-header">
+      <div class="tiermaker-header-actions">
+        <button type="button" id="close-tiermaker-btn" class="pill-btn glass" data-i18n="tiermaker.backToPlayers">← Back to Players</button>
+        <div class="tiermaker-header-right">
+          <button type="button" id="tm-undo-btn" class="pill-btn glass" data-i18n="tiermaker.undo">Undo</button>
+          <button type="button" id="tm-reset-btn" class="pill-btn glass" data-i18n="tiermaker.reset">Reset</button>
+          <button type="button" id="tm-export-btn" class="pill-btn gold-pill" data-i18n="tiermaker.export">Export PNG</button>
+        </div>
+      </div>
+      <div class="tiermaker-toolbar glass">
+        <div class="tm-toolbar-group">
+          <label for="tm-game-select" class="mono muted" data-i18n="tiermaker.game">Game</label>
+          <select id="tm-game-select" class="game-filter glass">
+            <option value="ultimate">Ultimate</option>
+            <option value="melee">Melee</option>
+            <option value="project-plus">Project+</option>
+            <option value="rivals-2">Rivals 2</option>
+            <option value="rivals-of-aether">Rivals of Aether</option>
+          </select>
+        </div>
+        <div class="tm-toolbar-group">
+          <label for="tm-pool-sort" class="mono muted" data-i18n="tiermaker.sort">Sort Pool</label>
+          <select id="tm-pool-sort" class="game-filter glass">
+            <option value="tag" data-i18n="tiermaker.sort.tag">Tag (A–Z)</option>
+            <option value="events" data-i18n="tiermaker.sort.events">Most played events</option>
+            <option value="recent" data-i18n="tiermaker.sort.recent">Most recently entered</option>
+          </select>
+        </div>
+        <div class="tm-toolbar-group tm-toolbar-actions">
+          <button type="button" id="tm-add-tier-btn" class="pill-btn glass tm-action-btn" data-i18n="tiermaker.addTier">+ Add Tier</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Tierlist Rows Container -->
+    <div id="tm-tiers-container" class="tm-tiers-container"></div>
+
+    <!-- Unranked Player Pools -->
+    <div class="tm-pools-container">
+      <!-- Regular Unranked Pool -->
+      <section class="tm-pool-section glass">
+        <div class="tm-pool-header">
+          <h2 class="tm-pool-title" data-i18n="tiermaker.unrankedTitle">Unranked Players</h2>
+          <span id="tm-unranked-count" class="mono muted">0</span>
+        </div>
+        <div id="tm-unranked-pool" class="tm-pool-dropzone" data-pool="regular"></div>
+      </section>
+
+      <!-- International Players Pool -->
+      <section class="tm-pool-section tm-intl-section glass">
+        <div class="tm-pool-header">
+          <div>
+            <h2 class="tm-pool-title" data-i18n="tiermaker.intlTitle">International Players</h2>
+            <p class="tm-pool-desc muted" data-i18n="tiermaker.intlDesc">Players from outside Uruguay who competed in local tournaments.</p>
+          </div>
+          <span id="tm-intl-count" class="mono muted">0</span>
+        </div>
+        <div id="tm-intl-pool" class="tm-pool-dropzone" data-pool="international"></div>
+      </section>
+    </div>
+  </section>
 </main>
 <footer class="foot mono muted" data-i18n="footer.players">Platfighters.uy · Player directory</footer>
 <script src="js/pr-badges.js"></script>
 <script src="js/players.js"></script>
+<script src="js/tiermaker.js"></script>
 <script src="js/theme.js"></script>
   <script src="js/mobile-nav.js"></script>
 </body>

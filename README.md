@@ -51,7 +51,13 @@ Each file wraps the untouched API response with its fetch time, operation name, 
 
 ## Import into SQLite
 
-SQLite is included with Python, so no database server or extra package is needed. From the project directory, run:
+SQLite is included with Python, so no database server is needed.
+
+For generating Tiermaker player badge images, install Pillow:
+
+    pip install Pillow
+
+From the project directory, run:
 
     python scripts/import_startgg_data.py
 
