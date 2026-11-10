@@ -1328,6 +1328,15 @@ button .pr-badge--compact {
   gap: 24px;
 }
 
+.tiermaker-view .pill-btn {
+  --text: #ffffff;
+  color: var(--text);
+}
+
+.tiermaker-view .pill-btn.gold-pill {
+  color: var(--text);
+}
+
 .tiermaker-header {
   display: flex;
   flex-direction: column;
@@ -1369,6 +1378,35 @@ button .pr-badge--compact {
   font-weight: 500;
 }
 
+.tm-checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  color: var(--text);
+  font: 500 13px 'Space Grotesk', system-ui, sans-serif;
+}
+
+.tm-checkbox {
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  cursor: pointer;
+  accent-color: var(--sky);
+}
+
+.tm-title-input {
+  min-width: 180px;
+  background-image: none !important;
+  padding: 0 16px !important;
+}
+
+.tm-title-input::placeholder {
+  color: var(--muted);
+}
+
 .tm-toolbar-actions {
   margin-left: auto;
 }
@@ -1391,7 +1429,9 @@ button .pr-badge--compact {
   background: rgba(10, 16, 35, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 12px;
-  min-height: 94px;
+  height: 86px;
+  min-height: 86px;
+  box-sizing: border-box;
   position: relative;
   transition: background-color 0.2s ease, border-color 0.2s ease;
 }
@@ -1435,11 +1475,14 @@ button .pr-badge--compact {
   flex: 1;
   display: flex;
   flex-wrap: wrap;
-  align-content: flex-start;
+  align-content: center;
   align-items: center;
   gap: 6px;
-  padding: 6px 10px;
-  min-height: 92px;
+  padding: 0 10px;
+  height: 100%;
+  box-sizing: border-box;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .tm-tier-controls {
