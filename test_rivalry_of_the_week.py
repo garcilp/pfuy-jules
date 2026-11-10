@@ -29,8 +29,11 @@ from scripts.build_rivalry import (
     calculate_cooldown_multiplier,
     calculate_rivalry_weight,
     get_current_week_of,
+    get_top_head_to_head_game,
     load_history,
     reconcile_published_and_history,
+    resolve_character_portrait,
+    resolve_player_image,
     resolve_player_photo,
     update_rivalry_of_the_week,
 )
@@ -227,6 +230,197 @@ class TestRivalryOfTheWeek(unittest.TestCase):
         p2 = [p for p in res["players"] if p["playerId"] == "102"][0]
         self.assertEqual(p1["photo"], photo_rel)
         self.assertEqual(p2["photo"], "assets/logo.jpg")
+
+    def _setup_player_profile_json(self, player_slug, games_data):
+        profile_path = self.repo_root / "data" / "profiles" / f"{player_slug}.json"
+        with profile_path.open("w", encoding="utf-8") as f:
+            json.dump({"slug": player_slug, "games": games_data}, f)
+
+    def _create_character_portrait(self, game_slug, char_slug):
+        portrait_path = self.repo_root / "assets" / "renders" / game_slug / "portraits" / f"{char_slug}.webp"
+        portrait_path.parent.mkdir(parents=True, exist_ok=True)
+        portrait_path.write_bytes(b"dummy portrait")
+        return portrait_path
+
+    def test_character_fallback_priority_both_have_uploaded_photos(self):
+        # Both players have uploaded profile photos -> use photos, not character portraits
+        photo1 = "assets/players/101.png"
+        photo2 = "assets/players/102.png"
+        (self.repo_root / photo1).write_bytes(b"p1")
+        (self.repo_root / photo2).write_bytes(b"p2")
+
+        self._setup_profiles([
+            ("101", "P1", photo1),
+            ("102", "P2", photo2),
+        ])
+        self._setup_player_profile_json("p1-101", [
+            {"slug": "ultimate", "characters": [{"name": "Fox", "usage": 100.0}]}
+        ])
+        self._setup_player_profile_json("p2-102", [
+            {"slug": "ultimate", "characters": [{"name": "Wolf", "usage": 100.0}]}
+        ])
+        self._create_character_portrait("ultimate", "fox")
+        self._create_character_portrait("ultimate", "wolf")
+
+        profile1 = {"playerId": "101", "slug": "p1-101", "photo": photo1}
+        profile2 = {"playerId": "102", "slug": "p2-102", "photo": photo2}
+
+        self.assertEqual(resolve_player_image(profile1, "ultimate", self.repo_root), photo1)
+        self.assertEqual(resolve_player_image(profile2, "ultimate", self.repo_root), photo2)
+
+    def test_character_fallback_neither_has_uploaded_photo_both_have_character_usage(self):
+        # Neither has uploaded photo -> resolve to character portraits in top game
+        self._setup_profiles([
+            ("101", "P1", None),
+            ("102", "P2", None),
+        ])
+        self._setup_player_profile_json("p1-101", [
+            {"slug": "ultimate", "characters": [{"name": "Fox", "usage": 80.0}, {"name": "Marth", "usage": 20.0}]}
+        ])
+        self._setup_player_profile_json("p2-102", [
+            {"slug": "ultimate", "characters": [{"name": "Wolf", "usage": 90.0}]}
+        ])
+        self._create_character_portrait("ultimate", "fox")
+        self._create_character_portrait("ultimate", "wolf")
+
+        profile1 = {"playerId": "101", "slug": "p1-101", "photo": None}
+        profile2 = {"playerId": "102", "slug": "p2-102", "photo": None}
+
+        self.assertEqual(
+            resolve_player_image(profile1, "ultimate", self.repo_root),
+            "assets/renders/ultimate/portraits/fox.webp",
+        )
+        self.assertEqual(
+            resolve_player_image(profile2, "ultimate", self.repo_root),
+            "assets/renders/ultimate/portraits/wolf.webp",
+        )
+
+    def test_character_fallback_only_one_has_character_usage(self):
+        # Player 1 has character usage, Player 2 has none for that game
+        self._setup_profiles([
+            ("101", "P1", None),
+            ("102", "P2", None),
+        ])
+        self._setup_player_profile_json("p1-101", [
+            {"slug": "ultimate", "characters": [{"name": "Fox", "usage": 100.0}]}
+        ])
+        self._setup_player_profile_json("p2-102", [
+            {"slug": "ultimate", "characters": []}
+        ])
+        self._create_character_portrait("ultimate", "fox")
+
+        profile1 = {"playerId": "101", "slug": "p1-101", "photo": None}
+        profile2 = {"playerId": "102", "slug": "p2-102", "photo": None}
+
+        self.assertEqual(
+            resolve_player_image(profile1, "ultimate", self.repo_root),
+            "assets/renders/ultimate/portraits/fox.webp",
+        )
+        self.assertEqual(
+            resolve_player_image(profile2, "ultimate", self.repo_root),
+            "assets/logo.jpg",
+        )
+
+    def test_character_fallback_neither_has_character_usage(self):
+        # Both players have no character usage -> both fall back to assets/logo.jpg
+        self._setup_profiles([
+            ("101", "P1", None),
+            ("102", "P2", None),
+        ])
+        self._setup_player_profile_json("p1-101", [
+            {"slug": "ultimate", "characters": []}
+        ])
+        self._setup_player_profile_json("p2-102", [
+            {"slug": "ultimate", "characters": []}
+        ])
+
+        profile1 = {"playerId": "101", "slug": "p1-101", "photo": None}
+        profile2 = {"playerId": "102", "slug": "p2-102", "photo": None}
+
+        self.assertEqual(
+            resolve_player_image(profile1, "ultimate", self.repo_root),
+            "assets/logo.jpg",
+        )
+        self.assertEqual(
+            resolve_player_image(profile2, "ultimate", self.repo_root),
+            "assets/logo.jpg",
+        )
+
+    def test_top_game_tie_breaker(self):
+        # Tie in head-to-head set count across multiple games:
+        # e.g., ultimate: 5 sets, melee: 5 sets, rivals-2: 5 sets.
+        # Deterministic tie-breaker: alphabetical gameSlug ascending -> 'melee'
+        breakdown = [
+            {"gameSlug": "ultimate", "sets": 5},
+            {"gameSlug": "melee", "sets": 5},
+            {"gameSlug": "rivals-2", "sets": 5},
+        ]
+        self.assertEqual(get_top_head_to_head_game(breakdown), "melee")
+
+        # Unequal: ultimate has 6 sets -> 'ultimate'
+        breakdown_unequal = [
+            {"gameSlug": "melee", "sets": 5},
+            {"gameSlug": "ultimate", "sets": 6},
+        ]
+        self.assertEqual(get_top_head_to_head_game(breakdown_unequal), "ultimate")
+
+    def test_character_usage_tie_breaker_and_other_exclusion(self):
+        # If multiple characters have tied usage or 'Other' is listed,
+        # 'Other' is skipped and first valid character in order is used.
+        self._setup_profiles([("101", "P1", None)])
+        self._setup_player_profile_json("p1-101", [
+            {"slug": "ultimate", "characters": [
+                {"name": "Other", "usage": 50.0},
+                {"name": "Marth", "usage": 25.0},
+                {"name": "Fox", "usage": 25.0},
+            ]}
+        ])
+        self._create_character_portrait("ultimate", "marth")
+        self._create_character_portrait("ultimate", "fox")
+
+        profile1 = {"playerId": "101", "slug": "p1-101", "photo": None}
+        self.assertEqual(
+            resolve_player_image(profile1, "ultimate", self.repo_root),
+            "assets/renders/ultimate/portraits/marth.webp",
+        )
+
+    def test_character_portrait_aliases(self):
+        # Check alias mapping, e.g. Simon Belmont -> simon
+        self._setup_profiles([("101", "P1", None)])
+        self._setup_player_profile_json("p1-101", [
+            {"slug": "ultimate", "characters": [{"name": "Simon Belmont", "usage": 100.0}]}
+        ])
+        self._create_character_portrait("ultimate", "simon")
+
+        profile1 = {"playerId": "101", "slug": "p1-101", "photo": None}
+        self.assertEqual(
+            resolve_player_image(profile1, "ultimate", self.repo_root),
+            "assets/renders/ultimate/portraits/simon.webp",
+        )
+
+    def test_missing_or_invalid_character_portrait_falls_back_to_logo(self):
+        # Character is listed in profile, but portrait webp file does not exist on disk
+        self._setup_profiles([("101", "P1", None)])
+        self._setup_player_profile_json("p1-101", [
+            {"slug": "ultimate", "characters": [{"name": "NonExistentChar", "usage": 100.0}]}
+        ])
+
+        profile1 = {"playerId": "101", "slug": "p1-101", "photo": None}
+        self.assertEqual(
+            resolve_player_image(profile1, "ultimate", self.repo_root),
+            "assets/logo.jpg",
+        )
+
+    def test_malformed_profile_json_graceful_fallback(self):
+        # Corrupted / malformed profile JSON file
+        profile_path = self.repo_root / "data" / "profiles" / "p1-101.json"
+        profile_path.write_text("{ corrupt json", encoding="utf-8")
+
+        profile1 = {"playerId": "101", "slug": "p1-101", "photo": None}
+        self.assertEqual(
+            resolve_player_image(profile1, "ultimate", self.repo_root),
+            "assets/logo.jpg",
+        )
 
     def test_weekly_idempotency_and_force_regeneration(self):
         self._setup_profiles([
