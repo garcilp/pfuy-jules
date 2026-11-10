@@ -106,6 +106,7 @@
       'tiermaker.deleteTier': 'Delete tier',
       'tiermaker.moveUp': 'Move up',
       'tiermaker.moveDown': 'Move down',
+      'tiermaker.changeColor': 'Click to change color',
 
       'events.eyebrow': 'START.GG TOURNAMENT DATA',
       'events.title': 'Events',
@@ -613,6 +614,7 @@
       'tiermaker.deleteTier': 'Eliminar tier',
       'tiermaker.moveUp': 'Mover arriba',
       'tiermaker.moveDown': 'Mover abajo',
+      'tiermaker.changeColor': 'Haz clic para cambiar el color',
 
       'events.eyebrow': 'DATOS DE TORNEOS DE START.GG',
       'events.title': 'Torneos',
