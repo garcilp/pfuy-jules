@@ -98,19 +98,24 @@ function renderStats() {
 
   const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
   const stats = [
-    { label: isEs ? 'JUGADORES' : 'PLAYERS', value: totalPlayers.toLocaleString(), sub: isEs ? `en ${activeCommunities.length} comunidades` : `across ${activeCommunities.length} communities` },
-    { label: isEs ? 'TORNEOS' : 'TOURNAMENTS', value: totalTournaments.toLocaleString(), sub: isEs ? 'registrados en start.gg' : 'indexed from start.gg' },
-    { label: isEs ? 'JUEGOS' : 'GAMES', value: activeCommunities.length.toString(), sub: isEs ? 'platform fighters activos' : 'platform fighters active' },
+    { label: isEs ? 'JUGADORES' : 'PLAYERS', value: totalPlayers.toLocaleString(), sub: isEs ? `en ${activeCommunities.length} comunidades` : `across ${activeCommunities.length} communities`, href: 'players.html' },
+    { label: isEs ? 'TORNEOS' : 'TOURNAMENTS', value: totalTournaments.toLocaleString(), sub: isEs ? 'registrados en start.gg' : 'indexed from start.gg', href: 'events.html' },
+    { label: isEs ? 'JUEGOS' : 'GAMES', value: activeCommunities.length.toString(), sub: isEs ? 'platform fighters activos' : 'platform fighters active', href: '#hubs' },
     { label: isEs ? 'JUGADORES CROSSOVER' : 'CROSSOVER PLAYERS', value: crossoverCount.toLocaleString(), sub: isEs ? 'compiten en 2+ juegos' : 'compete in 2+ games' }
   ];
 
-  statsContainer.innerHTML = stats.map(s => `
-    <div class="tile glass">
-      <div class="label">${esc(s.label)}</div>
-      <div class="val">${esc(s.value)}</div>
-      <div class="sub">${esc(s.sub)}</div>
-    </div>
-  `).join('');
+  statsContainer.innerHTML = stats.map(s => {
+    const tag = s.href ? 'a' : 'div';
+    const hrefAttr = s.href ? ` href="${esc(s.href)}"` : '';
+    const linkClass = s.href ? ' stat-link' : '';
+    return `
+      <${tag} class="tile glass${linkClass}"${hrefAttr}>
+        <div class="label">${esc(s.label)}</div>
+        <div class="val">${esc(s.value)}</div>
+        <div class="sub">${esc(s.sub)}</div>
+      </${tag}>
+    `;
+  }).join('');
 }
 
 // 2. Upcoming Events
