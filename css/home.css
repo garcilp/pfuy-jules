@@ -349,6 +349,28 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.home a.tile,
+.home .tile.stat-link {
+  cursor: pointer;
+  transition: background 150ms ease, transform 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.home a.tile:hover,
+.home a.tile:focus-visible {
+  color: var(--text);
+  background: var(--faint);
+  border-color: var(--glass-border);
+  box-shadow: 0 20px 48px var(--glass-shadow);
+  transform: translateY(-2px);
+}
+
+.home a.tile:focus-visible {
+  outline: 2px solid var(--sky);
+  outline-offset: 2px;
 }
 
 .home .tile .label {
@@ -360,6 +382,7 @@
   font-size: 40px;
   font-weight: 700;
   line-height: 1;
+  color: var(--text);
 }
 
 .home .tile .sub {
