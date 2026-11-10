@@ -275,7 +275,26 @@
       const labelBox = document.createElement('div');
       labelBox.className = 'tm-tier-label-box';
       labelBox.style.backgroundColor = tier.color;
+      labelBox.title = window.i18n ? window.i18n.t('tiermaker.changeColor') || 'Click to change color' : 'Click to change color';
 
+      // Color Input hidden within labelBox
+      const colorInput = document.createElement('input');
+      colorInput.type = 'color';
+      colorInput.className = 'tm-tier-color-input';
+      colorInput.value = tier.color;
+      colorInput.tabIndex = -1;
+      colorInput.setAttribute('aria-hidden', 'true');
+      colorInput.addEventListener('input', () => {
+        tier.color = colorInput.value;
+        labelBox.style.backgroundColor = tier.color;
+      });
+      colorInput.addEventListener('change', () => {
+        pushHistory();
+        saveState();
+      });
+      labelBox.appendChild(colorInput);
+
+      // Editable Text Input
       const input = document.createElement('input');
       input.type = 'text';
       input.className = 'tm-tier-label-input';
@@ -286,7 +305,25 @@
         tier.name = input.value.trim() || 'TIER';
         saveState();
       });
+      // Prevent clicking the text input from triggering the color picker
+      input.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
       labelBox.appendChild(input);
+
+      // Clicking label box triggers color picker
+      labelBox.addEventListener('click', (e) => {
+        if (e.target === input) return;
+        if (typeof colorInput.showPicker === 'function') {
+          try {
+            colorInput.showPicker();
+            return;
+          } catch (err) {
+            // Fallback to click
+          }
+        }
+        colorInput.click();
+      });
 
       // Items Box
       const itemsBox = document.createElement('div');
@@ -341,27 +378,6 @@
         }
       });
       controls.appendChild(downBtn);
-
-      // Color Picker
-      const colorWrap = document.createElement('div');
-      colorWrap.className = 'tm-color-picker-wrap';
-      colorWrap.style.backgroundColor = tier.color;
-
-      const colorInput = document.createElement('input');
-      colorInput.type = 'color';
-      colorInput.className = 'tm-color-picker-input';
-      colorInput.value = tier.color;
-      colorInput.addEventListener('input', () => {
-        tier.color = colorInput.value;
-        labelBox.style.backgroundColor = tier.color;
-        colorWrap.style.backgroundColor = tier.color;
-      });
-      colorInput.addEventListener('change', () => {
-        pushHistory();
-        saveState();
-      });
-      colorWrap.appendChild(colorInput);
-      controls.appendChild(colorWrap);
 
       // Delete Tier
       const delBtn = document.createElement('button');
@@ -501,11 +517,31 @@
 
   function setupDragAndDrop() {
     let draggedPid = null;
+    let draggedFromTier = false;
+    let droppedInValidZone = false;
+
+    // Allow dropping outside tiers anywhere on the page
+    document.addEventListener('dragover', (e) => {
+      if (!draggedPid) return;
+      const dropzone = e.target.closest('.tm-tier-items-box, .tm-pool-dropzone');
+      if (dropzone) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        dropzone.classList.add('drag-over');
+      } else if (draggedFromTier) {
+        // Allow dropping outside the tier list to trigger a drop event
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+      }
+    });
 
     document.addEventListener('dragstart', (e) => {
       const badge = e.target.closest('.tm-badge');
       if (!badge) return;
       draggedPid = badge.dataset.playerId;
+      // Check if dragged from within a tier row
+      draggedFromTier = !!badge.closest('.tm-tier-items-box');
+      droppedInValidZone = false;
       badge.classList.add('dragging');
       e.dataTransfer.effectAllowed = 'move';
       e.dataTransfer.setData('text/plain', draggedPid);
@@ -514,16 +550,16 @@
     document.addEventListener('dragend', (e) => {
       const badge = e.target.closest('.tm-badge');
       if (badge) badge.classList.remove('dragging');
-      draggedPid = null;
       document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
-    });
 
-    document.addEventListener('dragover', (e) => {
-      const dropzone = e.target.closest('.tm-tier-items-box, .tm-pool-dropzone');
-      if (!dropzone) return;
-      e.preventDefault();
-      e.dataTransfer.dropEffect = 'move';
-      dropzone.classList.add('drag-over');
+      // If dragged from a tier and not dropped into a tier row or pool dropzone, remove from tier
+      if (draggedPid && draggedFromTier && !droppedInValidZone) {
+        movePlayerToPool(draggedPid);
+      }
+
+      draggedPid = null;
+      draggedFromTier = false;
+      droppedInValidZone = false;
     });
 
     document.addEventListener('dragleave', (e) => {
@@ -534,22 +570,30 @@
     });
 
     document.addEventListener('drop', (e) => {
+      if (!draggedPid) return;
       const dropzone = e.target.closest('.tm-tier-items-box, .tm-pool-dropzone');
-      if (!dropzone || !draggedPid) return;
-      e.preventDefault();
-      dropzone.classList.remove('drag-over');
+      document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
 
-      if (dropzone.classList.contains('tm-tier-items-box')) {
-        const tierId = dropzone.dataset.tierId;
-        // Check if dropped before an existing badge for inline reordering
-        const targetBadge = e.target.closest('.tm-badge');
-        let targetIndex = null;
-        if (targetBadge && targetBadge.parentElement === dropzone) {
-          const badges = Array.from(dropzone.querySelectorAll('.tm-badge'));
-          targetIndex = badges.indexOf(targetBadge);
+      if (dropzone) {
+        e.preventDefault();
+        droppedInValidZone = true;
+
+        if (dropzone.classList.contains('tm-tier-items-box')) {
+          const tierId = dropzone.dataset.tierId;
+          // Check if dropped before an existing badge for inline reordering
+          const targetBadge = e.target.closest('.tm-badge');
+          let targetIndex = null;
+          if (targetBadge && targetBadge.parentElement === dropzone) {
+            const badges = Array.from(dropzone.querySelectorAll('.tm-badge'));
+            targetIndex = badges.indexOf(targetBadge);
+          }
+          movePlayerToTier(draggedPid, tierId, targetIndex);
+        } else if (dropzone.classList.contains('tm-pool-dropzone')) {
+          movePlayerToPool(draggedPid);
         }
-        movePlayerToTier(draggedPid, tierId, targetIndex);
-      } else if (dropzone.classList.contains('tm-pool-dropzone')) {
+      } else if (draggedFromTier) {
+        e.preventDefault();
+        droppedInValidZone = true;
         movePlayerToPool(draggedPid);
       }
     });
