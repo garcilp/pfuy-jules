@@ -71,6 +71,10 @@
       </div>
       <div class="tiermaker-toolbar glass">
         <div class="tm-toolbar-group">
+          <label for="tm-title-input" class="mono muted" data-i18n="tiermaker.titlePlaceholder">Title</label>
+          <input type="text" id="tm-title-input" class="game-filter glass tm-title-input" placeholder="Title" data-i18n-placeholder="tiermaker.titlePlaceholder">
+        </div>
+        <div class="tm-toolbar-group">
           <label for="tm-game-select" class="mono muted" data-i18n="tiermaker.game">Game</label>
           <select id="tm-game-select" class="game-filter glass">
             <option value="ultimate">Ultimate</option>
@@ -88,6 +92,12 @@
             <option value="recent" data-i18n="tiermaker.sort.recent">Most recently entered</option>
           </select>
         </div>
+        <div class="tm-toolbar-group">
+          <label class="tm-checkbox-label">
+            <input type="checkbox" id="tm-show-intl" class="tm-checkbox">
+            <span data-i18n="tiermaker.showIntl">Show international players</span>
+          </label>
+        </div>
         <div class="tm-toolbar-group tm-toolbar-actions">
           <button type="button" id="tm-add-tier-btn" class="pill-btn glass tm-action-btn" data-i18n="tiermaker.addTier">+ Add Tier</button>
         </div>
@@ -102,14 +112,14 @@
       <!-- Regular Unranked Pool -->
       <section class="tm-pool-section glass">
         <div class="tm-pool-header">
-          <h2 class="tm-pool-title" data-i18n="tiermaker.unrankedTitle">Unranked Players</h2>
+          <h2 class="tm-pool-title" data-i18n="tiermaker.unrankedTitle">Player List</h2>
           <span id="tm-unranked-count" class="mono muted">0</span>
         </div>
         <div id="tm-unranked-pool" class="tm-pool-dropzone" data-pool="regular"></div>
       </section>
 
       <!-- International Players Pool -->
-      <section class="tm-pool-section tm-intl-section glass">
+      <section id="tm-intl-section" class="tm-pool-section tm-intl-section glass" style="display:none;">
         <div class="tm-pool-header">
           <div>
             <h2 class="tm-pool-title" data-i18n="tiermaker.intlTitle">International Players</h2>

@@ -23,6 +23,7 @@
   const scrollSentinel = document.getElementById('scroll-sentinel');
 
   // Controls
+  const titleInput = document.getElementById('tm-title-input');
   const gameSelect = document.getElementById('tm-game-select');
   const poolSortSelect = document.getElementById('tm-pool-sort');
   const addTierBtn = document.getElementById('tm-add-tier-btn');
@@ -33,6 +34,8 @@
   const tiersContainer = document.getElementById('tm-tiers-container');
   const unrankedPoolEl = document.getElementById('tm-unranked-pool');
   const intlPoolEl = document.getElementById('tm-intl-pool');
+  const intlSectionEl = document.getElementById('tm-intl-section');
+  const showIntlCheckbox = document.getElementById('tm-show-intl');
   const unrankedCountEl = document.getElementById('tm-unranked-count');
   const intlCountEl = document.getElementById('tm-intl-count');
 
@@ -63,6 +66,15 @@
     poolSortSelect.addEventListener('change', () => {
       renderPools();
     });
+
+    if (showIntlCheckbox && intlSectionEl) {
+      showIntlCheckbox.checked = false;
+      intlSectionEl.style.display = 'none';
+
+      showIntlCheckbox.addEventListener('change', () => {
+        intlSectionEl.style.display = showIntlCheckbox.checked ? 'flex' : 'none';
+      });
+    }
 
     addTierBtn.addEventListener('click', () => {
       pushHistory();
@@ -561,11 +573,22 @@
       const contentWidth = width - (padding * 2);
       const itemsAreaWidth = contentWidth - labelWidth;
 
+      // Title and Game metadata
+      const userTitle = (titleInput ? titleInput.value.trim() : '') || 'COMMUNITY TIER LIST';
+      const gameNames = {
+        'ultimate': 'Super Smash Bros. Ultimate',
+        'melee': 'Super Smash Bros. Melee',
+        'project-plus': 'Project+',
+        'rivals-2': 'Rivals 2',
+        'rivals-of-aether': 'Rivals of Aether'
+      };
+      const gameTitle = gameNames[activeGame] || activeGame.toUpperCase();
+
       // Calculate layout heights
       let totalHeight = padding; // Top padding
 
-      // Header: Logo/Title (approx 90px)
-      const headerHeight = 90;
+      // Header: Eyebrow + Title + Game name
+      const headerHeight = 94;
       totalHeight += headerHeight + 20;
 
       // Calculate tier row heights
@@ -581,21 +604,7 @@
         totalHeight += tl.rowHeight + 10;
       });
 
-      totalHeight += 20; // Gap before unranked pools
-
-      // International Players section
-      const placed = getPlacedPlayerIds();
-      const intlPlayers = (catalog?.international || []).filter(p => !placed.has(String(p.id)));
-      const badgesPerRowPool = Math.max(1, Math.floor((contentWidth - 24) / (badgeSize + badgeGap)));
-      const intlRows = Math.max(1, Math.ceil(intlPlayers.length / badgesPerRowPool));
-      const intlPoolHeight = 44 + (intlRows * (badgeSize + badgeGap)) + 16;
-      totalHeight += intlPoolHeight + 20;
-
-      // Regular Unranked Players section
-      const unrankedPlayers = (catalog?.players || []).filter(p => !placed.has(String(p.id)));
-      const unrankedRows = Math.max(1, Math.ceil(unrankedPlayers.length / badgesPerRowPool));
-      const unrankedPoolHeight = 44 + (unrankedRows * (badgeSize + badgeGap)) + 16;
-      totalHeight += unrankedPoolHeight + padding;
+      totalHeight += padding; // Bottom padding (no unused pools)
 
       // Set canvas dimensions
       canvas.width = width;
@@ -612,11 +621,9 @@
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, width, totalHeight);
 
-      // Preload images
+      // Preload images only for placed players in tiers
       const allPidsToRender = new Set();
       tiers.forEach(t => (t.playerIds || []).forEach(id => allPidsToRender.add(String(id))));
-      intlPlayers.forEach(p => allPidsToRender.add(String(p.id)));
-      unrankedPlayers.forEach(p => allPidsToRender.add(String(p.id)));
 
       const loadedImages = new Map();
       await Promise.all(Array.from(allPidsToRender).map(pid => {
@@ -634,22 +641,21 @@
 
       // Render Header
       let currentY = padding;
+
+      // Eyebrow
       ctx.fillStyle = '#9FD6FF';
-      ctx.font = '700 14px "JetBrains Mono", monospace';
-      ctx.fillText('PLATFIGHTERS.UY · COMMUNITY TIER LIST', padding, currentY + 18);
+      ctx.font = '700 13px "JetBrains Mono", monospace';
+      ctx.fillText('PLATFIGHTERS.UY', padding, currentY + 16);
 
-      const gameNames = {
-        'ultimate': 'Super Smash Bros. Ultimate',
-        'melee': 'Super Smash Bros. Melee',
-        'project-plus': 'Project+',
-        'rivals-2': 'Rivals 2',
-        'rivals-of-aether': 'Rivals of Aether'
-      };
-      const gameTitle = gameNames[activeGame] || activeGame.toUpperCase();
-
+      // Title field (where game name was previously displayed)
       ctx.fillStyle = '#FFFFFF';
       ctx.font = '700 32px "Space Grotesk", sans-serif';
-      ctx.fillText(gameTitle, padding, currentY + 54);
+      ctx.fillText(userTitle, padding, currentY + 54);
+
+      // Game name (displayed smaller than the Title, in JetBrains Mono font)
+      ctx.fillStyle = '#AEB6C7';
+      ctx.font = '500 14px "JetBrains Mono", monospace';
+      ctx.fillText(gameTitle.toUpperCase(), padding, currentY + 80);
 
       currentY += headerHeight + 20;
 
@@ -686,7 +692,7 @@
 
         // Render Badges
         const itemsStartX = rowX + labelWidth + 12;
-        const itemsStartY = rowY + 8;
+        const itemsStartY = rowY + Math.max(8, (rowH - (badgeSize + (Math.floor((tl.pids.length - 1) / tl.badgesPerRow) * (badgeSize + badgeGap)))) / 2);
 
         tl.pids.forEach((pid, bIdx) => {
           const col = bIdx % tl.badgesPerRow;
@@ -713,90 +719,6 @@
         });
 
         currentY += rowH + 10;
-      });
-
-      currentY += 15;
-
-      // Render International Players Category
-      const intlBoxX = padding;
-      const intlBoxY = currentY;
-      const intlBoxW = contentWidth;
-
-      ctx.fillStyle = 'rgba(245, 197, 66, 0.05)';
-      ctx.strokeStyle = 'rgba(245, 197, 66, 0.3)';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.roundRect(intlBoxX, intlBoxY, intlBoxW, intlPoolHeight, 16);
-      ctx.fill();
-      ctx.stroke();
-
-      ctx.fillStyle = '#F5C542';
-      ctx.font = '700 18px "Space Grotesk", sans-serif';
-      ctx.fillText(`International Players (${intlPlayers.length})`, intlBoxX + 16, intlBoxY + 30);
-
-      intlPlayers.forEach((p, bIdx) => {
-        const col = bIdx % badgesPerRowPool;
-        const r = Math.floor(bIdx / badgesPerRowPool);
-        const bx = intlBoxX + 16 + col * (badgeSize + badgeGap);
-        const by = intlBoxY + 44 + r * (badgeSize + badgeGap);
-
-        const img = loadedImages.get(String(p.id));
-        if (img) {
-          ctx.save();
-          ctx.beginPath();
-          ctx.roundRect(bx, by, badgeSize, badgeSize, 10);
-          ctx.clip();
-          ctx.drawImage(img, bx, by, badgeSize, badgeSize);
-          ctx.restore();
-
-          ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-          ctx.lineWidth = 1;
-          ctx.beginPath();
-          ctx.roundRect(bx, by, badgeSize, badgeSize, 10);
-          ctx.stroke();
-        }
-      });
-
-      currentY += intlPoolHeight + 20;
-
-      // Render Regular Unranked Pool
-      const unrankedBoxX = padding;
-      const unrankedBoxY = currentY;
-      const unrankedBoxW = contentWidth;
-
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.roundRect(unrankedBoxX, unrankedBoxY, unrankedBoxW, unrankedPoolHeight, 16);
-      ctx.fill();
-      ctx.stroke();
-
-      ctx.fillStyle = '#FFFFFF';
-      ctx.font = '700 18px "Space Grotesk", sans-serif';
-      ctx.fillText(`Unranked Players (${unrankedPlayers.length})`, unrankedBoxX + 16, unrankedBoxY + 30);
-
-      unrankedPlayers.forEach((p, bIdx) => {
-        const col = bIdx % badgesPerRowPool;
-        const r = Math.floor(bIdx / badgesPerRowPool);
-        const bx = unrankedBoxX + 16 + col * (badgeSize + badgeGap);
-        const by = unrankedBoxY + 44 + r * (badgeSize + badgeGap);
-
-        const img = loadedImages.get(String(p.id));
-        if (img) {
-          ctx.save();
-          ctx.beginPath();
-          ctx.roundRect(bx, by, badgeSize, badgeSize, 10);
-          ctx.clip();
-          ctx.drawImage(img, bx, by, badgeSize, badgeSize);
-          ctx.restore();
-
-          ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-          ctx.lineWidth = 1;
-          ctx.beginPath();
-          ctx.roundRect(bx, by, badgeSize, badgeSize, 10);
-          ctx.stroke();
-        }
       });
 
       // Download PNG
