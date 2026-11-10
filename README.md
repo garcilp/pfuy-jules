@@ -127,3 +127,22 @@ The mobile layout activates automatically at `@media (max-width: 640px)` across 
   - Horizontal strips (`.hs`): 44px minimum tap targets, smooth horizontal touch/keyboard scroll with negative side bleed, hidden scrollbars. Used for game tabs, game switchers, upcoming events, and ranking article player jump links.
   - Stat tiles: 2-column grid layout with 16px padding, 20px radius, 11px monospace labels, 26px bold values with word wrapping, and 12px muted sub-lines.
   - Data tables: Automatically transform to stacked key-value rows on mobile viewports with dividers, avoiding horizontal scrollbars.
+
+## Diagnostic window
+
+The ranking **Diagnostic window** (opened via the Diagnostic button on any player's row in a ranking on `rankings.html`) breaks down how a player's rank and score were calculated:
+
+- **Modal & Bottom Sheet Shell**:
+  - **Desktop (> 640px)**: Centered 960px modal with max-height 90vh, 32px border radius, 28px padding, and `rgba(16,24,50,.8)` Liquid Glass surface with background blur.
+  - **Mobile (≤ 640px)**: Bottom sheet pinned to the bottom of the viewport with 28px top corner radius, max-height 92vh, a visual 40x5 drag handle, 0 16px padding, and a 56px strip of blurred background page visible above.
+  - **Accessibility & Interaction**: Full `role="dialog"` modal with `aria-modal="true"`, dynamic `aria-labelledby`, focus trapping inside the dialog, restoration of focus to the triggering Diagnostic button on close, body scroll locking, and dismissal via Escape key, backdrop click, or the 44px close button. Only the body content scrolls; the header and segmented tab bar remain pinned at the top.
+- **Header**:
+  - Player avatar/initials, tag, and start.gg player ID.
+  - Informational chips: game, ranking system, formatted date range (e.g. `Jan 1 – Dec 31, 2025`), and a period notice (`Counts this period only`).
+  - Rank block (placement-colored SVG hexagon ordinal) and score block (`Score / 100` with an accent progress bar).
+  - Generated context sentence (`What decided this rank`), summarizing high-impact wins and costliest losses.
+- **Tabs**:
+  - **Summary**: At-a-glance stat tiles (Sets played, Events, Best result, Record vs Top 10), neighbor ranking comparison ("Where #N sits" with final scores, head-to-head records, and explanatory glass box), pivotal sets ("Moments that shaped it" listing best wins and costliest losses), responsive SVG score progression chart over the period with gain callouts, and an execution footnote.
+  - **Sets**: Complete set trace grouped by event (showing the 3 most recent events with a "Show all M events" expander), filter chips (All, Wins, Losses, Biggest impact), sort controls (Newest, Oldest, Biggest impact), pre-set Win chance bars, and signed Impact values.
+  - **Method**: Rules for the ranking (System, Game, Date range, Mode), plain English guide explaining how to read the Sets tab, and a focusable monospace raw configuration block.
+  - **Empty State**: Dedicated empty state fallback with clear messaging when no matches are recorded in the active period.

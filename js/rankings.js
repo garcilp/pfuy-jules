@@ -289,7 +289,45 @@ async function init() {
   });
 
   if (modalCloseBtn) {
-    modalCloseBtn.addEventListener('click', () => diagnosticModal.close());
+    modalCloseBtn.addEventListener('click', () => closeDiagnosticModal());
+  }
+
+  if (diagnosticModal) {
+    // Close on backdrop click
+    diagnosticModal.addEventListener('click', (e) => {
+      const rect = diagnosticModal.getBoundingClientRect();
+      const isInDialog = (rect.top <= e.clientY && e.clientY <= rect.top + rect.height &&
+                          rect.left <= e.clientX && e.clientX <= rect.left + rect.width);
+      if (!isInDialog) {
+        closeDiagnosticModal();
+      }
+    });
+
+    // Close on Escape & trap tab focus
+    diagnosticModal.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        closeDiagnosticModal();
+        return;
+      }
+      if (e.key === 'Tab') {
+        const focusables = diagnosticModal.querySelectorAll('button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])');
+        if (focusables.length === 0) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            last.focus();
+            e.preventDefault();
+          }
+        } else {
+          if (document.activeElement === last) {
+            first.focus();
+            e.preventDefault();
+          }
+        }
+      }
+    });
   }
 
   window.addEventListener('hashchange', () => {
@@ -1669,183 +1707,1146 @@ function renderComparison() {
   setupInfiniteScroll(totalFiltered);
 }
 
-// Diagnostic Modal
-window.openDiagnosticModal = async function(playerId) {
-  const game = gameFilter.value;
-  const system = getActiveSystem() === 'overview' || getActiveSystem() === 'comparison' ? 'glicko2' : getActiveSystem();
-  const mode = modeFilter.value;
-  const isHistorical = mode === 'historical';
-  const start = isHistorical ? '' : startDateInput.value;
-  const end = isHistorical ? '' : endDateInput.value;
-
-  const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
-  modalPlayerInfo.innerHTML = `<p class="muted">${isEs ? 'Cargando traza diagnóstica de cálculo…' : 'Loading calculation diagnostic trace…'}</p>`;
-  modalBody.innerHTML = '';
-  diagnosticModal.showModal();
-
-  let diagData = null;
-
-  // Calculate diagnostic data client-side from static game JSON
-  try {
-    const gameData = await getGameData(game);
-    if (window.ClientRankingEngine) {
-      const engine = new window.ClientRankingEngine(gameData);
-      diagData = engine.calculate(system, mode, start || null, end || null, playerId, prWeights);
-    }
-  } catch (err) {
-    modalPlayerInfo.innerHTML = `<h2>${isEs ? 'Error de Diagnóstico del Jugador' : 'Player Diagnostic Error'}</h2>`;
-    modalBody.innerHTML = `<p class="muted">${esc(err.message)}</p>`;
-    return;
-  }
-
-  if (!diagData || !diagData.diagnostic) {
-    modalPlayerInfo.innerHTML = `<h2>${isEs ? 'Jugador' : 'Player'} ID ${esc(playerId)}</h2>`;
-    modalBody.innerHTML = `<p class="muted">${isEs ? 'No hay traza diagnóstica disponible para este jugador y selección.' : 'No diagnostic trace available for this player and selection.'}</p>`;
-    return;
-  }
-
-  const diag = diagData.diagnostic;
-  const algo = diagData.algorithm || {};
-  const summary = diag.summary || {};
-  const breakdown = summary.breakdown || {};
-
-  modalPlayerInfo.innerHTML = `
-    <div class="diag-player-head">
-      <span class="player-avatar"><img src="assets/players/${esc(playerId)}.png" alt="" onerror="this.remove()"></span>
-      <div>
-        <h2>${esc(diag.playerTag)} <span class="muted font-normal">(ID ${esc(playerId)})</span></h2>
-        <p class="muted mono">
-          Rank: <b>${diag.playerRank ? '#' + diag.playerRank : 'Unranked'}</b> ·
-          Final Score: <b>${diag.finalScore !== null ? diag.finalScore : '-'}</b>
-          ${breakdown.change !== undefined && breakdown.change !== null ? ` · Rating Change: <b>${breakdown.change >= 0 ? '+' : ''}${breakdown.change}</b>` : ''} ·
-          Game: <b>${esc(getGameName(game))}</b> ·
-          System: <b>${esc(algo.name || system)}</b> (${esc(mode)})
-        </p>
-      </div>
-    </div>
-  `;
-
-  let historyHtml = `
-    <div class="diag-summary panel glass">
-      <h3>Calculation Context &amp; Algorithm Configuration</h3>
-      <div class="mono muted">
-        <span>Formula: <b>${esc(summary.formula || algo.description || '')}</b></span><br>
-        <span>Parameters: ${formatAlgorithmParams(summary.parameters || algo.parameters)}</span><br>
-        ${start || end ? `<span>Date Range: <b>${esc(start || 'Inception')} → ${esc(end || 'Present')}</b></span><br>` : ''}
-        <span>Total Matches / Events: <b>${diag.totalMatches || 0} matches (${diag.wins || 0}W - ${diag.losses || 0}L)${diag.events && diag.events.length ? ' / ' + diag.events.length + ' events' : ''}</b></span>
-      </div>
-    </div>
-
-    <div class="diag-summary panel glass">
-      <h3>Representative Breakdown &amp; Intermediate Values</h3>
-      <div class="mono muted">
-        ${formatBreakdown(system, breakdown)}
-      </div>
-    </div>
-  `;
-
-  if (diag.events && diag.events.length) {
-    historyHtml += `
-      <h3>Contributing Tournament Events (${diag.events.length})</h3>
-      <div class="table diag-table">
-        <div class="tr head diag-tr">
-          <span>DATE &amp; EVENT</span>
-          <span>PLACEMENT</span>
-          <span>ENTRANTS</span>
-          <span>FIELD STRENGTH</span>
-          <span>EVENT POINTS</span>
-        </div>
-        ${diag.events.map(ev => `
-          <div class="tr diag-tr">
-            <span>
-              <small>${esc(ev.date || '')}</small>
-              <b>${ev.eventKey ? `<a href="https://www.start.gg/${esc(ev.eventKey)}" target="_blank" class="player-link">${esc(ev.tournamentName)} · ${esc(ev.eventName)}</a>` : esc(ev.tournamentName + ' · ' + ev.eventName)}</b>
-            </span>
-            <span class="mono">#${ev.placement}</span>
-            <span class="mono">${ev.entrants}</span>
-            <span class="mono">${ev.fieldStrength}</span>
-            <span class="mono font-bold win">+${ev.eventPoints}</span>
-          </div>
-        `).join('')}
-      </div>
-    `;
-  }
-
-  historyHtml += `
-    <h3>Step-by-Step Match Trace (${diag.history ? diag.history.length : 0} sets recorded)</h3>
-    <div class="table diag-table">
-      <div class="tr head diag-tr">
-        <span>DATE &amp; EVENT</span>
-        <span>ROUND / PHASE</span>
-        <span>OPPONENT</span>
-        <span>OUTCOME</span>
-        <span>EXPECTED / DIFF</span>
-        <span>CONTRIBUTION / PENALTY</span>
-      </div>
-      ${diag.history && diag.history.length ? diag.history.map(item => `
-        <div class="tr diag-tr">
-          <span>
-            <small>${esc(item.date || '')}</small>
-            <b>${item.eventKey ? `<a href="https://www.start.gg/${esc(item.eventKey)}" target="_blank" class="player-link">${esc(item.event || '')}</a>` : esc(item.event || '')}</b>
-          </span>
-          <span>${esc(item.phase || '')} <small>${esc(item.round || '')}</small></span>
-          <span><b>${esc(item.opponentTag)}</b> <small>Pre:${item.opponentPreRating !== undefined ? item.opponentPreRating : '-'}${item.playerPreRating !== undefined ? ' | You:' + item.playerPreRating : ''}</small></span>
-          <span class="mono ${item.outcome === 'win' ? 'win' : 'loss'}">${item.outcome.toUpperCase()}</span>
-          <span class="mono">${item.expectedScore !== undefined ? 'E:' + item.expectedScore : (item.scoreDisplay || item.displayScore || (item.preScore !== undefined ? item.preScore + '→' + item.postScore : '-'))}</span>
-          <span class="mono ${item.penalty !== undefined ? (item.penalty > 0 ? 'loss' : 'win') : (item.credit !== undefined && item.outcome === 'win' ? 'win' : (item.change !== undefined && item.change >= 0 ? 'win' : 'muted'))}">
-            ${item.penalty !== undefined ? '-' + item.penalty : (item.credit !== undefined ? (item.outcome === 'win' ? '+' + item.credit : '0.0 (' + (item.exclusionReason || 'Excluded') + ')') : (item.change !== undefined ? (item.change >= 0 ? '+' + item.change : item.change) : (item.contribution !== undefined ? item.contribution : '-')))}
-          </span>
-        </div>
-      `).join('') : '<div class="empty-state"><p class="muted">No contributing sets recorded in this date range.</p></div>'}
-    </div>
-  `;
-
-  modalBody.innerHTML = historyHtml;
+// Diagnostic State & Logic
+const diagState = {
+  activeTab: 'summary',
+  setsFilter: 'all',
+  setsSort: 'newest',
+  showAllEvents: false,
+  diagData: null,
+  playerId: null,
+  playerTag: '',
+  playerRank: null,
+  finalScore: null,
+  game: '',
+  gameName: '',
+  system: '',
+  mode: '',
+  startDate: '',
+  endDate: '',
+  allRankings: [],
+  allSets: [],
+  allEvents: [],
+  triggerElement: null
 };
 
-function formatBreakdown(systemKey, b) {
-  if (!b || !Object.keys(b).length) return '<span>No breakdown details available.</span>';
-  if (systemKey === 'glicko2') {
-    return `
-      <span>Rating (r): <b>${b.rating}</b></span> ·
-      <span>Rating Deviation (RD): <b>${b.rd}</b></span> ·
-      <span>Volatility (σ): <b>${b.volatility}</b></span><br>
-      <span>Conservative Rating (r - 2*RD): <b>${b.conservativeScore}</b></span>
-      ${b.baselineScore !== undefined && b.baselineScore !== null ? `<br><span>Pre-period Baseline: <b>${b.baselineScore}</b></span> · <span>Rating Change: <b>${b.change !== undefined && b.change !== null ? (b.change >= 0 ? '+' : '') + b.change : '-'}</b></span>` : ''}
-    `;
-  } else if (systemKey === 'sof') {
-    return `
-      <span>Total Event Points: <b>${b.totalEventPoints}</b></span> ·
-      <span>Events Count: <b>${b.eventsCount}</b></span><br>
-      <span>Avg Field Strength: <b>${b.avgFieldStrength}</b></span> ·
-      <span>Sample Dampener: <b>${b.sampleDampener}</b></span>
-    `;
-  } else if (systemKey === 'quality_wins') {
-    return `
-      <span>Cumulative QoW Points: <b>${b.totalQualityWins}</b></span> ·
-      <span>Eligible Wins: <b>${b.eligibleWins !== undefined ? b.eligibleWins : b.wins}</b></span> ·
-      <span>Losses: <b>${b.losses}</b><br>
-      <span>Avg Opponent Win Rating: <b>${b.avgOpponentWinRating || '-'}</b></span> ·
-      <span>Status: <b>${b.isUnranked ? 'Unranked (0 Wins)' : (b.isProvisional ? 'Provisional (< 3 Wins)' : 'Ranked')}</b></span>
-    `;
-  } else if (systemKey === 'loss_quality') {
-    return `
-      <span>Win Credits Total: <b>${b.winCreditsTotal}</b></span> ·
-      <span>Loss Penalties Total: <b>${b.lossPenaltiesTotal}</b></span><br>
-      <span>Net Performance Points: <b>${b.totalPoints}</b></span> ·
-      <span>Matches: <b>${b.matches}</b></span>
-    `;
-  } else if (systemKey === 'custom') {
-    const weightsStr = b.weights ? Object.entries(b.weights).map(([k, v]) => `${k}: ${v}%`).join(' · ') : '';
-    const contribsStr = b.weightedContributions ? Object.entries(b.weightedContributions).map(([k, v]) => `${k}: +${v} pts`).join(' · ') : '';
-    return `
-      <span>Custom Score: <b>${b.finalScore}</b></span><br>
-      <span>Configured Weights: <b>${esc(weightsStr)}</b></span><br>
-      <span>Weighted Contributions: <b>${esc(contribsStr)}</b></span>
-    `;
+function formatDiagDateRange(start, end) {
+  if (!start && !end) return '';
+  const parse = d => d ? new Date(`${d}T00:00:00`) : null;
+  const sDate = parse(start);
+  const eDate = parse(end);
+  if (!sDate && !eDate) return '';
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  if (sDate && eDate) {
+    if (sDate.getFullYear() === eDate.getFullYear()) {
+      return `${months[sDate.getMonth()]} ${sDate.getDate()} – ${months[eDate.getMonth()]} ${eDate.getDate()}, ${sDate.getFullYear()}`;
+    }
+    return `${months[sDate.getMonth()]} ${sDate.getDate()}, ${sDate.getFullYear()} – ${months[eDate.getMonth()]} ${eDate.getDate()}, ${eDate.getFullYear()}`;
   }
-  return Object.entries(b).map(([k, v]) => `<span>${esc(k)}: <b>${esc(v)}</b></span>`).join(' · ');
+  if (sDate) return `Since ${months[sDate.getMonth()]} ${sDate.getDate()}, ${sDate.getFullYear()}`;
+  return `Until ${months[eDate.getMonth()]} ${eDate.getDate()}, ${eDate.getFullYear()}`;
 }
 
-// Start
+function getDiagHexagonSvg(rank) {
+  let cls = 'place-accent';
+  let stroke = 'var(--accent, #9fd6ff)';
+  if (rank === 1) { cls = 'place-gold'; stroke = 'var(--gold, #ffcc00)'; }
+  else if (rank === 2) { cls = 'place-silver'; stroke = 'var(--silver, #d1d5db)'; }
+  else if (rank === 3) { cls = 'place-bronze'; stroke = 'var(--bronze, #d97706)'; }
+
+  const ordStr = (window.PRBadges && window.PRBadges.getOrdinal) ? window.PRBadges.getOrdinal(rank) : (rank ? rank : '-');
+  return `
+    <div class="diag-hex-wrap ${cls}">
+      <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="22,2 40,12 40,32 22,42 4,32 4,12" stroke="${stroke}" stroke-width="2" fill="rgba(16,24,50,0.85)"/>
+      </svg>
+      <span class="diag-hex-ordinal">${esc(ordStr)}</span>
+    </div>
+  `;
+}
+
+function generateDecidedSentence(playerTag, playerRank, sets, neighbors) {
+  if (!sets || sets.length === 0) return '';
+
+  const wins = sets.filter(s => s.won);
+  const losses = sets.filter(s => !s.won);
+
+  let sentence1 = '';
+  if (wins.length > 0) {
+    const oppWins = new Map();
+    for (const w of wins) {
+      if (w.opponentRank !== null && w.opponentRank !== undefined) {
+        if (!oppWins.has(w.opponentId)) {
+          oppWins.set(w.opponentId, { tag: w.opponentTag, rank: w.opponentRank, count: 0 });
+        }
+        oppWins.get(w.opponentId).count++;
+      }
+    }
+    const sortedBeaten = Array.from(oppWins.values()).sort((a, b) => a.rank - b.rank);
+    if (sortedBeaten.length > 0) {
+      const topBeaten = sortedBeaten.slice(0, 2);
+      const parts = topBeaten.map(o => {
+        const timesStr = o.count === 2 ? ', twice' : (o.count > 2 ? `, ${o.count} times` : '');
+        return `<strong>${esc(o.tag)} (#${o.rank}${timesStr})</strong>`;
+      });
+      if (parts.length === 1) {
+        sentence1 = `${esc(playerTag)} finished <strong>#${playerRank || '-'}</strong> on the strength of wins over ${parts[0]}.`;
+      } else {
+        sentence1 = `${esc(playerTag)} finished <strong>#${playerRank || '-'}</strong> on the strength of wins over ${parts[0]} and ${parts[1]}.`;
+      }
+    }
+  }
+
+  let sentence2 = '';
+  if (losses.length > 0) {
+    const sortedLosses = [...losses].sort((a, b) => a.impact - b.impact);
+    const worstLoss = sortedLosses[0];
+    if (worstLoss) {
+      const oppRankStr = worstLoss.opponentRank ? ` (#${worstLoss.opponentRank})` : '';
+      sentence2 = `The costliest result was a loss to <strong>${esc(worstLoss.opponentTag)}${oppRankStr}</strong> at ${esc(worstLoss.eventName || 'Tournament')}`;
+
+      if (neighbors && neighbors.above) {
+        const neighborAboveId = neighbors.above.playerId;
+        const setsVsAbove = sets.filter(s => s.opponentId === neighborAboveId);
+        if (setsVsAbove.length === 1 && !setsVsAbove[0].won) {
+          const s = setsVsAbove[0];
+          sentence2 += `, and the only set against <strong>${esc(neighbors.above.playerTag)} (#${neighbors.above.rank})</strong> was lost, ${esc(s.score || '1–3')}.`;
+        } else {
+          sentence2 += '.';
+        }
+      } else {
+        sentence2 += '.';
+      }
+    }
+  }
+
+  if (sentence1 && sentence2) {
+    return `${sentence1} ${sentence2}`;
+  }
+  return sentence1 || sentence2 || '';
+}
+
+function closeDiagnosticModal() {
+  if (diagnosticModal) {
+    diagnosticModal.close();
+  }
+  document.body.classList.remove('mobile-scroll-locked');
+  if (diagState.triggerElement) {
+    try { diagState.triggerElement.focus(); } catch (e) {}
+    diagState.triggerElement = null;
+  }
+}
+
+// Global modal open
+window.openDiagnosticModal = async function(playerId) {
+  diagState.triggerElement = document.activeElement;
+  diagState.playerId = String(playerId);
+  diagState.activeTab = 'summary';
+  diagState.setsFilter = 'all';
+  diagState.setsSort = 'newest';
+  diagState.showAllEvents = false;
+
+  const game = gameFilter.value;
+  diagState.game = game;
+  diagState.gameName = getGameName(game);
+  diagState.system = getActiveSystem();
+  diagState.mode = modeFilter.value;
+  diagState.startDate = diagState.mode === 'historical' ? '' : startDateInput.value;
+  diagState.endDate = diagState.mode === 'historical' ? '' : endDateInput.value;
+
+  const diagHeader = $('#diag-header');
+  const diagBody = $('#diag-body');
+
+  if (diagHeader) {
+    diagHeader.innerHTML = `
+      <div class="diag-player-head">
+        <div class="diag-player-avatar">${playerId.charAt(0).toUpperCase()}</div>
+        <div class="diag-player-meta">
+          <h2 id="diag-player-tag">Loading…</h2>
+          <span class="player-id mono muted">ID ${esc(playerId)}</span>
+        </div>
+      </div>
+      <p class="muted">Loading calculation diagnostic data…</p>
+    `;
+  }
+  if (diagBody) {
+    diagBody.innerHTML = '';
+  }
+
+  diagnosticModal.showModal();
+  document.body.classList.add('mobile-scroll-locked');
+
+  // Focus modal
+  const closeBtn = $('#modal-close-btn');
+  if (closeBtn) closeBtn.focus();
+
+  try {
+    const gameData = await getGameData(game);
+    if (!window.ClientRankingEngine) {
+      throw new Error('Ranking engine client library not found.');
+    }
+
+    const calcSystem = (diagState.system === 'overview' || diagState.system === 'comparison') ? 'glicko2' : diagState.system;
+    const engine = new window.ClientRankingEngine(gameData);
+    const result = engine.calculate(calcSystem, diagState.mode, diagState.startDate || null, diagState.endDate || null, diagState.playerId, prWeights);
+
+    // Also calculate Glicko2 if calcSystem is custom and has empty history
+    let glickoRes = null;
+    if (calcSystem === 'custom' && (!result.diagnostic || !result.diagnostic.history || result.diagnostic.history.length === 0)) {
+      try {
+        glickoRes = engine.calculate('glicko2', diagState.mode, diagState.startDate || null, diagState.endDate || null, diagState.playerId);
+      } catch (e) {}
+    }
+
+    diagState.diagData = result;
+    diagState.allRankings = result.rankings || [];
+
+    const pRankObj = diagState.allRankings.find(r => String(r.playerId) === String(diagState.playerId));
+    diagState.playerTag = pRankObj ? pRankObj.playerTag : (result.diagnostic?.playerTag || `Player ${diagState.playerId}`);
+    diagState.playerRank = pRankObj ? pRankObj.rank : (result.diagnostic?.playerRank || null);
+    diagState.finalScore = pRankObj ? pRankObj.score : (result.diagnostic?.finalScore !== null ? result.diagnostic?.finalScore : null);
+
+    // Map ranks to players for easy lookup
+    const rankMap = new Map();
+    diagState.allRankings.forEach(r => rankMap.set(String(r.playerId), r.rank));
+
+    // Normalize sets
+    const rawHistory = (result.diagnostic && result.diagnostic.history && result.diagnostic.history.length > 0)
+      ? result.diagnostic.history
+      : (glickoRes && glickoRes.diagnostic && glickoRes.diagnostic.history ? glickoRes.diagnostic.history : []);
+
+    // Filter sets by date if in period_only or period_performance
+    let filteredHistory = rawHistory;
+    if (diagState.mode !== 'historical') {
+      filteredHistory = rawHistory.filter(h => {
+        if (!h.date) return true;
+        if (diagState.startDate && h.date < diagState.startDate) return false;
+        if (diagState.endDate && h.date > diagState.endDate) return false;
+        return true;
+      });
+    }
+
+    diagState.allSets = filteredHistory.map(h => {
+      const won = h.outcome === 'win';
+      const oppId = String(h.opponentId || '');
+      const oppRank = rankMap.get(oppId) || null;
+
+      let winChance = 0.5;
+      if (h.expectedScore !== undefined && h.expectedScore !== null) {
+        winChance = parseFloat(h.expectedScore) || 0.5;
+      } else if (h.opponentPreRating !== undefined && h.playerPreRating !== undefined) {
+        const diff = (h.playerPreRating - h.opponentPreRating);
+        winChance = 1 / (1 + Math.pow(10, -diff / 400));
+      } else if (h.opponentPreRating !== undefined && h.preScore !== undefined) {
+        const diff = (h.preScore - h.opponentPreRating);
+        winChance = 1 / (1 + Math.pow(10, -diff / 400));
+      }
+
+      let impact = 0;
+      if (h.penalty !== undefined && h.penalty !== null) {
+        impact = -parseFloat(h.penalty);
+      } else if (h.contribution !== undefined && h.contribution !== null) {
+        impact = parseFloat(h.contribution);
+      } else if (h.credit !== undefined && h.credit !== null) {
+        impact = parseFloat(h.credit);
+      } else if (h.change !== undefined && h.change !== null) {
+        impact = parseFloat(h.change);
+      } else if (h.qualityPoints !== undefined && h.qualityPoints !== null) {
+        impact = parseFloat(h.qualityPoints);
+      } else {
+        impact = won ? 1.0 : -1.0;
+      }
+
+      // Format event name & clean up
+      let eventTitle = h.event || 'Tournament';
+      if (eventTitle.includes(' · ')) {
+        eventTitle = eventTitle.split(' · ')[0];
+      }
+
+      return {
+        setId: h.setId,
+        eventId: h.eventId || h.tournamentSlug || eventTitle,
+        eventName: eventTitle,
+        eventDate: h.date || '',
+        round: h.round ? (h.phase ? `${h.phase} ${h.round}` : h.round) : (h.phase || 'Bracket'),
+        opponentId: oppId,
+        opponentTag: h.opponentTag || `Player ${oppId}`,
+        opponentRank: oppRank,
+        won: won,
+        score: h.scoreDisplay || h.displayScore || (won ? 'Won' : 'Lost'),
+        winChance: Math.max(0.01, Math.min(0.99, winChance)),
+        impact: impact
+      };
+    });
+
+    // Extract events summary from placements or sets
+    const rawPlacements = (gameData.placements || []).filter(p => String(p.playerId) === String(diagState.playerId));
+    let filteredPlacements = rawPlacements;
+    if (diagState.mode !== 'historical') {
+      filteredPlacements = rawPlacements.filter(p => {
+        if (!p.date) return true;
+        if (diagState.startDate && p.date < diagState.startDate) return false;
+        if (diagState.endDate && p.date > diagState.endDate) return false;
+        return true;
+      });
+    }
+
+    const eventMap = new Map();
+    filteredPlacements.forEach(p => {
+      const key = p.tournamentName || p.eventName || p.eventId;
+      if (!eventMap.has(key)) {
+        eventMap.set(key, {
+          name: p.tournamentName || p.eventName || 'Tournament',
+          date: p.date || '',
+          placement: p.placement,
+          entrants: p.entrants || 0
+        });
+      }
+    });
+
+    // Also populate any events in sets that might be missing in placements
+    diagState.allSets.forEach(s => {
+      if (!eventMap.has(s.eventName)) {
+        eventMap.set(s.eventName, {
+          name: s.eventName,
+          date: s.eventDate,
+          placement: null,
+          entrants: null
+        });
+      }
+    });
+
+    diagState.allEvents = Array.from(eventMap.values()).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+
+    // Render modal view
+    renderDiagnosticHeader();
+    bindDiagnosticTabs();
+    renderDiagnosticActiveTab();
+
+  } catch (err) {
+    if (diagHeader) {
+      diagHeader.innerHTML = `<h2>Diagnostic Error</h2>`;
+    }
+    if (diagBody) {
+      diagBody.innerHTML = `<div class="diag-empty-card"><p>${esc(err.message)}</p></div>`;
+    }
+  }
+};
+
+function renderDiagnosticHeader() {
+  const diagHeader = $('#diag-header');
+  if (!diagHeader) return;
+
+  const tag = diagState.playerTag;
+  const pId = diagState.playerId;
+  const rank = diagState.playerRank;
+  const score = diagState.finalScore !== null ? diagState.finalScore : '-';
+  const scoreNum = parseFloat(score) || 0;
+  const isGlicko = diagState.system === 'glicko2' || (scoreNum > 100);
+  const maxScore = isGlicko ? (Math.max(2200, Math.ceil(scoreNum / 100) * 100)) : 100;
+  const scorePct = Math.min(100, Math.max(0, (scoreNum / maxScore) * 100));
+
+  // Determine neighbors for summary sentence & where it sits
+  const neighbors = getPlayerNeighbors(pId, diagState.allRankings);
+
+  // Date range formatted chip
+  const dateRangeStr = formatDiagDateRange(diagState.startDate, diagState.endDate) || (diagState.mode === 'historical' ? 'All-time' : 'Full history');
+  const systemName = (diagState.system === 'custom' || diagState.system === 'power_rankings') ? 'Power Rankings' : (getSystemNames()[diagState.system] || diagState.system);
+
+  const initial = tag.charAt(0).toUpperCase();
+
+  let rankCls = 'place-accent';
+  if (rank === 1) rankCls = 'place-gold';
+  else if (rank === 2) rankCls = 'place-silver';
+  else if (rank === 3) rankCls = 'place-bronze';
+
+  const decidedSentence = generateDecidedSentence(tag, rank, diagState.allSets, neighbors);
+
+  diagHeader.innerHTML = `
+    <div class="diag-player-head">
+      <div class="diag-player-avatar" id="diag-player-avatar">
+        <img src="assets/players/${esc(pId)}.png" alt="${esc(tag)}" onerror="this.onerror=null; this.parentNode.textContent='${esc(initial)}';">
+      </div>
+      <div class="diag-player-meta">
+        <h2 id="diag-player-tag">${esc(tag)}</h2>
+        <span class="player-id mono muted">ID ${esc(pId)}</span>
+      </div>
+    </div>
+
+    <div class="diag-chips-row" id="diag-chips">
+      <span class="diag-chip">${esc(diagState.gameName)}</span>
+      <span class="diag-chip">${esc(systemName)}</span>
+      <span class="diag-chip">${esc(dateRangeStr)}</span>
+      ${diagState.mode === 'period_only' ? '<span class="diag-chip muted">Counts this period only</span>' : ''}
+    </div>
+
+    <div class="diag-stats-summary-row">
+      <div class="diag-badge-card diag-rank-block">
+        ${getDiagHexagonSvg(rank)}
+        <div class="diag-rank-num-group">
+          <span class="rank-label">Rank</span>
+          <span class="rank-val ${rankCls}">#${rank ? rank : '-'}</span>
+        </div>
+      </div>
+
+      <div class="diag-badge-card score-card">
+        <div class="diag-score-title">Final Score</div>
+        <div class="diag-score-value-row">
+          <span class="score-num font-bold">${score}</span>
+          <span class="score-max">/ ${maxScore}</span>
+        </div>
+        <div class="diag-progress-track">
+          <div class="diag-progress-fill" style="width:${scorePct}%;"></div>
+        </div>
+      </div>
+    </div>
+
+    ${decidedSentence ? `
+      <div class="diag-decided-wrap">
+        <div class="diag-decided-label">What decided this rank</div>
+        <div class="diag-decided-text">${decidedSentence}</div>
+      </div>
+    ` : ''}
+  `;
+
+  // Update tab labels (e.g. Sets (24))
+  const setsTab = $('#diag-tab-sets');
+  if (setsTab) {
+    setsTab.textContent = `Sets (${diagState.allSets.length})`;
+  }
+}
+
+function getPlayerNeighbors(playerId, rankings) {
+  if (!rankings || rankings.length === 0) return { above: null, below: null, list: [] };
+  const idx = rankings.findIndex(r => String(r.playerId) === String(playerId));
+  if (idx === -1) return { above: null, below: null, list: [] };
+
+  const current = rankings[idx];
+  const above = idx > 0 ? rankings[idx - 1] : null;
+  const below = idx < rankings.length - 1 ? rankings[idx + 1] : null;
+
+  // Window of up to 4 rows
+  let start = Math.max(0, idx - 1);
+  let end = Math.min(rankings.length, start + 4);
+  if (end - start < 4 && start > 0) {
+    start = Math.max(0, end - 4);
+  }
+  const list = rankings.slice(start, end);
+
+  return { current, above, below, list };
+}
+
+function bindDiagnosticTabs() {
+  const tabs = [
+    { id: 'diag-tab-summary', key: 'summary' },
+    { id: 'diag-tab-sets', key: 'sets' },
+    { id: 'diag-tab-method', key: 'method' }
+  ];
+
+  tabs.forEach((tabInfo, idx) => {
+    const el = $(`#${tabInfo.id}`);
+    if (!el) return;
+
+    el.onclick = () => {
+      setDiagActiveTab(tabInfo.key);
+    };
+
+    el.onkeydown = (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+        e.preventDefault();
+        const nextIdx = e.key === 'ArrowRight' ? (idx + 1) % tabs.length : (idx - 1 + tabs.length) % tabs.length;
+        const nextEl = $(`#${tabs[nextIdx].id}`);
+        if (nextEl) {
+          nextEl.focus();
+          setDiagActiveTab(tabs[nextIdx].key);
+        }
+      }
+    };
+  });
+}
+
+function setDiagActiveTab(tabKey) {
+  diagState.activeTab = tabKey;
+  ['summary', 'sets', 'method'].forEach(k => {
+    const tabEl = $(`#diag-tab-${k}`);
+    if (tabEl) {
+      const active = (k === tabKey);
+      tabEl.classList.toggle('active', active);
+      tabEl.setAttribute('aria-selected', active ? 'true' : 'false');
+      tabEl.setAttribute('tabindex', active ? '0' : '-1');
+    }
+  });
+  renderDiagnosticActiveTab();
+}
+
+function renderDiagnosticActiveTab() {
+  const diagBody = $('#diag-body');
+  if (!diagBody) return;
+
+  if (diagState.activeTab === 'summary') {
+    diagBody.innerHTML = renderDiagSummaryTab();
+  } else if (diagState.activeTab === 'sets') {
+    diagBody.innerHTML = renderDiagSetsTab();
+    bindDiagSetsControls();
+  } else if (diagState.activeTab === 'method') {
+    diagBody.innerHTML = renderDiagMethodTab();
+  }
+}
+
+function renderDiagSummaryTab() {
+  const sets = diagState.allSets;
+  const events = diagState.allEvents;
+  const pId = diagState.playerId;
+  const pTag = diagState.playerTag;
+  const rank = diagState.playerRank;
+  const neighbors = getPlayerNeighbors(pId, diagState.allRankings);
+
+  // 1. At a glance metrics
+  const setsPlayedCount = sets.length;
+  const winsCount = sets.filter(s => s.won).length;
+  const lossesCount = sets.filter(s => !s.won).length;
+  const winRate = setsPlayedCount > 0 ? Math.round((winsCount / setsPlayedCount) * 100) : 0;
+
+  const eventsCount = events.length;
+  let eventDatesStr = '—';
+  if (events.length > 0) {
+    const sortedEv = [...events].filter(e => e.date).sort((a, b) => a.date.localeCompare(b.date));
+    if (sortedEv.length > 0) {
+      const firstD = sortedEv[0].date;
+      const lastD = sortedEv[sortedEv.length - 1].date;
+      eventDatesStr = formatDiagDateRange(firstD, lastD) || `${firstD} – ${lastD}`;
+    }
+  }
+
+  // Best Result
+  let bestPlacingStr = '—';
+  let bestEventSub = '—';
+  const placements = events.filter(e => e.placement !== null && e.placement !== undefined);
+  if (placements.length > 0) {
+    const sortedP = [...placements].sort((a, b) => a.placement - b.placement);
+    const bestP = sortedP[0];
+    const ord = (window.PRBadges && window.PRBadges.getOrdinal) ? window.PRBadges.getOrdinal(bestP.placement) : `#${bestP.placement}`;
+    bestPlacingStr = ord;
+    bestEventSub = `${bestP.name}${bestP.entrants ? ` · ${bestP.entrants}` : ''}`;
+  }
+
+  // Record vs Top 10
+  const top10Sets = sets.filter(s => s.opponentRank !== null && s.opponentRank <= 10);
+  const top10Wins = top10Sets.filter(s => s.won).length;
+  const top10Losses = top10Sets.filter(s => !s.won).length;
+  const top10Rate = top10Sets.length > 0 ? Math.round((top10Wins / top10Sets.length) * 100) : 0;
+
+  // 2. Where #N sits
+  let whereSitsHtml = '';
+  if (neighbors.list && neighbors.list.length > 0) {
+    const scoreRowsHtml = neighbors.list.map(r => {
+      const isCur = String(r.playerId) === String(pId);
+      const sc = parseFloat(r.score) || 0;
+      const maxSc = (diagState.system === 'glicko2') ? 2200 : 100;
+      const pct = Math.min(100, Math.max(0, (sc / maxSc) * 100));
+      let rankCls = 'place-accent';
+      if (r.rank === 1) rankCls = 'place-gold';
+      else if (r.rank === 2) rankCls = 'place-silver';
+      else if (r.rank === 3) rankCls = 'place-bronze';
+
+      return `
+        <div class="diag-score-row ${isCur ? 'current' : ''}">
+          <span class="rank-num ${rankCls}">#${r.rank}</span>
+          <span class="player-tag">${esc(r.playerTag)}</span>
+          <div class="score-bar-wrap">
+            <div class="score-bar-fill" style="width:${pct}%;"></div>
+          </div>
+          <span class="score-num font-mono">${r.score}</span>
+        </div>
+      `;
+    }).join('');
+
+    // H2H against above and below
+    const compareNeighbors = [neighbors.above, neighbors.below].filter(Boolean);
+    const h2hRowsHtml = compareNeighbors.map(nb => {
+      const vsSets = sets.filter(s => s.opponentId === String(nb.playerId));
+      const w = vsSets.filter(s => s.won).length;
+      const l = vsSets.filter(s => !s.won).length;
+      let desc = 'No sets recorded';
+      if (vsSets.length > 0) {
+        const sortedVs = [...vsSets].sort((a, b) => (b.eventDate || '').localeCompare(a.eventDate || ''));
+        const latest = sortedVs[0];
+        if (latest.score && latest.score !== 'Won' && latest.score !== 'Lost') {
+          desc = `${latest.won ? 'Won' : 'Lost'} ${latest.score} at ${latest.eventName}`;
+        } else {
+          desc = `${latest.won ? 'Won' : 'Lost'} at ${latest.eventName}`;
+        }
+      }
+      return `
+        <div class="diag-h2h-row">
+          <div class="diag-h2h-info">
+            <div>
+              <span class="opp-tag">${esc(nb.playerTag)}</span>
+              <span class="opp-rank">#${nb.rank}</span>
+            </div>
+            <span class="opp-detail">${esc(desc)}</span>
+          </div>
+          <span class="diag-h2h-score font-mono">${w}–${l}</span>
+        </div>
+      `;
+    }).join('');
+
+    // Why sentences
+    let whySentences = [];
+    if (neighbors.above) {
+      const nb = neighbors.above;
+      const vsSets = sets.filter(s => s.opponentId === String(nb.playerId));
+      const w = vsSets.filter(s => s.won).length;
+      const l = vsSets.filter(s => !s.won).length;
+      const ptsBehind = Math.abs(Math.round(((nb.score || 0) - (diagState.finalScore || 0)) * 10) / 10);
+      let vsStr = (vsSets.length === 1 && l === 1) ? `lost the only set against ${esc(nb.playerTag)} (${vsSets[0].score || '1–3'})` : `is ${w}–${l} against ${esc(nb.playerTag)}`;
+      whySentences.push(`<strong>Why #${rank} and not #${nb.rank}:</strong> ${esc(pTag)} ${vsStr} and finished ${ptsBehind} points behind.`);
+    }
+    if (neighbors.below) {
+      const nb = neighbors.below;
+      const vsSets = sets.filter(s => s.opponentId === String(nb.playerId));
+      const w = vsSets.filter(s => s.won).length;
+      const l = vsSets.filter(s => !s.won).length;
+      const ptsAhead = Math.abs(Math.round(((diagState.finalScore || 0) - (nb.score || 0)) * 10) / 10);
+      whySentences.push(`<strong>Why not #${nb.rank}:</strong> ${esc(pTag)} leads ${esc(nb.playerTag)} ${w}–${l} and by ${ptsAhead} points.`);
+    }
+
+    whereSitsHtml = `
+      <div class="diag-card">
+        <h3 class="diag-card-title">Where #${rank || '-'} sits</h3>
+        <p class="diag-card-subtitle">The players on either side of ${esc(pTag)}, and how ${esc(pTag)} did against them.</p>
+
+        <div class="diag-where-grid">
+          <div>
+            <div class="diag-section-label">Final scores</div>
+            <div class="diag-score-rows">${scoreRowsHtml}</div>
+          </div>
+          <div>
+            <div class="diag-section-label">Head-to-head</div>
+            <div class="diag-h2h-rows">${h2hRowsHtml}</div>
+          </div>
+        </div>
+
+        ${whySentences.length > 0 ? `
+          <div class="diag-why-box">
+            ${whySentences.join(' ')}
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }
+
+  // 3. Moments that shaped it
+  let momentsHtml = '';
+  if (setsPlayedCount === 0) {
+    momentsHtml = `
+      <div class="diag-card">
+        <h3 class="diag-card-title">Moments that shaped it</h3>
+        <p class="diag-card-subtitle">The sets that moved the score the most.</p>
+        <div class="diag-empty-card">
+          No sets are recorded for this player between ${esc(diagState.startDate || 'start')} and ${esc(diagState.endDate || 'end')}, so no significant win or loss moments could be identified.
+        </div>
+      </div>
+    `;
+  } else {
+    const wins = sets.filter(s => s.won).sort((a, b) => b.impact - a.impact).slice(0, 3);
+    const losses = sets.filter(s => !s.won).sort((a, b) => a.impact - b.impact).slice(0, 3);
+
+    const renderMomentItem = (item) => {
+      const oppRankStr = item.opponentRank ? `<span class="opp-rank">#${item.opponentRank}</span>` : '';
+      const roundScore = `${item.round} · ${item.score}`;
+      const sign = item.impact > 0 ? `+${item.impact}` : `${item.impact}`;
+      const cls = item.impact >= 0 ? 'pos' : 'neg';
+
+      return `
+        <div class="diag-moment-item">
+          <div class="diag-moment-info">
+            <div>
+              <span class="opp-name">${esc(item.opponentTag)}</span>
+              ${oppRankStr}
+            </div>
+            <span class="event-round">${esc(item.eventName)} · ${esc(roundScore)}</span>
+          </div>
+          <span class="diag-impact-val ${cls}">${sign}</span>
+        </div>
+      `;
+    };
+
+    momentsHtml = `
+      <div class="diag-card">
+        <h3 class="diag-card-title">Moments that shaped it</h3>
+        <p class="diag-card-subtitle">The sets that moved the score the most.</p>
+        <div class="diag-moments-grid">
+          <div>
+            <div class="diag-section-label">Best wins</div>
+            <div class="diag-moment-list">
+              ${wins.length > 0 ? wins.map(renderMomentItem).join('') : '<div class="muted font-13">No recorded wins</div>'}
+            </div>
+          </div>
+          <div>
+            <div class="diag-section-label">Costliest losses</div>
+            <div class="diag-moment-list">
+              ${losses.length > 0 ? losses.map(renderMomentItem).join('') : '<div class="muted font-13">No recorded losses</div>'}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // 4. Score over the period (SVG chart)
+  let chartHtml = '';
+  if (setsPlayedCount === 0) {
+    chartHtml = `
+      <div class="diag-card">
+        <h3 class="diag-card-title">Score over the period</h3>
+        <p class="diag-card-subtitle">The score after each event.</p>
+        <div class="diag-empty-card">
+          No sets are recorded for this player between ${esc(diagState.startDate || 'start')} and ${esc(diagState.endDate || 'end')}, so score progression is unavailable.
+        </div>
+      </div>
+    `;
+  } else {
+    chartHtml = `
+      <div class="diag-card">
+        <h3 class="diag-card-title">Score over the period</h3>
+        <p class="diag-card-subtitle">The score after each event. The larger dot is the biggest gain.</p>
+        <div class="diag-chart-container">
+          ${renderScoreChartSvg(sets, events)}
+        </div>
+      </div>
+    `;
+  }
+
+  // 5. Footnote
+  const footnoteHtml = `
+    <div class="diag-footnote">
+      Based on ${setsPlayedCount} sets across ${eventsCount} events
+    </div>
+  `;
+
+  return `
+    <div class="diag-glance-grid">
+      <div class="diag-glance-tile">
+        <span class="tile-label">Sets played</span>
+        <span class="tile-value">${setsPlayedCount}</span>
+        <span class="tile-sub">${setsPlayedCount > 0 ? `${winsCount}W – ${lossesCount}L · ${winRate}% win rate` : '—'}</span>
+      </div>
+      <div class="diag-glance-tile">
+        <span class="tile-label">Events</span>
+        <span class="tile-value">${eventsCount}</span>
+        <span class="tile-sub">${esc(eventDatesStr)}</span>
+      </div>
+      <div class="diag-glance-tile">
+        <span class="tile-label">Best result</span>
+        <span class="tile-value">${bestPlacingStr}</span>
+        <span class="tile-sub">${esc(bestEventSub)}</span>
+      </div>
+      <div class="diag-glance-tile">
+        <span class="tile-label">vs Top 10</span>
+        <span class="tile-value">${top10Sets.length > 0 ? `${top10Wins}–${top10Losses}` : '0–0'}</span>
+        <span class="tile-sub">${top10Sets.length > 0 ? `${top10Rate}% win rate` : '—'}</span>
+      </div>
+    </div>
+
+    ${whereSitsHtml}
+    ${momentsHtml}
+    ${chartHtml}
+    ${footnoteHtml}
+  `;
+}
+
+// Generate the responsive SVG score chart
+function renderScoreChartSvg(sets, events) {
+  const eventsByDate = [...events].filter(e => e.date).sort((a, b) => a.date.localeCompare(b.date));
+  let runningScore = 50;
+  const points = [];
+  let biggestGain = -Infinity;
+  let biggestGainPoint = null;
+
+  if (eventsByDate.length === 0) {
+    points.push({ label: 'Initial', score: diagState.finalScore || 70, date: '2025-01-01' });
+  } else {
+    eventsByDate.forEach(ev => {
+      const evSets = sets.filter(s => s.eventName === ev.name);
+      let evImpact = evSets.reduce((acc, s) => acc + s.impact, 0);
+      runningScore += evImpact;
+      const pt = { label: ev.name, score: Math.round(runningScore * 10) / 10, date: ev.date, gain: evImpact };
+      points.push(pt);
+      if (evImpact > biggestGain) {
+        biggestGain = evImpact;
+        biggestGainPoint = pt;
+      }
+    });
+  }
+
+  if (diagState.finalScore !== null && points.length > 0) {
+    const delta = (diagState.finalScore - points[points.length - 1].score);
+    points.forEach(p => p.score = Math.round((p.score + delta) * 10) / 10);
+  }
+
+  const scores = points.map(p => p.score);
+  const minScore = Math.floor(Math.min(...scores, 50) / 10) * 10;
+  const maxScore = Math.ceil(Math.max(...scores, 80) / 10) * 10;
+  const range = Math.max(1, maxScore - minScore);
+
+  const w = 800;
+  const h = 260;
+  const padLeft = 45;
+  const padRight = 70;
+  const padTop = 30;
+  const padBottom = 40;
+
+  const chartW = w - padLeft - padRight;
+  const chartH = h - padTop - padBottom;
+
+  const getX = (idx) => padLeft + (points.length <= 1 ? chartW / 2 : (idx / (points.length - 1)) * chartW);
+  const getY = (val) => padTop + chartH - ((val - minScore) / range) * chartH;
+
+  const coords = points.map((p, idx) => ({ x: getX(idx), y: getY(p.score), ...p }));
+
+  const lineD = coords.map((c, i) => `${i === 0 ? 'M' : 'L'} ${c.x.toFixed(1)} ${c.y.toFixed(1)}`).join(' ');
+  const areaD = `${lineD} L ${coords[coords.length - 1].x.toFixed(1)} ${(padTop + chartH).toFixed(1)} L ${coords[0].x.toFixed(1)} ${(padTop + chartH).toFixed(1)} Z`;
+
+  // Grid lines
+  const gridVals = [minScore, Math.round((minScore + maxScore) / 2), maxScore];
+  const gridLines = gridVals.map(val => {
+    const y = getY(val);
+    return `
+      <line x1="${padLeft}" y1="${y}" x2="${w - padRight}" y2="${y}" stroke="rgba(255,255,255,0.08)" stroke-dasharray="4,4"/>
+      <text x="${padLeft - 10}" y="${y + 4}" fill="#94a3b8" font-size="11" font-family="'JetBrains Mono', monospace" text-anchor="end">${val}</text>
+    `;
+  }).join('');
+
+  // Months on x axis
+  const monthLetters = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
+  const monthLabels = monthLetters.map((m, i) => {
+    const x = padLeft + (i / 11) * chartW;
+    return `<text x="${x}" y="${h - 10}" fill="#94a3b8" font-size="11" font-family="'JetBrains Mono', monospace" text-anchor="middle">${m}</text>`;
+  }).join('');
+
+  // Biggest gain point marker
+  let biggestGainSvg = '';
+  if (biggestGainPoint) {
+    const bgCoord = coords.find(c => c.label === biggestGainPoint.label) || coords[0];
+    const sign = bgCoord.gain > 0 ? `+${Math.round(bgCoord.gain * 10) / 10}` : `${Math.round(bgCoord.gain * 10) / 10}`;
+    biggestGainSvg = `
+      <circle cx="${bgCoord.x}" cy="${bgCoord.y}" r="7" fill="var(--accent, #9fd6ff)" stroke="rgba(16,24,50,0.9)" stroke-width="2"/>
+      <text x="${bgCoord.x - 8}" y="${bgCoord.y - 12}" fill="#fff" font-size="12" font-family="'Space Grotesk', sans-serif" font-weight="600" text-anchor="end">${esc(bgCoord.label)} ${sign}</text>
+    `;
+  }
+
+  // Final point marker
+  const lastCoord = coords[coords.length - 1];
+  const finalSvg = `
+    <circle cx="${lastCoord.x}" cy="${lastCoord.y}" r="4" fill="var(--accent, #9fd6ff)"/>
+    <text x="${lastCoord.x}" y="${lastCoord.y - 12}" fill="#fff" font-size="12" font-family="'Space Grotesk', sans-serif" font-weight="700" text-anchor="middle">Finished at ${lastCoord.score}</text>
+  `;
+
+  return `
+    <svg class="diag-chart-svg" viewBox="0 0 ${w} ${h}" role="img" aria-label="Score progression chart from ${minScore} to ${maxScore}, finishing at ${diagState.finalScore || scores[scores.length - 1]}">
+      <defs>
+        <linearGradient id="diagChartGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="var(--accent, #9fd6ff)" stop-opacity="0.25"/>
+          <stop offset="100%" stop-color="var(--accent, #9fd6ff)" stop-opacity="0.0"/>
+        </linearGradient>
+      </defs>
+      ${gridLines}
+      ${monthLabels}
+      <path d="${areaD}" fill="url(#diagChartGrad)"/>
+      <path d="${lineD}" fill="none" stroke="var(--accent, #9fd6ff)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      ${coords.map(c => `<circle cx="${c.x}" cy="${c.y}" r="3" fill="var(--accent, #9fd6ff)"/>`).join('')}
+      ${biggestGainSvg}
+      ${finalSvg}
+    </svg>
+  `;
+}
+
+// Sets Tab Rendering
+function renderDiagSetsTab() {
+  const allSets = diagState.allSets;
+
+  if (allSets.length === 0) {
+    return `
+      <div class="diag-card">
+        <h3 class="diag-card-title">Sets (${allSets.length})</h3>
+        <div class="diag-empty-card">
+          No sets are recorded for this player between ${esc(diagState.startDate || 'start')} and ${esc(diagState.endDate || 'end')}.
+        </div>
+      </div>
+      <div class="diag-footnote">0 sets across 0 events</div>
+    `;
+  }
+
+  // Filter sets
+  let filtered = allSets;
+  if (diagState.setsFilter === 'wins') {
+    filtered = allSets.filter(s => s.won);
+  } else if (diagState.setsFilter === 'losses') {
+    filtered = allSets.filter(s => !s.won);
+  } else if (diagState.setsFilter === 'impact') {
+    filtered = [...allSets].sort((a, b) => Math.abs(b.impact) - Math.abs(a.impact));
+  }
+
+  // Sort sets
+  let sorted = [...filtered];
+  if (diagState.setsSort === 'newest') {
+    sorted.sort((a, b) => (b.eventDate || '').localeCompare(a.eventDate || ''));
+  } else if (diagState.setsSort === 'oldest') {
+    sorted.sort((a, b) => (a.eventDate || '').localeCompare(b.eventDate || ''));
+  } else if (diagState.setsSort === 'impact') {
+    sorted.sort((a, b) => Math.abs(b.impact) - Math.abs(a.impact));
+  }
+
+  // Group by event
+  const eventGroupMap = new Map();
+  sorted.forEach(s => {
+    if (!eventGroupMap.has(s.eventName)) {
+      const evMeta = diagState.allEvents.find(e => e.name === s.eventName) || { name: s.eventName, date: s.eventDate, placement: null, entrants: null };
+      eventGroupMap.set(s.eventName, {
+        meta: evMeta,
+        sets: []
+      });
+    }
+    eventGroupMap.get(s.eventName).sets.push(s);
+  });
+
+  const eventGroups = Array.from(eventGroupMap.values());
+  const visibleGroups = diagState.showAllEvents ? eventGroups : eventGroups.slice(0, 3);
+
+  const winsCount = allSets.filter(s => s.won).length;
+  const lossesCount = allSets.filter(s => !s.won).length;
+
+  const eventCardsHtml = visibleGroups.map(grp => {
+    const ev = grp.meta;
+    const netImpact = Math.round(grp.sets.reduce((acc, s) => acc + s.impact, 0) * 10) / 10;
+    const netSign = netImpact > 0 ? `+${netImpact}` : `${netImpact}`;
+    const netCls = netImpact >= 0 ? 'pos' : 'neg';
+
+    const placeStr = ev.placement ? `${(window.PRBadges && window.PRBadges.getOrdinal) ? window.PRBadges.getOrdinal(ev.placement) : '#' + ev.placement}${ev.entrants ? ' of ' + ev.entrants : ''}` : '';
+    const datePlaceStr = [ev.date, placeStr].filter(Boolean).join(' · ');
+
+    const rowsHtml = grp.sets.map(s => {
+      const oppRankStr = s.opponentRank ? `<span class="opp-rank">#${s.opponentRank}</span>` : '';
+      const resCls = s.won ? 'pos' : 'neg';
+      const resText = s.won ? `W ${s.score}` : `L ${s.score}`;
+      const impSign = s.impact > 0 ? `+${s.impact}` : `${s.impact}`;
+      const impCls = s.impact >= 0 ? 'pos' : 'neg';
+      const pct = Math.round(s.winChance * 100);
+
+      // Desktop row
+      const desktopRow = `
+        <div class="diag-set-row-desktop">
+          <span class="set-round">${esc(s.round)}</span>
+          <span class="set-opp">${esc(s.opponentTag)} ${oppRankStr}</span>
+          <span class="set-res ${resCls}">${esc(resText)}</span>
+          <div class="set-chance-wrap">
+            <div class="chance-bar"><div class="chance-bar-fill" style="width:${pct}%;"></div></div>
+            <span class="chance-num font-mono">${pct}%</span>
+          </div>
+          <span class="set-impact font-mono ${impCls}">${impSign}</span>
+        </div>
+      `;
+
+      // Mobile card
+      const mobileCard = `
+        <div class="diag-set-card-mobile">
+          <div class="line-1">
+            <span class="round-caps font-mono">${esc(s.round)}</span>
+            <span class="diag-impact-val ${impCls}">${impSign}</span>
+          </div>
+          <div class="line-2">
+            <div>
+              <span class="opp-bold">${esc(s.opponentTag)}</span>
+              ${oppRankStr}
+            </div>
+            <span class="score-res ${resCls}">${esc(resText)}</span>
+          </div>
+          <div class="line-3">
+            <span class="chance-label">WIN CHANCE</span>
+            <div class="chance-bar"><div class="chance-bar-fill" style="width:${pct}%;"></div></div>
+            <span class="chance-num">${pct}%</span>
+          </div>
+        </div>
+      `;
+
+      return desktopRow + mobileCard;
+    }).join('');
+
+    return `
+      <div class="diag-event-card">
+        <div class="diag-event-head">
+          <div class="diag-event-meta">
+            <h4 class="diag-event-name">${esc(ev.name)}</h4>
+            <span class="diag-event-sub">${esc(datePlaceStr)}</span>
+          </div>
+          <div class="diag-event-impact">
+            <span class="net-label">Net impact</span>
+            <span class="net-val ${netCls}">${netSign}</span>
+          </div>
+        </div>
+        ${rowsHtml}
+      </div>
+    `;
+  }).join('');
+
+  const showMoreBtnHtml = (!diagState.showAllEvents && eventGroups.length > 3) ? `
+    <button class="diag-show-more-btn" id="diag-btn-show-all-events">
+      Show all ${eventGroups.length} events
+    </button>
+  ` : '';
+
+  return `
+    <div class="diag-sets-toolbar">
+      <div class="diag-filter-chips">
+        <button class="diag-filter-btn ${diagState.setsFilter === 'all' ? 'active' : ''}" data-filter="all">All ${allSets.length}</button>
+        <button class="diag-filter-btn ${diagState.setsFilter === 'wins' ? 'active' : ''}" data-filter="wins">Wins ${winsCount}</button>
+        <button class="diag-filter-btn ${diagState.setsFilter === 'losses' ? 'active' : ''}" data-filter="losses">Losses ${lossesCount}</button>
+        <button class="diag-filter-btn ${diagState.setsFilter === 'impact' ? 'active' : ''}" data-filter="impact">Biggest impact</button>
+      </div>
+
+      <div class="diag-sort-wrap">
+        <label for="diag-sort-select" class="mono muted font-12">Sort by:</label>
+        <select id="diag-sort-select" class="diag-sort-select">
+          <option value="newest" ${diagState.setsSort === 'newest' ? 'selected' : ''}>Newest first</option>
+          <option value="oldest" ${diagState.setsSort === 'oldest' ? 'selected' : ''}>Oldest first</option>
+          <option value="impact" ${diagState.setsSort === 'impact' ? 'selected' : ''}>Biggest impact</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="diag-sets-explanation">
+      Win chance indicates estimated probability before the set; Impact indicates points gained or lost.
+    </div>
+
+    <div class="diag-table-head-row">
+      <span>ROUND</span>
+      <span>OPPONENT</span>
+      <span>RESULT</span>
+      <span>WIN CHANCE BEFORE SET</span>
+      <span style="text-align:right;">IMPACT</span>
+    </div>
+
+    <div class="diag-event-cards">
+      ${eventCardsHtml}
+    </div>
+
+    ${showMoreBtnHtml}
+
+    <div class="diag-footnote">
+      Based on ${allSets.length} sets across ${diagState.allEvents.length} events
+    </div>
+  `;
+}
+
+function bindDiagSetsControls() {
+  const filterBtns = document.querySelectorAll('.diag-filter-btn');
+  filterBtns.forEach(btn => {
+    btn.onclick = () => {
+      diagState.setsFilter = btn.getAttribute('data-filter');
+      renderDiagnosticActiveTab();
+    };
+  });
+
+  const sortSelect = $('#diag-sort-select');
+  if (sortSelect) {
+    sortSelect.onchange = () => {
+      diagState.setsSort = sortSelect.value;
+      renderDiagnosticActiveTab();
+    };
+  }
+
+  const showMoreBtn = $('#diag-btn-show-all-events');
+  if (showMoreBtn) {
+    showMoreBtn.onclick = () => {
+      diagState.showAllEvents = true;
+      renderDiagnosticActiveTab();
+    };
+  }
+}
+
+// Method Tab Rendering
+function renderDiagMethodTab() {
+  const algo = diagState.diagData?.algorithm || {};
+  const sysKey = diagState.system;
+  const sysName = (sysKey === 'custom' || sysKey === 'power_rankings') ? 'Power Rankings' : (algo.name || sysKey);
+
+  const dateRangeStr = formatDiagDateRange(diagState.startDate, diagState.endDate) || (diagState.mode === 'historical' ? 'All-time (no date restrictions)' : 'Full period');
+
+  let modeDescription = 'Historical: uses all recorded sets across tournament history.';
+  if (diagState.mode === 'period_only') {
+    modeDescription = 'Period only: only sets played inside this date range count.';
+  } else if (diagState.mode === 'period_performance') {
+    modeDescription = 'Period performance: pre-period history establishes starting baseline ratings; performance is evaluated over the date range.';
+  }
+
+  const rawConfig = {
+    system: sysKey,
+    mode: diagState.mode,
+    dateRange: {
+      start: diagState.startDate || null,
+      end: diagState.endDate || null
+    },
+    formula: algo.parameters?.formula || algo.description || 'Conservative Rating = r - 2*RD',
+    weights: diagState.diagData?.weights || prWeights,
+    parameters: algo.parameters || {}
+  };
+
+  return `
+    <div class="diag-card">
+      <h3 class="diag-card-title">Rules for this ranking</h3>
+      <dl class="diag-method-defs">
+        <div class="diag-def-item">
+          <dt>SYSTEM</dt>
+          <dd>${esc(sysName)}</dd>
+        </div>
+        <div class="diag-def-item">
+          <dt>GAME</dt>
+          <dd>${esc(diagState.gameName)}</dd>
+        </div>
+        <div class="diag-def-item">
+          <dt>DATE RANGE</dt>
+          <dd>${esc(dateRangeStr)}</dd>
+        </div>
+        <div class="diag-def-item">
+          <dt>MODE</dt>
+          <dd>${esc(modeDescription)}</dd>
+        </div>
+      </dl>
+    </div>
+
+    <div class="diag-card">
+      <h3 class="diag-card-title">How to read the Sets tab</h3>
+      <dl class="diag-method-defs">
+        <div class="diag-def-item">
+          <dt>Round</dt>
+          <dd>The tournament round or bracket phase in which the match was played.</dd>
+        </div>
+        <div class="diag-def-item">
+          <dt>Opponent rank</dt>
+          <dd>The final standing of the opponent in this ranking.</dd>
+        </div>
+        <div class="diag-def-item">
+          <dt>Result</dt>
+          <dd>Whether the set was won (W) or lost (L) along with the final game count.</dd>
+        </div>
+        <div class="diag-def-item">
+          <dt>Win chance</dt>
+          <dd>The pre-match predicted probability of victory based on relative ratings.</dd>
+        </div>
+        <div class="diag-def-item">
+          <dt>Impact</dt>
+          <dd>The signed rating or standing point delta resulting from the match outcome.</dd>
+        </div>
+      </dl>
+    </div>
+
+    <div class="diag-card">
+      <h3 class="diag-card-title">Raw configuration</h3>
+      <pre class="diag-code-block" tabindex="0">${esc(JSON.stringify(rawConfig, null, 2))}</pre>
+    </div>
+  `;
+}
+
+
 document.addEventListener('DOMContentLoaded', init);
