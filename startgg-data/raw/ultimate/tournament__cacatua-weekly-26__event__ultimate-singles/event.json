@@ -1,0 +1,47 @@
+{
+  "fetchedAt": "2026-11-11T04:12:23.142925+00:00",
+  "sourceUrl": "https://www.start.gg/tournament/cacatua-weekly-26/event/ultimate-singles",
+  "operationName": "GetEvent",
+  "variables": {
+    "slug": "tournament/cacatua-weekly-26/event/ultimate-singles"
+  },
+  "response": {
+    "data": {
+      "event": {
+        "id": 1737990,
+        "name": "Ultimate Singles",
+        "numEntrants": 5,
+        "startAt": 1794769200,
+        "state": "CREATED",
+        "tournament": {
+          "id": 966534,
+          "name": "Cacatua Weekly #26",
+          "slug": "tournament/cacatua-weekly-26",
+          "startAt": 1794769200,
+          "images": [
+            {
+              "url": "https://images.start.gg/images/tournament/966534/image-3015af768f240197be0dab86b1210f37.png",
+              "type": "profile"
+            }
+          ]
+        }
+      }
+    },
+    "extensions": {
+      "cacheControl": {
+        "version": 1,
+        "hints": [
+          {
+            "path": [
+              "event"
+            ],
+            "maxAge": 60,
+            "scope": "PRIVATE"
+          }
+        ]
+      },
+      "queryComplexity": 4
+    },
+    "actionRecords": []
+  }
+}
