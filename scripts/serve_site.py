@@ -47,9 +47,20 @@ from scripts.youtube_vod import (
 )
 
 PROFILE_DIR = ROOT / "data" / "profiles"
+from scripts.tournament_dates import (
+    load_tournament_date_overrides,
+    save_tournament_date_overrides,
+    normalize_tournament_slug,
+    validate_date_string,
+    resolve_tournament_date,
+    resolve_tournament_timestamp,
+    epoch_to_iso,
+)
+
 EVENT_GROUPS_PATH = PROFILE_DIR / "event_groups.json"
 EXCLUSIONS_PATH = PROFILE_DIR / "exclusions.json"
 COMMUNITY_SOCIALS_PATH = ROOT / "data" / "community_socials.json"
+TOURNAMENT_DATES_PATH = PROFILE_DIR / "tournament_dates.json"
 DATABASE = ROOT / "startgg-data" / "platfighters.sqlite3"
 PLAYER_ASSETS = ROOT / "assets" / "players"
 RANKING_PLAYER_ASSETS = ROOT / "assets" / "players" / "rankings"
@@ -299,6 +310,7 @@ NON_PROFILE_NAMES = {
     "amateur_brackets.json",
     "event_groups.json",
     "exclusions.json",
+    "tournament_dates.json",
 }
 
 
@@ -516,6 +528,37 @@ class Handler(SimpleHTTPRequestHandler):
                 self.send_json(200, {"socials": community_socials()})
             except Exception as err:
                 self.send_json(500, {"error": str(err)})
+        elif parsed.path == "/api/admin/tournament-dates":
+            if not self.require_admin():
+                return
+            try:
+                overrides = load_tournament_date_overrides(ROOT)
+                with sqlite3.connect(DATABASE) as connection:
+                    connection.row_factory = sqlite3.Row
+                    rows = connection.execute(
+                        "SELECT t.slug, t.name, t.start_at, "
+                        "(SELECT MIN(COALESCE(s.started_at, s.start_at, s.completed_at)) "
+                        "FROM events e JOIN sets s ON s.event_id=e.id WHERE e.tournament_slug=t.slug) AS earliest_set_ts "
+                        "FROM tournaments t ORDER BY t.name ASC"
+                    ).fetchall()
+                tournaments = []
+                for row in rows:
+                    slug = row["slug"]
+                    orig_date = epoch_to_iso(row["start_at"]) or epoch_to_iso(row["earliest_set_ts"])
+                    override_date = overrides.get(slug)
+                    effective_date = override_date or orig_date
+                    tournaments.append({
+                        "slug": slug,
+                        "name": row["name"] or slug,
+                        "originalDate": orig_date,
+                        "overrideDate": override_date,
+                        "effectiveDate": effective_date,
+                        "isOverridden": bool(override_date),
+                    })
+                tournaments.sort(key=lambda item: (item["effectiveDate"] or "", item["name"]), reverse=True)
+                self.send_json(200, {"tournaments": tournaments, "overrides": overrides})
+            except Exception as err:
+                self.send_json(500, {"error": f"Could not load tournament dates: {err}"})
         elif parsed.path == "/api/admin/event-groups":
             if not self.require_admin():
                 return
@@ -1469,6 +1512,49 @@ class Handler(SimpleHTTPRequestHandler):
                 return
             refresh_index()
             self.send_json(200, {"merged": source, "into": target, "profiles": profile_entries()})
+        elif parsed.path == "/api/admin/tournament-dates":
+            raw_slug = body.get("tournamentSlug")
+            slug = normalize_tournament_slug(raw_slug)
+            if not slug:
+                self.send_json(400, {"error": "Please provide a valid tournament slug."})
+                return
+
+            with sqlite3.connect(DATABASE) as connection:
+                connection.row_factory = sqlite3.Row
+                tourney = connection.execute("SELECT slug FROM tournaments WHERE slug = ?", (slug,)).fetchone()
+            if not tourney:
+                self.send_json(404, {"error": f"Tournament '{slug}' was not found in the database."})
+                return
+
+            remove = bool(body.get("remove") or body.get("action") == "remove")
+            overrides = load_tournament_date_overrides(ROOT)
+            previous = dict(overrides)
+
+            if remove:
+                if slug not in overrides:
+                    self.send_json(404, {"error": f"No date override found for tournament '{slug}'."})
+                    return
+                overrides.pop(slug, None)
+            else:
+                date_str = body.get("date")
+                if not isinstance(date_str, str) or not validate_date_string(date_str):
+                    self.send_json(400, {"error": "Please provide a valid calendar date in YYYY-MM-DD format."})
+                    return
+                overrides[slug] = date_str.strip()
+
+            save_tournament_date_overrides(overrides, ROOT)
+            result = rebuild_profiles()
+            if result.returncode:
+                save_tournament_date_overrides(previous, ROOT)
+                self.send_json(500, {"error": "Could not rebuild profiles after updating tournament date. " + (result.stderr[-1000:] or result.stdout[-1000:])})
+                return
+            refresh_index()
+            self.send_json(200, {
+                "success": True,
+                "tournamentSlug": slug,
+                "overrides": overrides,
+                "action": "removed" if remove else "saved",
+            })
         elif parsed.path == "/api/admin/event-group":
             groups = event_groups()
             child_key = normalize_event_key(body.get("child"))

@@ -192,6 +192,31 @@
         </form>
       </section>
 
+      <section class="merge-panel" aria-labelledby="tournament-dates-heading" style="margin-top: 0; margin-bottom: 32px; padding-bottom: 28px;">
+        <h3 id="tournament-dates-heading" data-i18n="admin.sec.tournamentDates">Tournament Date Overrides</h3>
+        <p class="muted admin-copy" data-i18n="admin.sec.tournamentDatesDesc">Correct tournament dates when start.gg has the wrong date. Overrides take precedence everywhere.</p>
+        <form id="tournament-date-form" class="admin-form merge-form">
+          <label><span data-i18n="admin.label.selectTournament">Select Tournament</span><select id="tournament-date-select" required></select></label>
+          <div style="display:flex; gap:16px; flex-wrap:wrap; margin-bottom: 8px;">
+            <div style="flex:1; min-width:200px;">
+              <span class="mono muted" style="font-size:12px; display:block; margin-bottom:4px;" data-i18n="admin.label.originalDate">Original start.gg date</span>
+              <span id="tournament-orig-date" class="mono" style="font-size:14px;">—</span>
+            </div>
+            <div style="flex:1; min-width:200px;">
+              <span class="mono muted" style="font-size:12px; display:block; margin-bottom:4px;" data-i18n="admin.label.effectiveDate">Current effective date</span>
+              <span id="tournament-eff-date" class="mono" style="font-size:14px; font-weight:600;">—</span>
+            </div>
+          </div>
+          <label><span data-i18n="admin.label.correctedDate">Corrected Date</span><input id="tournament-corrected-date" type="date" required></label>
+          <div class="form-actions">
+            <button class="action-button" type="submit" data-i18n="admin.btn.saveDateOverride">Save Date Override</button>
+            <button id="tournament-revert-btn" class="quiet-button" type="button" style="display:none; color:var(--muted);" data-i18n="admin.btn.revertDateOverride">Revert to Original Date</button>
+            <p id="tournament-date-message" class="form-message mono" role="status"></p>
+          </div>
+        </form>
+        <div id="tournament-date-list" class="event-group-list" aria-live="polite" style="margin-top:20px;"></div>
+      </section>
+
       <section class="merge-panel" aria-labelledby="event-group-heading" style="margin-top: 0; margin-bottom: 32px; padding-bottom: 28px;">
         <h3 id="event-group-heading" data-i18n="admin.sec.groupEvent">Group an additional event</h3>
         <p class="muted admin-copy" data-i18n="admin.sec.groupEventDesc">Attach an event such as an amateur bracket to its main event so participant placements are contiguous.</p>

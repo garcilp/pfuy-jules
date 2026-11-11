@@ -21,6 +21,11 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from scripts.summary_tracker import SummaryTracker
+from scripts.tournament_dates import (
+    load_tournament_date_overrides,
+    resolve_tournament_date,
+    resolve_tournament_timestamp,
+)
 
 DATABASE = PROJECT_ROOT / "startgg-data" / "platfighters.sqlite3"
 PROFILE_DIR = PROJECT_ROOT / "data" / "profiles"
@@ -314,6 +319,8 @@ class RankingEngine:
             elif self.connection is not None and self.connection.row_factory is None:
                 self.connection.row_factory = sqlite3.Row
 
+        self.date_overrides = load_tournament_date_overrides(PROJECT_ROOT)
+
         if self.connection is not None:
             self.latest_tags = get_latest_player_tags(self.connection, self.merges)
         else:
@@ -415,8 +422,19 @@ class RankingEngine:
                game_slug in self.exclusions["playerGames"].get(loser_player, []):
                 continue
 
-            ts = row["started_at"] or row["start_at"] or row["completed_at"] or row["tournament_start"]
-            date_str = date_from_epoch(ts)
+            earliest_set_ts = row["started_at"] or row["start_at"] or row["completed_at"]
+            effective_date = resolve_tournament_date(
+                row["tournament_slug"],
+                row["tournament_start"],
+                earliest_set_ts,
+                self.date_overrides,
+            )
+            effective_ts = resolve_tournament_timestamp(
+                row["tournament_slug"],
+                row["tournament_start"],
+                earliest_set_ts,
+                self.date_overrides,
+            )
 
             winner_score = entrant_scores.get(winner_entrant)
             loser_score = entrant_scores.get(loser_entrant) if loser_entrant else None
@@ -428,8 +446,8 @@ class RankingEngine:
                 "tournamentSlug": row["tournament_slug"],
                 "eventName": row["event_name"],
                 "tournamentName": row["tournament_name"],
-                "date": date_str,
-                "timestamp": ts or 0,
+                "date": effective_date,
+                "timestamp": effective_ts or 0,
                 "phaseName": row["phase_name"] or "Phase",
                 "roundText": f"Round {row['round']}" if row["round"] is not None else "Set",
                 "winnerId": winner_player,
@@ -488,13 +506,14 @@ class RankingEngine:
         rows = conn.execute(
             "SELECT es.event_id, es.entrant_id, es.placement, e.num_entrants, "
             "e.source_url, e.name AS event_name, t.slug AS tournament_slug, t.name AS tournament_name, "
-            "COALESCE(t.start_at, (SELECT MIN(COALESCE(s.started_at, s.start_at, s.completed_at)) "
-            "FROM sets s WHERE s.event_id=e.id)) AS event_timestamp "
+            "t.start_at AS tournament_start_at, "
+            "(SELECT MIN(COALESCE(s.started_at, s.start_at, s.completed_at)) "
+            "FROM sets s WHERE s.event_id=e.id) AS earliest_set_ts "
             "FROM event_standings es "
             "JOIN events e ON e.id = es.event_id "
             "JOIN tournaments t ON t.slug = e.tournament_slug "
             "WHERE e.videogame_slug = ? AND e.is_temporary = 0 AND es.placement IS NOT NULL "
-            "ORDER BY event_timestamp ASC",
+            "ORDER BY e.id ASC, es.placement ASC",
             (game_slug,),
         ).fetchall()
 
@@ -518,7 +537,18 @@ class RankingEngine:
             if game_slug in self.exclusions["playerGames"].get(player_id, []):
                 continue
 
-            date_str = date_from_epoch(row["event_timestamp"])
+            effective_date = resolve_tournament_date(
+                row["tournament_slug"],
+                row["tournament_start_at"],
+                row["earliest_set_ts"],
+                self.date_overrides,
+            )
+            effective_ts = resolve_tournament_timestamp(
+                row["tournament_slug"],
+                row["tournament_start_at"],
+                row["earliest_set_ts"],
+                self.date_overrides,
+            )
             entrants_count = row["num_entrants"] or 1
 
             event_placements.append({
@@ -530,8 +560,8 @@ class RankingEngine:
                 "playerId": player_id,
                 "placement": row["placement"],
                 "entrants": entrants_count,
-                "date": date_str,
-                "timestamp": row["event_timestamp"] or 0,
+                "date": effective_date,
+                "timestamp": effective_ts or 0,
             })
 
         return event_placements
@@ -539,11 +569,11 @@ class RankingEngine:
     def _build_tournament_date_maps(self, sets, placements):
         """Builds mappings for resolving tournament dates from JSON data structure."""
         event_dates = {}
-        tourney_dates = {}
+        tourney_dates = dict(self.date_overrides) if self.date_overrides else {}
         for p in placements:
             eid = text_id(p.get("eventId"))
             tslug = p.get("tournamentSlug")
-            p_date = p.get("date")
+            p_date = self.date_overrides.get(tslug) if tslug in self.date_overrides else p.get("date")
             if eid and p_date:
                 event_dates[eid] = p_date
             if tslug and p_date:
@@ -553,7 +583,7 @@ class RankingEngine:
         for s in sets:
             eid = text_id(s.get("eventId"))
             tslug = s.get("tournamentSlug")
-            s_date = s.get("date")
+            s_date = self.date_overrides.get(tslug) if tslug in self.date_overrides else s.get("date")
             if eid and s_date and eid not in event_dates:
                 event_dates[eid] = s_date
             if tslug and s_date and tslug not in tourney_dates:
@@ -562,10 +592,12 @@ class RankingEngine:
         return event_dates, tourney_dates
 
     def _get_tournament_date(self, item, event_dates, tourney_dates):
+        tslug = item.get("tournamentSlug")
+        if tslug and tslug in self.date_overrides:
+            return self.date_overrides[tslug]
         eid = text_id(item.get("eventId"))
         if eid in event_dates:
             return event_dates[eid]
-        tslug = item.get("tournamentSlug")
         if tslug in tourney_dates:
             return tourney_dates[tslug]
         return item.get("date")
