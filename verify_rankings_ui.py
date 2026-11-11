@@ -20,9 +20,9 @@ def run():
             browser = p.chromium.launch(headless=True)
             page = browser.new_page(viewport={"width": 1280, "height": 900})
 
-            # 1. Rankings Tab Order & Ranked Systems destination
+            # 1. Rankings Tab Order & Default Rankings Archive destination
             page.goto(f"http://127.0.0.1:{PORT}/rankings.html")
-            page.wait_for_selector(".comparison-row")
+            page.wait_for_selector(".head-panel")
             page.wait_for_selector("#section-tabs")
 
             # Verify tab ordering: 1. Rankings Archive, 2. PR Creator, 3. Ranked Systems
@@ -35,12 +35,22 @@ def run():
             assert tabs.nth(2).text_content().strip() == "Ranked Systems"
             assert tabs.nth(2).get_attribute("data-section") == "systems"
 
-            # Verify top-level Ranked Systems active and breadcrumb
+            # Verify top-level Rankings Archive active and breadcrumb
+            hist_sec = page.locator("button[data-section='historical']")
+            assert "active" in hist_sec.get_attribute("class")
+            bc_text = " ".join(page.locator("#ranking-breadcrumbs").text_content().split())
+            assert "Rankings / Rankings Archive" in bc_text
+
+            page.screenshot(path="verification/rankings_archive_default.png")
+            print("Captured rankings_archive_default.png")
+
+            # 1b. Navigate to Ranked Systems tab
+            page.click("button[data-section='systems']")
+            page.wait_for_selector(".comparison-row")
             systems_sec = page.locator("button[data-section='systems']")
             assert "active" in systems_sec.get_attribute("class")
-            bc_text = " ".join(page.locator("#ranking-breadcrumbs").text_content().split())
-            assert "Rankings / Ranked Systems / Overview" in bc_text
-
+            sys_bc_text = " ".join(page.locator("#ranking-breadcrumbs").text_content().split())
+            assert "Rankings / Ranked Systems / Overview" in sys_bc_text
             page.screenshot(path="verification/rankings_overview.png")
             print("Captured rankings_overview.png")
 

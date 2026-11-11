@@ -26,7 +26,7 @@ let scrollObserver = null;
 function getStateFromURL() {
   const params = new URLSearchParams(window.location.search);
   let section = params.get('section') || '';
-  let system = params.get('system') || 'overview';
+  let system = params.get('system') || '';
 
   // Backward compatibility & aliases
   if (system === 'custom' || system === 'power_rankings' || section === 'power_rankings' || section === 'pr_creator') {
@@ -35,19 +35,20 @@ function getStateFromURL() {
   } else if (section === 'historical' || section === 'archive' || system === 'historical' || system === 'archive') {
     section = 'historical';
     system = 'historical';
+  } else if (section === 'systems' || section === 'ranked-systems') {
+    section = 'systems';
+    if (!system) system = 'overview';
+  } else if (system && !section) {
+    section = 'systems';
   } else if (!section) {
-    if (window.location.hash && !params.get('system')) {
-      section = 'historical';
-      system = 'historical';
-    } else {
-      section = 'systems';
-    }
+    section = 'historical';
+    system = 'historical';
   }
 
   return {
     section,
     game: params.get('game') || 'ultimate',
-    system,
+    system: system || 'historical',
     mode: params.get('mode') || 'historical',
     start: params.get('start') || '',
     end: params.get('end') || '',
@@ -58,7 +59,7 @@ function getStateFromURL() {
 
 function updateURLState(state) {
   const params = new URLSearchParams();
-  if (state.section && state.section !== 'systems') params.set('section', state.section);
+  if (state.section && state.section !== 'historical') params.set('section', state.section);
   if (state.section === 'historical') {
     const hash = window.location.hash || '';
     const newSearch = params.toString() ? `?${params.toString()}` : window.location.pathname;
@@ -91,8 +92,8 @@ const modalPlayerInfo = $('#modal-player-info');
 const modalBody = $('#modal-body');
 const breadcrumbNav = $('#ranking-breadcrumbs');
 
-let activeSection = 'systems';
-let activeSubsection = 'overview';
+let activeSection = 'historical';
+let activeSubsection = 'historical';
 
 // Helper to get descriptive names for system tabs
 function getSystemNames() {
@@ -147,14 +148,14 @@ function updateBreadcrumbsAndNav() {
     if (activeSection === 'power_rankings') {
       const prTitle = (window.i18n && window.i18n.t) ? window.i18n.t('rankings.tab.powerRankings') : (isEs ? 'Creador de PR' : 'PR Creator');
       breadcrumbNav.innerHTML = `
-        <a href="rankings.html?section=systems&system=overview" onclick="event.preventDefault(); window.navigateToSection('systems', 'overview');">Rankings</a>
+        <a href="rankings.html" onclick="event.preventDefault(); window.navigateToSection('historical');">Rankings</a>
         <span class="sep">/</span>
         <span class="current">${esc(prTitle)}</span>
       `;
     } else if (activeSection === 'historical') {
       const histTitle = (window.i18n && window.i18n.t) ? window.i18n.t('rankings.tab.historical') : (isEs ? 'Archivo de Rankings' : 'Rankings Archive');
       breadcrumbNav.innerHTML = `
-        <a href="rankings.html?section=systems&system=overview" onclick="event.preventDefault(); window.navigateToSection('systems', 'overview');">Rankings</a>
+        <a href="rankings.html" onclick="event.preventDefault(); window.navigateToSection('historical');">Rankings</a>
         <span class="sep">/</span>
         <span class="current">${esc(histTitle)}</span>
       `;
@@ -163,7 +164,7 @@ function updateBreadcrumbsAndNav() {
       const names = getSystemNames();
       const subName = names[activeSubsection] || activeSubsection;
       breadcrumbNav.innerHTML = `
-        <a href="rankings.html?section=systems&system=overview" onclick="event.preventDefault(); window.navigateToSection('systems', 'overview');">Rankings</a>
+        <a href="rankings.html" onclick="event.preventDefault(); window.navigateToSection('historical');">Rankings</a>
         <span class="sep">/</span>
         <a href="rankings.html?section=systems&system=overview" onclick="event.preventDefault(); window.navigateToSection('systems', 'overview');">${esc(sysTitle)}</a>
         <span class="sep">/</span>
