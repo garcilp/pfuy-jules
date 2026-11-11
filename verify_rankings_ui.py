@@ -20,21 +20,31 @@ def run():
             browser = p.chromium.launch(headless=True)
             page = browser.new_page(viewport={"width": 1280, "height": 900})
 
-            # 1. Ranking Systems destination & Overview Tab (Side-by-side system comparison)
+            # 1. Rankings Tab Order & Ranked Systems destination
             page.goto(f"http://127.0.0.1:{PORT}/rankings.html")
             page.wait_for_selector(".comparison-row")
             page.wait_for_selector("#section-tabs")
 
-            # Verify top-level Ranking Systems active and breadcrumb
+            # Verify tab ordering: 1. Rankings Archive, 2. PR Creator, 3. Ranked Systems
+            tabs = page.locator("#section-tabs .ranking-section-tab")
+            assert tabs.count() == 3
+            assert tabs.nth(0).text_content().strip() == "Rankings Archive"
+            assert tabs.nth(0).get_attribute("data-section") == "historical"
+            assert tabs.nth(1).text_content().strip() == "PR Creator"
+            assert tabs.nth(1).get_attribute("data-section") == "power_rankings"
+            assert tabs.nth(2).text_content().strip() == "Ranked Systems"
+            assert tabs.nth(2).get_attribute("data-section") == "systems"
+
+            # Verify top-level Ranked Systems active and breadcrumb
             systems_sec = page.locator("button[data-section='systems']")
             assert "active" in systems_sec.get_attribute("class")
             bc_text = " ".join(page.locator("#ranking-breadcrumbs").text_content().split())
-            assert "Rankings / Ranking Systems / Overview" in bc_text
+            assert "Rankings / Ranked Systems / Overview" in bc_text
 
             page.screenshot(path="verification/rankings_overview.png")
             print("Captured rankings_overview.png")
 
-            # 2. Top-level Power Rankings Tab (Custom weights & contribution indicators)
+            # 2. Top-level PR Creator Tab (Custom weights & contribution indicators)
             page.click("button[data-section='power_rankings']")
             page.wait_for_selector(".pr-setup-panel")
             page.wait_for_selector(".ranking-row")
@@ -42,7 +52,7 @@ def run():
             pr_sec = page.locator("button[data-section='power_rankings']")
             assert "active" in pr_sec.get_attribute("class")
             pr_bc_text = " ".join(page.locator("#ranking-breadcrumbs").text_content().split())
-            assert "Rankings / Power Rankings" in pr_bc_text
+            assert "Rankings / PR Creator" in pr_bc_text
 
             # Verify default weights (55/20/15/10)
             glicko_badge = page.locator(".pr-card-badge[data-sys='glicko2']").text_content()
@@ -95,7 +105,7 @@ def run():
 
             # 3b. Quality Wins Diagnostic Modal
             page.click(".diagnostic-btn")
-            page.wait_for_selector(".diag-summary")
+            page.wait_for_selector("#diag-header")
             page.screenshot(path="verification/rankings_quality_wins_diagnostic.png")
             print("Captured rankings_quality_wins_diagnostic.png")
 

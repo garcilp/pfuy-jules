@@ -28,11 +28,11 @@ function getStateFromURL() {
   let section = params.get('section') || '';
   let system = params.get('system') || 'overview';
 
-  // Backward compatibility: system=custom maps to power_rankings section
-  if (system === 'custom' || system === 'power_rankings') {
+  // Backward compatibility & aliases
+  if (system === 'custom' || system === 'power_rankings' || section === 'power_rankings' || section === 'pr_creator') {
     section = 'power_rankings';
     system = 'custom';
-  } else if (section === 'historical' || system === 'historical') {
+  } else if (section === 'historical' || section === 'archive' || system === 'historical' || system === 'archive') {
     section = 'historical';
     system = 'historical';
   } else if (!section) {
@@ -143,25 +143,29 @@ function updateBreadcrumbsAndNav() {
 
   // Render breadcrumbs
   if (breadcrumbNav) {
+    const isEs = (window.i18n && window.i18n.getLang && window.i18n.getLang() === 'es');
     if (activeSection === 'power_rankings') {
+      const prTitle = (window.i18n && window.i18n.t) ? window.i18n.t('rankings.tab.powerRankings') : (isEs ? 'Creador de PR' : 'PR Creator');
       breadcrumbNav.innerHTML = `
         <a href="rankings.html?section=systems&system=overview" onclick="event.preventDefault(); window.navigateToSection('systems', 'overview');">Rankings</a>
         <span class="sep">/</span>
-        <span class="current">Power Rankings</span>
+        <span class="current">${esc(prTitle)}</span>
       `;
     } else if (activeSection === 'historical') {
+      const histTitle = (window.i18n && window.i18n.t) ? window.i18n.t('rankings.tab.historical') : (isEs ? 'Archivo de Rankings' : 'Rankings Archive');
       breadcrumbNav.innerHTML = `
         <a href="rankings.html?section=systems&system=overview" onclick="event.preventDefault(); window.navigateToSection('systems', 'overview');">Rankings</a>
         <span class="sep">/</span>
-        <span class="current">Historical Rankings</span>
+        <span class="current">${esc(histTitle)}</span>
       `;
     } else {
+      const sysTitle = (window.i18n && window.i18n.t) ? window.i18n.t('rankings.tab.systems') : (isEs ? 'Sistemas de Ranking' : 'Ranked Systems');
       const names = getSystemNames();
       const subName = names[activeSubsection] || activeSubsection;
       breadcrumbNav.innerHTML = `
         <a href="rankings.html?section=systems&system=overview" onclick="event.preventDefault(); window.navigateToSection('systems', 'overview');">Rankings</a>
         <span class="sep">/</span>
-        <a href="rankings.html?section=systems&system=overview" onclick="event.preventDefault(); window.navigateToSection('systems', 'overview');">Ranking Systems</a>
+        <a href="rankings.html?section=systems&system=overview" onclick="event.preventDefault(); window.navigateToSection('systems', 'overview');">${esc(sysTitle)}</a>
         <span class="sep">/</span>
         <span class="current">${esc(subName)}</span>
       `;
