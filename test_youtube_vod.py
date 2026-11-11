@@ -260,6 +260,85 @@ class TestVODDatabaseAndSync(unittest.TestCase):
         self.assertEqual(row["match_id"], "set-1")
         self.assertEqual(row["status"], "complete")
 
+    def test_write_event_details_attaches_sponsors(self):
+        from scripts.build_player_profile import write_event_details
+        from pathlib import Path
+        import tempfile
+        from unittest.mock import patch
+
+        self.conn.executescript("""
+            CREATE TABLE IF NOT EXISTS participants (
+                id TEXT PRIMARY KEY,
+                player_id TEXT,
+                gamer_tag TEXT,
+                prefix TEXT
+            );
+            CREATE TABLE IF NOT EXISTS entrant_participants (
+                entrant_id TEXT,
+                participant_id TEXT,
+                PRIMARY KEY (entrant_id, participant_id)
+            );
+            CREATE TABLE IF NOT EXISTS event_standings (
+                event_id TEXT,
+                entrant_id TEXT,
+                placement INTEGER,
+                PRIMARY KEY (event_id, entrant_id)
+            );
+        """)
+        # Add tournament start_at column if missing
+        cols = [c[1] for c in self.conn.execute("PRAGMA table_info(tournaments)").fetchall()]
+        if "start_at" not in cols:
+            self.conn.execute("ALTER TABLE tournaments ADD COLUMN start_at INTEGER")
+        if "startgg_id" not in cols:
+            self.conn.execute("ALTER TABLE tournaments ADD COLUMN startgg_id TEXT")
+        set_cols = [c[1] for c in self.conn.execute("PRAGMA table_info(sets)").fetchall()]
+        if "started_at" not in set_cols:
+            self.conn.execute("ALTER TABLE sets ADD COLUMN started_at INTEGER")
+        if "start_at" not in set_cols:
+            self.conn.execute("ALTER TABLE sets ADD COLUMN start_at INTEGER")
+        if "completed_at" not in set_cols:
+            self.conn.execute("ALTER TABLE sets ADD COLUMN completed_at INTEGER")
+        ev_cols = [c[1] for c in self.conn.execute("PRAGMA table_info(events)").fetchall()]
+        if "num_entrants" not in ev_cols:
+            self.conn.execute("ALTER TABLE events ADD COLUMN num_entrants INTEGER")
+        if "source_url" not in ev_cols:
+            self.conn.execute("ALTER TABLE events ADD COLUMN source_url TEXT")
+        if "is_temporary" not in ev_cols:
+            self.conn.execute("ALTER TABLE events ADD COLUMN is_temporary INTEGER DEFAULT 0")
+
+        self.conn.execute("INSERT INTO participants VALUES ('p-1', '101', 'Player Alpha')")
+        self.conn.execute("INSERT INTO participants VALUES ('p-2', '102', 'Player Beta')")
+        self.conn.execute("INSERT INTO entrant_participants VALUES ('ent-1', 'p-1')")
+        self.conn.execute("INSERT INTO entrant_participants VALUES ('ent-2', 'p-2')")
+        self.conn.execute("""
+            INSERT INTO event_vods (event_id, match_id, youtube_video_id, youtube_title, status, availability, created_at, updated_at)
+            VALUES ('ev-100', 'set-1', 'vid_match1', 'Alpha vs Beta', 'complete', 'available', 100, 100)
+        """)
+        self.conn.commit()
+
+        mock_meta = {
+            "101": {"sponsor": "SPON_A"},
+            "102": {"sponsor": ""}
+        }
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_events_dir = Path(temp_dir) / "data" / "events"
+            temp_events_dir.mkdir(parents=True, exist_ok=True)
+            with patch("scripts.build_player_profile.PROJECT_ROOT", Path(temp_dir)), \
+                 patch("scripts.build_player_profile.startgg_metadata", return_value=mock_meta):
+                write_event_details(self.conn)
+
+            event_json_path = temp_events_dir / "tourney-1.json"
+            self.assertTrue(event_json_path.is_file())
+            with event_json_path.open() as f:
+                event_data = json.load(f)
+
+            self.assertIn("vods", event_data)
+            self.assertEqual(len(event_data["vods"]), 1)
+            vod_entry = event_data["vods"][0]
+            self.assertEqual(vod_entry["player1"]["sponsor"], "SPON_A")
+            self.assertEqual(vod_entry["player2"]["sponsor"], "")
+
 
 if __name__ == "__main__":
     unittest.main()
