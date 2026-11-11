@@ -1363,7 +1363,7 @@ def write_event_details(connection):
         t_date = min(dates) if dates else resolve_tournament_date(t_slug, t["start_at"], None, date_overrides)
 
         games_map = {}
-        for er in valid_events:
+        for er, _, _ in valid_events:
             games_map[er["videogame_slug"]] = er["game_name"]
         games_list = [{"slug": slug, "name": name} for slug, name in sorted(games_map.items(), key=lambda x: x[1])]
 

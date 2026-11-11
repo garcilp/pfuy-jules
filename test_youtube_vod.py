@@ -154,7 +154,12 @@ class TestVODDatabaseAndSync(unittest.TestCase):
 
         # Setup minimal schema
         self.conn.executescript("""
-            CREATE TABLE tournaments (slug TEXT PRIMARY KEY, name TEXT);
+            CREATE TABLE tournaments (
+                slug TEXT PRIMARY KEY,
+                startgg_id TEXT,
+                name TEXT,
+                start_at INTEGER
+            );
             CREATE TABLE videogames (slug TEXT PRIMARY KEY, name TEXT);
             CREATE TABLE events (
                 id TEXT PRIMARY KEY,
@@ -168,6 +173,12 @@ class TestVODDatabaseAndSync(unittest.TestCase):
             CREATE TABLE entrants (id TEXT PRIMARY KEY, event_id TEXT, name TEXT);
             CREATE TABLE participants (id TEXT PRIMARY KEY, player_id TEXT, gamer_tag TEXT);
             CREATE TABLE entrant_participants (entrant_id TEXT, participant_id TEXT, PRIMARY KEY(entrant_id, participant_id));
+            CREATE TABLE event_standings (
+                event_id TEXT,
+                entrant_id TEXT,
+                placement INTEGER,
+                PRIMARY KEY (event_id, entrant_id)
+            );
             CREATE TABLE sets (
                 id TEXT PRIMARY KEY,
                 event_id TEXT,
@@ -177,7 +188,9 @@ class TestVODDatabaseAndSync(unittest.TestCase):
                 identifier TEXT,
                 display_score TEXT,
                 winner_entrant_id TEXT,
-                started_at INTEGER
+                started_at INTEGER,
+                start_at INTEGER,
+                completed_at INTEGER
             );
             CREATE TABLE set_entrants (
                 set_id TEXT,
@@ -196,12 +209,12 @@ class TestVODDatabaseAndSync(unittest.TestCase):
         migrate_vod_schema(self.conn)
 
         # Seed event and match
-        self.conn.execute("INSERT INTO tournaments VALUES ('tourney-1', 'Test Tournament')")
+        self.conn.execute("INSERT INTO tournaments VALUES ('tourney-1', '1000', 'Test Tournament', 1600000000)")
         self.conn.execute("INSERT INTO videogames VALUES ('game-1', 'Test Game')")
         self.conn.execute("INSERT INTO events (id, tournament_slug, videogame_slug, name) VALUES ('ev-100', 'tourney-1', 'game-1', 'Singles')")
         self.conn.execute("INSERT INTO entrants VALUES ('ent-1', 'ev-100', 'Player Alpha')")
         self.conn.execute("INSERT INTO entrants VALUES ('ent-2', 'ev-100', 'Player Beta')")
-        self.conn.execute("INSERT INTO sets VALUES ('set-1', 'ev-100', NULL, 'Grand Finals', 1, 'GF', '3–1', 'ent-1', 1600000000)")
+        self.conn.execute("INSERT INTO sets VALUES ('set-1', 'ev-100', NULL, 'Grand Finals', 1, 'GF', '3–1', 'ent-1', 1600000000, 1600000000, 1600001000)")
         self.conn.execute("INSERT INTO set_entrants VALUES ('set-1', 's1', 0, 'ent-1', 3, '3', '3', 1)")
         self.conn.execute("INSERT INTO set_entrants VALUES ('set-1', 's2', 1, 'ent-2', 1, '1', '1', 2)")
         self.conn.commit()
@@ -338,6 +351,46 @@ class TestVODDatabaseAndSync(unittest.TestCase):
             vod_entry = event_data["vods"][0]
             self.assertEqual(vod_entry["player1"]["sponsor"], "SPON_A")
             self.assertEqual(vod_entry["player2"]["sponsor"], "")
+
+    def test_save_vods_updates_and_writes_event_details(self):
+        """Regression test: verify updating VODs and calling write_event_details works without tuple TypeError."""
+        from scripts.build_player_profile import write_event_details
+        from pathlib import Path
+        import tempfile
+        from unittest.mock import patch
+
+        # Insert a pending VOD record
+        self.conn.execute("""
+            INSERT INTO event_vods (event_id, match_id, youtube_video_id, youtube_title, status, availability, created_at, updated_at)
+            VALUES ('ev-100', NULL, 'vid_save_test', 'Pending Match', 'pending', 'available', 100, 100)
+        """)
+        self.conn.commit()
+
+        # Update VOD association as done by /api/admin/save-event-vods
+        self.conn.execute(
+            "UPDATE event_vods SET match_id=?, status=?, updated_at=? WHERE youtube_video_id=?",
+            ('set-1', 'complete', 150, 'vid_save_test')
+        )
+        self.conn.commit()
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_events_dir = Path(temp_dir) / "data" / "events"
+            temp_events_dir.mkdir(parents=True, exist_ok=True)
+            with patch("scripts.build_player_profile.PROJECT_ROOT", Path(temp_dir)):
+                # This call must not raise TypeError: tuple indices must be integers or slices, not str
+                write_event_details(self.conn)
+
+            event_json_path = temp_events_dir / "tourney-1.json"
+            self.assertTrue(event_json_path.is_file())
+            with event_json_path.open() as f:
+                event_data = json.load(f)
+
+            self.assertEqual(event_data["tournamentSlug"], "tourney-1")
+            self.assertEqual(len(event_data["games"]), 1)
+            self.assertEqual(event_data["games"][0]["slug"], "game-1")
+            self.assertEqual(event_data["games"][0]["name"], "Test Game")
+            self.assertIn("vods", event_data)
+            self.assertTrue(any(v["videoId"] == "vid_save_test" for v in event_data["vods"]))
 
 
 if __name__ == "__main__":
