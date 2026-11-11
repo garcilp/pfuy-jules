@@ -399,8 +399,36 @@
 
   .mobile-search-results {
     margin-top: 12px;
-    max-height: 240px;
+    max-height: 260px;
     overflow-y: auto;
+    overscroll-behavior: contain;
+    background: var(--bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    box-shadow: 0 16px 40px var(--glass-shadow);
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--accent) 35%, transparent) transparent;
+  }
+
+  .mobile-search-results::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .mobile-search-results::-webkit-scrollbar-track {
+    background: transparent;
+    margin: 8px 0;
+  }
+
+  .mobile-search-results::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--accent) 35%, transparent);
+    border-radius: 999px;
+  }
+
+  .mobile-search-results::-webkit-scrollbar-thumb:hover {
+    background: var(--sky);
   }
 
   .mobile-search-item {
@@ -408,16 +436,17 @@
     align-items: center;
     justify-content: space-between;
     min-height: 44px;
-    padding: 6px 12px;
+    padding: 10px 14px;
     border-radius: 12px;
     color: var(--text, #f0f4fc);
     text-decoration: none;
     font-size: 14px;
+    transition: background 150ms ease;
   }
 
   .mobile-search-item:hover,
   .mobile-search-item:active {
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--faint);
   }
 
   /* ==========================================================================
