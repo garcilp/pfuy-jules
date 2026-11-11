@@ -547,7 +547,7 @@ function render() {
                 const v = set.vods[0];
                 vodHtml = `<span class="set-vod"><a href="${esc(v.url)}" target="_blank" rel="noopener noreferrer" class="set-vod-yt-link" title="${esc(v.title || 'Watch VOD')}" aria-label="${esc(v.title || 'Watch VOD')}">${ytIconSvg}</a></span>`;
               } else {
-                const vodItems = set.vods.map((v, vIdx) => `<li><a href="${esc(v.url)}" target="_blank" rel="noopener noreferrer" style="display:block; padding:6px 10px; color:var(--text); text-decoration:none; font-size:12px; border-radius:6px;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">${v.title ? esc(v.title) : `Video ${vIdx + 1}`} ↗</a></li>`).join('');
+                const vodItems = set.vods.map((v, vIdx) => `<li><a href="${esc(v.url)}" target="_blank" rel="noopener noreferrer">${v.title ? esc(v.title) : `Video ${vIdx + 1}`} ↗</a></li>`).join('');
                 vodHtml = `<span class="set-vod"><span class="set-vod-multi"><button type="button" class="set-vod-yt-link" title="${set.vods.length} VODs available" aria-label="${set.vods.length} VODs available" style="cursor:pointer; border:0;" onclick="const m=this.nextElementSibling; const isOpen=m.style.display==='block'; document.querySelectorAll('.vod-multi-menu').forEach(el=>el.style.display='none'); if(!isOpen) m.style.display='block'; event.stopPropagation();">${ytIconSvg}</button><ul class="vod-multi-menu">${vodItems}</ul></span></span>`;
               }
             }
@@ -605,7 +605,7 @@ function render() {
             vodHtml = `<span class="set-vod"><a href="${esc(v.url)}" target="_blank" rel="noopener noreferrer" class="set-vod-yt-link" title="${esc(v.title || 'Watch VOD')}" aria-label="${esc(v.title || 'Watch VOD')}">${ytIconSvg}</a></span>`;
           } else {
             // Multiple VODs: dropdown/popover button
-            const vodItems = set.vods.map((v, vIdx) => `<li><a href="${esc(v.url)}" target="_blank" rel="noopener noreferrer" style="display:block; padding:6px 10px; color:var(--text); text-decoration:none; font-size:12px; border-radius:6px;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">${v.title ? esc(v.title) : `Video ${vIdx + 1}`} ↗</a></li>`).join('');
+            const vodItems = set.vods.map((v, vIdx) => `<li><a href="${esc(v.url)}" target="_blank" rel="noopener noreferrer">${v.title ? esc(v.title) : `Video ${vIdx + 1}`} ↗</a></li>`).join('');
             vodHtml = `
               <span class="set-vod">
                 <span class="set-vod-multi">
