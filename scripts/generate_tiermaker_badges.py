@@ -39,6 +39,14 @@ except ImportError:
     sys.exit(1)
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+from scripts.tournament_dates import (
+    load_tournament_date_overrides,
+    resolve_tournament_date,
+    resolve_tournament_timestamp,
+)
+
 DB_PATH = PROJECT_ROOT / "startgg-data" / "platfighters.sqlite3"
 INDEX_PATH = PROJECT_ROOT / "data" / "profiles" / "index.json"
 EXCLUSIONS_PATH = PROJECT_ROOT / "data" / "profiles" / "exclusions.json"
@@ -359,35 +367,49 @@ class TiermakerDataPipeline:
         Returns:
             (player_id, videogame_slug) -> (event_count, last_participation_date)
         """
+        date_overrides = load_tournament_date_overrides(PROJECT_ROOT)
         con = self.connect()
         query = """
         SELECT
             p.player_id,
             ev.videogame_slug,
-            COUNT(DISTINCT ev.id) as distinct_events,
-            MAX(COALESCE(s.completed_at, s.started_at, s.start_at, t.start_at, 0)) as latest_ts
+            ev.id as event_id,
+            t.slug as tournament_slug,
+            t.start_at as tournament_start_at,
+            (SELECT MIN(COALESCE(s.started_at, s.start_at, s.completed_at)) FROM sets s WHERE s.event_id = ev.id) as earliest_set_ts
         FROM participants p
         JOIN entrant_participants ep ON ep.participant_id = p.id
         JOIN entrants ent ON ent.id = ep.entrant_id
         JOIN events ev ON ev.id = ent.event_id
         JOIN tournaments t ON t.slug = ev.tournament_slug
-        LEFT JOIN sets s ON s.event_id = ev.id
         WHERE p.player_id IS NOT NULL
-        GROUP BY p.player_id, ev.videogame_slug
+        GROUP BY p.player_id, ev.videogame_slug, ev.id, t.slug, t.start_at
         """
         cur = con.cursor()
         cur.execute(query)
 
-        res: Dict[Tuple[str, str], Tuple[int, Optional[str]]] = {}
+        events_by_pg: Dict[Tuple[str, str], Set[str]] = {}
+        latest_date_by_pg: Dict[Tuple[str, str], Optional[str]] = {}
+
         for row in cur.fetchall():
             pid = str(row["player_id"])
             gslug = str(row["videogame_slug"])
-            event_count = int(row["distinct_events"] or 0)
-            latest_ts = int(row["latest_ts"] or 0)
-            last_date = None
-            if latest_ts > 0:
-                last_date = datetime.fromtimestamp(latest_ts, tz=timezone.utc).strftime("%Y-%m-%d")
-            res[(pid, gslug)] = (event_count, last_date)
+            key = (pid, gslug)
+            events_by_pg.setdefault(key, set()).add(str(row["event_id"]))
+            d = resolve_tournament_date(
+                row["tournament_slug"],
+                row["tournament_start_at"],
+                row["earliest_set_ts"],
+                date_overrides,
+            )
+            if d:
+                current_latest = latest_date_by_pg.get(key)
+                if current_latest is None or d > current_latest:
+                    latest_date_by_pg[key] = d
+
+        res: Dict[Tuple[str, str], Tuple[int, Optional[str]]] = {}
+        for key, ev_set in events_by_pg.items():
+            res[key] = (len(ev_set), latest_date_by_pg.get(key))
         return res
 
     def resolve_player_portrait(

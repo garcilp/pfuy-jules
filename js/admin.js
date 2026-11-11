@@ -10,6 +10,8 @@ let csrfToken = '';
 let officialRankingsList = [];
 let eventsCache = [];
 let eventsIndexMap = new Map();
+let tournamentsCache = [];
+let tournamentDatesMap = {};
 
 async function initEventsIndex() {
   try {
@@ -183,14 +185,16 @@ function renderRankingsTable(rankings) {
 
 async function loadProfiles(selected = '') {
   try {
-    const [{ profiles }, { merges }, { eventGroups }, { exclusions }, { events }, { socials }, { games }] = await Promise.all([
+    const [{ profiles }, { merges }, { eventGroups }, { exclusions }, { events }, { socials }, { games }, tourneyDatesData] = await Promise.all([
       api('/api/admin/profiles'), api('/api/admin/merges'), api('/api/admin/event-groups'), api('/api/admin/exclusions'), api('/api/admin/events').catch(() => ({ events: [] })),
       api('/api/admin/community-socials').catch(() => ({ socials: {} })),
-      api('/api/games').catch(() => ({ games: [] }))
+      api('/api/games').catch(() => ({ games: [] })),
+      api('/api/admin/tournament-dates').catch(() => ({ tournaments: [], overrides: {} })),
     ]);
     eventsCache = events || [];
     renderEventGroups(eventGroups);
     renderExcludedEvents(exclusions.events || []);
+    renderTournamentDates(tourneyDatesData?.tournaments || [], tourneyDatesData?.overrides || {});
     renderEventSelects(events || []);
     renderCommunitySocials(socials || {});
     renderGameFilter(games || []);
@@ -308,6 +312,76 @@ function getTournamentNameForEventKey(eventKey) {
   }
 
   return '';
+}
+
+function renderTournamentDates(tournaments = [], overrides = {}) {
+  tournamentsCache = tournaments;
+  tournamentDatesMap = overrides;
+  const select = $('#tournament-date-select');
+  const list = $('#tournament-date-list');
+  if (!select) return;
+
+  const currentVal = select.value;
+  select.innerHTML = tournaments.map(t => {
+    const badge = t.isOverridden ? ' [Overridden]' : '';
+    const dateLabel = t.effectiveDate ? ` (${t.effectiveDate})` : ' (No date)';
+    return `<option value="${esc(t.slug)}" data-orig-date="${esc(t.originalDate || '')}" data-eff-date="${esc(t.effectiveDate || '')}" data-overridden="${t.isOverridden ? '1' : '0'}">${esc(t.name)}${badge}${dateLabel}</option>`;
+  }).join('');
+
+  if (currentVal && tournaments.some(t => t.slug === currentVal)) {
+    select.value = currentVal;
+  } else if (tournaments.length) {
+    select.selectedIndex = 0;
+  }
+  updateTournamentDateFormState();
+
+  if (list) {
+    const overriddenTourneys = tournaments.filter(t => t.isOverridden);
+    if (!overriddenTourneys.length) {
+      list.innerHTML = '<p class="muted event-group-empty">No tournament dates are currently overridden.</p>';
+    } else {
+      list.innerHTML = overriddenTourneys.map(t => {
+        const origText = t.originalDate ? `start.gg: ${esc(t.originalDate)}` : 'start.gg: None';
+        return `
+          <div class="event-group-item">
+            <span>
+              <b>${esc(t.name)}</b>
+              <small class="mono" style="color:var(--sky); font-weight:600;">Overridden: ${esc(t.overrideDate)}</small>
+              <small class="muted mono">(${origText} · slug: ${esc(t.slug)})</small>
+            </span>
+            <button class="quiet-button" type="button" data-revert-tournament-date="${esc(t.slug)}">Revert</button>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+}
+
+function updateTournamentDateFormState() {
+  const select = $('#tournament-date-select');
+  const origEl = $('#tournament-orig-date');
+  const effEl = $('#tournament-eff-date');
+  const dateInput = $('#tournament-corrected-date');
+  const revertBtn = $('#tournament-revert-btn');
+  if (!select || !select.selectedOptions.length) return;
+
+  const opt = select.selectedOptions[0];
+  const origDate = opt.dataset.origDate || '';
+  const effDate = opt.dataset.effDate || '';
+  const isOverridden = opt.dataset.overridden === '1';
+
+  if (origEl) origEl.textContent = origDate || 'None (no timestamp on start.gg)';
+  if (effEl) {
+    effEl.innerHTML = effDate
+      ? `${esc(effDate)}${isOverridden ? ' <span class="tag-badge" style="font-size:10px; background:rgba(56, 189, 248, 0.2); color:var(--sky); padding:2px 6px; border-radius:4px; margin-left:6px;">Overridden</span>' : ''}`
+      : 'None';
+  }
+  if (dateInput) {
+    dateInput.value = effDate || '';
+  }
+  if (revertBtn) {
+    revertBtn.style.display = isOverridden ? 'inline-block' : 'none';
+  }
 }
 
 function renderEventGroups(groups = {}) {
@@ -851,6 +925,85 @@ $('#bulk-exclude-execute-btn')?.addEventListener('click', async () => {
   } catch (err) {
     message.textContent = `Batch execution failed: ${err.message}`;
     if (executeBtn) executeBtn.disabled = false;
+  }
+});
+
+$('#tournament-date-select').addEventListener('change', () => {
+  updateTournamentDateFormState();
+  $('#tournament-date-message').textContent = '';
+});
+
+$('#tournament-date-form').addEventListener('submit', async event => {
+  event.preventDefault();
+  const select = $('#tournament-date-select');
+  const dateInput = $('#tournament-corrected-date');
+  const message = $('#tournament-date-message');
+  if (!select || !select.value || !dateInput) return;
+
+  const slug = select.value;
+  const dateVal = dateInput.value;
+  message.textContent = 'Saving date override and rebuilding datasets…';
+
+  try {
+    const res = await api('/api/admin/tournament-dates', {
+      method: 'POST',
+      body: JSON.stringify({
+        tournamentSlug: slug,
+        date: dateVal,
+      })
+    });
+    message.textContent = 'Tournament date override saved. Static catalogs and rankings have been refreshed.';
+    const tourneyDatesData = await api('/api/admin/tournament-dates');
+    renderTournamentDates(tourneyDatesData?.tournaments || [], tourneyDatesData?.overrides || {});
+  } catch (err) {
+    message.textContent = err.message;
+  }
+});
+
+$('#tournament-revert-btn').addEventListener('click', async () => {
+  const select = $('#tournament-date-select');
+  const message = $('#tournament-date-message');
+  if (!select || !select.value) return;
+
+  const slug = select.value;
+  message.textContent = 'Reverting date override and rebuilding datasets…';
+
+  try {
+    await api('/api/admin/tournament-dates', {
+      method: 'POST',
+      body: JSON.stringify({
+        tournamentSlug: slug,
+        remove: true,
+      })
+    });
+    message.textContent = 'Date override removed. Reverted to original start.gg date.';
+    const tourneyDatesData = await api('/api/admin/tournament-dates');
+    renderTournamentDates(tourneyDatesData?.tournaments || [], tourneyDatesData?.overrides || {});
+  } catch (err) {
+    message.textContent = err.message;
+  }
+});
+
+$('#tournament-date-list').addEventListener('click', async event => {
+  const button = event.target.closest('[data-revert-tournament-date]');
+  if (!button) return;
+  const slug = button.dataset.revertTournamentDate;
+  const message = $('#tournament-date-message');
+  message.textContent = `Reverting date override for ${slug} and rebuilding datasets…`;
+
+  try {
+    await api('/api/admin/tournament-dates', {
+      method: 'POST',
+      body: JSON.stringify({
+        tournamentSlug: slug,
+        remove: true,
+      })
+    });
+    message.textContent = `Date override removed for ${slug}.`;
+    const tourneyDatesData = await api('/api/admin/tournament-dates');
+    renderTournamentDates(tourneyDatesData?.tournaments || [], tourneyDatesData?.overrides || {});
+  } catch (err) {
+    message.textContent = err.message;
   }
 });
 

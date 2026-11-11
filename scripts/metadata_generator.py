@@ -78,7 +78,7 @@ def load_profile_by_id_or_slug(player_query: str) -> dict | None:
         if p.name in {
             "index.json", "overrides.json", "merges.json",
             "startgg_metadata.json", "amateur_brackets.json",
-            "event_groups.json", "exclusions.json",
+            "event_groups.json", "exclusions.json", "tournament_dates.json",
         }:
             continue
         try:

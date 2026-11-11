@@ -15,6 +15,11 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from scripts.summary_tracker import SummaryTracker
+from scripts.tournament_dates import (
+    load_tournament_date_overrides,
+    resolve_tournament_date,
+    resolve_tournament_timestamp,
+)
 
 DATABASE = PROJECT_ROOT / "startgg-data" / "platfighters.sqlite3"
 PROFILE_DIR = PROJECT_ROOT / "data" / "profiles"
@@ -712,8 +717,17 @@ def profile_for_player(connection, player_id, display_tag, profile_slug):
             f"WHERE s.event_id=? AND se.entrant_id IN ({placeholders})",
             [event_id, *own_entrants],
         ).fetchone()
-        timestamp = row["tournament_start"] or timing[0] or timing[1] or timing[2]
-        result_date = date_from_epoch(timestamp)
+        earliest_set_ts = timing[0] or timing[1] or timing[2] if timing else None
+        result_date = resolve_tournament_date(
+            row["tournament_slug"],
+            row["tournament_start"],
+            earliest_set_ts,
+        )
+        timestamp = resolve_tournament_timestamp(
+            row["tournament_slug"],
+            row["tournament_start"],
+            earliest_set_ts,
+        )
         entrants_count = row["num_entrants"]
         if entrants_count is None:
             entrants_count = connection.execute(
@@ -1297,6 +1311,7 @@ def write_event_details(connection):
             except (OSError, json.JSONDecodeError, AttributeError, TypeError):
                 continue
 
+    date_overrides = load_tournament_date_overrides(PROJECT_ROOT)
     tournaments = connection.execute(
         "SELECT slug, startgg_id, name, start_at FROM tournaments"
     ).fetchall()
@@ -1307,8 +1322,8 @@ def write_event_details(connection):
         e_rows = connection.execute(
             "SELECT e.id, e.videogame_slug, v.name AS game_name, e.name AS event_name, "
             "e.num_entrants, e.source_url, e.is_temporary, "
-            "COALESCE(t.start_at, (SELECT MIN(COALESCE(s.started_at, s.start_at, s.completed_at)) "
-            "FROM sets s WHERE s.event_id=e.id)) AS event_timestamp "
+            "(SELECT MIN(COALESCE(s.started_at, s.start_at, s.completed_at)) "
+            "FROM sets s WHERE s.event_id=e.id) AS earliest_set_ts "
             "FROM events e JOIN videogames v ON v.slug=e.videogame_slug "
             "JOIN tournaments t ON t.slug=e.tournament_slug "
             "WHERE e.tournament_slug=?", (t_slug,)
@@ -1320,11 +1335,22 @@ def write_event_details(connection):
             if key in excluded_events:
                 continue
             is_temp = bool(er["is_temporary"])
-            date_str = date_from_epoch(er["event_timestamp"])
+            event_ts = resolve_tournament_timestamp(
+                t_slug,
+                t["start_at"],
+                er["earliest_set_ts"],
+                date_overrides,
+            )
+            date_str = resolve_tournament_date(
+                t_slug,
+                t["start_at"],
+                er["earliest_set_ts"],
+                date_overrides,
+            )
             today_iso = datetime.now(timezone.utc).date().isoformat()
             if is_temp and date_str and date_str < today_iso:
                 continue
-            valid_events.append(er)
+            valid_events.append((er, event_ts, date_str))
 
         if not valid_events:
             continue
@@ -1333,8 +1359,8 @@ def write_event_details(connection):
         image_url = tournament_images.get(t_slug) or ""
         startgg_url = f"https://www.start.gg/tournament/{t_slug}"
 
-        dates = [date_from_epoch(er["event_timestamp"]) for er in valid_events if er["event_timestamp"]]
-        t_date = min(dates) if dates else None
+        dates = [ev_date for (_, _, ev_date) in valid_events if ev_date]
+        t_date = min(dates) if dates else resolve_tournament_date(t_slug, t["start_at"], None, date_overrides)
 
         games_map = {}
         for er in valid_events:
@@ -1342,7 +1368,7 @@ def write_event_details(connection):
         games_list = [{"slug": slug, "name": name} for slug, name in sorted(games_map.items(), key=lambda x: x[1])]
 
         sub_events = []
-        for er in valid_events:
+        for er, _, _ in valid_events:
             event_id = text_id(er["id"])
             game_slug = er["videogame_slug"]
             game_name = er["game_name"]
@@ -1555,11 +1581,13 @@ def write_event_index(connection):
                     tournament_images[slug] = image_url
             except (OSError, json.JSONDecodeError, AttributeError, TypeError):
                 continue
+    date_overrides = load_tournament_date_overrides(PROJECT_ROOT)
     rows = connection.execute(
         "SELECT e.id, e.videogame_slug, v.name AS game_name, e.name AS event_name, "
         "e.num_entrants, e.source_url, e.is_temporary, t.slug AS tournament_slug, t.name AS tournament_name, "
-        "COALESCE(t.start_at, (SELECT MIN(COALESCE(s.started_at, s.start_at, s.completed_at)) "
-        "FROM sets s WHERE s.event_id=e.id)) AS event_timestamp "
+        "t.start_at AS tournament_start_at, "
+        "(SELECT MIN(COALESCE(s.started_at, s.start_at, s.completed_at)) "
+        "FROM sets s WHERE s.event_id=e.id) AS earliest_set_ts "
         "FROM events e JOIN videogames v ON v.slug=e.videogame_slug "
         "JOIN tournaments t ON t.slug=e.tournament_slug"
     ).fetchall()
@@ -1572,8 +1600,18 @@ def write_event_index(connection):
         entrant_count = connection.execute(
             "SELECT COUNT(*) FROM entrants WHERE event_id=?", (row["id"],)
         ).fetchone()[0]
-        event_timestamp = row["event_timestamp"]
-        date_str = date_from_epoch(event_timestamp)
+        event_timestamp = resolve_tournament_timestamp(
+            row["tournament_slug"],
+            row["tournament_start_at"],
+            row["earliest_set_ts"],
+            date_overrides,
+        )
+        date_str = resolve_tournament_date(
+            row["tournament_slug"],
+            row["tournament_start_at"],
+            row["earliest_set_ts"],
+            date_overrides,
+        )
         is_temp = bool(row["is_temporary"])
 
         if date_str:
