@@ -9,6 +9,24 @@ const ord = n => {
 
 const tournamentSlug = new URLSearchParams(location.search).get('tournament');
 const main = $('#main');
+let playerDirectoryMap = new Map();
+
+async function loadPlayerDirectory() {
+  if (playerDirectoryMap.size > 0) return;
+  try {
+    const res = await fetch('data/profiles/index.json', { cache: 'no-store' });
+    if (res.ok) {
+      const list = await res.json();
+      list.forEach(p => {
+        if (p.playerId) {
+          playerDirectoryMap.set(String(p.playerId), p);
+        }
+      });
+    }
+  } catch (e) {
+    // Graceful fallback if index.json cannot be fetched
+  }
+}
 
 async function loadEvent() {
   if (!tournamentSlug) {
@@ -17,9 +35,12 @@ async function loadEvent() {
   }
 
   try {
-    const response = await fetch(`data/events/${encodeURIComponent(tournamentSlug)}.json`, { cache: 'no-store' });
-    if (!response.ok) throw new Error('Tournament details not found.');
-    const event = await response.json();
+    const [eventRes] = await Promise.all([
+      fetch(`data/events/${encodeURIComponent(tournamentSlug)}.json`, { cache: 'no-store' }),
+      loadPlayerDirectory()
+    ]);
+    if (!eventRes.ok) throw new Error('Tournament details not found.');
+    const event = await eventRes.json();
     renderEvent(event);
   } catch (error) {
     main.innerHTML = `<div class="panel glass empty-state"><h2>Event unavailable</h2><p class="muted">${esc(error.message)}</p><p style="margin-top:12px;"><a href="events.html" class="action-button">Return to Event Directory</a></p></div>`;
@@ -79,16 +100,29 @@ function renderEventVods(event) {
 
   const groupSections = Object.entries(groups).map(([phaseName, vodList]) => {
     const itemsHtml = vodList.map(vod => {
-      const p1Tag = esc(vod.player1?.tag || 'Player 1');
-      const p2Tag = esc(vod.player2?.tag || 'Player 2');
-      const p1Link = vod.player1?.playerId
-        ? `<a class="standing-tag opponent-link" href="player.html?player=${encodeURIComponent(vod.player1.playerId)}">${p1Tag}</a>`
-        : `<span class="standing-tag">${p1Tag}</span>`;
-      const p2Link = vod.player2?.playerId
-        ? `<a class="standing-tag opponent-link" href="player.html?player=${encodeURIComponent(vod.player2.playerId)}">${p2Tag}</a>`
-        : `<span class="standing-tag">${p2Tag}</span>`;
+      const p1Id = vod.player1?.playerId;
+      const p2Id = vod.player2?.playerId;
 
-      const scoreHtml = vod.displayScore ? `<span class="mono muted" style="font-size:13px; margin:0 6px;">(${esc(vod.displayScore)})</span>` : ' <span class="muted" style="margin:0 4px;">vs</span> ';
+      const p1Info = p1Id ? playerDirectoryMap.get(String(p1Id)) : null;
+      const p2Info = p2Id ? playerDirectoryMap.get(String(p2Id)) : null;
+
+      const p1Sponsor = (vod.player1?.sponsor || p1Info?.sponsor || '').trim();
+      const p2Sponsor = (vod.player2?.sponsor || p2Info?.sponsor || '').trim();
+
+      const p1Tag = (vod.player1?.tag || 'Player 1').trim();
+      const p2Tag = (vod.player2?.tag || 'Player 2').trim();
+
+      const p1Full = p1Sponsor ? `${esc(p1Sponsor)} ${esc(p1Tag)}` : esc(p1Tag);
+      const p2Full = p2Sponsor ? `${esc(p2Sponsor)} ${esc(p2Tag)}` : esc(p2Tag);
+
+      const p1Link = p1Id
+        ? `<a class="standing-tag opponent-link" href="player.html?player=${encodeURIComponent(p1Id)}">${p1Full}</a>`
+        : `<span class="standing-tag">${p1Full}</span>`;
+      const p2Link = p2Id
+        ? `<a class="standing-tag opponent-link" href="player.html?player=${encodeURIComponent(p2Id)}">${p2Full}</a>`
+        : `<span class="standing-tag">${p2Full}</span>`;
+
+      const phaseOrRound = vod.phase || vod.round || 'Bracket';
       const roundLabel = vod.round ? `<span class="mono muted" style="font-size:12px;">${esc(vod.round)}</span>` : '';
       const thumbSrc = esc(vod.thumbnail || 'assets/logo.jpg');
 
@@ -100,7 +134,7 @@ function renderEventVods(event) {
             </a>
             <div>
               <div style="font-weight:600; font-size:14px; display:flex; align-items:center; flex-wrap:wrap; gap:4px;">
-                ${p1Link} ${scoreHtml} ${p2Link}
+                <span>${esc(phaseOrRound)}</span> · ${p1Link} <span class="muted" style="margin:0 4px; font-weight:normal;">vs</span> ${p2Link}
               </div>
               <div class="mono muted" style="font-size:12px; margin-top:2px;">
                 ${roundLabel}${roundLabel && vod.title ? ' · ' : ''}${esc(vod.title)}

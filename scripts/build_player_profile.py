@@ -1280,6 +1280,7 @@ def write_event_details(connection):
     latest_tags = current_player_tags(connection, merges)
     amateur_cfg = amateur_brackets_config()
     event_links = event_group_overrides()
+    metadata_by_id = startgg_metadata()
 
     tournament_images = {}
     if RAW_EVENT_DIR.is_dir():
@@ -1485,8 +1486,14 @@ def write_event_details(connection):
             players = []
             for pr in p_rows:
                 p_key = canonical_id(text_id(pr["player_id"]), merges) if pr["player_id"] is not None else None
+                raw_pid = text_id(pr["player_id"]) if pr["player_id"] is not None else None
                 tag = latest_tags.get(p_key) or pr["gamer_tag"] or pr["entrant_name"] or "Unknown"
-                players.append({"tag": tag, "playerId": p_key})
+                sponsor = ""
+                if p_key and p_key in metadata_by_id and metadata_by_id[p_key].get("sponsor"):
+                    sponsor = metadata_by_id[p_key]["sponsor"]
+                elif raw_pid and raw_pid in metadata_by_id and metadata_by_id[raw_pid].get("sponsor"):
+                    sponsor = metadata_by_id[raw_pid]["sponsor"]
+                players.append({"tag": tag, "playerId": p_key, "sponsor": sponsor})
 
             p1_tag = players[0]["tag"] if len(players) > 0 else "Unknown"
             p2_tag = players[1]["tag"] if len(players) > 1 else "Unknown"
